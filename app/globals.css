@@ -22,5 +22,23 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Helvetica, sans-serif;
+}
+
+.center-content {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;     
+}
+
+h1 {
+  font-size: 5rem;
+  font-weight: bold;
+}
+
+p {
+  font-size: 1.5rem;
+  margin-top: 1rem;
 }
