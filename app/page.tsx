@@ -1,10 +1,14 @@
-import Image from "next/image";
+import Navbar from "./components/Navbar";
+
 
 export default function Home() {
   return (
-    <div className="center-content">
-      <h1>Rest All</h1>
-      <p>Work in progress...</p>
-    </div>
+    <>
+      <Navbar />
+      <div className="center-content">
+        <h1>Rest All</h1>
+        <p>Work in progress...</p>
+      </div>
+    </>
   );
 }

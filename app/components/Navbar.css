@@ -1,0 +1,30 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #111;
+    color: white;   
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar img {
+    margin-right: 10px;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar li {
+    margin: 0 10px;
+}
+
+
+.navbar-title {
+    font-size: 2rem;
+    font-weight: bold;
+}
