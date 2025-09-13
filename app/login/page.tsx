@@ -1,42 +1,35 @@
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
+"use client";
+
+import { AuthForm } from "@/app/components/auth/auth-form";
+import { useState } from "react";
 
 export default function LoginPage() {
-  return (
-    <>
-      <div className=" flex flex-wrap flex-col justify-center items-center min-h-screen">
-        <div className="w-full max-w-md backdrop-blur-md rounded-lg shadow-xl/30 shadow-white/20 border border-white/10 bg-[--foreground]">
-          <form
-            id="login-form"
-            className="space-y-4 p-6 flex flex-col justify-center items-center"
-          >
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>();
 
-            {/* Header */}
-            <h1 className="text-5xl font-bold m-6">RestAll</h1>
-            <p className="">Ваша подорож починається тут</p>
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(undefined);
 
-            {/* Form Fields */}
-            <div>
-              <Label htmlFor="username">Username:</Label>
-              <Input type="text" id="username" name="username" required />
-            </div>
-            <div>
-              <Label htmlFor="password">Password:</Label>
-              <Input type="password" id="password" name="password" required />
-            </div>
-            <Button type="submit" variant="outline">Login</Button>
-          </form>
+    try {
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get("email");
+      const password = formData.get("password");
 
+      // TODO: Add your login logic here
+      console.log("Login attempt:", { email, password });
 
-          <hr className="w-full border-t border-gray-300/30 my-4" />
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-          {/* Footer */}
-          <div className="mt-4 text-center mb-6">
-            <p>Don't have an account? <a href="/register" className="text-blue-500 underline">Register here</a></p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+    } catch (err) {
+      setError("An error occurred during login. Please try again.");
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return <AuthForm type="login" onSubmit={handleSubmit} isLoading={isLoading} error={error} />;
 }

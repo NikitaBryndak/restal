@@ -6,7 +6,7 @@ export default function Navbar() {
         <nav className="navbar">
             <Link href="/" className='flex items-center '>
                 <img src="/logo.png" alt="RestAll Logo" className="w-10" />
-                <h1 className="navbar-title">RestAll</h1>
+                <h1 className="navbar-title hidden sm:block">RestAll</h1>
             </Link>
             <ul className="fw-bold text-lg space-x-6">
                 <li><Link href="/">Головна</Link></li>
