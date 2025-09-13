@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function Navbar() {
     return (
         <nav className="navbar">
-            <Link href="/"><h1 className="navbar-title">Rest All</h1></Link>
+            <Link href="/"><h1 className="navbar-title">RestAll</h1></Link>
             <ul>
                 <li><Link href="/">Головна</Link></li>
                 <li><Link href="/info">Інформація</Link></li>
