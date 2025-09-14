@@ -11,10 +11,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen flex-col" suppressHydrationWarning>
-      <Spotlight />
+      <body className="flex antialiased min-h-screen flex-col w-full" suppressHydrationWarning>
         <AuthProvider>
           <Navbar />
+          <div className="fixed w-full">
+            <Spotlight />
+          </div>
           {children}    
           <Footer />
         </AuthProvider>

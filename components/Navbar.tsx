@@ -39,7 +39,7 @@ export default function Navbar() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/manager-contact">
+                    <NavLink href="/contact">
                         Менеджер
                     </NavLink>
                 </li>
