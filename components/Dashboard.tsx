@@ -13,14 +13,14 @@ export default function Dashboard() {
     });
 
     return (
-        <div className="flex justify-center items-center min-h-screen flex-col gap-4 ">
-            <div className="rounded-md border p-6 ">
-                <h1>Dashboard</h1>
-                <p>Name: {session?.user?.name}</p>
-                <p>Email: {session?.user?.email}</p>
+        <div className="flex justify-center items-center min-h-screen flex-col gap-3">
+            <div className="rounded-md border p-5 w-full max-w-[380px] mx-4">
+                <h1 className="text-2xl font-light mb-4">Dashboard</h1>
+                <p className="text-sm text-foreground/60 mb-1">Name: {session?.user?.name}</p>
+                <p className="text-sm text-foreground/60">Email: {session?.user?.email}</p>
                 <Button
                     onClick={() => signOut({ callbackUrl: '/login' })}
-                    className="mt-4"
+                    className="mt-4 h-10 text-sm w-full"
                     variant="outline"
                 >
                     Logout

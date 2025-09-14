@@ -13,7 +13,8 @@
 }
 
 body {
-  background: radial-gradient(circle at 50% 50%, #301f0d 0%, #000000 100%);
+  /* background: radial-gradient(circle at 50% 50%, #301f0d 0%, #000000 100%); */
+  background: var(--background);
   color: var(--foreground);
   min-height: 100vh;
   overflow-x: hidden;
@@ -34,6 +35,25 @@ body {
   z-index: 0;
 }
 
+@keyframes slideRollIn {
+  0% {
+    transform: translateX(-20px) rotateX(-90deg);
+    opacity: 0;
+    width: 0;
+    margin-left: 0;
+  }
+  30% {
+    width: var(--expanded-width);
+    margin-left: 0.5rem;
+  }
+  100% {
+    transform: translateX(0) rotateX(0);
+    opacity: 1;
+    width: var(--expanded-width);
+    margin-left: 0.5rem;
+  }
+}
+
 @keyframes scroll {
   0% {
     transform: translateX(0);
@@ -49,4 +69,8 @@ body {
 
 .animate-scroll:hover {
   animation-play-state: paused;
+}
+
+.animated-appearance {
+  animation: expandAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

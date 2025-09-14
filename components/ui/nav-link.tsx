@@ -1,0 +1,53 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+
+interface NavLinkProps {
+  href: string
+  className?: string
+  children: React.ReactNode
+  variant?: "default" | "button"
+}
+
+export function NavLink({ 
+  href, 
+  className,
+  children,
+  variant = "default"
+}: NavLinkProps) {
+  const pathname = usePathname()
+  const isActive = pathname === href
+
+  if (variant === "button") {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "border rounded-md border-foreground/20 px-4 py-2 text-sm transition-colors",
+          "bg-white/90 text-black",
+          className
+        )}
+      >
+        {children}
+      </Link>
+    )
+  }
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "text-sm text-foreground/70 transition-colors",
+        {
+          "text-foreground": isActive,
+        },
+        "hover:text-foreground",
+        className
+      )}
+    >
+      {children}
+    </Link>
+  )
+}

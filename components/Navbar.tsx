@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { NavLink } from "./ui/nav-link";
 
 export default function Navbar() {
 
@@ -24,32 +25,32 @@ export default function Navbar() {
                     RestAll
                 </h1>
             </Link>
+            
+            
             <ul className="flex items-center gap-8 list-none m-0 p-0">
                 <li>
-                    <Link 
-                        href="/" 
-                        className="text-foreground/70 hover:text-foreground transition-colors"
-                    >
-                        Головна
-                    </Link>
+                    <NavLink href="/tour-search">
+                        Підбір
+                    </NavLink>
                 </li>
                 <li>
-                    <Link 
-                        href="/info" 
-                        className="text-foreground/70 hover:text-foreground transition-colors"
-                    >
-                        Інформація
-                    </Link>
+                    <NavLink href="/info">
+                        Інфоцентр
+                    </NavLink>
                 </li>
                 <li>
-                    <Link 
-                        href="/login" 
-                        className="border rounded-md border-foreground/20 px-4 py-2 hover:bg-accent transition-colors hover:bg-white/90 hover:text-black"
-                    >
-                        {session ? "Аккаунт" : "Увійти"}
-                    </Link>
+                    <NavLink href="/manager-contact">
+                        Менеджер
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/login" variant="button">
+                        {session ? "Аккаунт" : "Стати клієнтом"}
+                    </NavLink>
                 </li>
             </ul>
+
+            
         </nav>
     )
 }
