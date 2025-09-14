@@ -1,7 +1,6 @@
 import { Search } from "lucide-react";
 import SearchBar from "./components/SearchBar";
-import { Button } from "./components/ui/Button";
-import Link from "next/link";
+import { Button } from "@/app/components/ui/Button";    
 
 export default function Home() {
   return (
@@ -32,7 +31,7 @@ export default function Home() {
           </div>
 
           {/* Subtitle */}
-                    <p className="text-sm text-foreground/50 mt-4">
+          <p className="text-sm text-foreground/50 mt-4">
             Натисніть Enter для пошуку або використовуйте фільтри для уточнення
           </p>
         </div>
