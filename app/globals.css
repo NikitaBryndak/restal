@@ -1,5 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orelega+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap&subset=cyrillic');
-@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Orelega+One&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -8,8 +8,8 @@
   --secondary: #666666;
   --accent: rgba(250, 142, 0, 0.1);
   --input-bg: rgba(0, 0, 0, 0.8);
-  font-family: "Orelega One", 'Inter', system-ui, -apple-system, sans-serif;
-  font-weight: 500;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 600;
 }
 
 body {
@@ -32,4 +32,21 @@ body {
   transform: translateY(-25%);
   pointer-events: none;
   z-index: 0;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
 }

@@ -9,3 +9,9 @@ export type Quote = {
   quote: string;
   author: string;
 };
+
+export type Company = {
+  name: string;
+  logoUrl: string;
+  websiteUrl: string;
+};
