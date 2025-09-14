@@ -1,9 +1,13 @@
 "use client"
 
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
+
+    const { data: session } = useSession();
+    
     const pathname = usePathname();
     return (
         pathname !== '/login' && 
@@ -42,7 +46,7 @@ export default function Navbar() {
                         href="/login" 
                         className="border rounded-md border-foreground/20 px-4 py-2 hover:bg-accent transition-colors hover:bg-white/90 hover:text-black"
                     >
-                        Увійти
+                        {session ? "Аккаунт" : "Увійти"}
                     </Link>
                 </li>
             </ul>

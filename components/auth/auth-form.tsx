@@ -8,10 +8,108 @@ import { Button } from "@/components/ui/button";
 import { AuthFormProps, Quote } from "@/types";
 import { chooseRandomItem } from "@/lib/utils";
 import { quotes } from "@/data";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 
-export function AuthForm({ type, onSubmit, isLoading, error }: AuthFormProps) {
 
-    // const [credentials, setCredentials] = React.useState<Credential>({ email: "", password: "", confirmPassword: "" });
+export function AuthForm({ type }: AuthFormProps) {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string>();
+    const router = useRouter();
+
+    const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError(undefined);
+
+      try {
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get("name");
+        const email = formData.get("email");
+        const password = formData.get("password");
+        const confirmPassword = formData.get("confirmPassword");
+
+
+        if (password !== confirmPassword) {
+          setError("Passwords do not match");
+          setIsLoading(false);
+          return;
+        }
+
+
+        { /* Api Call */ }
+        const resUserExists = await fetch('/api/userExists', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+        const { exists } = await resUserExists.json();
+        if (exists) {
+          setError("User with this email already exists. Please log in.");
+          setIsLoading(false);
+          return;
+        }
+        
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, password }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) { setError(data.message || "Registration failed");} else {
+          router.push('/login');
+        }
+
+
+
+
+      } catch (err) {
+        setError("An error occurred during registration. Please try again.");
+        console.error("Registration error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError(undefined);
+
+      try {
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get("email");
+        const password = formData.get("password");
+
+        { /* Api Call */ }
+        const res = await signIn("credentials", {
+          email, password, redirect: false
+        })
+
+        if (res?.error) {
+          const errorMessage = res.error === "CredentialsSignin" 
+            ? "Invalid email or password"
+            : res.error;
+          setError(errorMessage);
+          return;
+        }
+
+        router.push("/dashboard");
+
+      } catch (err) {
+        setError("An error occurred during login. Please try again.");
+        console.error("Login error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
     // Fetch Quote
     const [currentQuote, setCurrentQuote] = React.useState<Quote>({ quote: "", author: "" });
@@ -68,7 +166,7 @@ export function AuthForm({ type, onSubmit, isLoading, error }: AuthFormProps) {
               <div className="h-px flex-1 border"></div>
             </div>
 
-            <form onSubmit={onSubmit} className="space-y-5">
+            <form onSubmit={type === "login" ? handleLoginSubmit : handleRegisterSubmit} className="space-y-5">
               {/* Error Message */}
               {error && (
                 <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">

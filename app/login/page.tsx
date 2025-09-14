@@ -1,32 +1,13 @@
-"use client";
-
 import { AuthForm } from "@/components/auth/auth-form";
-import { useState } from "react";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 
-export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>();
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(undefined);
+export default async function LoginPage() {
+  const session = await getServerSession();
 
-    try {
-      const formData = new FormData(e.currentTarget);
-      const email = formData.get("email");
-      const password = formData.get("password");
+  if (session) {
+    redirect("/dashboard");
+  }
 
-      { /* Api Call */ }
-      
-
-    } catch (err) {
-      setError("An error occurred during login. Please try again.");
-      console.error("Login error:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return <AuthForm type="login" onSubmit={handleSubmit} isLoading={isLoading} error={error} />;
+  return <AuthForm type="login"/>;
 }

@@ -10,12 +10,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen flex-col">
-        <Navbar />
+      <body className="flex min-h-screen flex-col" suppressHydrationWarning>
         <AuthProvider>
+          <Navbar />
           {children}    
+          <Footer />
         </AuthProvider>
-        <Footer />
       </body>
     </html>
   );
