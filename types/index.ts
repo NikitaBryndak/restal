@@ -15,3 +15,9 @@ export type Company = {
   logoUrl: string;
   websiteUrl: string;
 };
+
+export type Credential = { 
+  email: string; 
+  password: string; 
+  confirmPassword?: string ;
+}

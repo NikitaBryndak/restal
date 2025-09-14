@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input } from "@/app/components/ui/input";
-import { searchTexts } from "@/app/data";
+import { Input } from "@/components/ui/input";
+import { searchTexts } from "@/data";
 
 
 export default function SearchBar({ className }: { className?: string }) {

@@ -1,6 +1,6 @@
-import { Button } from "@/app/components/ui/button";    
+import { Button } from "@/components/ui/button";    
 import { Search } from "lucide-react";
-import SearchBar from "./components/SearchBar";
+import SearchBar from "../components/SearchBar";
 
 export default function Home() {
   return (

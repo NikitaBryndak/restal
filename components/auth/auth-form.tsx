@@ -1,13 +1,17 @@
+"use client"
+
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import { Button } from "@/app/components/ui/button";
-import { AuthFormProps, Quote } from "@/app/types";
-import { chooseRandomItem } from "@/app/lib/utils";
-import { quotes } from "@/app/data";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { AuthFormProps, Quote } from "@/types";
+import { chooseRandomItem } from "@/lib/utils";
+import { quotes } from "@/data";
 
 export function AuthForm({ type, onSubmit, isLoading, error }: AuthFormProps) {
+
+    // const [credentials, setCredentials] = React.useState<Credential>({ email: "", password: "", confirmPassword: "" });
 
     // Fetch Quote
     const [currentQuote, setCurrentQuote] = React.useState<Quote>({ quote: "", author: "" });
@@ -73,7 +77,21 @@ export function AuthForm({ type, onSubmit, isLoading, error }: AuthFormProps) {
               )}
 
               {/* Form Fields */}
-              <div className="space-y-4">
+                {type === "register" && (
+                <div>
+                  <Label htmlFor="name" className="text-sm text-foreground/70">Ім'я</Label>
+                  <Input 
+                    type="name" 
+                    id="name" 
+                    name="name" 
+                    required 
+                    disabled={isLoading}
+                    className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
+                    placeholder="Ваше ім'я"
+                  />
+                </div>
+                )}
+
                 <div>
                   <Label htmlFor="email" className="text-sm text-foreground/70">Електронна пошта</Label>
                   <Input 
@@ -118,7 +136,6 @@ export function AuthForm({ type, onSubmit, isLoading, error }: AuthFormProps) {
                     />
                   </div>
                 )}
-              </div>
 
               {/* Submit Button */}
               <Button 

@@ -1,12 +1,12 @@
 "use client";
 
-import { AuthForm } from "@/app/components/auth/auth-form";
+import { AuthForm } from "@/components/auth/auth-form";
 import { useState } from "react";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>();
-
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -17,11 +17,8 @@ export default function LoginPage() {
       const email = formData.get("email");
       const password = formData.get("password");
 
-      // TODO: Add your login logic here
-      console.log("Login attempt:", { email, password });
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      { /* Api Call */ }
+      
 
     } catch (err) {
       setError("An error occurred during login. Please try again.");
