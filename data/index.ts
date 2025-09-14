@@ -86,45 +86,5 @@ export const searchTexts: string[] = [
     "Готелі на Кіпрі..."
 ];
 
-export const companies: Company[] = [
-  {
-    name: "Join UP!",
-    logoUrl: "/companies/joinup.png",
-    websiteUrl: "https://joinup.ua/"
-  },
-  {
-    name: "Coral Travel",
-    logoUrl: "/companies/coral.png",
-    websiteUrl: "https://coral.ua/"
-  },
-  {
-    name: "TUI Ukraine",
-    logoUrl: "/companies/tui.png",
-    websiteUrl: "https://www.tui.ua/"
-  },
-  {
-    name: "Anex Tour",
-    logoUrl: "/companies/anex.png",
-    websiteUrl: "https://anextour.com.ua/"
-  },
-  {
-    name: "TPG",
-    logoUrl: "/companies/tpg.png",
-    websiteUrl: "https://www.tpg.ua/"
-  },
-  {
-    name: "Pegas Touristik",
-    logoUrl: "/companies/pegas.png",
-    websiteUrl: "https://pegast.com.ua/"
-  },
-  {
-    name: "TEZ Tour",
-    logoUrl: "/companies/tez.png",
-    websiteUrl: "https://www.tez-tour.com/"
-  },
-  {
-    name: "Mouzenidis Travel",
-    logoUrl: "/companies/mouzenidis.png",
-    websiteUrl: "https://www.mouzenidis.com/uk-ua/"
-  }
-];
+
+export const loginImage = "https://images.unsplash.com/photo-1757492166964-518d2c8b9f41?q=80&w=1365&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"

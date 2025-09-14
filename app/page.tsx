@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";    
 import { Search, Send } from "lucide-react";
 import SearchBar from "../components/SearchBar";
 import Link from "next/link";
+import { use } from "react";
 
 export default function Home() {
   return (
@@ -18,8 +20,8 @@ export default function Home() {
           </h2>
           
           {/* Search Bar */}
-          <div className="flex justify-center">
-            <div className="flex justify-center items-center w-full gap-2 p-2.5 rounded-lg bg-input-bg backdrop-blur-sm">
+          <div className="flex justify-center ">
+            <div className="flex justify-center items-center w-full gap-2 p-2.5 rounded-lg bg-input-bg backdrop-blur-sm ">
               <SearchBar />
               <Button 
                 variant="outline" 
@@ -31,19 +33,29 @@ export default function Home() {
 
               <Link 
                 href="/contact"
-                className="p-2 bg-white/90 text-black rounded-md transition-colors flex items-center justify-center gap-2 text-sm"
+                className="hidden p-2 bg-white/90 text-black rounded-md transition-colors sm:flex items-center justify-center gap-2 text-sm "
               >
                 Зв'язатись
                 <Send className="w-4 h-4 flex-shrink-0" />
               </Link>
-              
+
             </div>
           </div>
 
           {/* Subtitle */}
-          <p className="text-sm text-white/50 mt-3">
+          <p className="text-sm text-white/50 my-3">
             Спробуйте запитати...
           </p>
+
+          <div className="flex justify-center mt-6">
+            <Link 
+                href="/contact"
+                className="sm:hidden w-32 p-2 bg-white/90 text-black rounded-md transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                Зв'язатись
+                <Send className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </main>
     </>

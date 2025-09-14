@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Quote } from "@/types";
 import { chooseRandomItem } from "@/lib/utils";
-import { quotes } from "@/data";
+import { loginImage, quotes } from "@/data";
 import { FormField } from "./form-field";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -187,7 +187,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         <div className="hidden lg:block lg:w-[55%] bg-cover bg-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-orange-900/20" />
           <img
-            src="https://images.unsplash.com/photo-1757492166964-518d2c8b9f41?q=80&w=1365&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src={loginImage}
             alt="Travel"
             className="absolute inset-0 w-full h-full object-cover"
           />
