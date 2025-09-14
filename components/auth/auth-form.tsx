@@ -2,113 +2,27 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { AuthFormProps, Quote } from "@/types";
+import { Quote } from "@/types";
 import { chooseRandomItem } from "@/lib/utils";
 import { quotes } from "@/data";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { FormField } from "./form-field";
+import { useAuth } from "@/hooks/useAuth";
 
 
-export function AuthForm({ type }: AuthFormProps) {
+export function AuthForm({ type }: { type: "login" | "register" }) {
+    const { isLoading, error, handleAuth } = useAuth({ type });
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string>();
-    const router = useRouter();
-
-    const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      setIsLoading(true);
-      setError(undefined);
-
-      try {
-        const formData = new FormData(e.currentTarget);
-        const name = formData.get("name");
-        const email = formData.get("email");
-        const password = formData.get("password");
-        const confirmPassword = formData.get("confirmPassword");
-
-
-        if (password !== confirmPassword) {
-          setError("Passwords do not match");
-          setIsLoading(false);
-          return;
-        }
-
-
-        { /* Api Call */ }
-        const resUserExists = await fetch('/api/userExists', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email }),
-        });
-        const { exists } = await resUserExists.json();
-        if (exists) {
-          setError("User with this email already exists. Please log in.");
-          setIsLoading(false);
-          return;
-        }
-        
-        const res = await fetch('/api/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name, email, password }),
-        });
-        const data = await res.json();
-
-        if (!res.ok) { setError(data.message || "Registration failed");} else {
-          router.push('/login');
-        }
-
-
-
-
-      } catch (err) {
-        setError("An error occurred during registration. Please try again.");
-        console.error("Registration error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      setIsLoading(true);
-      setError(undefined);
-
-      try {
-        const formData = new FormData(e.currentTarget);
-        const email = formData.get("email");
-        const password = formData.get("password");
-
-        { /* Api Call */ }
-        const res = await signIn("credentials", {
-          email, password, redirect: false
-        })
-
-        if (res?.error) {
-          const errorMessage = res.error === "CredentialsSignin" 
-            ? "Invalid email or password"
-            : res.error;
-          setError(errorMessage);
-          return;
-        }
-
-        router.push("/dashboard");
-
-      } catch (err) {
-        setError("An error occurred during login. Please try again.");
-        console.error("Login error:", err);
-      } finally {
-        setIsLoading(false);
-      }
+      const formData = new FormData(e.currentTarget);
+      
+      await handleAuth({
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
+        confirmPassword: formData.get("confirmPassword") as string,
+      });
     };
 
     // Fetch Quote
@@ -121,29 +35,29 @@ export function AuthForm({ type }: AuthFormProps) {
     return (
       <div className="min-h-screen flex">
         {/* Left Side - Login Form */}
-        <div className="w-full lg:w-[45%] flex items-center justify-center p-8 xl:p-12 relative">
-          <div className="w-full max-w-md">
+        <div className="w-full lg:w-[45%] flex items-center justify-center p-8 relative">
+          <div className="w-full max-w-[380px]">
 
             {/* Back */}
             <Link 
               href="/" 
-              className="absolute top-8 left-8 text-sm text-foreground/60 flex items-center gap-2 transition-colors"
+              className="absolute top-6 left-6 text-sm text-foreground/60 flex items-center gap-2 transition-colors"
             >
               <span>&larr;</span>
               <span className="hover:underline">Назад</span>
             </Link>
 
             {/* Logo */}
-            <Link href="/" className="inline-block mb-12">
-              <img src="/logo.png" alt="RestAll" className="h-8" />
+            <Link href="/" className="inline-block mb-8">
+              <img src="/logo.png" alt="RestAll" className="h-7" />
             </Link>
 
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-light mb-2">
+            <div className="mb-6">
+              <h1 className="text-2xl font-light mb-1.5">
                 {type === "login" ? "З поверненням" : "Створити акаунт"}
               </h1>
-              <p className="text-foreground/60">
+              <p className="text-foreground/60 text-sm">
                 {type === "login" ? "Увійдіть для продовження" : "Почніть свою подорож"}
               </p>
             </div>
@@ -152,9 +66,9 @@ export function AuthForm({ type }: AuthFormProps) {
             <div className="space-y-3">
               <Button 
                 variant="outline" 
-                className="w-full h-11 bg-background/50 border border-foreground/10 hover:bg-white/90 hover:text-black hover:border-foreground/20 transition-colors group"
+                className="w-full h-10 bg-background/50 border border-foreground/10 hover:bg-white/90 hover:text-black hover:border-foreground/20 transition-colors group text-sm"
               >
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2 fill-white group-hover:fill-black transition-colors" >
+                <svg viewBox="0 0 24 24" className="h-4 w-4 mr-2 fill-white group-hover:fill-black transition-colors" >
                   <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
                 </svg>
                 Продовжити з Google
@@ -162,11 +76,11 @@ export function AuthForm({ type }: AuthFormProps) {
             </div>
 
             {/* Divider */} 
-            <div className="flex items-center gap-3 my-8">
+            <div className="flex items-center gap-3 my-6">
               <div className="h-px flex-1 border"></div>
             </div>
 
-            <form onSubmit={type === "login" ? handleLoginSubmit : handleRegisterSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Error Message */}
               {error && (
                 <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
@@ -175,79 +89,73 @@ export function AuthForm({ type }: AuthFormProps) {
               )}
 
               {/* Form Fields */}
-                {type === "register" && (
-                <div>
-                  <Label htmlFor="name" className="text-sm text-foreground/70">Ім'я</Label>
-                  <Input 
-                    type="name" 
-                    id="name" 
-                    name="name" 
-                    required 
-                    disabled={isLoading}
-                    className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
-                    placeholder="Ваше ім'я"
-                  />
-                </div>
-                )}
+              {type === "register" && (
+                <FormField
+                  id="name"
+                  label="Ім'я"
+                  type="text"
+                  required
+                  disabled={isLoading}
+                  placeholder="Ваше ім'я"
+                />
+              )}
 
-                <div>
-                  <Label htmlFor="email" className="text-sm text-foreground/70">Електронна пошта</Label>
-                  <Input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    required 
-                    disabled={isLoading}
-                    className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
-                    placeholder="name@example.com"
-                  />
-                </div>
+              <FormField
+                id="email"
+                label="Електронна пошта"
+                type="email"
+                required
+                disabled={isLoading}
+                placeholder="name@example.com"
+              />
 
-                <div>
-                  <Label htmlFor="password" className="text-sm text-foreground/70">Пароль</Label>
-                  <Input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required 
-                    disabled={isLoading}
-                    className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
-                    minLength={8}
-                    placeholder="••••••••"
-                  />
-                </div>
+              <FormField
+                id="password"
+                label="Пароль"
+                type="password"
+                required
+                disabled={isLoading}
+                minLength={8}
+                placeholder="••••••••"
+              />
 
-                {type === "register" && (
-                  <div>
-                    <Label htmlFor="confirm-password" className="text-sm text-foreground/70">
-                      Підтвердіть пароль
-                    </Label>
-                    <Input 
-                      type="password" 
-                      id="confirm-password" 
-                      name="confirmPassword" 
-                      required 
-                      disabled={isLoading}
-                      className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
-                      minLength={8}
-                      placeholder="••••••••"
-                    />
-                  </div>
-                )}
+              {type === "register" && (
+                <FormField
+                  id="confirmPassword"
+                  label="Підтвердіть пароль"
+                  type="password"
+                  required
+                  disabled={isLoading}
+                  minLength={8}
+                  placeholder="••••••••"
+                />
+              )}
 
               {/* Submit Button */}
               <Button 
                 type="submit" 
                 disabled={isLoading}
                 variant="default"
-                className="w-full h-11 mt-4 mb-8 text-black bg-white hover:bg-white/70 transition-colors"
+                className="w-full h-10 mt-2 text-black bg-white hover:bg-white/70 transition-colors text-sm"
               >
                 {isLoading ? "Завантаження..." : type === "login" ? "Увійти" : "Зареєструватися"}
               </Button>
+              
+              {/* Forgot Password Link */}
+              {type === "login" && (
+                <div className="text-center mt-2">
+                  <Link 
+                    href="/forgot-password" 
+                    className="text-sm text-foreground/60 hover:text-foreground/80 underline underline-offset-4 transition-colors"
+                  >
+                    Забули пароль?
+                  </Link>
+                </div>
+              )}
             </form>
 
             {/* Switch Auth Type Link */}
-            <div className="absolute bottom-0 left-0 right-0 p-8 text-center bg-gradient-to-t from-background/80 to-transparent backdrop-blur-sm">
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-center bg-gradient-to-t from-background/80 to-transparent backdrop-blur-sm">
               <p className="text-sm text-foreground/60">
                 {type === "login" ? (
                   <>

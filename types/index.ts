@@ -1,7 +1,3 @@
-export type AuthFormProps = {
-  type: "login" | "register";
-};
-
 export type Quote = {
   quote: string;
   author: string;
