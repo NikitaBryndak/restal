@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
+import { Button } from "@/app/components/ui/button";
 import { AuthFormProps, Quote } from "@/app/types";
 import { chooseRandomItem } from "@/app/lib/utils";
 import { quotes } from "@/app/data";

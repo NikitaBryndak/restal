@@ -1,6 +1,6 @@
+import { Button } from "@/app/components/ui/button";    
 import { Search } from "lucide-react";
 import SearchBar from "./components/SearchBar";
-import { Button } from "@/app/components/ui/Button";    
 
 export default function Home() {
   return (
@@ -21,7 +21,7 @@ export default function Home() {
             <div className="flex justify-center items-center w-full gap-2 p-3 rounded-lg bg-input-bg backdrop-blur-sm">
               <SearchBar />
               <Button 
-                variant="ghost" 
+                variant="outline" 
                 size="icon"
                 className="size-10 text-foreground/50 hover:text-foreground transition-colors"
               >
