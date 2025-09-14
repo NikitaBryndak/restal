@@ -1,101 +1,169 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
-import { AuthFormProps } from "@/app/types";
+import { AuthFormProps, Quote } from "@/app/types";
+import { chooseRandomItem } from "@/app/lib/utils";
+import { quotes } from "@/app/data";
 
 export function AuthForm({ type, onSubmit, isLoading, error }: AuthFormProps) {
-  return (
-    <div className="flex flex-wrap flex-col justify-center items-center min-h-screen">
-      <div className="w-full max-w-md backdrop-blur-md rounded-lg shadow-xl/30 shadow-white/20 border border-white/10 bg-[--foreground]">
-        <form
-          onSubmit={onSubmit}
-          className="space-y-4 p-6 flex flex-col justify-center items-center"
-        >
-          {/* Header */}
-          <h1 className="text-5xl font-bold m-6">RestAll</h1>
-          <p className="">Ваша подорож починається тут</p>
 
-          {/* Error Message */}
-          {error && (
-            <div className="w-full p-3 rounded bg-red-500/10 border border-red-500/20 text-red-500">
-              {error}
+    // Fetch Quote
+    const [currentQuote, setCurrentQuote] = React.useState<Quote>({ quote: "", author: "" });
+    useEffect(() => {
+      const { quote, author } = chooseRandomItem(quotes);
+      setCurrentQuote({ quote, author });
+    }, []);
+
+    return (
+      <div className="min-h-screen flex">
+        {/* Left Side - Login Form */}
+        <div className="w-full lg:w-[45%] flex items-center justify-center p-8 xl:p-12 relative">
+          <div className="w-full max-w-md">
+            
+            {/* Back */}
+            <Link href="/" className="absolute top-8 left-8 text-sm text-foreground/70">
+              &larr; Назад
+            </Link>
+
+            {/* Logo */}
+            <Link href="/" className="inline-block mb-12">
+              <img src="/logo.png" alt="RestAll" className="h-8" />
+            </Link>
+
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-light mb-2">
+                {type === "login" ? "З поверненням" : "Створити акаунт"}
+              </h1>
+              <p className="text-foreground/60">
+                {type === "login" ? "Увійдіть для продовження" : "Почніть свою подорож"}
+              </p>
             </div>
-          )}
 
-          {/* Form Fields */}
-          <div className="w-full space-y-1">
-            <Label htmlFor="email">Email:</Label>
-            <Input 
-              type="email" 
-              id="email" 
-              name="email" 
-              required 
-              disabled={isLoading}
-              className="w-full"
-            />
-          </div>
+            {/* Social Logins */}
+            <div className="space-y-3">
+              <Button 
+                variant="outline" 
+                className="w-full h-11 bg-background/50 border border-foreground/10 hover:border-foreground/20"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2" fill="currentColor">
+                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+                </svg>
+                Продовжити з Google
+              </Button>
+            </div>
 
-          <div className="w-full space-y-1">
-            <Label htmlFor="password">Password:</Label>
-            <Input 
-              type="password" 
-              id="password" 
-              name="password" 
-              required 
-              disabled={isLoading}
-              className="w-full"
-              minLength={8}
-            />
-          </div>
+            {/* Divider */} 
+            <div className="flex items-center gap-3 my-8">
+              <div className="h-px flex-1 border"></div>
+            </div>
 
-          {type === "register" && (
-            <div className="w-full space-y-1">
-              <Label htmlFor="confirm-password">Confirm Password:</Label>
-              <Input 
-                type="password" 
-                id="confirm-password" 
-                name="confirmPassword" 
-                required 
+            <form onSubmit={onSubmit} className="space-y-5">
+              {/* Error Message */}
+              {error && (
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
+                  {error}
+                </div>
+              )}
+
+              {/* Form Fields */}
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-sm text-foreground/70">Електронна пошта</Label>
+                  <Input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    disabled={isLoading}
+                    className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
+                    placeholder="name@example.com"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="password" className="text-sm text-foreground/70">Пароль</Label>
+                  <Input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    disabled={isLoading}
+                    className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
+                    minLength={8}
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                {type === "register" && (
+                  <div>
+                    <Label htmlFor="confirm-password" className="text-sm text-foreground/70">
+                      Підтвердіть пароль
+                    </Label>
+                    <Input 
+                      type="password" 
+                      id="confirm-password" 
+                      name="confirmPassword" 
+                      required 
+                      disabled={isLoading}
+                      className="mt-1.5 h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30"
+                      minLength={8}
+                      placeholder="••••••••"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <Button 
+                type="submit" 
                 disabled={isLoading}
-                className="w-full"
-                minLength={8}
-              />
-            </div>
-          )}
+                className="w-full h-11 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+              >
+                {isLoading ? "Завантаження..." : type === "login" ? "Увійти" : "Зареєструватися"}
+              </Button>
+            </form>
 
-          <Button 
-            type="submit" 
-            variant="outline"
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? "Loading..." : type === "login" ? "Login" : "Register"}
-          </Button>
-        </form>
-
-        <hr className="w-full border-t border-gray-300/30 my-4" />
-
-        {/* Footer */}
-        <div className="mt-4 text-center mb-6">
-          {type === "login" ? (
-            <p>
-              Don't have an account?{" "}
-              <Link href="/register" className="text-blue-500 hover:text-blue-400 underline">
-                Register here
-              </Link>
+            {/* Switch Auth Type Link */}
+            <p className="mt-6 text-sm text-foreground/60">
+              {type === "login" ? (
+                <>
+                  Немає облікового запису?{" "}
+                  <Link href="/register" className="text-foreground hover:text-foreground/80 underline underline-offset-4">
+                    Зареєструватися
+                  </Link>
+                </>
+              ) : (
+                <>
+                  Вже маєте обліковий запис?{" "}
+                  <Link href="/login" className="text-foreground hover:text-foreground/80 underline underline-offset-4">
+                    Увійти
+                  </Link>
+                </>
+              )}
             </p>
-          ) : (
-            <p>
-              Already have an account?{" "}
-              <Link href="/login" className="text-blue-500 hover:text-blue-400 underline">
-                Login here
-              </Link>
-            </p>
-          )}
+          </div>
+        </div>
+
+        {/* Right Side - Image */}
+        <div className="hidden lg:block lg:w-[55%] bg-cover bg-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-orange-900/20" />
+          <img
+            src="https://images.unsplash.com/photo-1757492166964-518d2c8b9f41?q=80&w=1365&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Travel"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 backdrop-blur-[1px]" />
+          <div className="relative z-10 p-12 h-full flex flex-col justify-end">
+            <blockquote className="text-white max-w-lg">
+              <p className="text-2xl font-light mb-4">
+                {currentQuote.quote}
+              </p>
+              <footer className="text-sm text-white/70">— {currentQuote.author}</footer>
+            </blockquote>
+          </div>
         </div>
       </div>
-    </div>
   );
-}
+};

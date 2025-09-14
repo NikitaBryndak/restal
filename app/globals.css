@@ -1,22 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap&subset=cyrillic');
-@import url('https://fonts.googleapis.com/css2?family=Orelega+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap&subset=cyrillic');
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Orelega+One&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --secondary-foreground: bg-neutral-900/80;
-  font-family: "Orelega One", 'Inter', Arial, Helvetica, sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #171717;
-    --foreground: #ededed;
-  }
+  --background: #000000;
+  --foreground: #ffffff;
+  --secondary: #666666;
+  --accent: rgba(250, 142, 0, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.8);
+  font-family: "Orelega One", 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 500;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground); 
+  background: radial-gradient(circle at 50% 50%, #301f0d 0%, #000000 100%);
+  color: var(--foreground);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.glow-effect {
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle at 50% 0%, var(--accent), transparent 70%);
+  transform: translateY(-25%);
+  pointer-events: none;
+  z-index: 0;
 }

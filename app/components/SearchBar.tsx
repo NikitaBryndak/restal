@@ -2,15 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Input } from "@/app/components/ui/input";
+import { searchTexts } from "@/app/data";
 
-const texts = [
-    "Погода в Єгипті...",
-    "Кращі місця для відпочинку в Італії...",
-    "Тури до Греції...",
-    "Погода в Туреччині...",
-    "Відпочинок на Мальдівах...",
-    "Екскурсії по Франції...",
-];
 
 export default function SearchBar({ className }: { className?: string }) {
     const [displayText, setDisplayText] = useState("");
@@ -20,19 +13,19 @@ export default function SearchBar({ className }: { className?: string }) {
 
     // typing and deleting effect
     useEffect(() => {
-        if (index >= texts.length) return;
+        if (index >= searchTexts.length) return;
 
         const timeout = setTimeout(() => {
         setSubIndex((prev) => prev + (deleting ? -1 : 1));
 
         // when finished typing
-        if (!deleting && subIndex === texts[index].length) {
+        if (!deleting && subIndex === searchTexts[index].length) {
             setTimeout(() => setDeleting(true), 1000); // pause before deleting
         }
         // when finished deleting
         else if (deleting && subIndex === 0) {
             setDeleting(false);
-            setIndex((prev) => (prev + 1) % texts.length);
+            setIndex((prev) => (prev + 1) % searchTexts.length);
         }
         }, deleting ? 50 : 100);
 
@@ -41,7 +34,7 @@ export default function SearchBar({ className }: { className?: string }) {
 
     // update displayed text    
     useEffect(() => {
-        setDisplayText(texts[index].substring(0, subIndex));
+        setDisplayText(searchTexts[index].substring(0, subIndex));
     }, [subIndex, index]);
 
     return (

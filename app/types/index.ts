@@ -4,3 +4,8 @@ export type AuthFormProps = {
   isLoading?: boolean;
   error?: string;
 };
+
+export type Quote = {
+  quote: string;
+  author: string;
+};
