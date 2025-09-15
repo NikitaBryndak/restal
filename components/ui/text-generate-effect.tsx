@@ -43,7 +43,7 @@ export const TextGenerateEffect = ({
               key={word + idx}
               className={cn(
                 "opacity-0",
-                accentWords.includes(word) ? cn(accentClassName, "") : "dark:text-white text-black"
+                accentWords.includes(word) ? cn(accentClassName, "") : "text-white"
               )}
               style={{
                 filter: filter ? "blur(10px)" : "none",
@@ -60,7 +60,7 @@ export const TextGenerateEffect = ({
   return (
     <div className={cn("font-bold", className)}>
       <div className="mt-4">
-        <div className=" dark:text-white text-black leading-snug tracking-wide">
+        <div className=" text-white leading-snug tracking-wide">
           {renderWords()}
         </div>
       </div>
