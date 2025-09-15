@@ -10,14 +10,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="flex antialiased min-h-screen flex-col w-full" suppressHydrationWarning>
-        <div className="fixed w-full"><Spotlight /></div>
+    <html lang="en" >
+      <body className="flex antialiased min-h-screen flex-col w-full smooth-scroll" suppressHydrationWarning>
         <AuthProvider>
           <Navbar />
           {children}    
           <Footer />
         </AuthProvider>
+        <div className="w-full z-0 pointer-events-none">
+          <Spotlight />
+        </div>
       </body>
     </html>
   );

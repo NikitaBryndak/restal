@@ -7,7 +7,7 @@ export default function Footer() {
     return (
           pathname !== '/register' &&
           pathname !== '/login' && 
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center my-6 gap-8 text-sm text-foreground/50">
+            <div className="bottom-0 left-0 right-0 flex justify-center my-6 gap-8 text-sm text-white/50">
                 <NavLink href="/">Умови використання</NavLink>
                 <NavLink href="/">Конфіденційність</NavLink>
                 <NavLink href="/">Допомога</NavLink>

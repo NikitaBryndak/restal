@@ -2,10 +2,11 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Quote } from "@/types";
 import { chooseRandomItem } from "@/lib/utils";
-import { loginImage, quotes } from "@/data";
+import { quotes } from "@/data";
 import { FormField } from "./form-field";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -186,8 +187,10 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         {/* Right Side - Image */}
         <div className="hidden lg:block lg:w-[55%] bg-cover bg-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-orange-900/20" />
-          <img
-            src={loginImage}
+          <Image
+            width={1365}
+            height={1706}
+            src="/login-bg.jpg"
             alt="Travel"
             className="absolute inset-0 w-full h-full object-cover"
           />

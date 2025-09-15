@@ -92,5 +92,3 @@ export const searchSuggestions: string[] = [
     "🗽 Тур по США",
     "🏔️ Гірськолижний курорт"
 ];
-
-export const loginImage = "https://images.unsplash.com/photo-1757492166964-518d2c8b9f41?q=80&w=1365&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"

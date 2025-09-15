@@ -43,7 +43,7 @@ export const TextGenerateEffect = ({
               key={word + idx}
               className={cn(
                 "opacity-0",
-                accentWords.includes(word) ? accentClassName : "dark:text-white text-black"
+                accentWords.includes(word) ? cn(accentClassName, "") : "dark:text-white text-black"
               )}
               style={{
                 filter: filter ? "blur(10px)" : "none",
