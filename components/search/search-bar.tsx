@@ -14,7 +14,8 @@ export default function SearchBar({ className }: { className?: string }) {
     // typing and deleting effect
     useEffect(() => {
         if (index >= searchTexts.length) return;
-
+        const randomTypeDelay = Math.random() * 70 + 50; 
+        const randomDeleteDelay = Math.random() * 100 + 50; 
         const timeout = setTimeout(() => {
         setSubIndex((prev) => prev + (deleting ? -1 : 1));
 
@@ -27,7 +28,7 @@ export default function SearchBar({ className }: { className?: string }) {
             setDeleting(false);
             setIndex((prev) => (prev + 1) % searchTexts.length);
         }
-        }, deleting ? 50 : 100);
+        }, deleting ? randomDeleteDelay : randomTypeDelay);
 
         return () => clearTimeout(timeout);
     }, [subIndex, deleting, index]);
@@ -39,7 +40,7 @@ export default function SearchBar({ className }: { className?: string }) {
 
     return (
         <div className="relative w-full max-w-md">
-        <Input type="text" placeholder={displayText} className={`w-full ${className}`} />
+            <Input name="search-query" id="search-query" type="text" placeholder={displayText} className={`w-full ${className}`} />
         </div>
     );
 }

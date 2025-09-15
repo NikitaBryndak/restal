@@ -1,4 +1,4 @@
-import { NavLink } from "../ui/nav-link";
+import { NavLink } from "./nav-link";
 import { useSession } from "next-auth/react";
 
 export default function WideNavbar() {

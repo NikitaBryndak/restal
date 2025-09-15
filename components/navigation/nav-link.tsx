@@ -26,7 +26,7 @@ export function NavLink({
         href={href}
         className={cn(
           "border rounded-md border-foreground/20 px-4 py-2 text-sm transition-colors",
-          "bg-white/90 text-black",
+          "bg-white/90 text-black hover:bg-accent hover:text-white hover:border-accent",
           className
         )}
       >
@@ -43,7 +43,7 @@ export function NavLink({
         {
           "text-foreground": isActive,
         },
-        "hover:text-foreground",
+        "hover:text-accent",
         className
       )}
     >
