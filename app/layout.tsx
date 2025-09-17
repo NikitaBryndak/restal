@@ -12,14 +12,14 @@ export default function RootLayout({
   return (
     <html lang="en" >
       <body className="flex antialiased min-h-screen flex-col w-full smooth-scroll" suppressHydrationWarning>
+        <div className="fixed w-full h-full top-0 left-0 z-0 overflow-hidden">
+          <Spotlight />
+        </div>
         <AuthProvider>
           <Navbar />
           {children}    
           <Footer />
         </AuthProvider>
-        <div className="w-full z-0 pointer-events-none">
-          <Spotlight />
-        </div>
       </body>
     </html>
   );
