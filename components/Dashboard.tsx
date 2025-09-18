@@ -20,7 +20,7 @@ export default function Dashboard() {
                 <p className="text-sm text-foreground/60">Email: {session?.user?.email}</p>
                 <Button
                     onClick={() => signOut({ callbackUrl: '/login' })}
-                    className="mt-4 h-10 text-sm w-full"
+                    className="mt-4 h-10 text-sm w-full cursor-pointer"
                     variant="outline"
                 >
                     Logout

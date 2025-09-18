@@ -15,6 +15,10 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    cashbackAmount: {
+        type: Number,
+        default: 1000
+    }
 }, { timestamps: true });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

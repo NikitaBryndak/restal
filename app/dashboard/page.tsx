@@ -1,4 +1,3 @@
-import SubNavbar from "@/components/navigation/SubNavbar"
 import Dashboard from "../../components/Dashboard"
 
 export default function DashboardPage() {

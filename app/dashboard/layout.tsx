@@ -1,4 +1,4 @@
-import SubNavbar from "@/components/navigation/SubNavbar";
+import SubNavbar from "@/components/navigation/SubDashboardNavbar";
 
 export default function Layout({
   children,
@@ -6,11 +6,11 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" >
-      <body className="flex antialiased min-h-screen flex-col w-full smooth-scroll" suppressHydrationWarning>
+      <div className="flex flex-1 flex-row mt-16 md:mt-20">
           <SubNavbar />
-          {children}    
-      </body>
-    </html>
-  );
+          <div className="flex-1">
+            {children}
+          </div>
+      </div>
+);
 }

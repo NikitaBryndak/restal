@@ -30,7 +30,7 @@ export default function SearchSection() {
             type="submit"
             variant="outline" 
             size="icon"
-            className="size-10 text-foreground/50 hover:text-foreground transition-colors"
+            className="size-10 text-foreground/50 hover:text-foreground hover:border-accent transition-colors"
           >
             <Search className="w-4 h-4" />
           </Button>
