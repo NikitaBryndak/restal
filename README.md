@@ -12,6 +12,10 @@ Restal is a modern web application built with [Next.js](https://nextjs.org), des
 
 The screenshot above showcases the main page interface.
 
+![Restal Screenshot](docs/LoginPage.png)
+
+The screenshot above showcases the login page interface.
+
 ---
 
 ## 🛠️ Getting Started
