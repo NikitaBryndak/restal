@@ -14,3 +14,9 @@ export type Credential = {
   password: string; 
   confirmPassword?: string ;
 }
+
+export type TouristInfo = {
+  id: number;
+  name: string;
+  pasportExpiryDate: string;
+}

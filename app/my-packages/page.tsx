@@ -1,7 +1,7 @@
 export default function MyPackagesPage() {
     return (
         <div>
-            <h1>Мої Турпакети</h1>
+            <h1>My Tour Packages</h1>
         </div>
     );
 }

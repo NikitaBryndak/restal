@@ -39,7 +39,7 @@ export default function SearchSection() {
             href="/contact"
             className="hover:bg-accent hover:text-white hover:border-accent hidden p-2 bg-white/90 text-black rounded-md transition-colors sm:flex items-center justify-center gap-2 text-sm"
           >
-            Зв'язатись
+            Contact
             <Send className="w-4 h-4 flex-shrink-0" />
           </Link>
         </form>
@@ -48,7 +48,7 @@ export default function SearchSection() {
       {/* Search Suggestions */}
       <div className="space-y-2">
         <p className="text-sm text-white/50">
-          Наприклад:
+          For example:
         </p>
         <SearchExamples handleSearch={handleSearch} />
       </div>

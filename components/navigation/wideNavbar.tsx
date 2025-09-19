@@ -10,17 +10,17 @@ export default function WideNavbar() {
         <ul className="hidden sm:flex items-center gap-8 list-none m-0 p-0">
             <li>
                 <NavLink href="/tour-screener">
-                    Підбір
+                    Selection
                 </NavLink>
             </li>
             <li>
                 <NavLink href="/info">
-                    Інфоцентр
+                    Info Center
                 </NavLink>
             </li>
             <li>
                 <NavLink href="/contact">
-                    Менеджер
+                    Manager
                 </NavLink>
             </li>
             <li>
@@ -28,7 +28,7 @@ export default function WideNavbar() {
                     <NavLink href="/info/cashback" className="bg-accent p-1 rounded-md mr-2 hover:text-black hover:bg-white">{userProfile?.cashbackAmount}₴</NavLink>
                 )}
                 <NavLink href="/login" variant="button">
-                    {session ? "Аккаунт" : "Стати клієнтом"}
+                    {session ? "Account" : "Become a client"}
                 </NavLink>
             </li>
         </ul>
