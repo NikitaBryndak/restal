@@ -8,6 +8,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { User, Mail, Calendar, Wallet, Plus,  } from "lucide-react";
 import type { TouristInfo } from "@/types";
 import TouristCard from "@/components/profile/touristCard";
+import Link from "next/link";
 
 export default function ProfilePage() {
     const { userProfile, loading, error } = useUserProfile();
@@ -50,9 +51,9 @@ export default function ProfilePage() {
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
+            day: 'numeric',
             month: 'long',
-            day: 'numeric'
+            year: 'numeric'
         });
     };
 
@@ -169,10 +170,10 @@ export default function ProfilePage() {
                                             <User className="w-10 h-10 text-slate-400" />
                                         </div>
                                         <p className="text-blue-200 font-medium text-lg mb-6">No tourists added yet</p>
-                                        <Button className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                        <Link href="/dashboard/profile/add-tourist"  className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                                             <Plus className="w-5 h-5 mr-3" />
                                             Add first tourist
-                                        </Button>
+                                        </Link>
                                     </div>
                                 )}
                             </div>
