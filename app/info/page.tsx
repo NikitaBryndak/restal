@@ -3,37 +3,40 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function InfoPage() {
+  // Array of button names
   const names = ["First", "Second", "Third", "Fourth", "Fifth"];
+  // State to track which button is selected
   const [selected, setSelected] = useState("First");
+  // State to store search input
   const [search, setSearch] = useState("");
-  
+
   return (
-    <div className="h-screen flex flex-col pt-20"> {/* wraps all page content in one div element */}
-      <div className="flex gap-4 p-4 border-b"> {/* wraps all buttons in one div element */}
-        {names.map((name) => ( 
-          /* maps every name from array to button */
-          <button
-            key={name} // sets unique key for each button
-            onClick={() => setSelected(name)}
-            className={`
-              px-8 py-3 text-lg font-semibold transition
-              rounded-full        /* fully rounded cloud shape */
-              shadow-lg           /* soft shadow for floating effect */
-              bg-white            /* cloud color */
-              text-blue-900       /* dark blue text */
-              hover:bg-blue-100
-              hover:shadow-xl
-              border border-gray-200
-              ${
-                selected === name
-                  ? "bg-blue-200 shadow-2xl"
-                  : ""
-              }
-            `}
-          >
-            {name}
-          </button>
-        ))}
+    // wraps all page content in one div element
+    <div className="h-screen flex flex-col pt-20">
+
+      {/* wraps all buttons in one div element */}
+      <div className="flex gap-4 p-4 border-b">
+        {names.map((name) => {
+          const isActive = selected === name; // checks if current button is active
+
+          return (
+            // maps every name from array to button
+            <button
+              key={name} // sets unique key for each button
+              onClick={() => setSelected(name)} // sets selected button on click
+              className={`
+                px-6 py-3 font-semibold rounded-md border border-black transition
+                ${
+                  isActive
+                    ? "bg-[#0099ff] text-white"
+                    : "bg-white text-black hover:bg-[#0099ff] hover:text-white"
+                }
+              `}
+            >
+              {name}
+            </button>
+          );
+        })}
       </div>
 
       {/* Main content */}
@@ -42,7 +45,7 @@ export default function InfoPage() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)} // updates search state as user types
           placeholder={`Search in ${selected}`}
           className="w-1/2 px-4 py-3 rounded-full border-2 border-gray-300 shadow-lg text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
         />
