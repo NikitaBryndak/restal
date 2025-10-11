@@ -5,7 +5,6 @@ export default function TripCard({ data }: { data: any }) {
         { label: "Booked", value: data.bookingDate },
         { label: "Duration", value: `${data.tripStartDate} – ${data.tripEndDate}` },
         { label: "Nights", value: data.hotelNights },
-        { label: "Meal", value: data.food },
     ];
 
     const addonItems = [
@@ -13,8 +12,12 @@ export default function TripCard({ data }: { data: any }) {
         { label: "Transfer", value: data.addons.transfer, icon: "🚗" },
     ];
 
+    const outdatedTrip = new Date(data.tripEndDate) < new Date();
+
+    const rootClass = `w-full h-64 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
+
     return (
-    <div className="w-full h-64 mb-6 rounded-xl overflow-hidden relative cursor-pointer hover:scale-[1.02] transition-transform">
+    <div className={rootClass}>
             {/* Background Image */}
             <Image
                 src={`/countryImages/${data.country}.jpg`}
@@ -86,6 +89,6 @@ export default function TripCard({ data }: { data: any }) {
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
     )
 }

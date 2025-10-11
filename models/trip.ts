@@ -111,7 +111,15 @@ const tripSchema = new Schema({
             default: false,
         }
     }
+    ,
+    ownerEmail: {
+        type: String,
+        required: false,
+    }
 }, { timestamps: true });
+
+// Ensure trip numbers are unique per owner
+tripSchema.index({ ownerEmail: 1, number: 1 }, { unique: true, sparse: true });
 
 
 
