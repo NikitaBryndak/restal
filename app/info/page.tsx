@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Selector from "@/components/navigation/selectorNavbar";
 import TitleSearch from "@/components/search/titleSearch";
-import Articles from "@/components/ui/articles";
+import Article from "@/components/ui/article";
 import {articlesData} from "@/app/info/articlesData";
 
 export default function InfoPage() {
@@ -24,7 +24,7 @@ export default function InfoPage() {
     <div className="min-h-screen flex flex-col pt-20 px-8">
       <Selector names={names} selected={selected} setSelected={setSelected} />
       <TitleSearch search={search} setSearch={setSearch} />
-      <Articles filteredItems={filteredItems} />
+      <Article filteredItems={filteredItems} />
     </div>
   );
 }

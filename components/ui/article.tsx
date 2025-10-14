@@ -1,7 +1,21 @@
 "use client";
 import Link from "next/link";
 
-export default function ContentBlock({ filteredItems }) {
+type Article = {
+
+  title: string,
+  description: string,
+  image: string,
+  link: string,
+  tag: string,
+  content?: string
+
+}
+
+type ArticleProps = {
+  filteredItems: Article[]
+}
+export default function Article({ filteredItems } : ArticleProps) {
   return (
     // Display content boxes
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl mx-auto">
