@@ -20,3 +20,4 @@ export type TouristInfo = {
   name: string;
   pasportExpiryDate: string;
 }
+
