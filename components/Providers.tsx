@@ -5,13 +5,5 @@ import { ReactNode } from "react";
 
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    return (
-        <SessionProvider 
-            basePath="/api/auth"
-            refetchInterval={0}
-            refetchOnWindowFocus={false}
-        >
-            {children}
-        </SessionProvider>
-    )
+    return <SessionProvider>{children}</SessionProvider>
 }
