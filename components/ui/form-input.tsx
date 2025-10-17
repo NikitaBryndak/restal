@@ -7,10 +7,11 @@ import { Input } from "./input";
 type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     labelText?: string;
     containerClassName?: string;
+    locale?: string;
 };
 
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-    ({ labelText, containerClassName, className, id, name, ...rest }, ref) => {
+    ({ labelText, containerClassName, className, id, name, locale, ...rest }, ref) => {
         const controlId = id ?? name;
 
         return (
@@ -24,6 +25,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                     id={controlId}
                     name={name}
                     className={cn("bg-background", className)}
+                    locale={locale}
                     ref={ref}
                     {...rest}
                 />

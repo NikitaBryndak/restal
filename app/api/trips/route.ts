@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
+import User from "@/models/user";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import crypto from 'crypto';
 
 export async function GET(request: Request) {
     try {
@@ -36,67 +36,29 @@ export async function POST(request: Request) {
 
         await connectToDatabase();
 
-        // Build base content string from trip info to derive deterministic number
-        const ownerEmail = session.user.email;
+        const largestTrip = await Trip.findOne({}).sort({ number: -1 }).select('number').lean() as { number?: number } | null;
+        const computedNumber = (largestTrip?.number ?? 0) + 1;
 
-        const makeContentString = (payload: any, salt: string | number = '') => {
-            // Select deterministic fields to describe a trip
-            const parts = [
-                payload.country || '',
-                payload.tripStartDate || '',
-                payload.tripEndDate || '',
-                (payload.flightInfo?.departure?.flightNumber) || '',
-                (payload.flightInfo?.arrival?.flightNumber) || '',
-                payload.hotel?.name || payload.hotelName || ''
-            ];
-            if (salt) parts.push(String(salt));
-            return parts.join('|');
+        const cashbackAmount = body.payment.totalAmount * 0.01;
+
+        const payload = {
+            ...body,
+            number: computedNumber,
         };
 
-        const hashToNumber = (str: string) => {
-            // Use SHA256, take first 8 bytes -> 16 hex chars => 64-bit-ish number, then mod a large range
-            const hash = crypto.createHash('sha256').update(str).digest('hex');
-            const prefix = hash.slice(0, 15); // 60 bits
-            // Convert hex prefix to integer (may exceed JS safe int for 60 bits, so use BigInt)
-            const num = BigInt('0x' + prefix);
-            // Map into a smaller positive integer range, e.g., 1..99999999
-            const mapped = Number(num % BigInt(100_000_000)) + 1;
-            return mapped;
-        };
-
-        // Attempt to compute a deterministic number and insert, retrying with salt if collision occurs
-        const basePayload = { ...body };
-        let created: any = null;
-        const maxAttempts = 6;
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
-            const salt = attempt === 0 ? '' : attempt; // 1,2,3...
-            const content = makeContentString(basePayload, salt);
-            const computedNumber = hashToNumber(content);
-
-            const toCreate = {
-                ...basePayload,
-                number: computedNumber,
-                ownerEmail
-            };
-
-            try {
-                created = await Trip.create(toCreate);
-                break;
-            } catch (err: any) {
-                const isDupKey = err && (err.code === 11000 || err.code === '11000' || (err.name === 'MongoServerError' && err.code === 11000));
-                if (isDupKey) {
-                    // collision - try next salt
-                    continue;
-                }
-                throw err;
-            }
+        const newTrip = new Trip({
+            ...payload,
+        });
+        await newTrip.save();
+        
+        // Update user's cashback directly
+        const user = await User.findOne({ email: session.user.email });
+        if (user) {
+            user.cashbackAmount = (user.cashbackAmount || 0) + cashbackAmount;
+            await user.save();
         }
 
-        if (!created) {
-            return NextResponse.json({ message: 'Failed to create trip after multiple attempts' }, { status: 500 });
-        }
-
-        return NextResponse.json({ trip: created }, { status: 201 });
+        return NextResponse.json({ trip: newTrip }, { status: 201 });
     } catch (error: any) {
         console.error("Error creating trip:", error);
         return NextResponse.json({ message: "Error creating trip", error: error.message }, { status: 500 });

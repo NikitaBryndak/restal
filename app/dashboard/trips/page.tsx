@@ -18,6 +18,8 @@ export default async function TripsPage(){
     // Fetch trips that belong to the logged-in user, sorted by createdAt desc
     const trips = await Trip.find({ ownerEmail: session.user.email }).sort({ createdAt: -1 }).lean();
 
+    console.log(trips)
+
     const tripCards = trips.map((trip: any) => (
         <Link href={`/dashboard/trips/${trip.number}`} key={trip._id.toString()}>
             <TripCard data={trip} />

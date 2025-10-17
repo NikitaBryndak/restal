@@ -1,10 +1,16 @@
 import Image from 'next/image';
 
 export default function TripCard({ data }: { data: any }) {
+    const totalAmount = data.payment?.totalAmount ?? 0;
+    const paidAmount = data.payment?.paidAmount ?? 0;
+    const toPay = totalAmount - paidAmount;
+    
     const summaryItems = [
         { label: "Booked", value: data.bookingDate },
         { label: "Duration", value: `${data.tripStartDate} – ${data.tripEndDate}` },
-        { label: "Nights", value: data.hotelNights },
+        { label: "Nights", value: data.hotel?.nights > 0 ? data.hotel.nights : 'undefined' },
+        { label: "To Pay", value: toPay > 0 ? toPay.toFixed(2) : 'undefined' },
+        { label: "Cashback", value: totalAmount > 0 ? (totalAmount * 0.01).toFixed(2) : 'NaN' },
     ];
 
     const addonItems = [
@@ -65,7 +71,7 @@ export default function TripCard({ data }: { data: any }) {
                             <div className="space-y-1">
                                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Stay</p>
                                 <p className="text-sm font-semibold">{data.hotel.name}</p>
-                                <p className="text-white/70 text-[11px]">Meal plan: {data.food}</p>
+                                <p className="text-white/70 text-[11px]">Meal plan: {data.hotel.food}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Add-ons</p>

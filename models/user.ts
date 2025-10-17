@@ -15,6 +15,10 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    privelegeLevel: {
+        type: Number,
+        default: 1
+    },
     cashbackAmount: {
         type: Number,
         default: 1000

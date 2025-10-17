@@ -8,6 +8,7 @@ interface UserProfile {
     userEmail: string;
     createdAt: string;
     cashbackAmount: number;
+    privelegeLevel: number;
 }
 
 export const useUserProfile = () => {

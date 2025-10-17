@@ -73,15 +73,27 @@ const tripSchema = new Schema({
         name: {
             type: String,
             required: true,
+        },
+        checkIn: {
+            type: String,
+            required: true,
+        },
+        checkOut: {
+            type: String,
+            required: true,
+        },
+        food: {
+            type: String,
+            required: true,
+        },
+        nights: {
+            type: Number,
+            required: true,
+        },
+        roomType: {
+            type: String,
+            required: true,
         }
-    },
-    food: {
-        type: String,
-        required: true,
-    },
-    hotelNights: {
-        type: Number,
-        required: true,
     },
     tourists: [{
         name: {
@@ -89,6 +101,10 @@ const tripSchema = new Schema({
             required: true,
         },
         surname: {
+            type: String,
+            required: true,
+        },
+        sex : {
             type: String,
             required: true,
         },
@@ -110,18 +126,64 @@ const tripSchema = new Schema({
             type: Boolean,
             default: false,
         }
-    }
-    ,
+    },
+    documents: {
+        contract: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }    
+        },
+        invoice: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        },
+        confirmation: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        },
+        tickets: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        },
+        voucher: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        },
+        insurancePolicy: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        },
+        tourProgram: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        },
+        memo: {
+            uploaded: { type: Boolean, default: false },
+            url: { type: String, default: "" }
+        }
+    },
+    payment: {
+        totalAmount: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        paidAmount: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        deadline : {
+            type: String,
+            required: true,
+        }
+    },
     ownerEmail: {
         type: String,
-        required: false,
-    }
+        required: true,
+    },
 }, { timestamps: true });
 
-// Ensure trip numbers are unique per owner
-tripSchema.index({ ownerEmail: 1, number: 1 }, { unique: true, sparse: true });
-
-
+tripSchema.index({ number: 1 }, { unique: true });
 
 const Trip = mongoose.models.Trip || mongoose.model("Trip", tripSchema);
 

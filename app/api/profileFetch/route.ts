@@ -17,7 +17,7 @@ export async function GET(request: Request) {
             });
         }
 
-        const user = await User.findOne({ email }).select("name email createdAt cashbackAmount");
+        const user = await User.findOne({ email }).select("name email createdAt cashbackAmount privelegeLevel");
 
         if (!user) {
             return NextResponse.json({
@@ -33,7 +33,8 @@ export async function GET(request: Request) {
             userName: user.name,
             userEmail: user.email,
             createdAt: user.createdAt,
-            cashbackAmount: user.cashbackAmount
+            cashbackAmount: user.cashbackAmount,
+            privelegeLevel: user.privelegeLevel
 
         }, {
             status: 200
