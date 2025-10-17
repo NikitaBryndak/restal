@@ -25,7 +25,6 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                     id={controlId}
                     name={name}
                     className={cn("bg-background", className)}
-                    locale={locale}
                     ref={ref}
                     {...rest}
                 />
