@@ -23,7 +23,6 @@ export function useAuth({ type }: AuthFormProps) {
 
     try {
         if (type === 'register') {
-            console.log(formData);
             if (formData.password !== formData.confirmPassword) {
             setError("Passwords do not match");
             return;
