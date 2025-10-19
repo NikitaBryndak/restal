@@ -29,6 +29,7 @@ export const PaymentSection = () => {
                     placeholder='30/01/2021'
                     name="paymentDeadline"
                     autoComplete="off"
+                    formatType="date"
                 />
             </div>
         </section>

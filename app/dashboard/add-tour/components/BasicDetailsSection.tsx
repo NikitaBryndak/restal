@@ -28,12 +28,14 @@ export const BasicDetailsSection = () => {
                     placeholder='30/01/2021'
                     name="tripStartDate"
                     autoComplete="off"
+                    formatType="date"
                 />
                 <FormInput
                     labelText="Return date"
                     placeholder='30/01/2021'
                     name="tripEndDate"
                     autoComplete="off"
+                    formatType="date"
                 />
             </div>
             <div>

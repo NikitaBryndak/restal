@@ -25,7 +25,7 @@ export default function WideNavbar() {
             </li>
             <li>
                 {session && userProfile && (
-                    <NavLink href="/cashback" className="bg-accent p-1 rounded-md mr-2 hover:text-black hover:bg-white">{userProfile?.cashbackAmount}₴</NavLink>
+                    <NavLink href="/cashback" className="bg-accent p-1 rounded-md mr-2 hover:text-black hover:bg-white">{(userProfile?.cashbackAmount ?? 0).toFixed(2)}₴</NavLink>
                 )}
                 <NavLink href="/login" variant="button">
                     {session ? "Account" : "Become a client"}

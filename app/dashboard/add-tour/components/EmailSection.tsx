@@ -14,6 +14,7 @@ export const EmailSection = () => {
                 name="ownerEmail"
                 type="email"
                 autoComplete="off"
+                formatType="email"
             />
         </section>
     );

@@ -18,7 +18,13 @@ export default function TripCard({ data }: { data: any }) {
         { label: "Transfer", value: data.addons.transfer, icon: "🚗" },
     ];
 
-    const outdatedTrip = new Date(data.tripEndDate) < new Date();
+    console.log('TripCard data:', data.tripEndDate);
+
+    const [day, month, year] = data.tripEndDate.split('/').map((part: string) => parseInt(part, 10));
+
+    const tripEnd = new Date(`${year}-${month}-${day}`);
+
+    const outdatedTrip = tripEnd < new Date();
 
     const rootClass = `w-full h-64 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
 

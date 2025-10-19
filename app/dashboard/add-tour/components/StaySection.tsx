@@ -19,12 +19,14 @@ export const StaySection = () => {
                     placeholder='30/01/2021'
                     name="hotelCheckIn"
                     autoComplete="off"
+                    formatType="date"
                 />
                 <FormInput
                     labelText="Check-out"
                     placeholder='30/01/2021'
                     name="hotelCheckOut"
                     autoComplete="off"
+                    formatType="date"
                 />
                 <FormInput
                     labelText="Room type"

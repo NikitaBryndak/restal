@@ -36,12 +36,14 @@ export const FlightsSection = () => {
                             placeholder='30/01/2021'
                             name="departureDate"
                             autoComplete="off"
+                            formatType="date"
                         />
                         <FormInput
                             labelText="Time"
                             placeholder='11:35'
                             name="departureTime"
                             autoComplete="off"
+                            formatType="time"
                         />
                     </div>
                 </div>
@@ -74,12 +76,14 @@ export const FlightsSection = () => {
                             placeholder='30/01/2021'
                             name="arrivalDate"
                             autoComplete="off"
+                            formatType="date"
                         />
                         <FormInput
                             labelText="Time"
                             placeholder='11:35'
                             name="arrivalTime"
                             autoComplete="off"
+                            formatType="time"
                         />
                     </div>
                 </div>

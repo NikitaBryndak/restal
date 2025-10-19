@@ -43,12 +43,14 @@ export const TravellerSection = () => {
                     placeholder='30/01/2021'
                     name="travellerPassportExpiry"
                     autoComplete="off"
+                    formatType="date"
                 />
                 <FormInput
                     labelText="DOB"
                     placeholder='30/01/2021'
                     name="travellerDOB"
                     autoComplete="off"
+                    formatType="date"
                 />
             </div>
         </section>

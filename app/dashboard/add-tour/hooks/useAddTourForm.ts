@@ -95,6 +95,18 @@ export const useAddTourForm = () => {
 
     const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        
+        // Check for invalid inputs (inputs with aria-invalid="true")
+        const form = event.currentTarget;
+        const invalidInputs = form.querySelectorAll('input[aria-invalid="true"]');
+        
+        if (invalidInputs.length > 0) {
+            alert('Please correct the invalid date/time fields before submitting.');
+            // Focus on the first invalid input
+            (invalidInputs[0] as HTMLInputElement).focus();
+            return;
+        }
+        
         const formData = new FormData(event.currentTarget);
 
 
@@ -191,6 +203,8 @@ export const useAddTourForm = () => {
             alert('Error creating trip');
         });
     }, [curDate]);
+
+    
 
     return {
         formRef,
