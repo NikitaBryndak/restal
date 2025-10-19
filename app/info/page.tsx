@@ -24,7 +24,13 @@ export default function InfoPage() {
     <div className="min-h-screen flex flex-col pt-20 px-8">
       <Selector names={names} selected={selected} setSelected={setSelected} />
       <TitleSearch search={search} setSearch={setSearch} />
-      <Article filteredItems={filteredItems} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl mx-auto">
+      {
+        filteredItems.map((item) => (
+          <Article key={item.title} data={item} />
+        ))
+      }
+      </div>
     </div>
   );
 }
