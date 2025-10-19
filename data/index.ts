@@ -91,3 +91,23 @@ export const searchSuggestions: string[] = [
     "🏰 Travel news",
     "🏔️ Discount tours"
 ];
+
+export const countriesAssociations = {
+    "Єгипет": "Egypt",
+    "Італія": "Italy",
+    "Греція": "Greece",
+    "Туреччина": "Turkey",
+    "Мальдіви": "Maldives",
+    "Франція": "France",
+    "Іспанія": "Spain",
+    "Великобританія": "United Kingdom",
+    "Об'єднані Арабські Емірати": "United Arab Emirates",
+    "Таїланд": "Thailand",
+    "Хорватія": "Croatia",    
+    "Японія": "Japan",
+    "Швейцарія": "Switzerland",
+    "Грузія": "Georgia",
+    "Індія": "India",
+    "Анталія": "Antalya",
+    "Кіпр": "Cyprus"
+}

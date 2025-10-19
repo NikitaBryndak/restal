@@ -1,3 +1,5 @@
+"use client";
+
 import FormInput from "@/components/ui/form-input";
 
 export default function AddTouristPage() {

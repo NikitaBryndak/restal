@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { PreviewState } from '../types';
 import { blankPreview } from '../constants';
 import { getCurrentDate } from '@/lib/utils';
 
 export const useAddTourForm = () => {
+    const router = useRouter();
     const formRef = useRef<HTMLFormElement | null>(null);
     const [previewState, setPreviewState] = useState<PreviewState>(blankPreview);
     const curDate = getCurrentDate();
@@ -198,11 +200,13 @@ export const useAddTourForm = () => {
                 return;
             }
             alert('Trip created');
+            // Redirect to dashboard after successful trip creation
+            router.push('/dashboard');
         }).catch((err) => {
             console.error('Create trip error', err);
             alert('Error creating trip');
         });
-    }, [curDate]);
+    }, [curDate, router]);
 
     
 

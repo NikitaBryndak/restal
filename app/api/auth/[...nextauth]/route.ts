@@ -34,6 +34,20 @@ export const authOptions = {
             }
         })
     ],
+    callbacks: {
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.privelegeLevel = user.privelegeLevel;
+            }
+            return token;
+        },
+        async session({ session, token }: any) {
+            if (session.user) {
+                session.user.privelegeLevel = token.privelegeLevel;
+            }
+            return session;
+        }
+    },
     session: {
         strategy: "jwt" as const,
         maxAge: 24 * 60 * 60, 

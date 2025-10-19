@@ -25,7 +25,7 @@ export default async function TripsPage(){
     ));
 
     return (
-        <div>
+        <div className="px-6">
             {tripCards.length ? <>{tripCards}</> : <p className="text-sm text-muted-foreground">You have no trips yet.</p>}
         </div>
     )
