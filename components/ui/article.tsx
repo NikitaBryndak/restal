@@ -21,7 +21,7 @@ export default function Article({ data }: ArticleProps) {
           className="group cursor-pointer block transform transition-transform duration-600 ease-out hover:scale-[1.04]"
         >
   
-          <div className="relative bg-white p-0 rounded-2xl overflow-hidden h-[400px] border border-transparent hover:border-accent shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:shadow-accent transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]">
+          <div className="relative bg-white p-0 rounded-2xl overflow-hidden h-[400px] border hover:border-4 border-transparent hover:border-accent shadow-[0_8px_40px_5px_rgba(0,0,0,0.35)] hover:shadow-accent transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]">
 
   {/* <div className="relative bg-white p-0 rounded-2xl overflow-hidden h-[400px] border border-transparent shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:border-accent hover:shadow-accent transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] transform group-hover:scale-[1.04]"> */}
     {/* ...rest of your content */}
@@ -49,7 +49,7 @@ export default function Article({ data }: ArticleProps) {
           <p className="text-[15px] text-gray-700 flex-grow pointer-events-none">{data.description}</p>
           <div className="absolute -top-10 left-0 w-full h-10 bg-gradient-to-b from-transparent to-white/100 pointer-events-none" />
           <div className="flex items-center gap-1 text-accent font-semibold mt-3">
-            <span>Tap to read more</span>
+            <span className="group-hover:underline transition">Tap to read more</span>
             <span className="translate-y-[1px]">→</span>
           </div>
         </div>
