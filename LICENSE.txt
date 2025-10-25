@@ -1,0 +1,89 @@
+Proprietary Commercial License Agreement — Restal
+
+Copyright (c) 2025 Nikita Bryndak. All rights reserved.
+
+DEFINITIONS
+"Software" means the Restal software, including source code, object code, binaries, installers, documentation, sample code, configuration files, and any accompanying materials provided by the copyright holder.
+"You" or "Licensee" means the individual or legal entity who obtains or uses the Software.
+"Commercial License" means a separate, written license agreement executed by the copyright holder that grants specified rights to use, distribute, sublicense, or otherwise exploit the Software.
+"Confidential Information" means non-public information disclosed by the copyright holder to You, including the Software, non-public performance characteristics, pricing, and technical or business information.
+
+1. LICENSE GRANT
+Subject to the terms and conditions of this Agreement and receipt of a valid Commercial License and any required fees, the copyright holder grants You a limited, non-exclusive, non-transferable, revocable license to use the Software only as expressly permitted by the applicable Commercial License. All rights not expressly granted are reserved.
+
+2. SCOPE OF USE
+Use of the Software is permitted only to the extent expressly authorized in a signed Commercial License. The Commercial License will specify permitted copies, permitted users, permitted environments, permitted hosting/hosting restrictions, permitted sublicenses (if any), and the period of use.
+
+3. RESTRICTIONS
+Except as expressly authorized by a valid Commercial License, You shall not, and shall not permit others to:
+- Redistribute, sublicense, sell, lease, lend, rent, or otherwise transfer the Software or any copies to any third party;
+- Make the Software available as a hosted service, SaaS, managed service, or on a subscription basis that permits third parties to access, copy, or derive the Software unless expressly permitted in the Commercial License;
+- Use the Software to train, fine-tune, or otherwise improve machine-learning or AI models without prior written consent and a specific license allowance;
+- Reverse engineer, decompile, disassemble, decode, or attempt to derive the source code from object code, except to the extent such restriction is unenforceable under applicable law;
+- Remove, obscure, or alter any proprietary notices, copyright, trademark, or other ownership notices;
+- Modify the Software to circumvent licensing controls or digital rights management (DRM).
+
+4. THIRD-PARTY COMPONENTS
+The Software may include third-party components provided under separate license terms. Such third-party components are licensed to You under their respective license terms and not under this Agreement. Notices and attributions for included third-party components (if any) are provided in the Software distribution.
+
+5. FEES, TAXES, AND PAYMENT
+Use of the Software under a Commercial License may require payment of fees. Fees are non-refundable except as expressly stated in the Commercial License. You are responsible for all taxes, levies, or duties (other than taxes on the copyright holder's income) arising from this Agreement.
+
+6. SUPPORT, MAINTENANCE, UPDATES
+Any support, maintenance, updates, upgrades, or new releases will be provided only if and to the extent covered by the Commercial License or a separate support agreement. The copyright holder has no obligation to provide support unless agreed in writing.
+
+7. CONFIDENTIALITY
+The Software and any non-public technical or business information are Confidential Information. You shall maintain such confidentiality using at least the same degree of care as You use to protect Your own confidential information, and shall not disclose it except to permitted employees, agents, or contractors who are bound by confidentiality obligations.
+
+8. OWNERSHIP
+All title, ownership rights, and intellectual property rights in and to the Software remain with the copyright holder and its licensors. No rights or licenses are granted by implication, estoppel, or otherwise except as expressly provided in this Agreement.
+
+9. EXPORT AND SANCTIONS
+You shall comply with all applicable export, re-export, embargo, and sanctions laws and regulations. You shall not export or re-export the Software to prohibited destinations or persons.
+
+10. AUDIT AND COMPLIANCE
+To verify compliance with the Commercial License, the copyright holder may, upon reasonable notice and during normal business hours, audit Your records related to use of the Software. If an audit reveals a material breach, You shall reimburse the copyright holder for reasonable audit costs and promptly cure the breach (including payment of any owed fees).
+
+11. ASSIGNMENT
+You may not assign or transfer this Agreement or any rights hereunder without the prior written consent of the copyright holder. The copyright holder may assign this Agreement in whole or in part to an affiliate or in connection with a merger, acquisition or sale of substantially all assets.
+
+12. CONFIDENTIAL DATA AND DATA PROTECTION
+If You provide data to the copyright holder, the handling of such data will be governed by the applicable Commercial License and any data-processing addenda. The copyright holder is not responsible for Licensee content and disclaims any obligations except as set forth in a Commercial License.
+
+13. LIMITED WARRANTY; NO OTHER WARRANTIES
+The Software is provided "AS IS" and, to the maximum extent permitted by law, the copyright holder disclaims all warranties, whether express, implied, statutory or otherwise, including but not limited to warranties of merchantability, fitness for a particular purpose, title, or non-infringement. Any limited warranty, if offered, will be set forth in the Commercial License.
+
+14. LIMITATION OF LIABILITY
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, EXEMPLARY OR PUNITIVE DAMAGES, OR FOR LOSS OF PROFITS, REVENUE, BUSINESS, DATA, OR GOODWILL. COPYRIGHT HOLDER'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT OR THE USE OF THE SOFTWARE SHALL NOT EXCEED THE AMOUNTS PAID BY YOU FOR THE SOFTWARE UNDER THE APPLICABLE COMMERCIAL LICENSE DURING THE TWELVE (12) MONTHS PRIOR TO THE EVENT GIVING RISE TO LIABILITY. THIS LIMITATION WILL APPLY WHETHER LIABILITY IS ASSERTED IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR ANY OTHER LEGAL THEORY.
+
+15. INDEMNIFICATION
+To the extent permitted by applicable law, You shall defend, indemnify, and hold harmless the copyright holder and its affiliates, officers, directors, employees and agents from and against any and all claims, liabilities, losses, damages, costs, and expenses (including reasonable attorneys' fees) arising out of Your breach of this Agreement, Your negligence, or Your use of the Software.
+
+16. EQUITABLE RELIEF
+You acknowledge that a breach of certain provisions (including Section 3 and Section 7) may cause irreparable harm to the copyright holder for which monetary damages would be inadequate. Accordingly, the copyright holder shall be entitled to seek injunctive or other equitable relief, in addition to any other remedies.
+
+17. TERM AND TERMINATION
+This Agreement is effective until terminated. The copyright holder may terminate this Agreement and any applicable Commercial License immediately upon written notice if You materially breach this Agreement and fail to cure within the period specified in the notice (if any). Upon termination, You must cease all use of the Software and promptly delete or destroy all copies in Your possession and certify destruction upon request.
+
+18. SURVIVAL
+Provisions that by their nature should survive termination or expiration of this Agreement shall survive, including but not limited to Sections 3 (Restrictions), 7 (Confidentiality), 8 (Ownership), 13 (Limited Warranty), 14 (Limitation of Liability), 15 (Indemnification), and 16 (Equitable Relief).
+
+19. GOVERNING LAW; DISPUTE RESOLUTION
+This Agreement and any Commercial License shall be governed by and construed in accordance with the laws of Ukraine. Absent specification in the Commercial License, disputes shall be resolved in the courts located in [Specify Jurisdiction]. You and the copyright holder hereby consent to the exclusive jurisdiction and venue of such courts. (Specify the jurisdiction you prefer before publishing.)
+
+20. SEVERABILITY; ENTIRE AGREEMENT
+If any provision of this Agreement is held invalid or unenforceable, the remainder shall continue in full force and effect. This Agreement, together with any Commercial License and any written agreements between You and the copyright holder, constitutes the entire agreement between the parties.
+
+21. NOTICES; CONTACT
+All notices under this Agreement shall be in writing and delivered to the addresses set forth in the Commercial License or to the copyright holder at: https://github.com/NikitaBryndak. For licensing inquiries and to obtain a Commercial License, contact: https://github.com/NikitaBryndak
+
+22. LEGAL ADVICE
+This License text is provided as a template for convenience only and does not constitute legal advice. It may not address all legal requirements for Your jurisdiction or business. Consult qualified legal counsel to draft or review commercial licensing terms before offering the Software commercially.
+
+OPTIONAL SIGNATURE (for inclusion in a separate Commercial License)
+Copyright holder: Nikita Bryndak
+Signature: __________________________
+Date: __________________________
+Licensee: __________________________
+Signature: __________________________
+Date: __________________________
