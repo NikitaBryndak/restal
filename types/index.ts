@@ -27,6 +27,9 @@ export type Tourist = {
   sex: string;
   pasportExpiryDate: string;
   DOB?: string;
+  PasportNumber?: string;
+  PasportSeries?: string;
+  PasportIsueDate?: string;
 }
 
 export type FlightInfo = {
@@ -89,6 +92,7 @@ export type Trip = {
   tripStartDate: string;
   tripEndDate: string;
   country: string;
+  region?: string;
   flightInfo: FlightInfo;
   hotel: Hotel;
   tourists: Tourist[];
@@ -96,6 +100,7 @@ export type Trip = {
   documents: Documents;
   payment: Payment;
   ownerEmail: string;
+  managerEmail?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

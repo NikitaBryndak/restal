@@ -52,6 +52,25 @@ export const TravellerSection = () => {
                     autoComplete="off"
                     formatType="date"
                 />
+                <FormInput
+                    labelText="Pasport number"
+                    placeholder='127485153'
+                    name="travellerPassportNumber"
+                    autoComplete="off"
+                />
+                <FormInput
+                    labelText="Pasport series"
+                    placeholder='AA123456'
+                    name="travellerPassportSeries"
+                    autoComplete="off"
+                />
+                <FormInput
+                    labelText="Pasport issue date"
+                    placeholder='30/01/2021'
+                    name="travellerPassportIssueDate"
+                    autoComplete="off"
+                    formatType="date"
+                />
             </div>
         </section>
     );

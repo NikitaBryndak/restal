@@ -23,6 +23,10 @@ const tripSchema = new Schema({
         type: String,
         required: true,
     },
+    region: {
+        type: String,
+        required: false,
+    },
     flightInfo: {
         departure: {
             airportCode: {
@@ -115,6 +119,18 @@ const tripSchema = new Schema({
         DOB: {
             type: String,
             required: false,
+        },
+        PasportNumber: {
+            type: String,
+            required: true,
+        },
+        PasportSeries: {
+            type: String,
+            required: true,
+        },
+        PasportIsueDate: {
+            type: String,
+            required: true,
         }
     }],
     addons: {
@@ -181,6 +197,10 @@ const tripSchema = new Schema({
         type: String,
         required: true,
     },
+    managerEmail: {
+        type: String,
+        required: true,
+    }
 }, { timestamps: true });
 
 tripSchema.index({ number: 1 }, { unique: true });

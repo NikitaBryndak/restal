@@ -15,6 +15,12 @@ export const BasicDetailsSection = () => {
                     autoComplete="off"
                 />
                 <FormInput
+                    labelText="Region"
+                    placeholder="Hurghada, Tuscany, Santorini..."
+                    name="region"
+                    autoComplete="off"
+                />
+                <FormInput
                     labelText="Hotel nights"
                     placeholder="e.g. 7"
                     name="hotelNights"

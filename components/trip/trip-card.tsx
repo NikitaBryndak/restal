@@ -22,14 +22,25 @@ export default function TripCard({ data }: { data: Trip }) {
 
     const outdatedTrip = tripEnd < new Date();
 
-    const rootClass = `w-full h-84 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
+    const rootClass = `w-full h-[900px] md:h-84 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
 
     const documentArray = Array.isArray(data.documents) ? data.documents : Object.values(data.documents ?? {});
 
+    const documentAbbreviations: string[] = [
+        "ДОГ", // договір
+        "ПТВ", // підтвердження
+        "ВАУ", // ваучер
+        "АВК", // авіаквитки
+        "СТП", // страховий поліс
+        "МКВ", // маршрутна квитанція
+        "ТРЛ", // трансферний лист
+        "ПТА", // посадковий талон
+        "ПТУ"  // програма туру
+        ];
     const documentDownloadSection = (documentArray as any[]).map((doc: any) => (
         <div className={cn('flex flex-col justify-center items-center m-[2px]', doc?.uploaded ? 'opacity-100' : 'opacity-50')} key={doc?.url ?? String(doc)}>
             <Download className="w-4 h-4 text-white/70" />
-            <span className='text-[10px] text-white/90 text-center'>{doc?.name ?? 'Doc'}</span>
+            <span className='text-[10px] text-white/90 text-center'>{doc?.name ?? documentAbbreviations[documentArray.indexOf(doc)]}</span>
         </div>
     ));
 
@@ -48,7 +59,7 @@ export default function TripCard({ data }: { data: Trip }) {
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
             {/* Content Container */}
-            <div className="absolute inset-0 flex">
+            <div className="absolute inset-0 flex flex-col md:flex-[0_70%_0] md:flex-row md:items-stretch">
                 {/* Left Side - Photo and Country Name (30%) */}
                 <div className="flex-[0_0_30%] flex flex-col justify-center items-center p-6">
                     <div className="h-[1.25rem]"></div>
@@ -65,7 +76,7 @@ export default function TripCard({ data }: { data: Trip }) {
                 </div>
 
                 {/* Right Side - All Data Points (70%) */}
-                <div className="flex flex-[0_0_70%] p-6 gap-5">
+                <div className="flex p-6 gap-5 flex-col md:flex-row">
                     {/* Flight & Hotel Info */}
                     <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-6 h-full text-white border border-white/10">
                         <div className="grid grid-cols-2 gap-x-6 gap-y-5 h-full">
@@ -109,11 +120,11 @@ export default function TripCard({ data }: { data: Trip }) {
                                 <p className="text-sm font-bold leading-tight pl-3">{data.hotel.name}</p>
                                 <div className="space-y-1 text-white/75 text-xs pl-3">
                                     <p className="flex justify-between">
-                                        <span className="text-white/60">Check-in:</span>
+                                        <span className="text-white/60">C-i:</span>
                                         <span className="font-medium">{data.hotel.checkIn}</span>
                                     </p>
                                     <p className="flex justify-between">
-                                        <span className="text-white/60">Check-out:</span>
+                                        <span className="text-white/60">C-o:</span>
                                         <span className="font-medium">{data.hotel.checkOut}</span>
                                     </p>
                                     <div className="pt-1 border-t border-white/10 mt-2">
@@ -152,22 +163,21 @@ export default function TripCard({ data }: { data: Trip }) {
                         </div>
                     </div>
 
-
                     <div className="flex flex-[0_0_40%] flex-col gap-3 ml-4 ">
                         <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-col justify-center">
                             <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center mb-2">Payment</p>
                             <div className="flex flex-col gap-2">
                                 <div className="text-center">
                                     <div className="flex items-center justify-center gap-1">
-                                        <p className="text-2xl font-bold leading-none">{totalAmount.toFixed(2)}₴</p>
+                                        <p className="text-2xl font-bold leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalAmount)}₴</p>
                                     </div>
-                                    <p className="text-[11px] text-emerald-300 font-medium mt-1">💰 +{cashback.toFixed(2)}₴ cashback</p>
+                                    <p className="text-[11px] text-emerald-300 font-medium mt-1">💰 +{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cashback)}₴ cashback</p>
                                 </div>
                                 
                                 <div className="w-full h-px bg-white/20 my-0.5"></div>
                                 
                                 <div className="text-center">
-                                    <p className="text-xl font-bold text-amber-300 leading-none">{toPay.toFixed(2)}₴</p>
+                                    <p className="text-xl font-bold text-amber-300 leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(toPay)}₴</p>
                                     <p className="text-[11px] text-white/60 mt-1">{data.payment.deadline}</p>
                                 </div>
                             </div>

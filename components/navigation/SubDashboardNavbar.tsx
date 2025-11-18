@@ -10,7 +10,7 @@ export default function SubDashboardNavbar() {
     
 
     return (
-        <nav className="w-1/6 h-screen sticky top-20">
+        <nav className="w-35 h-screen sticky top-20">
             <div className="flex flex-col p-6">
                 <ul className="flex flex-col space-y-4">
                     
@@ -22,6 +22,14 @@ export default function SubDashboardNavbar() {
                                 </NavLink>
                             </li>
                     ))}
+
+                    {userProfile && userProfile.privelegeLevel > 1 && (
+                        <li>
+                            <NavLink href="/dashboard/manage-tour" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
+                                Manage Tours
+                            </NavLink>
+                        </li>
+                    )}
 
                     <li>
                         <NavLink href="/dashboard/trips" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
