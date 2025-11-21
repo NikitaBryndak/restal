@@ -2,9 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PreviewState } from '../types';
 import { blankPreview } from '../constants';
-import { getCurrentDate } from '@/lib/utils';
-import { Documents } from '@/types';
-import { DOCUMENT_KEYS } from '../../shared/documents';
+import { getCurrentDate, validateDate } from '@/lib/utils';
+import { Documents, DOCUMENT_KEYS } from '@/types';
 
 type RawTraveller = {
     firstName: string;
@@ -179,18 +178,18 @@ export const useAddTourForm = () => {
 
     const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        
+
         // Check for invalid inputs (inputs with aria-invalid="true")
         const form = event.currentTarget;
         const invalidInputs = form.querySelectorAll('input[aria-invalid="true"]');
-        
+
         if (invalidInputs.length > 0) {
             alert('Please correct the invalid date/time fields before submitting.');
             // Focus on the first invalid input
             (invalidInputs[0] as HTMLInputElement).focus();
             return;
         }
-        
+
         const formData = new FormData(event.currentTarget);
 
 
@@ -293,7 +292,29 @@ export const useAddTourForm = () => {
             documents,
         };
 
+        const dateErrors: string[] = [];
+        if (validateDate(payload.bookingDate)) dateErrors.push(`Booking Date: ${validateDate(payload.bookingDate)}`);
+        if (validateDate(payload.tripStartDate)) dateErrors.push(`Trip Start Date: ${validateDate(payload.tripStartDate)}`);
+        if (validateDate(payload.tripEndDate)) dateErrors.push(`Trip End Date: ${validateDate(payload.tripEndDate)}`);
 
+        if (validateDate(payload.flightInfo.departure.date)) dateErrors.push(`Departure Date: ${validateDate(payload.flightInfo.departure.date)}`);
+        if (validateDate(payload.flightInfo.arrival.date)) dateErrors.push(`Return Date: ${validateDate(payload.flightInfo.arrival.date)}`);
+
+        if (validateDate(payload.hotel.checkIn)) dateErrors.push(`Hotel Check-in: ${validateDate(payload.hotel.checkIn)}`);
+        if (validateDate(payload.hotel.checkOut)) dateErrors.push(`Hotel Check-out: ${validateDate(payload.hotel.checkOut)}`);
+
+        if (validateDate(payload.payment.deadline)) dateErrors.push(`Payment Deadline: ${validateDate(payload.payment.deadline)}`);
+
+        payload.tourists.forEach((t: any, i: number) => {
+            if (validateDate(t.DOB)) dateErrors.push(`Traveller #${i+1} DOB: ${validateDate(t.DOB)}`);
+            if (validateDate(t.pasportExpiryDate)) dateErrors.push(`Traveller #${i+1} Passport Expiry: ${validateDate(t.pasportExpiryDate)}`);
+            if (validateDate(t.PasportIsueDate)) dateErrors.push(`Traveller #${i+1} Passport Issue Date: ${validateDate(t.PasportIsueDate)}`);
+        });
+
+        if (dateErrors.length > 0) {
+            alert(`Please correct the following date errors:\n${dateErrors.join('\n')}`);
+            return;
+        }
 
         fetch('/api/trips', {
             method: 'POST',
@@ -316,7 +337,7 @@ export const useAddTourForm = () => {
         });
     }, [buildDocuments, curDate, parseTravellerGroups, router]);
 
-    
+
 
     return {
         formRef,

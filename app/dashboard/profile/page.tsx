@@ -42,11 +42,11 @@ export default function ProfilePage() {
             pasportExpiryDate: "2025-12-31"
         },
         {
-            id: 2,  
+            id: 2,
             name: "Mary Johnson",
             pasportExpiryDate: "2026-06-15"
         },
-        
+
     ];
 
     const formatDate = (dateString: string) => {
@@ -91,12 +91,12 @@ export default function ProfilePage() {
                                             <User className="w-5 h-5 text-accent" />
                                             Name
                                         </Label>
-                                        <Input 
-                                            type="text" 
-                                            id="name" 
-                                            value={userProfile?.userName || ''} 
-                                            placeholder="Name" 
-                                            readOnly 
+                                        <Input
+                                            type="text"
+                                            id="name"
+                                            value={userProfile?.userName || ''}
+                                            placeholder="Name"
+                                            readOnly
                                             className="bg-white/10 border-white/20 backdrop-blur-sm h-12 text-white font-medium rounded-xl placeholder:text-gray-400"
                                         />
                                     </div>
@@ -107,12 +107,12 @@ export default function ProfilePage() {
                                             <Mail className="w-5 h-5 text-accent" />
                                             Email
                                         </Label>
-                                        <Input 
-                                            type="email" 
-                                            id="email" 
-                                            value={userProfile?.userEmail || ''} 
-                                            placeholder="Email" 
-                                            readOnly 
+                                        <Input
+                                            type="email"
+                                            id="email"
+                                            value={userProfile?.userEmail || ''}
+                                            placeholder="Email"
+                                            readOnly
                                             className="bg-white/10 border-white/20 backdrop-blur-sm h-12 text-white font-medium rounded-xl placeholder:text-gray-400"
                                         />
                                     </div>
@@ -141,41 +141,6 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Tourists Management */}
-                        <div className="lg:col-span-2">
-                            <div className="backdrop-blur-sm bg-white/5 rounded-3xl border border-white/10 shadow-xl p-8 hover:bg-white/10 transition-all duration-300">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-white mb-2">Tourist list</h2>
-                                        <p className="text-blue-200 font-medium">Manage tourists in your account</p>
-                                    </div>
-                                    <Button className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2">
-                                        <Plus className="w-5 h-5" />
-                                        Add tourist
-                                    </Button>
-                                </div>
-
-                                {accountTourists.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
-                                        {accountTourists.map((tourist) => (
-                                            <TouristCard key={tourist.id} tourist={tourist} />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-16">
-                                        <div className="w-20 h-20 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                            <User className="w-10 h-10 text-slate-400" />
-                                        </div>
-                                        <p className="text-blue-200 font-medium text-lg mb-6">No tourists added yet</p>
-                                        <Link href="/dashboard/profile/add-tourist"  className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                                            <Plus className="w-5 h-5 mr-3" />
-                                            Add first tourist
-                                        </Link>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>

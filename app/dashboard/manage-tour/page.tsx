@@ -1,12 +1,23 @@
 'use client';
 
-import { DragEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import FormInput from '@/components/ui/form-input';
 import { Label } from '@/components/ui/label';
-import { Trip, Documents, Tourist, FlightInfo, Hotel, Payment, Addons } from '@/types';
-import { FlightsSection, StaySection, ExtrasSection, PaymentSection } from '../add-tour/components';
-import { DEFAULT_DOCUMENTS, DOCUMENT_LABELS, DOCUMENT_KEYS } from '../shared/documents';
+import { Trip, Documents, Tourist, FlightInfo, Hotel, Payment, Addons, DEFAULT_DOCUMENTS, DOCUMENT_KEYS } from '@/types';
+import { validateDate } from '@/lib/utils';
+import {
+    BasicDetailsSection,
+    EmailSection,
+    FlightsSection,
+    StaySection,
+    ExtrasSection,
+    PaymentSection,
+    TravellerSection,
+    DocumentsSection,
+} from '../add-tour/components';
+import type { BasicDetailsField } from '../add-tour/components';
 
 type EditableTourist = Tourist & {
     PasportNumber?: string;
@@ -140,27 +151,44 @@ const validateTripData = (data: RawTrip): string | null => {
     if (isBlank(data.ownerEmail)) return 'Owner email is required.';
     if (isBlank(data.country)) return 'Destination country is required.';
     if (isBlank(data.region)) return 'Region is required.';
+
     if (isBlank(data.bookingDate)) return 'Booking date is required.';
+    if (validateDate(data.bookingDate)) return `Booking date: ${validateDate(data.bookingDate)}`;
+
     if (isBlank(data.tripStartDate)) return 'Trip start date is required.';
+    if (validateDate(data.tripStartDate)) return `Trip start date: ${validateDate(data.tripStartDate)}`;
+
     if (isBlank(data.tripEndDate)) return 'Trip end date is required.';
+    if (validateDate(data.tripEndDate)) return `Trip end date: ${validateDate(data.tripEndDate)}`;
 
     const { flightInfo } = data;
     if (isBlank(flightInfo.departure.country)) return 'Departure country is required.';
     if (isBlank(flightInfo.departure.airportCode)) return 'Departure airport code is required.';
     if (isBlank(flightInfo.departure.flightNumber)) return 'Departure flight number is required.';
+
     if (isBlank(flightInfo.departure.date)) return 'Departure date is required.';
+    if (validateDate(flightInfo.departure.date)) return `Departure date: ${validateDate(flightInfo.departure.date)}`;
+
     if (isBlank(flightInfo.departure.time)) return 'Departure time is required.';
 
     if (isBlank(flightInfo.arrival.country)) return 'Return country is required.';
     if (isBlank(flightInfo.arrival.airportCode)) return 'Return airport code is required.';
     if (isBlank(flightInfo.arrival.flightNumber)) return 'Return flight number is required.';
+
     if (isBlank(flightInfo.arrival.date)) return 'Return date is required.';
+    if (validateDate(flightInfo.arrival.date)) return `Return date: ${validateDate(flightInfo.arrival.date)}`;
+
     if (isBlank(flightInfo.arrival.time)) return 'Return time is required.';
 
     const { hotel } = data;
     if (isBlank(hotel.name)) return 'Hotel name is required.';
+
     if (isBlank(hotel.checkIn)) return 'Hotel check-in date is required.';
+    if (validateDate(hotel.checkIn)) return `Hotel check-in date: ${validateDate(hotel.checkIn)}`;
+
     if (isBlank(hotel.checkOut)) return 'Hotel check-out date is required.';
+    if (validateDate(hotel.checkOut)) return `Hotel check-out date: ${validateDate(hotel.checkOut)}`;
+
     if (isBlank(hotel.food)) return 'Meal plan is required.';
     if (!Number.isFinite(hotel.nights) || hotel.nights <= 0) return 'Hotel nights must be greater than zero.';
     if (isBlank(hotel.roomType)) return 'Room type is required.';
@@ -169,7 +197,9 @@ const validateTripData = (data: RawTrip): string | null => {
     if (!Number.isFinite(payment.totalAmount) || payment.totalAmount <= 0) return 'Total amount must be greater than zero.';
     if (!Number.isFinite(payment.paidAmount) || payment.paidAmount < 0) return 'Paid amount must be zero or a positive number.';
     if (payment.paidAmount > payment.totalAmount) return 'Paid amount cannot exceed total amount.';
+
     if (isBlank(payment.deadline)) return 'Payment deadline is required.';
+    if (validateDate(payment.deadline)) return `Payment deadline: ${validateDate(payment.deadline)}`;
 
     if (!Array.isArray(data.tourists) || data.tourists.length === 0) {
         return 'At least one traveller is required.';
@@ -180,11 +210,18 @@ const validateTripData = (data: RawTrip): string | null => {
         if (isBlank(traveller.name)) return `Traveller #${index + 1} first name is required.`;
         if (isBlank(traveller.surname)) return `Traveller #${index + 1} surname is required.`;
         if (isBlank(traveller.sex)) return `Traveller #${index + 1} sex is required.`;
+
         if (isBlank(traveller.DOB)) return `Traveller #${index + 1} date of birth is required.`;
+        if (validateDate(traveller.DOB ?? '')) return `Traveller #${index + 1} DOB: ${validateDate(traveller.DOB ?? '')}`;
+
         if (isBlank(traveller.pasportExpiryDate)) return `Traveller #${index + 1} passport expiry is required.`;
+        if (validateDate(traveller.pasportExpiryDate)) return `Traveller #${index + 1} passport expiry: ${validateDate(traveller.pasportExpiryDate)}`;
+
         if (isBlank(traveller.PasportNumber)) return `Traveller #${index + 1} passport number is required.`;
         if (isBlank(traveller.PasportSeries)) return `Traveller #${index + 1} passport series is required.`;
+
         if (isBlank(traveller.PasportIsueDate)) return `Traveller #${index + 1} passport issue date is required.`;
+        if (validateDate(traveller.PasportIsueDate ?? '')) return `Traveller #${index + 1} passport issue date: ${validateDate(traveller.PasportIsueDate ?? '')}`;
     }
 
     return null;
@@ -315,21 +352,13 @@ export default function ManageTourPage() {
         }));
     };
 
-    const handleDocumentDrop = (event: DragEvent<HTMLDivElement>, key: keyof Documents) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const file = event.dataTransfer.files?.[0];
-        if (file) {
-            handleDocumentFileSelection(key, file);
-        }
-    };
-
     const clearPendingFile = (key: keyof Documents) => {
         setPendingFiles((prev) => ({
             ...prev,
             [key]: null,
         }));
     };
+
 
     const handleFlightFieldChange = useCallback(
         (segment: 'departure' | 'arrival', field: keyof FlightInfo['departure'], value: string) => {
@@ -404,6 +433,133 @@ export default function ManageTourPage() {
         [],
     );
 
+    const handleBasicFieldChange = useCallback((field: BasicDetailsField, value: string) => {
+        setTrip((prev) => {
+            if (!prev) {
+                return prev;
+            }
+
+            if (field === 'country' || field === 'region') {
+                return {
+                    ...prev,
+                    [field]: value,
+                };
+            }
+
+            if (field === 'tripStartDate') {
+                return {
+                    ...prev,
+                    tripStartDate: value,
+                    hotel: {
+                        ...prev.hotel,
+                        checkIn: prev.hotel.checkIn || value,
+                    },
+                };
+            }
+
+            if (field === 'tripEndDate') {
+                return {
+                    ...prev,
+                    tripEndDate: value,
+                    hotel: {
+                        ...prev.hotel,
+                        checkOut: prev.hotel.checkOut || value,
+                    },
+                };
+            }
+
+            if (field === 'hotelNights') {
+                return {
+                    ...prev,
+                    hotel: {
+                        ...prev.hotel,
+                        nights: Number.parseInt(value, 10) || 0,
+                    },
+                };
+            }
+
+            if (field === 'food') {
+                return {
+                    ...prev,
+                    hotel: {
+                        ...prev.hotel,
+                        food: value,
+                    },
+                };
+            }
+
+            return prev;
+        });
+    }, []);
+
+    const handleOwnerEmailChange = useCallback((value: string) => {
+        setTrip((prev) => (prev ? { ...prev, ownerEmail: value } : prev));
+    }, []);
+
+    const handleTouristChange = useCallback((index: number, field: keyof Tourist, value: string) => {
+        setTrip((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      tourists: prev.tourists.map((entry, idx) =>
+                          idx === index ? { ...entry, [field]: value } : entry,
+                      ),
+                  }
+                : prev
+        );
+    }, []);
+
+    const handleAddTourist = useCallback(() => {
+        setTrip((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      tourists: [
+                          ...prev.tourists,
+                          {
+                              name: '',
+                              surname: '',
+                              sex: '',
+                              pasportExpiryDate: '',
+                              DOB: '',
+                              PasportNumber: '',
+                              PasportSeries: '',
+                              PasportIsueDate: '',
+                          },
+                      ],
+                  }
+                : prev
+        );
+    }, []);
+
+    const handleRemoveTourist = useCallback((index: number) => {
+        setTrip((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      tourists: prev.tourists.filter((_, idx) => idx !== index),
+                  }
+                : prev
+        );
+    }, []);
+
+    const handleDocumentToggleReady = useCallback((key: keyof Documents, isReady: boolean) => {
+        setTrip((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      documents: {
+                          ...prev.documents,
+                          [key]: {
+                              ...prev.documents[key],
+                              uploaded: isReady,
+                          },
+                      },
+                  }
+                : prev
+        );
+    }, []);
+
     return (
         <div className="min-h-screen bg-background py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
@@ -465,439 +621,104 @@ export default function ManageTourPage() {
                                         disabled
                                     />
                                 </div>
-                                <div>
-                                    <Label htmlFor="tour-owner">Owner email</Label>
-                                    <Input
-                                        id="tour-owner"
-                                        value={trip.ownerEmail ?? ''}
-                                        onChange={(event) =>
-                                            setTrip((prev) => (prev ? { ...prev, ownerEmail: event.target.value } : prev))
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="tour-country">Destination country</Label>
-                                    <Input
-                                        id="tour-country"
-                                        value={trip.country ?? ''}
-                                        onChange={(event) =>
-                                            setTrip((prev) => (prev ? { ...prev, country: event.target.value } : prev))
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="tour-region">Region</Label>
-                                    <Input
-                                        id="tour-region"
-                                        value={trip.region ?? ''}
-                                        onChange={(event) =>
-                                            setTrip((prev) => (prev ? { ...prev, region: event.target.value } : prev))
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="booking-date">Booking date</Label>
-                                    <Input
-                                        id="booking-date"
-                                        value={trip.bookingDate ?? ''}
-                                        onChange={(event) =>
-                                            setTrip((prev) => (prev ? { ...prev, bookingDate: event.target.value } : prev))
-                                        }
-                                        required
-                                    />
-                                </div>
+                                <FormInput
+                                    id="booking-date"
+                                    labelText="Booking date"
+                                    value={trip.bookingDate ?? ''}
+                                    onChange={(event) =>
+                                        setTrip((prev) => (prev ? { ...prev, bookingDate: event.target.value } : prev))
+                                    }
+                                    required
+                                    formatType="date"
+                                />
                                 <div>
                                     <Label htmlFor="manager-email">Last managed by</Label>
                                     <Input id="manager-email" value={trip.managerEmail ?? ''} disabled />
                                 </div>
                             </div>
-                            <div className="mt-6 grid gap-4 md:grid-cols-2">
-                                <div>
-                                    <Label htmlFor="trip-start">Trip start</Label>
-                                    <Input
-                                        id="trip-start"
-                                        value={trip.tripStartDate ?? ''}
-                                        onChange={(event) =>
-                                            setTrip((prev) =>
-                                                prev
-                                                    ? {
-                                                          ...prev,
-                                                          tripStartDate: event.target.value,
-                                                          hotel: { ...prev.hotel, checkIn: prev.hotel.checkIn || event.target.value },
-                                                      }
-                                                    : prev
-                                            )
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="trip-end">Trip end</Label>
-                                    <Input
-                                        id="trip-end"
-                                        value={trip.tripEndDate ?? ''}
-                                        onChange={(event) =>
-                                            setTrip((prev) =>
-                                                prev
-                                                    ? {
-                                                          ...prev,
-                                                          tripEndDate: event.target.value,
-                                                          hotel: { ...prev.hotel, checkOut: prev.hotel.checkOut || event.target.value },
-                                                      }
-                                                    : prev
-                                            )
-                                        }
-                                        required
-                                    />
-                                </div>
+                            <div className="mt-8 space-y-8">
+                                <BasicDetailsSection
+                                    variant="edit"
+                                    values={{
+                                        country: trip.country,
+                                        region: trip.region,
+                                        tripStartDate: trip.tripStartDate,
+                                        tripEndDate: trip.tripEndDate,
+                                    }}
+                                    onChange={handleBasicFieldChange}
+                                    showHotelNights={false}
+                                    showMealPlan={false}
+                                    title="Destination"
+                                    description="Update where and when the travellers are headed."
+                                />
+                                <EmailSection
+                                    variant="edit"
+                                    value={trip.ownerEmail ?? ''}
+                                    onChange={handleOwnerEmailChange}
+                                    title="Owner email"
+                                    description="Primary client contact used for confirmations and updates."
+                                />
                             </div>
                         </div>
 
                         <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
-                            <FlightsSection />
+                            <FlightsSection
+                                variant="edit"
+                                values={trip.flightInfo}
+                                onChange={handleFlightFieldChange}
+                                title="Flight information"
+                                description="Update outbound and inbound flight details."
+                            />
                         </div>
 
                         <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
-                            <StaySection />
+                            <StaySection
+                                variant="edit"
+                                values={trip.hotel}
+                                onChange={handleHotelFieldChange}
+                                includeMealPlan
+                                includeNights
+                                title="Accommodation"
+                                description="Capture hotel stay details and room allocation."
+                            />
                         </div>
 
                         <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
-                            <PaymentSection />
+                            <PaymentSection
+                                variant="edit"
+                                values={trip.payment}
+                                onChange={handlePaymentFieldChange}
+                                title="Payment overview"
+                                description="Track outstanding balances and payment deadlines."
+                            />
                             <div className="mt-6 border-t border-border/40 pt-6">
-                                <ExtrasSection />
+                                <ExtrasSection
+                                    variant="edit"
+                                    values={trip.addons}
+                                    onChange={handleAddonToggle}
+                                    title="Add-ons"
+                                    description="Toggle optional extras to reflect traveller preferences."
+                                />
                             </div>
                         </div>
 
                         <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
-                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                                <div>
-                                    <h2 className="text-2xl font-semibold text-foreground">Travellers</h2>
-                                    <p className="text-sm text-foreground/60">Adjust traveller details or add new participants.</p>
-                                </div>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() =>
-                                        setTrip((prev) =>
-                                            prev
-                                                ? {
-                                                      ...prev,
-                                                      tourists: [
-                                                          ...prev.tourists,
-                                                          {
-                                                              name: '',
-                                                              surname: '',
-                                                              sex: '',
-                                                              pasportExpiryDate: '',
-                                                              DOB: '',
-                                                              PasportNumber: '',
-                                                              PasportSeries: '',
-                                                              PasportIsueDate: '',
-                                                          },
-                                                      ],
-                                                  }
-                                                : prev
-                                        )
-                                    }
-                                >
-                                    Add traveller
-                                </Button>
-                            </div>
-                            <div className="mt-6 grid gap-6">
-                                {trip.tourists.map((tourist, index) => (
-                                    <div key={index} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
-                                        <div className="mb-4 flex items-center justify-between">
-                                            <h3 className="text-lg font-semibold text-foreground">Traveller #{index + 1}</h3>
-                                            {trip.tourists.length > 1 && (
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    onClick={() =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.filter((_, idx) => idx !== index),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                >
-                                                    Remove
-                                                </Button>
-                                            )}
-                                        </div>
-                                        <div className="grid gap-4 md:grid-cols-2">
-                                            <div>
-                                                <Label htmlFor={`traveller-name-${index}`}>First name</Label>
-                                                <Input
-                                                    id={`traveller-name-${index}`}
-                                                    value={tourist.name ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index ? { ...entry, name: event.target.value } : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-surname-${index}`}>Surname</Label>
-                                                <Input
-                                                    id={`traveller-surname-${index}`}
-                                                    value={tourist.surname ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index ? { ...entry, surname: event.target.value } : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-sex-${index}`}>Sex</Label>
-                                                <Input
-                                                    id={`traveller-sex-${index}`}
-                                                    value={tourist.sex ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index ? { ...entry, sex: event.target.value } : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-dob-${index}`}>Date of birth</Label>
-                                                <Input
-                                                    id={`traveller-dob-${index}`}
-                                                    value={tourist.DOB ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index ? { ...entry, DOB: event.target.value } : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-passport-expiry-${index}`}>Passport expiry</Label>
-                                                <Input
-                                                    id={`traveller-passport-expiry-${index}`}
-                                                    value={tourist.pasportExpiryDate ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index
-                                                                              ? { ...entry, pasportExpiryDate: event.target.value }
-                                                                              : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-passport-number-${index}`}>Passport number</Label>
-                                                <Input
-                                                    id={`traveller-passport-number-${index}`}
-                                                    value={tourist.PasportNumber ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index
-                                                                              ? { ...entry, PasportNumber: event.target.value }
-                                                                              : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-passport-series-${index}`}>Passport series</Label>
-                                                <Input
-                                                    id={`traveller-passport-series-${index}`}
-                                                    value={tourist.PasportSeries ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index
-                                                                              ? { ...entry, PasportSeries: event.target.value }
-                                                                              : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={`traveller-passport-issue-${index}`}>Passport issue date</Label>
-                                                <Input
-                                                    id={`traveller-passport-issue-${index}`}
-                                                    value={tourist.PasportIsueDate ?? ''}
-                                                    onChange={(event) =>
-                                                        setTrip((prev) =>
-                                                            prev
-                                                                ? {
-                                                                      ...prev,
-                                                                      tourists: prev.tourists.map((entry, idx) =>
-                                                                          idx === index
-                                                                              ? { ...entry, PasportIsueDate: event.target.value }
-                                                                              : entry,
-                                                                      ),
-                                                                  }
-                                                                : prev
-                                                        )
-                                                    }
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            <TravellerSection
+                                variant="edit"
+                                tourists={trip.tourists}
+                                onChange={handleTouristChange}
+                                onAdd={handleAddTourist}
+                                onRemove={handleRemoveTourist}
+                            />
                         </div>
 
-                        <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
-                            <h2 className="text-2xl font-semibold text-foreground">Documents</h2>
-                            <p className="text-sm text-foreground/60">Toggle availability and stage files for future upload. Selected files stay on this device until the upload flow is implemented.</p>
-                            <div className="mt-6 grid gap-4 md:grid-cols-2">
-                                {documentKeys.map((key) => {
-                                    const document = trip.documents[key] ?? DEFAULT_DOCUMENTS[key];
-                                    const pendingFile = pendingFiles[key];
-                                    return (
-                                        <div key={key} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
-                                            <div className="flex items-center justify-between gap-3">
-                                                <div>
-                                                    <h3 className="text-base font-semibold text-foreground">{DOCUMENT_LABELS[key]}</h3>
-                                                    <p className="text-xs text-foreground/50">Stage the latest file and mark it ready when it&apos;s approved.</p>
-                                                </div>
-                                                <label className="flex items-center gap-2 text-xs font-medium text-foreground">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={document.uploaded}
-                                                        onChange={(event) =>
-                                                            setTrip((prev) =>
-                                                                prev
-                                                                    ? {
-                                                                          ...prev,
-                                                                          documents: {
-                                                                              ...prev.documents,
-                                                                              [key]: {
-                                                                                  ...prev.documents[key],
-                                                                                  uploaded: event.target.checked,
-                                                                              },
-                                                                          },
-                                                                      }
-                                                                    : prev
-                                                            )
-                                                        }
-                                                        className="h-4 w-4"
-                                                    />
-                                                    Ready
-                                                </label>
-                                            </div>
-                                            <div
-                                                className="mt-3 rounded-xl border border-dashed border-border/60 bg-white/40 p-4 text-center text-sm text-foreground/60 transition-colors hover:border-foreground/40 dark:bg-white/10"
-                                                onDragOver={(event) => {
-                                                    event.preventDefault();
-                                                    event.stopPropagation();
-                                                }}
-                                                onDrop={(event) => handleDocumentDrop(event, key)}
-                                            >
-                                                <input
-                                                    id={`document-file-${key}`}
-                                                    type="file"
-                                                    className="hidden"
-                                                    onChange={(event) => {
-                                                        const file = event.target.files?.[0];
-                                                        if (file) {
-                                                            handleDocumentFileSelection(key, file);
-                                                        }
-                                                        event.target.value = '';
-                                                    }}
-                                                />
-                                                <label
-                                                    htmlFor={`document-file-${key}`}
-                                                    className="flex cursor-pointer flex-col items-center gap-2 text-xs font-medium text-foreground"
-                                                >
-                                                    <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
-                                                        {pendingFile?.name ?? 'Select or drop a file'}
-                                                    </span>
-                                                    <span className="text-foreground/50">
-                                                        {pendingFile ? 'File staged locally. Upload coming soon.' : 'Drag & drop or click to choose a file.'}
-                                                    </span>
-                                                </label>
-                                            </div>
-                                            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-foreground/60">
-                                                {pendingFile && (
-                                                    <Button type="button" variant="ghost" size="sm" onClick={() => clearPendingFile(key)}>
-                                                        Clear selection
-                                                    </Button>
-                                                )}
-                                                {document.url && (
-                                                    <a
-                                                        href={document.url}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="text-primary underline"
-                                                    >
-                                                        View existing link
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                        <DocumentsSection
+                            documents={trip.documents}
+                            pendingFiles={pendingFiles}
+                            onToggleReady={handleDocumentToggleReady}
+                            onFileSelect={handleDocumentFileSelection}
+                            onFileClear={clearPendingFile}
+                        />
 
                         <div className="flex justify-end">
                             <Button type="button" size="lg" onClick={handleSave} disabled={isSaving}>
@@ -914,4 +735,3 @@ export default function ManageTourPage() {
         </div>
     );
 }
-//

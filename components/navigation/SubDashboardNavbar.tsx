@@ -7,14 +7,14 @@ import { useSession } from "next-auth/react";
 export default function SubDashboardNavbar() {
     const { data: session } = useSession();
     const { userProfile } = useUserProfile();
-    
+
 
     return (
-        <nav className="w-35 h-screen sticky top-20">
+        <nav className="w-40 h-screen sticky top-20">
             <div className="flex flex-col p-6">
                 <ul className="flex flex-col space-y-4">
-                    
-                    { userProfile && 
+
+                    { userProfile &&
                         (userProfile?.privelegeLevel > 1 && (
                             <li>
                                 <NavLink href="/dashboard/add-tour" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">

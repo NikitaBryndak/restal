@@ -7,7 +7,7 @@ export default function TripCard({ data }: { data: Trip }) {
     const totalAmount = data.payment?.totalAmount ?? 0;
     const paidAmount = data.payment?.paidAmount ?? 0;
     const toPay = totalAmount - paidAmount;
-    const cashback = data.payment.totalAmount * 0.01; 
+    const cashback = data.payment.totalAmount * 0.01;
 
     const addonItems = [
         { label: "Insurance", value: data.addons.insurance, icon: "🛡️" },
@@ -76,9 +76,9 @@ export default function TripCard({ data }: { data: Trip }) {
                 </div>
 
                 {/* Right Side - All Data Points (70%) */}
-                <div className="flex p-6 gap-5 flex-col md:flex-row">
+                <div className="flex w-full p-6 gap-5 flex-col md:flex-row">
                     {/* Flight & Hotel Info */}
-                    <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-6 h-full text-white border border-white/10">
+                    <div className="w-full bg-white/10 backdrop-blur-md rounded-xl p-6 h-full text-white border border-white/10">
                         <div className="grid grid-cols-2 gap-x-6 gap-y-5 h-full">
                             {/* Departure */}
                             <div className="space-y-2.5">
@@ -88,7 +88,7 @@ export default function TripCard({ data }: { data: Trip }) {
                                 </div>
                                 <p className="text-base font-semibold pl-3">{data.flightInfo.departure.airportCode} · {data.flightInfo.departure.flightNumber}</p>
                                 <div className="flex items-center gap-2 text-white/80 pl-3">
-                                    <p className="text-xs font-medium">{data.flightInfo.departure.date}</p> 
+                                    <p className="text-xs font-medium">{data.flightInfo.departure.date}</p>
                                     <Clock className='w-3.5 h-3.5 text-white/60'/>
                                     <p className="text-xs font-medium">{data.flightInfo.departure.time}</p>
                                 </div>
@@ -147,8 +147,8 @@ export default function TripCard({ data }: { data: Trip }) {
                                         <div
                                             key={addon.label}
                                             className={`flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm border ${
-                                                addon.value 
-                                                    ? 'bg-emerald-500/15 border-emerald-400/40 text-white' 
+                                                addon.value
+                                                    ? 'bg-emerald-500/15 border-emerald-400/40 text-white'
                                                     : 'bg-white/5 border-white/10 text-white/50'
                                             }`}
                                         >
@@ -173,9 +173,9 @@ export default function TripCard({ data }: { data: Trip }) {
                                     </div>
                                     <p className="text-[11px] text-emerald-300 font-medium mt-1">💰 +{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cashback)}₴ cashback</p>
                                 </div>
-                                
+
                                 <div className="w-full h-px bg-white/20 my-0.5"></div>
-                                
+
                                 <div className="text-center">
                                     <p className="text-xl font-bold text-amber-300 leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(toPay)}₴</p>
                                     <p className="text-[11px] text-white/60 mt-1">{data.payment.deadline}</p>

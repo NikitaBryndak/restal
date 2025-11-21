@@ -1,27 +1,60 @@
-export const ExtrasSection = () => {
+import { ChangeEvent } from 'react';
+
+import { Addons } from '@/types';
+
+type ExtrasField = keyof Addons;
+
+type ExtrasSectionProps = {
+    variant?: 'create' | 'edit';
+    values?: Addons;
+    onChange?: (field: ExtrasField, value: boolean) => void;
+    title?: string;
+    description?: string;
+};
+
+const extrasOptions: Array<{ field: ExtrasField; label: string; name: string }> = [
+    { field: 'insurance', label: 'Travel insurance', name: 'insurance' },
+    { field: 'transfer', label: 'Airport transfer', name: 'transfer' },
+];
+
+export const ExtrasSection = ({
+    variant = 'create',
+    values,
+    onChange,
+    title = 'Extras',
+    description = 'Optional add-ons for peace of mind.',
+}: ExtrasSectionProps) => {
+    const controlled = variant === 'edit' && values && onChange;
+
+    const buildInputProps = (field: ExtrasField) => {
+        if (!controlled) {
+            return {};
+        }
+
+        return {
+            checked: Boolean(values?.[field]),
+            onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.checked),
+        };
+    };
+
     return (
         <section className="space-y-4">
             <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground">Extras</h2>
-                <p className="text-sm text-foreground/60">Optional add-ons for peace of mind.</p>
+                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                <p className="text-sm text-foreground/60">{description}</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
-                <label className="flex items-center gap-3 text-sm font-medium text-foreground/80">
-                    <input
-                        type="checkbox"
-                        name="insurance"
-                        className="size-4 rounded border border-border/60 text-primary focus:ring-primary/30"
-                    />
-                    Travel insurance
-                </label>
-                <label className="flex items-center gap-3 text-sm font-medium text-foreground/80">
-                    <input
-                        type="checkbox"
-                        name="transfer"
-                        className="size-4 rounded border border-border/60 text-primary focus:ring-primary/30"
-                    />
-                    Airport transfer
-                </label>
+                {extrasOptions.map(({ field, label, name }) => (
+                    <label key={field} className="flex items-center gap-3 text-sm font-medium text-foreground/80">
+                        <input
+                            type="checkbox"
+                            name={name}
+                            className="size-4 rounded border border-border/60 text-primary focus:ring-primary/30"
+                            {...buildInputProps(field)}
+                        />
+                        {label}
+                    </label>
+                ))}
             </div>
         </section>
     );

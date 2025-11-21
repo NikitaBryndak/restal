@@ -1,36 +1,68 @@
-import FormInput from '@/components/ui/form-input';
+import { ChangeEvent } from 'react';
 
-export const PaymentSection = () => {
+import FormInput from '@/components/ui/form-input';
+import { Payment } from '@/types';
+
+type PaymentField = keyof Payment;
+
+type PaymentSectionProps = {
+    variant?: 'create' | 'edit';
+    values?: Payment;
+    onChange?: (field: PaymentField, value: string) => void;
+    title?: string;
+    description?: string;
+};
+
+const paymentConfig: Array<{ field: PaymentField; label: string; placeholder: string; name: string; type?: string; formatType?: 'date' }> = [
+    { field: 'totalAmount', label: 'Total amount', placeholder: 'e.g. 1299.99', name: 'paymentTotal', type: 'number' },
+    { field: 'paidAmount', label: 'Paid amount', placeholder: 'e.g. 500', name: 'paymentPaid', type: 'number' },
+    { field: 'deadline', label: 'Payment deadline', placeholder: '30/01/2021', name: 'paymentDeadline', formatType: 'date' },
+];
+
+export const PaymentSection = ({
+    variant = 'create',
+    values,
+    onChange,
+    title = 'Payment',
+    description = 'Capture the financials to keep billing clear.',
+}: PaymentSectionProps) => {
+    const controlled = variant === 'edit' && values && onChange;
+
+    const buildInputProps = (field: PaymentField) => {
+        if (!controlled) {
+            return {};
+        }
+
+        const rawValue = values?.[field];
+        const value = typeof rawValue === 'number' ? String(rawValue ?? '') : rawValue ?? '';
+
+        return {
+            value,
+            onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value),
+        };
+    };
+
     return (
         <section className="space-y-6">
             <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground">Payment</h2>
-                <p className="text-sm text-foreground/60">Capture the financials to keep billing clear.</p>
+                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                <p className="text-sm text-foreground/60">{description}</p>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                <FormInput
-                    labelText="Total amount"
-                    placeholder="e.g. 1299.99"
-                    name="paymentTotal"
-                    type="number"
-                    step="0.01"
-                    inputMode="decimal"
-                />
-                <FormInput
-                    labelText="Paid amount"
-                    placeholder="e.g. 500"
-                    name="paymentPaid"
-                    type="number"
-                    step="0.01"
-                    inputMode="decimal"
-                />
-                <FormInput
-                    labelText="Payment deadline"
-                    placeholder='30/01/2021'
-                    name="paymentDeadline"
-                    autoComplete="off"
-                    formatType="date"
-                />
+                {paymentConfig.map(({ field, label, placeholder, name, type, formatType }) => (
+                    <FormInput
+                        key={field}
+                        labelText={label}
+                        placeholder={placeholder}
+                        name={name}
+                        type={type}
+                        autoComplete="off"
+                        inputMode={type === 'number' ? 'decimal' : undefined}
+                        step={type === 'number' ? '0.01' : undefined}
+                        formatType={formatType}
+                        {...buildInputProps(field)}
+                    />
+                ))}
             </div>
         </section>
     );
