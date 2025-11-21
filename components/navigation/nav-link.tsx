@@ -9,13 +9,15 @@ interface NavLinkProps {
   className?: string
   children: React.ReactNode
   variant?: "default" | "button"
+  onClick?: () => void
 }
 
-export function NavLink({ 
-  href, 
+export function NavLink({
+  href,
   className,
   children,
-  variant = "default"
+  variant = "default",
+  onClick
 }: NavLinkProps) {
   const pathname = usePathname()
   const isActive = pathname === href
@@ -24,6 +26,7 @@ export function NavLink({
     return (
       <Link
         href={href}
+        onClick={onClick}
         className={cn(
           "border rounded-md border-foreground/20 px-4 py-2 text-sm transition-colors",
           "bg-white/90 text-black hover:bg-accent hover:text-white hover:border-accent",
@@ -38,6 +41,7 @@ export function NavLink({
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={cn(
         "text-sm text-foreground/70 transition-colors",
         {

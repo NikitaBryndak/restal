@@ -1,6 +1,7 @@
 import { ChangeEvent } from 'react';
-
+import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
+import { TourFormValues } from '../schema';
 
 export type BasicDetailsField = 'country' | 'region' | 'hotelNights' | 'tripStartDate' | 'tripEndDate' | 'food';
 
@@ -20,7 +21,7 @@ const primaryFields: Array<{
     field: BasicDetailsField;
     label: string;
     placeholder: string;
-    name: string;
+    name: keyof TourFormValues;
     formatType?: 'date';
     inputMode?: 'numeric';
     pattern?: string;
@@ -30,7 +31,7 @@ const primaryFields: Array<{
     { field: 'hotelNights', label: 'Hotel nights', placeholder: 'e.g. 7', name: 'hotelNights', inputMode: 'numeric', pattern: '[0-9]*' },
 ];
 
-const dateFields: Array<{ field: Extract<BasicDetailsField, 'tripStartDate' | 'tripEndDate'>; label: string; name: string }> = [
+const dateFields: Array<{ field: Extract<BasicDetailsField, 'tripStartDate' | 'tripEndDate'>; label: string; name: keyof TourFormValues }> = [
     { field: 'tripStartDate', label: 'Departure date', name: 'tripStartDate' },
     { field: 'tripEndDate', label: 'Return date', name: 'tripEndDate' },
 ];
@@ -44,20 +45,20 @@ export const BasicDetailsSection = ({
     showHotelNights = true,
     showMealPlan = true,
 }: BasicDetailsSectionProps) => {
+    const { register, formState: { errors } } = useFormContext<TourFormValues>();
     const controlled = variant === 'edit' && values && onChange;
 
-    const buildInputProps = (field: BasicDetailsField) => {
-        if (!controlled) {
-            return {};
+    const buildInputProps = (field: BasicDetailsField, name: keyof TourFormValues) => {
+        if (controlled) {
+            const rawValue = values?.[field];
+            const value = typeof rawValue === 'number' ? String(rawValue ?? '') : rawValue ?? '';
+            return {
+                value,
+                onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value),
+            };
         }
 
-        const rawValue = values?.[field];
-        const value = typeof rawValue === 'number' ? String(rawValue ?? '') : rawValue ?? '';
-
-        return {
-            value,
-            onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value),
-        };
+        return register(name);
     };
 
     const mealPlanProps = controlled
@@ -65,7 +66,7 @@ export const BasicDetailsSection = ({
               value: typeof values?.food === 'string' ? values.food : '',
               onChange: (event: ChangeEvent<HTMLSelectElement>) => onChange('food', event.target.value),
           }
-        : { defaultValue: '' };
+        : register('food');
 
     return (
         <section className="space-y-6">
@@ -77,36 +78,41 @@ export const BasicDetailsSection = ({
                 {primaryFields
                     .filter((field) => field.field !== 'hotelNights' || showHotelNights)
                     .map(({ field, label, placeholder, name, inputMode, pattern }) => (
-                        <FormInput
-                            key={field}
-                            labelText={label}
-                            placeholder={placeholder}
-                            name={name}
-                            autoComplete="off"
-                            inputMode={inputMode}
-                            pattern={pattern}
-                            {...buildInputProps(field)}
-                        />
+                        <div key={field}>
+                            <FormInput
+                                labelText={label}
+                                placeholder={placeholder}
+                                autoComplete="off"
+                                inputMode={inputMode}
+                                pattern={pattern}
+                                {...buildInputProps(field, name)}
+                            />
+                            {!controlled && errors[name] && (
+                                <p className="text-xs text-red-500 mt-1">{errors[name]?.message as string}</p>
+                            )}
+                        </div>
                     ))}
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {dateFields.map(({ field, label, name }) => (
-                    <FormInput
-                        key={field}
-                        labelText={label}
-                        placeholder="30/01/2021"
-                        name={name}
-                        autoComplete="off"
-                        formatType="date"
-                        {...buildInputProps(field)}
-                    />
+                    <div key={field}>
+                        <FormInput
+                            labelText={label}
+                            placeholder="30/01/2021"
+                            autoComplete="off"
+                            formatType="date"
+                            {...buildInputProps(field, name)}
+                        />
+                        {!controlled && errors[name] && (
+                            <p className="text-xs text-red-500 mt-1">{errors[name]?.message as string}</p>
+                        )}
+                    </div>
                 ))}
             </div>
             {showMealPlan && (
                 <div>
                     <label className="mb-2 block text-sm font-medium text-foreground/80">Meal plan</label>
                     <select
-                        name="food"
                         className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                         {...mealPlanProps}
                     >

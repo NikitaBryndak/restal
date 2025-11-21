@@ -1,6 +1,7 @@
 import { ChangeEvent } from 'react';
-
+import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
+import { TourFormValues } from '../schema';
 
 type EmailSectionProps = {
     variant?: 'create' | 'edit';
@@ -17,6 +18,7 @@ export const EmailSection = ({
     title = 'Email',
     description = 'Who is the primary contact for this tour?',
 }: EmailSectionProps) => {
+    const { register, formState: { errors } } = useFormContext<TourFormValues>();
     const controlled = variant === 'edit' && onChange;
 
     const inputProps = controlled
@@ -24,7 +26,7 @@ export const EmailSection = ({
               value: value ?? '',
               onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
           }
-        : {};
+        : register('ownerEmail');
 
     return (
         <section className="space-y-6">
@@ -33,15 +35,19 @@ export const EmailSection = ({
                 <p className="text-sm text-foreground/60">{description}</p>
             </div>
 
-            <FormInput
-                labelText="Email"
-                placeholder="e.g. john.doe@example.com"
-                name="ownerEmail"
-                type="email"
-                autoComplete="off"
-                formatType="email"
-                {...inputProps}
-            />
+            <div>
+                <FormInput
+                    labelText="Email"
+                    placeholder="e.g. john.doe@example.com"
+                    type="email"
+                    autoComplete="off"
+                    formatType="email"
+                    {...inputProps}
+                />
+                {!controlled && errors.ownerEmail && (
+                    <p className="text-xs text-red-500 mt-1">{errors.ownerEmail.message}</p>
+                )}
+            </div>
         </section>
     );
 };

@@ -1,6 +1,7 @@
 import { ChangeEvent } from 'react';
-
+import { useFormContext } from 'react-hook-form';
 import { Addons } from '@/types';
+import { TourFormValues } from '../schema';
 
 type ExtrasField = keyof Addons;
 
@@ -12,7 +13,7 @@ type ExtrasSectionProps = {
     description?: string;
 };
 
-const extrasOptions: Array<{ field: ExtrasField; label: string; name: string }> = [
+const extrasOptions: Array<{ field: ExtrasField; label: string; name: keyof TourFormValues }> = [
     { field: 'insurance', label: 'Travel insurance', name: 'insurance' },
     { field: 'transfer', label: 'Airport transfer', name: 'transfer' },
 ];
@@ -24,17 +25,17 @@ export const ExtrasSection = ({
     title = 'Extras',
     description = 'Optional add-ons for peace of mind.',
 }: ExtrasSectionProps) => {
+    const { register } = useFormContext<TourFormValues>();
     const controlled = variant === 'edit' && values && onChange;
 
-    const buildInputProps = (field: ExtrasField) => {
-        if (!controlled) {
-            return {};
+    const buildInputProps = (field: ExtrasField, name: keyof TourFormValues) => {
+        if (controlled) {
+            return {
+                checked: Boolean(values?.[field]),
+                onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.checked),
+            };
         }
-
-        return {
-            checked: Boolean(values?.[field]),
-            onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.checked),
-        };
+        return register(name);
     };
 
     return (
@@ -48,9 +49,8 @@ export const ExtrasSection = ({
                     <label key={field} className="flex items-center gap-3 text-sm font-medium text-foreground/80">
                         <input
                             type="checkbox"
-                            name={name}
                             className="size-4 rounded border border-border/60 text-primary focus:ring-primary/30"
-                            {...buildInputProps(field)}
+                            {...buildInputProps(field, name)}
                         />
                         {label}
                     </label>

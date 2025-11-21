@@ -1,5 +1,6 @@
 'use client';
 
+import { FormProvider } from 'react-hook-form';
 import TripCard from '@/components/trip/trip-card';
 import { Button } from '@/components/ui/button';
 import { usePreviewData } from './hooks/usePreviewData';
@@ -8,7 +9,7 @@ import { useAddTourForm } from './hooks/useAddTourForm';
 import { BasicDetailsSection, FlightsSection, TravellerSection, EmailSection, StaySection, ExtrasSection, PaymentSection } from './components';
 
 export default function AddTourPage() {
-    const { formRef, previewState, handleSubmit, handleFormInteraction } = useAddTourForm();
+    const { form, previewState, onSubmit } = useAddTourForm();
     const previewData = usePreviewData(previewState);
 
     return (
@@ -36,29 +37,28 @@ export default function AddTourPage() {
                         )}
                     </aside>
 
-                    <form
-                        ref={formRef}
-                        onSubmit={handleSubmit}
-                        onInput={handleFormInteraction}
-                        onChange={handleFormInteraction}
-                        className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8"
-                    >
-                        <div className="space-y-10">
-                            <BasicDetailsSection />
-                            <FlightsSection />
-                            <TravellerSection />
-                            <EmailSection />
-                            <StaySection />
-                            <ExtrasSection />
-                            <PaymentSection />
-                        </div>
+                    <FormProvider {...form}>
+                        <form
+                            onSubmit={onSubmit}
+                            className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8"
+                        >
+                            <div className="space-y-10">
+                                <BasicDetailsSection />
+                                <FlightsSection />
+                                <TravellerSection />
+                                <EmailSection />
+                                <StaySection />
+                                <ExtrasSection />
+                                <PaymentSection />
+                            </div>
 
-                        <div className="mt-10 flex justify-end border-t border-border/40 pt-6">
-                            <Button type="submit" size="lg" className="px-8">
-                                Create tour
-                            </Button>
-                        </div>
-                    </form>
+                            <div className="mt-10 flex justify-end border-t border-border/40 pt-6">
+                                <Button type="submit" size="lg" className="px-8">
+                                    Create tour
+                                </Button>
+                            </div>
+                        </form>
+                    </FormProvider>
                 </div>
             </div>
         </div>

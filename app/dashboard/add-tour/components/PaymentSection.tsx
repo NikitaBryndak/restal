@@ -1,7 +1,8 @@
 import { ChangeEvent } from 'react';
-
+import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { Payment } from '@/types';
+import { TourFormValues } from '../schema';
 
 type PaymentField = keyof Payment;
 
@@ -13,7 +14,7 @@ type PaymentSectionProps = {
     description?: string;
 };
 
-const paymentConfig: Array<{ field: PaymentField; label: string; placeholder: string; name: string; type?: string; formatType?: 'date' }> = [
+const paymentConfig: Array<{ field: PaymentField; label: string; placeholder: string; name: keyof TourFormValues; type?: string; formatType?: 'date' }> = [
     { field: 'totalAmount', label: 'Total amount', placeholder: 'e.g. 1299.99', name: 'paymentTotal', type: 'number' },
     { field: 'paidAmount', label: 'Paid amount', placeholder: 'e.g. 500', name: 'paymentPaid', type: 'number' },
     { field: 'deadline', label: 'Payment deadline', placeholder: '30/01/2021', name: 'paymentDeadline', formatType: 'date' },
@@ -26,20 +27,19 @@ export const PaymentSection = ({
     title = 'Payment',
     description = 'Capture the financials to keep billing clear.',
 }: PaymentSectionProps) => {
+    const { register, formState: { errors } } = useFormContext<TourFormValues>();
     const controlled = variant === 'edit' && values && onChange;
 
-    const buildInputProps = (field: PaymentField) => {
-        if (!controlled) {
-            return {};
+    const buildInputProps = (field: PaymentField, name: keyof TourFormValues) => {
+        if (controlled) {
+            const rawValue = values?.[field];
+            const value = typeof rawValue === 'number' ? String(rawValue ?? '') : rawValue ?? '';
+            return {
+                value,
+                onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value),
+            };
         }
-
-        const rawValue = values?.[field];
-        const value = typeof rawValue === 'number' ? String(rawValue ?? '') : rawValue ?? '';
-
-        return {
-            value,
-            onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value),
-        };
+        return register(name);
     };
 
     return (
@@ -50,18 +50,21 @@ export const PaymentSection = ({
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {paymentConfig.map(({ field, label, placeholder, name, type, formatType }) => (
-                    <FormInput
-                        key={field}
-                        labelText={label}
-                        placeholder={placeholder}
-                        name={name}
-                        type={type}
-                        autoComplete="off"
-                        inputMode={type === 'number' ? 'decimal' : undefined}
-                        step={type === 'number' ? '0.01' : undefined}
-                        formatType={formatType}
-                        {...buildInputProps(field)}
-                    />
+                    <div key={field}>
+                        <FormInput
+                            labelText={label}
+                            placeholder={placeholder}
+                            type={type}
+                            autoComplete="off"
+                            inputMode={type === 'number' ? 'decimal' : undefined}
+                            step={type === 'number' ? '0.01' : undefined}
+                            formatType={formatType}
+                            {...buildInputProps(field, name)}
+                        />
+                        {!controlled && errors[name] && (
+                            <p className="text-xs text-red-500 mt-1">{errors[name]?.message as string}</p>
+                        )}
+                    </div>
                 ))}
             </div>
         </section>

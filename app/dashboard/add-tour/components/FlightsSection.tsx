@@ -1,7 +1,8 @@
 import { ChangeEvent } from 'react';
-
+import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { FlightInfo } from '@/types';
+import { TourFormValues } from '../schema';
 
 type FlightSegment = 'departure' | 'arrival';
 type FlightField = keyof FlightInfo['departure'];
@@ -19,12 +20,12 @@ const segmentCopy: Record<FlightSegment, { heading: string }> = {
     arrival: { heading: 'Return' },
 };
 
-const fieldMeta: Record<FlightField, { label: string; placeholder: string; name: string; formatType?: 'date' | 'time' }> = {
-    country: { label: 'Country', placeholder: 'e.g. Spain', name: 'country' },
-    airportCode: { label: 'Airport code', placeholder: 'e.g. MAD', name: 'airport' },
-    flightNumber: { label: 'Flight number', placeholder: 'e.g. IB1234', name: 'flight' },
-    date: { label: 'Date', placeholder: '30/01/2021', name: 'date', formatType: 'date' },
-    time: { label: 'Time', placeholder: '11:35', name: 'time', formatType: 'time' },
+const fieldMeta: Record<FlightField, { label: string; placeholder: string; nameSuffix: string; formatType?: 'date' | 'time' }> = {
+    country: { label: 'Country', placeholder: 'e.g. Spain', nameSuffix: 'Country' },
+    airportCode: { label: 'Airport code', placeholder: 'e.g. MAD', nameSuffix: 'Airport' },
+    flightNumber: { label: 'Flight number', placeholder: 'e.g. IB1234', nameSuffix: 'Flight' },
+    date: { label: 'Date', placeholder: '30/01/2021', nameSuffix: 'Date', formatType: 'date' },
+    time: { label: 'Time', placeholder: '11:35', nameSuffix: 'Time', formatType: 'time' },
 };
 
 export const FlightsSection = ({
@@ -34,6 +35,9 @@ export const FlightsSection = ({
     title = 'Flights',
     description = 'Outbound and return flight details for the itinerary.',
 }: FlightsSectionProps) => {
+    const { register, formState: { errors } } = useFormContext<TourFormValues>();
+    const controlled = variant === 'edit' && values && onChange;
+
     const handleFieldChange = (
         segment: FlightSegment,
         field: FlightField,
@@ -42,8 +46,6 @@ export const FlightsSection = ({
             onChange(segment, field, event.target.value);
         }
     };
-
-    const controlled = variant === 'edit' && values && onChange;
 
     return (
         <section className="space-y-6">
@@ -60,23 +62,28 @@ export const FlightsSection = ({
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             {(Object.keys(fieldMeta) as FlightField[]).map((field) => {
                                 const meta = fieldMeta[field];
+                                const fieldName = `${segment}${meta.nameSuffix}` as keyof TourFormValues;
+
                                 const inputProps = controlled
                                     ? {
                                           value: values?.[segment]?.[field] ?? '',
                                           onChange: handleFieldChange(segment, field),
                                       }
-                                    : {};
+                                    : register(fieldName);
 
                                 return (
-                                    <FormInput
-                                        key={`${segment}-${field}`}
-                                        labelText={meta.label}
-                                        placeholder={meta.placeholder}
-                                        name={`${segment}${meta.name.charAt(0).toUpperCase()}${meta.name.slice(1)}`}
-                                        autoComplete="off"
-                                        formatType={meta.formatType}
-                                        {...inputProps}
-                                    />
+                                    <div key={`${segment}-${field}`}>
+                                        <FormInput
+                                            labelText={meta.label}
+                                            placeholder={meta.placeholder}
+                                            autoComplete="off"
+                                            formatType={meta.formatType}
+                                            {...inputProps}
+                                        />
+                                        {!controlled && errors[fieldName] && (
+                                            <p className="text-xs text-red-500 mt-1">{errors[fieldName]?.message as string}</p>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </div>
