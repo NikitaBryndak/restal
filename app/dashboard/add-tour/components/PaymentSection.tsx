@@ -27,7 +27,9 @@ export const PaymentSection = ({
     title = 'Payment',
     description = 'Capture the financials to keep billing clear.',
 }: PaymentSectionProps) => {
-    const { register, formState: { errors } } = useFormContext<TourFormValues>();
+    const context = useFormContext<TourFormValues>();
+    const register = context?.register ?? (() => ({} as any));
+    const errors = context?.formState?.errors ?? {};
     const controlled = variant === 'edit' && values && onChange;
 
     const buildInputProps = (field: PaymentField, name: keyof TourFormValues) => {

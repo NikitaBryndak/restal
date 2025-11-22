@@ -13,10 +13,7 @@ type TravellerSectionProps = {
     onRemove?: (index: number) => void;
 };
 
-export const TravellerSection = ({
-    variant = 'create',
-    tourists,
-    onChange,
+const TravellerSectionCreate = ({
     onAdd,
     onRemove,
 }: TravellerSectionProps) => {
@@ -26,9 +23,8 @@ export const TravellerSection = ({
         name: "travellers",
     });
 
-    // If in create mode, ensure at least one traveller exists
     useEffect(() => {
-        if (variant === 'create' && fields.length === 0) {
+        if (fields.length === 0) {
             append({
                 firstName: '',
                 lastName: '',
@@ -40,135 +36,139 @@ export const TravellerSection = ({
                 passportIssueDate: '',
             });
         }
-    }, [variant, fields.length, append]);
+    }, [fields.length, append]);
 
-    if (variant === 'create') {
-        return (
-            <section className="space-y-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <h2 className="text-2xl font-semibold text-foreground">Travellers</h2>
-                        <p className="text-sm text-foreground/60">Main traveller details — at least name and passport expiry.</p>
-                    </div>
-                    <Button type="button" variant="outline" onClick={() => append({
-                        firstName: '',
-                        lastName: '',
-                        sex: 'unspecified',
-                        passportExpiry: '',
-                        dob: '',
-                        passportNumber: '',
-                        passportSeries: '',
-                        passportIssueDate: '',
-                    })}>
-                        Add traveller
-                    </Button>
+    return (
+        <section className="space-y-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 className="text-2xl font-semibold text-foreground">Travellers</h2>
+                    <p className="text-sm text-foreground/60">Main traveller details — at least name and passport expiry.</p>
                 </div>
-                <div className="mt-6 grid gap-6">
-                    {fields.map((field, index) => (
-                        <div key={field.id} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
-                            <div className="mb-4 flex items-center justify-between">
-                                <h3 className="text-lg font-semibold text-foreground">Traveller #{index + 1}</h3>
-                                {fields.length > 1 && (
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        onClick={() => remove(index)}
-                                    >
-                                        Remove
-                                    </Button>
+                <Button type="button" variant="outline" onClick={() => append({
+                    firstName: '',
+                    lastName: '',
+                    sex: 'unspecified',
+                    passportExpiry: '',
+                    dob: '',
+                    passportNumber: '',
+                    passportSeries: '',
+                    passportIssueDate: '',
+                })}>
+                    Add traveller
+                </Button>
+            </div>
+            <div className="mt-6 grid gap-6">
+                {fields.map((field, index) => (
+                    <div key={field.id} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
+                        <div className="mb-4 flex items-center justify-between">
+                            <h3 className="text-lg font-semibold text-foreground">Traveller #{index + 1}</h3>
+                            {fields.length > 1 && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => remove(index)}
+                                >
+                                    Remove
+                                </Button>
+                            )}
+                        </div>
+                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+                            <div className="space-y-1">
+                                <FormInput
+                                    labelText="First name"
+                                    placeholder="e.g. John"
+                                    autoComplete="off"
+                                    {...register(`travellers.${index}.firstName`)}
+                                />
+                                {errors.travellers?.[index]?.firstName && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.firstName?.message}</p>
                                 )}
                             </div>
-                            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
-                                <div className="space-y-1">
-                                    <FormInput
-                                        labelText="First name"
-                                        placeholder="e.g. John"
-                                        autoComplete="off"
-                                        {...register(`travellers.${index}.firstName`)}
-                                    />
-                                    {errors.travellers?.[index]?.firstName && (
-                                        <p className="text-xs text-red-500">{errors.travellers[index]?.firstName?.message}</p>
-                                    )}
-                                </div>
-                                <div className="space-y-1">
-                                    <FormInput
-                                        labelText="Surname"
-                                        placeholder="e.g. Doe"
-                                        autoComplete="off"
-                                        {...register(`travellers.${index}.lastName`)}
-                                    />
-                                    {errors.travellers?.[index]?.lastName && (
-                                        <p className="text-xs text-red-500">{errors.travellers[index]?.lastName?.message}</p>
-                                    )}
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-foreground/80">
-                                        Sex
-                                    </label>
-                                    <select
-                                        className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                        {...register(`travellers.${index}.sex`)}
-                                    >
-                                        <option value="unspecified" disabled>
-                                            Select an option
-                                        </option>
-                                        <option value="female">Female</option>
-                                        <option value="male">Male</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <FormInput
-                                        labelText="Passport expiry"
-                                        placeholder='30/01/2021'
-                                        autoComplete="off"
-                                        formatType="date"
-                                        {...register(`travellers.${index}.passportExpiry`)}
-                                    />
-                                    {errors.travellers?.[index]?.passportExpiry && (
-                                        <p className="text-xs text-red-500">{errors.travellers[index]?.passportExpiry?.message}</p>
-                                    )}
-                                </div>
-                                <div className="space-y-1">
-                                    <FormInput
-                                        labelText="DOB"
-                                        placeholder='30/01/2021'
-                                        autoComplete="off"
-                                        formatType="date"
-                                        {...register(`travellers.${index}.dob`)}
-                                    />
-                                    {errors.travellers?.[index]?.dob && (
-                                        <p className="text-xs text-red-500">{errors.travellers[index]?.dob?.message}</p>
-                                    )}
-                                </div>
+                            <div className="space-y-1">
                                 <FormInput
-                                    labelText="Pasport number"
-                                    placeholder='127485153'
+                                    labelText="Surname"
+                                    placeholder="e.g. Doe"
                                     autoComplete="off"
-                                    {...register(`travellers.${index}.passportNumber`)}
+                                    {...register(`travellers.${index}.lastName`)}
                                 />
+                                {errors.travellers?.[index]?.lastName && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.lastName?.message}</p>
+                                )}
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-foreground/80">
+                                    Sex
+                                </label>
+                                <select
+                                    className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                    {...register(`travellers.${index}.sex`)}
+                                >
+                                    <option value="unspecified" disabled>
+                                        Select an option
+                                    </option>
+                                    <option value="female">Female</option>
+                                    <option value="male">Male</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
                                 <FormInput
-                                    labelText="Pasport series"
-                                    placeholder='AA123456'
-                                    autoComplete="off"
-                                    {...register(`travellers.${index}.passportSeries`)}
-                                />
-                                <FormInput
-                                    labelText="Pasport issue date"
+                                    labelText="Passport expiry"
                                     placeholder='30/01/2021'
                                     autoComplete="off"
                                     formatType="date"
-                                    {...register(`travellers.${index}.passportIssueDate`)}
+                                    {...register(`travellers.${index}.passportExpiry`)}
                                 />
+                                {errors.travellers?.[index]?.passportExpiry && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.passportExpiry?.message}</p>
+                                )}
                             </div>
+                            <div className="space-y-1">
+                                <FormInput
+                                    labelText="DOB"
+                                    placeholder='30/01/2021'
+                                    autoComplete="off"
+                                    formatType="date"
+                                    {...register(`travellers.${index}.dob`)}
+                                />
+                                {errors.travellers?.[index]?.dob && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.dob?.message}</p>
+                                )}
+                            </div>
+                            <FormInput
+                                labelText="Pasport number"
+                                placeholder='127485153'
+                                autoComplete="off"
+                                {...register(`travellers.${index}.passportNumber`)}
+                            />
+                            <FormInput
+                                labelText="Pasport series"
+                                placeholder='AA123456'
+                                autoComplete="off"
+                                {...register(`travellers.${index}.passportSeries`)}
+                            />
+                            <FormInput
+                                labelText="Pasport issue date"
+                                placeholder='30/01/2021'
+                                autoComplete="off"
+                                formatType="date"
+                                {...register(`travellers.${index}.passportIssueDate`)}
+                            />
                         </div>
-                    ))}
-                </div>
-            </section>
-        );
-    }
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+};
 
-    // Edit mode implementation remains similar but uses props
+const TravellerSectionEdit = ({
+    tourists,
+    onChange,
+    onAdd,
+    onRemove,
+}: TravellerSectionProps) => {
     return (
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -263,4 +263,11 @@ export const TravellerSection = ({
             </div>
         </section>
     );
+};
+
+export const TravellerSection = (props: TravellerSectionProps) => {
+    if (props.variant === 'create') {
+        return <TravellerSectionCreate {...props} />;
+    }
+    return <TravellerSectionEdit {...props} />;
 };

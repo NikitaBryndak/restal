@@ -35,7 +35,9 @@ export const FlightsSection = ({
     title = 'Flights',
     description = 'Outbound and return flight details for the itinerary.',
 }: FlightsSectionProps) => {
-    const { register, formState: { errors } } = useFormContext<TourFormValues>();
+    const context = useFormContext<TourFormValues>();
+    const register = context?.register ?? (() => ({} as any));
+    const errors = context?.formState?.errors ?? {};
     const controlled = variant === 'edit' && values && onChange;
 
     const handleFieldChange = (

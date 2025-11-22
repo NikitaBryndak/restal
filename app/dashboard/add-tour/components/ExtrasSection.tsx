@@ -25,7 +25,8 @@ export const ExtrasSection = ({
     title = 'Extras',
     description = 'Optional add-ons for peace of mind.',
 }: ExtrasSectionProps) => {
-    const { register } = useFormContext<TourFormValues>();
+    const context = useFormContext<TourFormValues>();
+    const register = context?.register ?? (() => ({} as any));
     const controlled = variant === 'edit' && values && onChange;
 
     const buildInputProps = (field: ExtrasField, name: keyof TourFormValues) => {

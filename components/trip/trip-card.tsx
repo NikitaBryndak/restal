@@ -37,10 +37,10 @@ export default function TripCard({ data }: { data: Trip }) {
         "ПТА", // посадковий талон
         "ПТУ"  // програма туру
         ];
-    const documentDownloadSection = (documentArray as any[]).map((doc: any) => (
-        <div className={cn('flex flex-col justify-center items-center m-[2px]', doc?.uploaded ? 'opacity-100' : 'opacity-50')} key={doc?.url ?? String(doc)}>
+    const documentDownloadSection = (documentArray as any[]).map((doc: any, index: number) => (
+        <div className={cn('flex flex-col justify-center items-center m-[2px]', doc?.uploaded ? 'opacity-100' : 'opacity-50')} key={index}>
             <Download className="w-4 h-4 text-white/70" />
-            <span className='text-[10px] text-white/90 text-center'>{doc?.name ?? documentAbbreviations[documentArray.indexOf(doc)]}</span>
+            <span className='text-[10px] text-white/90 text-center'>{doc?.name ?? documentAbbreviations[index]}</span>
         </div>
     ));
 

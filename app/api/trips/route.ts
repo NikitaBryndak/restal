@@ -36,14 +36,10 @@ export async function POST(request: Request) {
 
         await connectToDatabase();
 
-        const largestTrip = await Trip.findOne({}).sort({ number: -1 }).select('number').lean() as { number?: number } | null;
-        const computedNumber = (largestTrip?.number ?? 0) + 1;
-
         const cashbackAmount = body.payment.totalAmount * 0.01;
 
         const payload = {
             ...body,
-            number: computedNumber,
             managerEmail: session.user.email,
         };
 

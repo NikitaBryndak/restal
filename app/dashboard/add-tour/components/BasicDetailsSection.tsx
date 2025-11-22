@@ -45,7 +45,9 @@ export const BasicDetailsSection = ({
     showHotelNights = true,
     showMealPlan = true,
 }: BasicDetailsSectionProps) => {
-    const { register, formState: { errors } } = useFormContext<TourFormValues>();
+    const context = useFormContext<TourFormValues>();
+    const register = context?.register ?? (() => ({} as any));
+    const errors = context?.formState?.errors ?? {};
     const controlled = variant === 'edit' && values && onChange;
 
     const buildInputProps = (field: BasicDetailsField, name: keyof TourFormValues) => {
