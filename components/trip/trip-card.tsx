@@ -163,7 +163,7 @@ export default function TripCard({ data }: { data: Trip }) {
                         </div>
                     </div>
 
-                    <div className="flex flex-[0_0_40%] flex-col gap-3 ml-4 ">
+                    <div className="flex flex-[0_0_40%] flex-col gap-3">
                         <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-col justify-center">
                             <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center mb-2">Payment</p>
                             <div className="flex flex-col gap-2">

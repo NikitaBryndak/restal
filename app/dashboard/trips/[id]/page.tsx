@@ -16,7 +16,7 @@ async function getTripData(id: string): Promise<Trip | null> {
 
         await connectToDatabase();
 
-        const query = !isNaN(Number(id)) 
+        const query = !isNaN(Number(id))
             ? { number: Number(id) }
             : { _id: id };
 
@@ -27,7 +27,7 @@ async function getTripData(id: string): Promise<Trip | null> {
         // Check authorization: user must be the owner OR have privilege level > 2
         const userEmail = session.user.email;
         const userPrivilegeLevel = session.user.privelegeLevel || 1;
-        
+
         const isOwner = (trip as any).ownerEmail === userEmail;
         const hasAdminAccess = userPrivilegeLevel > 2;
 
@@ -281,8 +281,8 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                             </h2>
                             <div className="space-y-3">
                                 <div className={`flex items-center justify-between rounded-xl p-4 border ${
-                                    trip.addons.insurance 
-                                        ? 'bg-emerald-500/15 border-emerald-400/40' 
+                                    trip.addons.insurance
+                                        ? 'bg-emerald-500/15 border-emerald-400/40'
                                         : 'bg-white/5 border-white/10'
                                 }`}>
                                     <div className="flex items-center gap-3">
@@ -296,8 +296,8 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                     </span>
                                 </div>
                                 <div className={`flex items-center justify-between rounded-xl p-4 border ${
-                                    trip.addons.transfer 
-                                        ? 'bg-emerald-500/15 border-emerald-400/40' 
+                                    trip.addons.transfer
+                                        ? 'bg-emerald-500/15 border-emerald-400/40'
                                         : 'bg-white/5 border-white/10'
                                 }`}>
                                     <div className="flex items-center gap-3">
@@ -325,8 +325,8 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                         key={index}
                                         href={doc.uploaded ? doc.url : '#'}
                                         className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${
-                                            doc.uploaded 
-                                                ? 'bg-blue-500/10 border-blue-400/30 hover:bg-blue-500/20 cursor-pointer' 
+                                            doc.uploaded
+                                                ? 'bg-blue-500/10 border-blue-400/30 hover:bg-blue-500/20 cursor-pointer'
                                                 : 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
                                         }`}
                                         target={doc.uploaded ? '_blank' : undefined}
@@ -352,6 +352,10 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                 <div className="flex justify-between">
                                     <span className="text-white/60">Owner Email:</span>
                                     <span className="text-white font-medium">{trip.ownerEmail}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-white/60">Manager Email:</span>
+                                    <span className="text-white font-medium">{trip.managerEmail}</span>
                                 </div>
                                 {trip.createdAt && (
                                     <div className="flex justify-between">

@@ -44,13 +44,14 @@ export async function POST(request: Request) {
         const payload = {
             ...body,
             number: computedNumber,
+            managerEmail: session.user.email,
         };
 
         const newTrip = new Trip({
             ...payload,
         });
         await newTrip.save();
-        
+
         // Update user's cashback directly
         const user = await User.findOne({ email: session.user.email });
         if (user) {

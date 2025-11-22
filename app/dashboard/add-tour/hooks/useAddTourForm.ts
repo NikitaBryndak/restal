@@ -14,12 +14,34 @@ export const useAddTourForm = () => {
     const form = useForm<TourFormValues>({
         resolver: zodResolver(tourSchema) as any,
         defaultValues: {
+            country: '',
+            region: '',
+            hotelNights: 0,
+            tripStartDate: '',
+            tripEndDate: '',
+            food: '',
+            bookingDate: '',
+            hotelName: '',
+            hotelCheckIn: '',
+            hotelCheckOut: '',
+            roomType: '',
+            departureCountry: '',
+            departureAirport: '',
+            departureFlight: '',
+            departureDate: '',
+            departureTime: '',
+            arrivalCountry: '',
+            arrivalAirport: '',
+            arrivalFlight: '',
+            arrivalDate: '',
+            arrivalTime: '',
             travellers: [],
             insurance: false,
             transfer: false,
-            hotelNights: 0,
             paymentTotal: 0,
             paymentPaid: 0,
+            paymentDeadline: '',
+            ownerEmail: '',
         },
         mode: 'onChange',
     });
@@ -27,70 +49,66 @@ export const useAddTourForm = () => {
     const { watch, handleSubmit: hookFormSubmit } = form;
     const formValues = watch();
 
-    const [previewState, setPreviewState] = useState<PreviewState>(blankPreview);
+    const mapToPreview = (values: TourFormValues): PreviewState => {
+        const travellers = values.travellers?.length ? values.travellers.map(t => ({
+            name: t.firstName || 'Traveller',
+            surname: t.lastName || 'Pending',
+            sex: t.sex || 'unspecified',
+            pasportExpiryDate: t.passportExpiry || '',
+            DOB: t.dob || '',
+        })) : [{
+            name: 'Traveller',
+            surname: 'Pending',
+            sex: 'unspecified',
+            pasportExpiryDate: '',
+            DOB: '',
+        }];
 
-    useEffect(() => {
-        const mapToPreview = (values: TourFormValues): PreviewState => {
-            const travellers = values.travellers?.length ? values.travellers.map(t => ({
-                name: t.firstName || 'Traveller',
-                surname: t.lastName || 'Pending',
-                sex: t.sex || 'unspecified',
-                pasportExpiryDate: t.passportExpiry || '',
-                DOB: t.dob || '',
-            })) : [{
-                name: 'Traveller',
-                surname: 'Pending',
-                sex: 'unspecified',
-                pasportExpiryDate: '',
-                DOB: '',
-            }];
-
-            return {
-                number: 0,
-                country: values.country || '',
-                bookingDate: values.bookingDate || curDate,
-                tripStartDate: values.tripStartDate || '',
-                tripEndDate: values.tripEndDate || '',
-                flightInfo: {
-                    departure: {
-                        country: values.departureCountry || '',
-                        airportCode: values.departureAirport?.toUpperCase() || '',
-                        flightNumber: values.departureFlight?.toUpperCase() || '',
-                        date: values.departureDate || '',
-                        time: values.departureTime || '',
-                    },
-                    arrival: {
-                        country: values.arrivalCountry || '',
-                        airportCode: values.arrivalAirport?.toUpperCase() || '',
-                        flightNumber: values.arrivalFlight?.toUpperCase() || '',
-                        date: values.arrivalDate || '',
-                        time: values.arrivalTime || '',
-                    },
+        return {
+            number: 0,
+            country: values.country || '',
+            bookingDate: values.bookingDate || curDate,
+            tripStartDate: values.tripStartDate || '',
+            tripEndDate: values.tripEndDate || '',
+            flightInfo: {
+                departure: {
+                    country: values.departureCountry || '',
+                    airportCode: values.departureAirport?.toUpperCase() || '',
+                    flightNumber: values.departureFlight?.toUpperCase() || '',
+                    date: values.departureDate || '',
+                    time: values.departureTime || '',
                 },
-                hotel: {
-                    name: values.hotelName || '',
-                    checkIn: values.hotelCheckIn || values.tripStartDate || '',
-                    checkOut: values.hotelCheckOut || values.tripEndDate || '',
-                    food: values.food || '',
-                    nights: values.hotelNights || 0,
-                    roomType: values.roomType || '',
+                arrival: {
+                    country: values.arrivalCountry || '',
+                    airportCode: values.arrivalAirport?.toUpperCase() || '',
+                    flightNumber: values.arrivalFlight?.toUpperCase() || '',
+                    date: values.arrivalDate || '',
+                    time: values.arrivalTime || '',
                 },
-                tourists: travellers,
-                addons: {
-                    insurance: values.insurance || false,
-                    transfer: values.transfer || false,
-                },
-                payment: {
-                    totalAmount: values.paymentTotal || 0,
-                    paidAmount: values.paymentPaid || 0,
-                    deadline: values.paymentDeadline || '',
-                },
-                ownerEmail: values.ownerEmail || '',
-            };
+            },
+            hotel: {
+                name: values.hotelName || '',
+                checkIn: values.hotelCheckIn || values.tripStartDate || '',
+                checkOut: values.hotelCheckOut || values.tripEndDate || '',
+                food: values.food || '',
+                nights: values.hotelNights || 0,
+                roomType: values.roomType || '',
+            },
+            tourists: travellers,
+            addons: {
+                insurance: values.insurance || false,
+                transfer: values.transfer || false,
+            },
+            payment: {
+                totalAmount: values.paymentTotal || 0,
+                paidAmount: values.paymentPaid || 0,
+                deadline: values.paymentDeadline || '',
+            },
+            ownerEmail: values.ownerEmail || '',
         };
+    };
 
-        setPreviewState(mapToPreview(formValues as TourFormValues));
-    }, [formValues, curDate]);
+    const previewState = mapToPreview(formValues as TourFormValues);
 
     const onSubmit = async (data: TourFormValues) => {
         const payload = {
@@ -168,9 +186,22 @@ export const useAddTourForm = () => {
         }
     };
 
+    const onError = (errors: any) => {
+        console.error('Form validation errors:', errors);
+        const errorMessages = Object.values(errors)
+            .map((error: any) => error.message)
+            .filter(Boolean);
+
+        if (errorMessages.length > 0) {
+            alert(`Please fix the following errors:\n${errorMessages.join('\n')}`);
+        } else {
+            alert('Please check the form for errors.');
+        }
+    };
+
     return {
         form,
         previewState,
-        onSubmit: hookFormSubmit(onSubmit),
+        onSubmit: hookFormSubmit(onSubmit, onError),
     };
 };

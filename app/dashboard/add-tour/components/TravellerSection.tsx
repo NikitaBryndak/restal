@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import FormInput from '@/components/ui/form-input';
@@ -26,18 +27,20 @@ export const TravellerSection = ({
     });
 
     // If in create mode, ensure at least one traveller exists
-    if (variant === 'create' && fields.length === 0) {
-        append({
-            firstName: '',
-            lastName: '',
-            sex: 'unspecified',
-            passportExpiry: '',
-            dob: '',
-            passportNumber: '',
-            passportSeries: '',
-            passportIssueDate: '',
-        });
-    }
+    useEffect(() => {
+        if (variant === 'create' && fields.length === 0) {
+            append({
+                firstName: '',
+                lastName: '',
+                sex: 'unspecified',
+                passportExpiry: '',
+                dob: '',
+                passportNumber: '',
+                passportSeries: '',
+                passportIssueDate: '',
+            });
+        }
+    }, [variant, fields.length, append]);
 
     if (variant === 'create') {
         return (
