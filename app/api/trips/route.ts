@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         await newTrip.save();
 
         // Update user's cashback directly
-        const user = await User.findOne({ email: session.user.email });
+        const user = await User.findOne({ email: body.ownerEmail });
         if (user) {
             user.cashbackAmount = (user.cashbackAmount || 0) + cashbackAmount;
             await user.save();
