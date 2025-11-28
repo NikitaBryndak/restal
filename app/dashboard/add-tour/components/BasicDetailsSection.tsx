@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { TourFormValues } from '../schema';
 
-export type BasicDetailsField = 'country' | 'region' | 'hotelNights' | 'tripStartDate' | 'tripEndDate' | 'food';
+export type BasicDetailsField = 'number' | 'country' | 'region' | 'hotelNights' | 'tripStartDate' | 'tripEndDate' | 'food';
 
 type BasicDetailsValues = Partial<Record<BasicDetailsField, string | number>>;
 
@@ -15,6 +15,7 @@ type BasicDetailsSectionProps = {
     description?: string;
     showHotelNights?: boolean;
     showMealPlan?: boolean;
+    showNumber?: boolean;
 };
 
 const primaryFields: Array<{
@@ -26,6 +27,7 @@ const primaryFields: Array<{
     inputMode?: 'numeric';
     pattern?: string;
 }> = [
+    { field: 'number', label: 'Tour Number', placeholder: 'e.g. 12345', name: 'number', inputMode: 'numeric', pattern: '[0-9]*' },
     { field: 'country', label: 'Destination', placeholder: 'Spain, Italy, Greece...', name: 'country' },
     { field: 'region', label: 'Region', placeholder: 'Hurghada, Tuscany, Santorini...', name: 'region' },
     { field: 'hotelNights', label: 'Hotel nights', placeholder: 'e.g. 7', name: 'hotelNights', inputMode: 'numeric', pattern: '[0-9]*' },
@@ -44,6 +46,7 @@ export const BasicDetailsSection = ({
     description = 'Start with the headline facts about this getaway.',
     showHotelNights = true,
     showMealPlan = true,
+    showNumber = true,
 }: BasicDetailsSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));
@@ -78,7 +81,7 @@ export const BasicDetailsSection = ({
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {primaryFields
-                    .filter((field) => field.field !== 'hotelNights' || showHotelNights)
+                    .filter((field) => (field.field !== 'hotelNights' || showHotelNights) && (field.field !== 'number' || showNumber))
                     .map(({ field, label, placeholder, name, inputMode, pattern }) => (
                         <div key={field}>
                             <FormInput

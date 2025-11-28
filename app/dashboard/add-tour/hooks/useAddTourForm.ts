@@ -14,6 +14,7 @@ export const useAddTourForm = () => {
     const form = useForm<TourFormValues>({
         resolver: zodResolver(tourSchema) as any,
         defaultValues: {
+            number: 0,
             country: '',
             region: '',
             hotelNights: 0,
@@ -65,7 +66,7 @@ export const useAddTourForm = () => {
         }];
 
         return {
-            number: 0,
+            number: values.number || 0,
             country: values.country || '',
             bookingDate: values.bookingDate || curDate,
             tripStartDate: values.tripStartDate || '',
@@ -112,6 +113,7 @@ export const useAddTourForm = () => {
 
     const onSubmit = async (data: TourFormValues) => {
         const payload = {
+            number: data.number,
             country: data.country,
             region: data.region,
             bookingDate: data.bookingDate || curDate,

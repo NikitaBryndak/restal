@@ -648,6 +648,7 @@ export default function ManageTourPage() {
                                     onChange={handleBasicFieldChange}
                                     showHotelNights={false}
                                     showMealPlan={false}
+                                    showNumber={false}
                                     title="Destination"
                                     description="Update where and when the travellers are headed."
                                 />

@@ -35,7 +35,10 @@ export default function SmallNavbar() {
                                     Info Center
                                 </NavLink>
                                 <NavLink href="/contact" onClick={toggleMobileMenu} className="text-lg font-medium">
-                                    Manager
+                                    Contact
+                                </NavLink>
+                                <NavLink href="/managers" onClick={toggleMobileMenu} className="text-lg font-medium">
+                                    Managers
                                 </NavLink>
                             </div>
 

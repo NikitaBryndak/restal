@@ -5,17 +5,17 @@ import { Input } from "@/components/ui/input";
 import { searchTexts } from "@/data";
 
 
-export default function SearchBar({ className }: { className?: string }) {
+export default function SearchBar({ className, disabled }: { className?: string; disabled?: boolean }) {
     const [displayText, setDisplayText] = useState("");
-    const [index, setIndex] = useState(0); 
-    const [subIndex, setSubIndex] = useState(0); 
+    const [index, setIndex] = useState(0);
+    const [subIndex, setSubIndex] = useState(0);
     const [deleting, setDeleting] = useState(false);
 
     // typing and deleting effect
     useEffect(() => {
         if (index >= searchTexts.length) return;
-        const randomTypeDelay = Math.random() * 70 + 50; 
-        const randomDeleteDelay = Math.random() * 100 + 50; 
+        const randomTypeDelay = Math.random() * 70 + 50;
+        const randomDeleteDelay = Math.random() * 100 + 50;
         const timeout = setTimeout(() => {
         setSubIndex((prev) => prev + (deleting ? -1 : 1));
 
@@ -33,14 +33,21 @@ export default function SearchBar({ className }: { className?: string }) {
         return () => clearTimeout(timeout);
     }, [subIndex, deleting, index]);
 
-    // update displayed text    
+    // update displayed text
     useEffect(() => {
         setDisplayText(searchTexts[index].substring(0, subIndex));
     }, [subIndex, index]);
 
     return (
         <div className="relative w-full max-w-md">
-            <Input name="search-query" id="search-query" type="text" placeholder={displayText} className={`w-full ${className}`} />
+            <Input
+                name="search-query"
+                id="search-query"
+                type="text"
+                placeholder={displayText}
+                className={`w-full ${className}`}
+                disabled={disabled}
+            />
         </div>
     );
 }
