@@ -121,8 +121,6 @@ const tripSchema = new Schema({
 // Ensure trip numbers are unique per owner
 tripSchema.index({ ownerEmail: 1, number: 1 }, { unique: true, sparse: true });
 
-
-
 const Trip = mongoose.models.Trip || mongoose.model("Trip", tripSchema);
 
 export default Trip;
