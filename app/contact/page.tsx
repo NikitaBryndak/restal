@@ -29,9 +29,9 @@ export default function ContactPage() {
 
                <div className="space-y-8 mt-8">
                   <div className="flex items-center gap-5 group">
-                     <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                     <Link href="mailto:restal.inform@gmail.com" className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
                         <Mail className="w-6 h-6" />
-                     </div>
+                     </Link>
                      <div>
                         <h3 className="font-medium text-lg">Email</h3>
                         <p className="text-secondary">restal.inform@gmail.com</p>
@@ -39,9 +39,9 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-center gap-5 group">
-                     <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                     <Link href="viber://chat?number=+380687772550" className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
                         <Phone className="w-6 h-6" />
-                     </div>
+                     </Link>
                      <div>
                         <h3 className="font-medium text-lg">Телефон/Viber</h3>
                         <p className="text-secondary">+38 (068) 7772550</p>
