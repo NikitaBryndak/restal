@@ -146,7 +146,7 @@ const tripSchema = new Schema({
     documents: {
         contract: {
             uploaded: { type: Boolean, default: false },
-            url: { type: String, default: "" }    
+            url: { type: String, default: "" }
         },
         invoice: {
             uploaded: { type: Boolean, default: false },

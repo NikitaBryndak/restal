@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+import Article from "@/models/article";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+import crypto from 'crypto';
+
+export async function GET(request: Request) {
+    try {
+        await connectToDatabase();
+
+        const articles = await Article.find().sort({ createdAt: -1 }).lean();
+
+        return NextResponse.json({ articles }, { status: 200 });
+    } catch (error: any) {
+        console.error("Error fetching articles:", error)
+        return NextResponse.json({ message: "Error fetching articles", error: error.message }, { status: 500 });
+    }
+}
+
+export async function POST(request: Request) {
+    try {
+        const session = (await getServerSession(authOptions as any) as any);
+
+        if (!session?.user?.email) {
+            return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+        }
+
+        const body = await request.json();
+
+        await connectToDatabase();
+    
+        const creatorEmail = session.user.email;
+
+        const toCreate = {
+                ...body,
+                creatorEmail
+            };
+        
+        let created = await Article.create(toCreate);
+        
+        if (!created) {
+            return NextResponse.json({ message: 'Failed to create article' }, { status: 500 });
+        }
+
+        return NextResponse.json({ article: created }, { status: 201 });
+    } catch (error: any) {
+            console.error("Error creating article:", error);
+            return NextResponse.json({ message: "Error creating article", error: error.message }, { status: 500 });
+    }
+} 

@@ -11,6 +11,7 @@ export const articlesData = [
       <p>From Tokyo’s neon lights to Kyoto’s tranquil temples...</p>
     `,
   },
+  
   {
     title: "Adventures in Iceland",
     description:
@@ -23,8 +24,8 @@ export const articlesData = [
     `,
   },
 
-    { title: "Wonders of Morocco", description: "A guide through Morocco’s deserts, markets, and rich culture.", image: "/images/morocco.jpg", link: "/info/morocco", tag: "Second" },
-    { title: "The Beauty of Italy", description: "From Venice canals to Roman ruins — Italy is a feast for the senses.", image: "/images/italy.jpg", link: "/info/italy", tag: "Third" },
-    { title: "Colors of India", description: "Dive into India’s festivals, food, and breathtaking landscapes.", image: "/images/india.jpg", link: "/info/india", tag: "Fourth" },
-    { title: "Hidden Trails of Peru", description: "Explore Machu Picchu and beyond — discover Peru’s ancient wonders.", image: "/images/peru.jpg", link: "/info/peru", tag: "Fifth" },
+  { title: "Wonders of Morocco", description: "A guide through Morocco’s deserts, markets, and rich culture.", image: "/images/morocco.jpg", link: "/info/morocco", tag: "Second" },
+  { title: "The Beauty of Italy", description: "From Venice canals to Roman ruins — Italy is a feast for the senses.", image: "/images/italy.jpg", link: "/info/italy", tag: "Third" },
+  { title: "Colors of India", description: "Dive into India’s festivals, food, and breathtaking landscapes.", image: "/images/india.jpg", link: "/info/india", tag: "Fourth" },
+  { title: "Hidden Trails of Peru", description: "Explore Machu Picchu and beyond — discover Peru’s ancient wonders.", image: "/images/peru.jpg", link: "/info/peru", tag: "Fifth" },
 ];
