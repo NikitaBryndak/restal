@@ -3,12 +3,16 @@
 import mongoose, { Schema } from "mongoose";
 
 const articleSchema = new Schema({
-    tag: {
+    articleID: {
         type: Number,
         required: true
     },
+    tag: {
+        type: String,
+        required: true
+    },
     images: {
-        type: URL, // TODO: need to do list later
+        type: String, // TODO: need to do list later
         required: true
     },
     title: {
@@ -23,7 +27,7 @@ const articleSchema = new Schema({
         type: String,
         required: true
     },
-    createrEmail: {
+    creatorEmail: {
         type: String,
         required: true
     }
