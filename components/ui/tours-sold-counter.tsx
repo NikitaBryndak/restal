@@ -3,14 +3,14 @@
 import { useEffect } from "react";
 import { motion, useSpring, useTransform } from "motion/react";
 
-export const ToursSoldCounter = () => {
-  const target = 1420;
+export const ToursSoldCounter = ({ count = 0 }: { count?: number }) => {
+  const target = count;
   const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
   const display = useTransform(spring, (current) => Math.round(current).toLocaleString());
 
   useEffect(() => {
     spring.set(target);
-  }, [spring]);
+  }, [spring, target]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-1 opacity-60 hover:opacity-100 transition-opacity duration-700 group cursor-default">

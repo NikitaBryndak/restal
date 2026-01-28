@@ -4,8 +4,11 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { titleTextFadeDuration } from "@/config";
 import SearchSection from "@/components/search/search-section";
 import { ToursSoldCounter } from "@/components/ui/tours-sold-counter";
+import { getTripCount } from "@/app/actions/get-trip-count";
 
-export default function Home() {
+export default async function Home() {
+  const tripCount = await getTripCount();
+
   return (
     <>
       {/* Main Content */}
@@ -29,7 +32,7 @@ export default function Home() {
 
           {/* Stats Counter */}
           <div className="pt-8">
-            <ToursSoldCounter />
+            <ToursSoldCounter count={tripCount} />
           </div>
 
           <div className="flex justify-center">
