@@ -19,6 +19,11 @@ export default function WideNavbar() {
                 </NavLink>
             </li>
             <li>
+                <NavLink href="/useful-info">
+                    Useful Info
+                </NavLink>
+            </li>
+            <li>
                 <NavLink href="/contact">
                     Contact
                 </NavLink>
