@@ -6,11 +6,11 @@ import bcrypt from "bcryptjs";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, phoneNumber, password } = body;
+        const { name, phoneNumber, email, password } = body;
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await connectToDatabase();
-        await User.create({ name, phoneNumber, password: hashedPassword });
+        await User.create({ name, phoneNumber, email, password: hashedPassword });
 
         return NextResponse.json({
             message: "User registered successfully"

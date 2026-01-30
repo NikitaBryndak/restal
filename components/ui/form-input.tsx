@@ -6,7 +6,7 @@ import { cn, getDateErrorMessage } from "@/lib/utils";
 import { Label } from "./label";
 import { Input } from "./input";
 
-type FormatType = 'date' | 'time' | 'email' | 'none';
+type FormatType = 'date' | 'time' | 'email' | 'phone' | 'none';
 
 type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     labelText?: string;
@@ -157,7 +157,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             }
         };
 
-        const inputProps = formatType !== 'none'
+        const inputProps = (formatType !== 'none' && formatType !== 'phone')
             ? {
                 value: displayValue,
                 onChange: handleChange,

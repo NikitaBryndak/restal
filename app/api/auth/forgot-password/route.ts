@@ -1,0 +1,64 @@
+import { NextResponse } from "next/server";
+import User from "@/models/user";
+import { connectToDatabase } from "@/lib/mongodb";
+import { sendSMS } from "@/lib/sms";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
+
+export async function POST(req: Request) {
+  try {
+    const { phoneNumber } = await req.json();
+
+    if (!phoneNumber) {
+      return NextResponse.json({ message: "Phone number is required" }, { status: 400 });
+    }
+
+    await connectToDatabase();
+
+    const user = await User.findOne({ phoneNumber });
+
+    if (!user) {
+        // Safe fail - don't reveal if number exists or not
+      return NextResponse.json({ message: "If an account with that number exists, we have sent a verification code." }, { status: 200 });
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash it for storage (using simple sha256 like tokens)
+    const otpHash = crypto
+      .createHash("sha256")
+      .update(otp)
+      .digest("hex");
+
+    // Expires in 10 minutes
+    const otpExpires = Date.now() + 10 * 60 * 1000;
+
+    user.resetPasswordToken = otpHash;
+    user.resetPasswordExpires = otpExpires;
+
+    await user.save();
+
+    // Send SMS via Twilio
+    try {
+        const message = `Your Restal password reset code is: ${otp}. Do not share this code.`;
+        await sendSMS(phoneNumber, message);
+    } catch (smsError) {
+        console.error("Error sending SMS:", smsError);
+    }
+
+    // For development/debugging purposes, we still log it.
+    if (process.env.NODE_ENV === "development") {
+        console.log("----------------------------------------------------------------");
+        console.log(`[DEV ONLY] To: ${phoneNumber}`);
+        console.log(`Code: ${otp}`);
+        console.log("----------------------------------------------------------------");
+    }
+
+    return NextResponse.json({ message: "If an account with that number exists, we have sent a verification code." });
+
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+  }
+}

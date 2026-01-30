@@ -282,5 +282,11 @@ export const useAddTourForm = () => {
         form,
         previewState,
         onSubmit: hookFormSubmit(onSubmit, onError),
+        documents,
+        pendingFiles,
+        isUploading,
+        handleFileSelect,
+        handleFileClear,
+        handleToggleReady
     };
 };

@@ -8,6 +8,7 @@ type AuthFormProps = {
 type AuthFormData = {
   name?: string;
   phoneNumber: string;
+  email?: string;
   password: string;
   confirmPassword?: string;
 };
@@ -52,6 +53,7 @@ export function useAuth({ type }: AuthFormProps) {
             body: JSON.stringify({
                 name: formData.name,
                 phoneNumber: formData.phoneNumber,
+                email: formData.email,
                 password: formData.password
             }),
             });

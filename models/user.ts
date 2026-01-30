@@ -28,6 +28,14 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     },
+    resetPasswordToken: {
+        type: String,
+        required: false,
+    },
+    resetPasswordExpires: {
+        type: Date,
+        required: false,
+    },
 }, { timestamps: true });
 
 // Prevent Mongoose model recompilation error in development

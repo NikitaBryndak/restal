@@ -20,16 +20,21 @@ export const authOptions = {
                         return null;
                     }
 
-                    const passwordMatch = await bcrypt.compare(password, user.password);
+                    const passwordMatch = await bcrypt.compare(password, (user as any).password);
 
                     if (!passwordMatch) {
                         return null;
                     }
 
                     // Normalize privilege level (handle potential typo in DB vs Schema)
-                    const level = user.privelegeLevel || (user as any).privilegeLevel || 1;
+                    const userAny = user as any;
+                    const level = userAny.privelegeLevel || userAny.privilegeLevel || 1;
 
-                    return { ...user, id: user._id.toString(), privelegeLevel: level };
+                    return { 
+                        ...userAny, 
+                        id: userAny._id.toString(), 
+                        privelegeLevel: level 
+                    };
                 } catch (error) {
                     console.error("Auth error:", error);
                     return null;

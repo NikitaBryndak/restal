@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         const [buffer] = await file.download();
 
         // Return as a proper response
-        return new NextResponse(buffer, {
+        return new NextResponse(buffer as any, {
             headers: {
                 'Content-Type': contentType,
                 'Content-Disposition': `inline; filename="${fileName}"`,
