@@ -2,7 +2,7 @@ import twilio from 'twilio';
 
 // Google Cloud Platform (GCP) does not have a comprehensive native SMS service.
 // GCP officially recommends using third-party partners like Twilio.
-// 
+//
 // Valid environment variables required in .env.local:
 // TWILIO_ACCOUNT_SID=AC...
 // TWILIO_AUTH_TOKEN=...
@@ -34,7 +34,7 @@ export const sendSMS = async (phoneNumber: string, message: string) => {
       from: fromNumber,
       to: phoneNumber,
     });
-    
+
     console.log(`SMS sent to ${phoneNumber}. SID: ${result.sid}`);
     return result;
   } catch (error) {

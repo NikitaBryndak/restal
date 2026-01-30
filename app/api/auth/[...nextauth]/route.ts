@@ -30,10 +30,10 @@ export const authOptions = {
                     const userAny = user as any;
                     const level = userAny.privelegeLevel || userAny.privilegeLevel || 1;
 
-                    return { 
-                        ...userAny, 
-                        id: userAny._id.toString(), 
-                        privelegeLevel: level 
+                    return {
+                        ...userAny,
+                        id: userAny._id.toString(),
+                        privelegeLevel: level
                     };
                 } catch (error) {
                     console.error("Auth error:", error);

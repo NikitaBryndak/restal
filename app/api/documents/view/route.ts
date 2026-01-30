@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
              console.error("GCP_BUCKET_NAME not defined");
              return NextResponse.json({ message: "Configuration error" }, { status: 500 });
         }
-        
+
         const bucket = storage.bucket(bucketName);
         const file = bucket.file(filePath);
 
