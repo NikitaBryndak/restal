@@ -10,7 +10,7 @@ async function getTripData(id: string): Promise<Trip | null> {
     try {
         const session = (await getServerSession(authOptions as any)) as any;
 
-        if (!session?.user?.email) {
+        if (!session?.user?.phoneNumber) {
             return null;
         }
 
@@ -25,10 +25,10 @@ async function getTripData(id: string): Promise<Trip | null> {
         if (!trip) return null;
 
         // Check authorization: user must be the owner OR have privilege level > 2
-        const userEmail = session.user.email;
+        const userPhone = session.user.phoneNumber;
         const userPrivilegeLevel = session.user.privelegeLevel || 1;
 
-        const isOwner = (trip as any).ownerEmail === userEmail;
+        const isOwner = (trip as any).ownerPhone === userPhone;
         const hasAdminAccess = userPrivilegeLevel > 2;
 
         if (!isOwner && !hasAdminAccess) {
@@ -350,12 +350,12 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                             </h2>
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-white/60">Owner Email:</span>
-                                    <span className="text-white font-medium">{trip.ownerEmail}</span>
+                                    <span className="text-white/60">Owner Phone:</span>
+                                    <span className="text-white font-medium">{trip.ownerPhone}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-white/60">Manager Email:</span>
-                                    <span className="text-white font-medium">{trip.managerEmail}</span>
+                                    <span className="text-white/60">Manager Phone:</span>
+                                    <span className="text-white font-medium">{trip.managerPhone}</span>
                                 </div>
                                 {trip.createdAt && (
                                     <div className="flex justify-between">

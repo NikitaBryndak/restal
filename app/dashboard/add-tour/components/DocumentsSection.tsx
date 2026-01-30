@@ -79,7 +79,7 @@ export const DocumentsSection = ({
                                         {pendingFile?.name ?? 'Select or drop a file'}
                                     </span>
                                     <span className="text-foreground/50">
-                                        {pendingFile ? 'File staged locally. Upload coming soon.' : 'Drag & drop or click to choose a file.'}
+                                        {pendingFile ? 'File staged locally. Will be uploaded on save.' : 'Drag & drop or click to choose a file.'}
                                     </span>
                                 </label>
                             </div>

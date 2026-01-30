@@ -10,7 +10,8 @@ export type Company = {
 };
 
 export type Credential = {
-  email: string;
+  name?: string;
+  phoneNumber: string;
   password: string;
   confirmPassword?: string ;
 }
@@ -99,8 +100,8 @@ export type Trip = {
   addons: Addons;
   documents: Documents;
   payment: Payment;
-  ownerEmail: string;
-  managerEmail?: string;
+  ownerPhone: string;
+  managerPhone?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

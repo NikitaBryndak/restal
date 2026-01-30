@@ -9,7 +9,7 @@ const userSchema = new Schema({
     },
     email: {
         type: String,
-        required: true,
+        required: false,
     },
     password: {
         type: String,
@@ -25,9 +25,18 @@ const userSchema = new Schema({
     },
     phoneNumber: {
         type: String,
-        required: false,
+        required: true,
+        unique: true,
     },
 }, { timestamps: true });
+
+// Prevent Mongoose model recompilation error in development
+// and ensure new schema is applied by deleting existing model if needed
+if (process.env.NODE_ENV === "development") {
+    if (mongoose.models.User) {
+        delete mongoose.models.User;
+    }
+}
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 

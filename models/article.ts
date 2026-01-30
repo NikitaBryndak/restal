@@ -27,12 +27,20 @@ const articleSchema = new Schema({
         type: String,
         required: true
     },
-    creatorEmail: {
+    creatorPhone: {
         type: String,
         required: true
     }
 });
 
 articleSchema.index({ articleID: 1 }, { unique: true });
+
+// Prevent Mongoose model recompilation error in development
+if (process.env.NODE_ENV === "development") {
+    if (mongoose.models.Article) {
+        delete mongoose.models.Article;
+    }
+}
+
 const Article = mongoose.models.Article || mongoose.model("Article", articleSchema);
 export default Article;

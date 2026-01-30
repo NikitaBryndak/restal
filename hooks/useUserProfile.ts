@@ -5,7 +5,8 @@ import { useSession } from "next-auth/react";
 
 interface UserProfile {
     userName: string;
-    userEmail: string;
+    userEmail?: string;
+    phoneNumber: string;
     createdAt: string;
     cashbackAmount: number;
     privelegeLevel: number;
@@ -19,17 +20,17 @@ export const useUserProfile = () => {
     const { data: session } = useSession();
 
     const fetchUserProfile = async () => {
-        if (!session?.user?.email) return;
-        
+        if (!session?.user?.phoneNumber) return;
+
         try {
             setLoading(true);
             setError(null);
-            
+
             const response = await fetch("/api/profileFetch", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "email": session.user.email
+                    "phoneNumber": session.user.phoneNumber
                 }
             });
 
@@ -47,7 +48,7 @@ export const useUserProfile = () => {
     };
 
     useEffect(() => {
-        if (session?.user?.email) {
+        if (session?.user?.phoneNumber) {
             fetchUserProfile();
         } else if (session === null) {
             setLoading(false);

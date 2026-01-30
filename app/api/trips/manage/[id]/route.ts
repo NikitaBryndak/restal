@@ -19,8 +19,12 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     try {
         const session = (await getServerSession(authOptions as any)) as any;
 
-        if (!session?.user?.email || (session.user.privelegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
-            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+        if (!session?.user?.phoneNumber) {
+             return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
+        }
+
+        if ((session.user.privelegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
+             return NextResponse.json({ message: `Forbidden: Insufficient privileges (Level ${session.user.privelegeLevel ?? 0}). Required: ${ADMIN_PRIVILEGE_LEVEL}` }, { status: 403 });
         }
 
         await connectToDatabase();
@@ -43,8 +47,12 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     try {
         const session = (await getServerSession(authOptions as any)) as any;
 
-        if (!session?.user?.email || (session.user.privelegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
-            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+        if (!session?.user?.phoneNumber) {
+             return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
+        }
+
+        if ((session.user.privelegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
+             return NextResponse.json({ message: "Forbidden: Insufficient privileges." }, { status: 403 });
         }
 
         const updates = await request.json();
@@ -58,7 +66,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         const { _id, createdAt, updatedAt, number, ...rest } = updates ?? {};
         const payload = {
             ...rest,
-            managerEmail: session.user.email,
+            managerPhone: session.user.phoneNumber,
         };
 
         const updatedTrip = await Trip.findOneAndUpdate(query, payload, { new: true, runValidators: true });

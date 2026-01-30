@@ -70,7 +70,7 @@ export const tourSchema = z.object({
     paymentDeadline: dateSchema,
 
     // Other
-    ownerEmail: z.string().email().optional().or(z.literal('')),
+    ownerPhone: z.string().optional().or(z.literal('')),
 
     documents: z.record(z.string(), documentSchema).optional(),
 });

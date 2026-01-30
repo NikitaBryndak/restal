@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoaderOne } from "@/components/ui/loader";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { User, Mail, Calendar, Wallet, Plus,  } from "lucide-react";
+import { User, Phone, Calendar, Wallet, Shield, Plus,  } from "lucide-react";
 import type { TouristInfo } from "@/types";
 import TouristCard from "@/components/profile/touristCard";
 import Link from "next/link";
@@ -101,17 +101,17 @@ export default function ProfilePage() {
                                         />
                                     </div>
 
-                                    { /* Email Field */ }
+                                    { /* Phone Field */ }
                                     <div>
-                                        <Label htmlFor="email" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
-                                            <Mail className="w-5 h-5 text-accent" />
-                                            Email
+                                        <Label htmlFor="phone" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
+                                            <Phone className="w-5 h-5 text-accent" />
+                                            Phone Number
                                         </Label>
                                         <Input
-                                            type="email"
-                                            id="email"
-                                            value={userProfile?.userEmail || ''}
-                                            placeholder="Email"
+                                            type="tel"
+                                            id="phone"
+                                            value={userProfile?.phoneNumber || ''}
+                                            placeholder="Phone Number"
                                             readOnly
                                             className="bg-white/10 border-white/20 backdrop-blur-sm h-12 text-white font-medium rounded-xl placeholder:text-gray-400"
                                         />
@@ -138,6 +138,17 @@ export default function ProfilePage() {
                                             <span className="text-xl font-bold text-emerald-300">
                                                 ${userProfile?.cashbackAmount || 0}
                                             </span>
+                                        </div>
+                                    </div>
+
+                                    { /* Privilege Level */ }
+                                    <div>
+                                        <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
+                                            <Shield className="w-5 h-5 text-accent" />
+                                            Privilege Level
+                                        </Label>
+                                        <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white font-medium">
+                                            Level {userProfile?.privelegeLevel || 1}
                                         </div>
                                     </div>
                                 </div>

@@ -7,10 +7,10 @@ type AuthFormProps = {
 };
 type AuthFormData = {
   name?: string;
-  email: string;
+  phoneNumber: string;
   password: string;
   confirmPassword?: string;
-};  
+};
 
 export function useAuth({ type }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,12 +34,12 @@ export function useAuth({ type }: AuthFormProps) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email: formData.email }),
+            body: JSON.stringify({ phoneNumber: formData.phoneNumber }),
             });
-            
+
             const { exists } = await resUserExists.json();
             if (exists) {
-            setError("User with this email already exists. Please log in.");
+            setError("User with this phone number already exists. Please log in.");
             return;
             }
 
@@ -51,7 +51,7 @@ export function useAuth({ type }: AuthFormProps) {
             },
             body: JSON.stringify({
                 name: formData.name,
-                email: formData.email,
+                phoneNumber: formData.phoneNumber,
                 password: formData.password
             }),
             });
@@ -66,19 +66,20 @@ export function useAuth({ type }: AuthFormProps) {
         }
 
         const resLogin = await signIn("credentials", {
-            email: formData.email,
+            phoneNumber: formData.phoneNumber,
             password: formData.password,
             redirect: false
         });
 
         if (resLogin?.error) {
-            const errorMessage = resLogin.error === "CredentialsSignin" 
-            ? "Invalid email or password"
+            console.log(resLogin);
+            const errorMessage = resLogin.error === "CredentialsSignin"
+            ? "Invalid phone number or password"
             : resLogin.error;
             setError(errorMessage);
             return;
         }
-        
+
 
       router.push("/dashboard");
     } catch (err) {

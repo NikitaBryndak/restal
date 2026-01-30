@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { TourFormValues } from '../schema';
 
-type EmailSectionProps = {
+type PhoneSectionProps = {
     variant?: 'create' | 'edit';
     value?: string;
     onChange?: (value: string) => void;
@@ -11,13 +11,13 @@ type EmailSectionProps = {
     description?: string;
 };
 
-export const EmailSection = ({
+export const PhoneSection = ({
     variant = 'create',
     value,
     onChange,
-    title = 'Email',
+    title = 'Phone',
     description = 'Who is the primary contact for this tour?',
-}: EmailSectionProps) => {
+}: PhoneSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));
     const errors = context?.formState?.errors ?? {};
@@ -28,7 +28,7 @@ export const EmailSection = ({
               value: value ?? '',
               onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
           }
-        : register('ownerEmail');
+        : register('ownerPhone');
 
     return (
         <section className="space-y-6">
@@ -39,15 +39,15 @@ export const EmailSection = ({
 
             <div>
                 <FormInput
-                    labelText="Email"
-                    placeholder="e.g. john.doe@example.com"
-                    type="email"
+                    labelText="Phone"
+                    placeholder="e.g. +1 (555) 000-0000"
+                    type="tel"
                     autoComplete="off"
-                    formatType="email"
+                    formatType="phone"
                     {...inputProps}
                 />
-                {!controlled && errors.ownerEmail && (
-                    <p className="text-xs text-red-500 mt-1">{errors.ownerEmail.message}</p>
+                {!controlled && errors.ownerPhone && (
+                    <p className="text-xs text-red-500 mt-1">{errors.ownerPhone.message}</p>
                 )}
             </div>
         </section>

@@ -192,17 +192,24 @@ const tripSchema = new Schema({
             required: true,
         }
     },
-    ownerEmail: {
+    ownerPhone: {
         type: String,
         required: true,
     },
-    managerEmail: {
+    managerPhone: {
         type: String,
         required: true,
     }
 }, { timestamps: true });
 
 tripSchema.index({ number: 1 }, { unique: true });
+
+// Prevent Mongoose model recompilation error in development
+if (process.env.NODE_ENV === "development") {
+    if (mongoose.models.Trip) {
+        delete mongoose.models.Trip;
+    }
+}
 
 const Trip = mongoose.models.Trip || mongoose.model("Trip", tripSchema);
 

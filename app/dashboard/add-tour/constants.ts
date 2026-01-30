@@ -48,6 +48,5 @@ export const blankPreview: PreviewState = {
         paidAmount: 0,
         deadline: '',
     },
-    ownerEmail: '',
+    ownerPhone: '',
 };
-

@@ -68,7 +68,7 @@ export const usePreviewData = (previewState: PreviewState): Trip => {
                 tourProgram: { uploaded: false, url: '' },
                 memo: { uploaded: false, url: '' },
             },
-            ownerEmail: '', // Preview mode - no owner yet
+            ownerPhone: '', // Preview mode - no owner yet
         };
     }, [previewState]);
 };

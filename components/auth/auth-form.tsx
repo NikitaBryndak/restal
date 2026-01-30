@@ -17,10 +17,10 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      
+
       await handleAuth({
         name: formData.get("name") as string,
-        email: formData.get("email") as string,
+        phoneNumber: formData.get("phoneNumber") as string,
         password: formData.get("password") as string,
         confirmPassword: formData.get("confirmPassword") as string,
       });
@@ -40,8 +40,8 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
           <div className="w-full max-w-[380px]">
 
             {/* Back */}
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="absolute top-6 left-6 text-sm text-foreground/60 flex items-center gap-2 transition-colors"
             >
               <span>&larr;</span>
@@ -63,20 +63,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               </p>
             </div>
 
-            {/* Social Logins */}
-            <div className="space-y-3">
-              <Button 
-                variant="outline" 
-                className="w-full h-10 bg-background/50 border border-foreground/10 hover:bg-white/90 hover:text-black hover:border-foreground/20 transition-colors group text-sm"
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4 mr-2 fill-white group-hover:fill-black transition-colors" >
-                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
-                </svg>
-                Continue with Google
-              </Button>
-            </div>
-
-            {/* Divider */} 
+            {/* Divider */}
             <div className="flex items-center gap-3 my-6">
               <div className="h-px flex-1 border"></div>
             </div>
@@ -102,12 +89,12 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               )}
 
               <FormField
-                id="email"
-                label="Email"
-                type="email"
+                id="phoneNumber"
+                label="Phone Number"
+                type="tel"
                 required
                 disabled={isLoading}
-                placeholder="name@example.com"
+                placeholder="+1234567890"
               />
 
               <FormField
@@ -133,20 +120,20 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               )}
 
               {/* Submit Button */}
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isLoading}
                 variant="default"
                 className="w-full h-10 mt-2 text-black bg-white hover:bg-white/70 transition-colors text-sm"
               >
                 {isLoading ? "Loading..." : type === "login" ? "Sign in" : "Sign up"}
               </Button>
-              
+
               {/* Forgot Password Link */}
               {type === "login" && (
                 <div className="text-center mt-2">
-                  <Link 
-                    href="/forgot-password" 
+                  <Link
+                    href="/forgot-password"
                     className="text-sm text-foreground/60 hover:text-foreground/80 underline underline-offset-4 transition-colors"
                   >
                     Forgot password?
@@ -161,8 +148,8 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                 {type === "login" ? (
                   <>
                     Don't have an account?{" "}
-                    <Link 
-                      href="/register" 
+                    <Link
+                      href="/register"
                       className="text-foreground hover:text-foreground/80 underline underline-offset-4 transition-colors"
                     >
                       Sign up
@@ -171,8 +158,8 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                 ) : (
                   <>
                     Already have an account?{" "}
-                    <Link 
-                      href="/login" 
+                    <Link
+                      href="/login"
                       className="text-foreground hover:text-foreground/80 underline underline-offset-4 transition-colors"
                     >
                       Sign in

@@ -9,13 +9,13 @@ export async function GET(request: Request) {
     try {
         const session = (await getServerSession(authOptions as any)) as any;
 
-        if (!session?.user?.email) {
+        if (!session?.user?.phoneNumber) {
             return NextResponse.json({ message: "Not authenticated", trips: [] }, { status: 401 });
         }
 
         await connectToDatabase();
 
-        const trips = await Trip.find({ ownerEmail: session.user.email }).sort({ createdAt: -1 }).lean();
+        const trips = await Trip.find({ ownerPhone: session.user.phoneNumber }).sort({ createdAt: -1 }).lean();
 
         return NextResponse.json({ trips }, { status: 200 });
     } catch (error: any) {
@@ -28,11 +28,13 @@ export async function POST(request: Request) {
     try {
         const session = (await getServerSession(authOptions as any)) as any;
 
-        if (!session?.user?.email) {
+        if (!session?.user?.phoneNumber) {
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
         const body = await request.json();
+
+        console.log("Creating trip with documents:", JSON.stringify(body.documents, null, 2));
 
         await connectToDatabase();
 
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
 
         const payload = {
             ...body,
-            managerEmail: session.user.email,
+            managerPhone: session.user.phoneNumber,
         };
 
         const newTrip = new Trip({
@@ -49,7 +51,7 @@ export async function POST(request: Request) {
         await newTrip.save();
 
         // Update user's cashback directly
-        const user = await User.findOne({ email: body.ownerEmail });
+        const user = await User.findOne({ phoneNumber: body.ownerPhone });
         if (user) {
             user.cashbackAmount = (user.cashbackAmount || 0) + cashbackAmount;
             await user.save();

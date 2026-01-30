@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FormInput from '@/components/ui/form-input';
 import { Label } from '@/components/ui/label';
-import { Trip, Documents, Tourist, FlightInfo, Hotel, Payment, Addons, DEFAULT_DOCUMENTS, DOCUMENT_KEYS } from '@/types';
+import { Trip, Documents, Tourist, FlightInfo, Hotel, Payment, Addons, DEFAULT_DOCUMENTS, DOCUMENT_KEYS, DOCUMENT_LABELS } from '@/types';
 import { validateDate } from '@/lib/utils';
 import {
     BasicDetailsSection,
-    EmailSection,
+    PhoneSection,
     FlightsSection,
     StaySection,
     ExtrasSection,
@@ -124,8 +124,8 @@ const normalizeTrip = (raw: any): RawTrip => {
             paidAmount: Number(raw?.payment?.paidAmount ?? 0),
             deadline: raw?.payment?.deadline ?? '',
         },
-        ownerEmail: raw?.ownerEmail ?? '',
-        managerEmail: raw?.managerEmail ?? raw?.ownerEmail ?? undefined,
+        ownerPhone: raw?.ownerPhone ?? '',
+        managerPhone: raw?.managerPhone ?? raw?.ownerPhone ?? undefined,
         region: raw?.region ?? '',
         createdAt: raw?.createdAt ?? undefined,
         updatedAt: raw?.updatedAt ?? undefined,
@@ -148,7 +148,7 @@ const serialiseTourists = (tourists: EditableTourist[]) => {
 const isBlank = (value: unknown): boolean => typeof value !== 'string' || value.trim().length === 0;
 
 const validateTripData = (data: RawTrip): string | null => {
-    if (isBlank(data.ownerEmail)) return 'Owner email is required.';
+    if (isBlank(data.ownerPhone)) return 'Owner phone is required.';
     if (isBlank(data.country)) return 'Destination country is required.';
     if (isBlank(data.region)) return 'Region is required.';
 
@@ -307,6 +307,46 @@ export default function ManageTourPage() {
         setSuccessMessage(null);
 
         try {
+            // 1. Upload pending documents first
+            const currentDocuments = { ...trip.documents }; // Clone from state
+
+            for (const key of DOCUMENT_KEYS) {
+                const file = pendingFiles[key];
+                if (file) {
+                    console.log(`Uploading file for ${key}:`, file.name);
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('folder', 'documents');
+
+                    try {
+                        const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (uploadRes.ok) {
+                            const { url } = await uploadRes.json();
+                            console.log(`Upload successful for ${key}. URL:`, url);
+                            currentDocuments[key] = {
+                                ...currentDocuments[key],
+                                url: url,
+                                uploaded: true // Mark as uploaded since we just did it
+                            };
+                        } else {
+                            const errorText = await uploadRes.text();
+                            console.error(`Failed to upload ${key}`, errorText);
+                            throw new Error(`Failed to upload ${DOCUMENT_LABELS[key]}: ${errorText}`);
+                        }
+                    } catch (uploadError: any) {
+                         console.error(`Upload error for ${key}:`, uploadError);
+                         setErrorMessage(uploadError.message || `Error uploading ${DOCUMENT_LABELS[key]}`);
+                         setIsSaving(false);
+                         return; // Abort save on upload failure
+                    }
+                }
+            }
+
+            // 2. Prepare payload with updated documents
             const { createdAt, updatedAt, ...rest } = trip;
             const payload = {
                 ...rest,
@@ -320,7 +360,7 @@ export default function ManageTourPage() {
                     paidAmount: Number(rest.payment.paidAmount ?? 0),
                 },
                 tourists: serialiseTourists(trip.tourists),
-                documents: trip.documents,
+                documents: currentDocuments,
             };
 
             const response = await fetch(`/api/trips/manage/${encodeURIComponent(activeId)}`, {
@@ -336,6 +376,7 @@ export default function ManageTourPage() {
             }
 
             setTrip(normalizeTrip(data.trip));
+            setPendingFiles(buildEmptyPendingFiles()); // Clear pending files on success
             setSuccessMessage('Changes saved successfully.');
         } catch (error: any) {
             console.error('Manager update failed', error);
@@ -492,8 +533,8 @@ export default function ManageTourPage() {
         });
     }, []);
 
-    const handleOwnerEmailChange = useCallback((value: string) => {
-        setTrip((prev) => (prev ? { ...prev, ownerEmail: value } : prev));
+    const handleOwnerPhoneChange = useCallback((value: string) => {
+        setTrip((prev) => (prev ? { ...prev, ownerPhone: value } : prev));
     }, []);
 
     const handleTouristChange = useCallback((index: number, field: keyof Tourist, value: string) => {
@@ -652,11 +693,11 @@ export default function ManageTourPage() {
                                     title="Destination"
                                     description="Update where and when the travellers are headed."
                                 />
-                                <EmailSection
+                                <PhoneSection
                                     variant="edit"
-                                    value={trip.ownerEmail ?? ''}
-                                    onChange={handleOwnerEmailChange}
-                                    title="Owner email"
+                                    value={trip.ownerPhone ?? ''}
+                                    onChange={handleOwnerPhoneChange}
+                                    title="Owner Phone"
                                     description="Primary client contact used for confirmations and updates."
                                 />
                             </div>

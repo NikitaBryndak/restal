@@ -6,10 +6,20 @@ import { Button } from '@/components/ui/button';
 import { usePreviewData } from './hooks/usePreviewData';
 import { useAddTourForm } from './hooks/useAddTourForm';
 
-import { BasicDetailsSection, FlightsSection, TravellerSection, EmailSection, StaySection, ExtrasSection, PaymentSection } from './components';
+import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, DocumentsSection } from './components';
 
 export default function AddTourPage() {
-    const { form, previewState, onSubmit } = useAddTourForm();
+    const {
+        form,
+        previewState,
+        onSubmit,
+        documents,
+        pendingFiles,
+        isUploading,
+        handleFileSelect,
+        handleFileClear,
+        handleToggleReady
+    } = useAddTourForm();
     const previewData = usePreviewData(previewState);
 
     return (
@@ -46,15 +56,22 @@ export default function AddTourPage() {
                                 <BasicDetailsSection />
                                 <FlightsSection />
                                 <TravellerSection />
-                                <EmailSection />
+                                <PhoneSection />
                                 <StaySection />
+                                <DocumentsSection
+                                    documents={documents}
+                                    pendingFiles={pendingFiles}
+                                    onFileSelect={handleFileSelect}
+                                    onFileClear={handleFileClear}
+                                    onToggleReady={handleToggleReady}
+                                />
                                 <ExtrasSection />
                                 <PaymentSection />
                             </div>
 
                             <div className="mt-10 flex justify-end border-t border-border/40 pt-6">
-                                <Button type="submit" size="lg" className="px-8">
-                                    Create tour
+                                <Button type="submit" size="lg" className="px-8" disabled={isUploading}>
+                                    {isUploading ? 'Uploading & Creating...' : 'Create tour'}
                                 </Button>
                             </div>
                         </form>

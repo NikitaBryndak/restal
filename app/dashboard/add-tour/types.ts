@@ -46,5 +46,5 @@ export type PreviewState = {
         paidAmount: number;
         deadline: string;
     };
-    ownerEmail: string;
+    ownerPhone: string;
 };

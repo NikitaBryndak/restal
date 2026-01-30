@@ -6,18 +6,18 @@ export async function GET(request: Request) {
     try {
         await connectToDatabase();
 
-        const email = request.headers.get("email");
+        const phoneNumber = request.headers.get("phoneNumber");
 
-        if (!email) {
+        if (!phoneNumber) {
             return NextResponse.json({
-                message: "Email is required",
+                message: "Phone number is required",
                 user: null
             }, {
                 status: 400
             });
         }
 
-        const user = await User.findOne({ email }).select("name email createdAt cashbackAmount privelegeLevel");
+        const user = await User.findOne({ phoneNumber }).select("name email phoneNumber createdAt cashbackAmount privelegeLevel");
 
         if (!user) {
             return NextResponse.json({
@@ -32,10 +32,10 @@ export async function GET(request: Request) {
         return NextResponse.json({
             userName: user.name,
             userEmail: user.email,
+            phoneNumber: user.phoneNumber,
             createdAt: user.createdAt,
             cashbackAmount: user.cashbackAmount,
             privelegeLevel: user.privelegeLevel
-
         }, {
             status: 200
         });

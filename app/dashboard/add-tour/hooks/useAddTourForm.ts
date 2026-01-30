@@ -6,10 +6,20 @@ import { tourSchema, TourFormValues } from '../schema';
 import { PreviewState } from '../types';
 import { blankPreview } from '../constants';
 import { getCurrentDate } from '@/lib/utils';
+import { Documents, DEFAULT_DOCUMENTS, DOCUMENT_KEYS, DOCUMENT_LABELS } from '@/types';
 
 export const useAddTourForm = () => {
     const router = useRouter();
     const curDate = getCurrentDate();
+
+    // Document state
+    const [documents, setDocuments] = useState<Documents>(DEFAULT_DOCUMENTS);
+    const [pendingFiles, setPendingFiles] = useState<Record<keyof Documents, File | null>>(() => {
+        const files: any = {};
+        DOCUMENT_KEYS.forEach(k => files[k] = null);
+        return files as Record<keyof Documents, File | null>;
+    });
+    const [isUploading, setIsUploading] = useState(false);
 
     const form = useForm<TourFormValues>({
         resolver: zodResolver(tourSchema) as any,
@@ -42,7 +52,7 @@ export const useAddTourForm = () => {
             paymentTotal: 0,
             paymentPaid: 0,
             paymentDeadline: '',
-            ownerEmail: '',
+            ownerPhone: '',
         },
         mode: 'onChange',
     });
@@ -105,14 +115,79 @@ export const useAddTourForm = () => {
                 paidAmount: values.paymentPaid || 0,
                 deadline: values.paymentDeadline || '',
             },
-            ownerEmail: values.ownerEmail || '',
+            ownerPhone: values.ownerPhone || '',
         };
     };
 
     const previewState = mapToPreview(formValues as TourFormValues);
 
+    const handleFileSelect = (key: keyof Documents, file: File) => {
+        setPendingFiles(prev => ({ ...prev, [key]: file }));
+    };
+
+    const handleFileClear = (key: keyof Documents) => {
+        setPendingFiles(prev => ({ ...prev, [key]: null }));
+    };
+
+    const handleToggleReady = (key: keyof Documents, isReady: boolean) => {
+        setDocuments(prev => ({
+            ...prev,
+            [key]: { ...prev[key], uploaded: isReady }
+        }));
+    };
+
     const onSubmit = async (data: TourFormValues) => {
-        const payload = {
+        setIsUploading(true);
+        try {
+            // Upload files
+            const finalDocuments = { ...documents };
+
+
+            console.log('Starting upload process. Pending files:', pendingFiles);
+
+            for (const key of DOCUMENT_KEYS) {
+                const file = pendingFiles[key];
+                if (file) {
+                    console.log(`Uploading file for ${key}:`, file.name);
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('folder', 'documents');
+
+                    try {
+                        const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (uploadRes.ok) {
+                            const { url } = await uploadRes.json();
+                            console.log(`Upload successful for ${key}. URL:`, url);
+                            finalDocuments[key] = {
+                                ...finalDocuments[key],
+                                url: url,
+                                uploaded: true
+                            };
+                        } else {
+                            const errorText = await uploadRes.text();
+                            console.error(`Failed to upload ${key}`, errorText);
+                            alert(`Failed to upload ${DOCUMENT_LABELS[key] || key}: ${errorText}`);
+                            setIsUploading(false);
+                            return; // Stop submission on upload failure
+                        }
+                    } catch (uploadErr) {
+                        console.error(`Error uploading ${key}`, uploadErr);
+                        alert(`Error uploading ${DOCUMENT_LABELS[key] || key}. Check console for details.`);
+                        setIsUploading(false);
+                        return;
+                    }
+                } else {
+                     console.log(`No file pending for ${key}`);
+                }
+            }
+
+            console.log('Final documents payload:', finalDocuments);
+
+            const payload = {
             number: data.number,
             country: data.country,
             region: data.region,
@@ -162,11 +237,11 @@ export const useAddTourForm = () => {
                 paidAmount: data.paymentPaid,
                 deadline: data.paymentDeadline,
             },
-            ownerEmail: data.ownerEmail,
-            documents: data.documents,
+            ownerPhone: data.ownerPhone,
+            documents: finalDocuments,
         };
 
-        try {
+
             const res = await fetch('/api/trips', {
                 method: 'POST',
                 headers: {
@@ -185,6 +260,8 @@ export const useAddTourForm = () => {
         } catch (err) {
             console.error('Create trip error', err);
             alert('Error creating trip');
+        } finally {
+            setIsUploading(false);
         }
     };
 

@@ -22,23 +22,23 @@ export async function POST(request: Request) {
     try {
         const session = (await getServerSession(authOptions as any) as any);
 
-        if (!session?.user?.email) {
+        if (!session?.user?.phoneNumber) {
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
         const body = await request.json();
 
         await connectToDatabase();
-    
-        const creatorEmail = session.user.email;
+
+        const creatorPhone = session.user.phoneNumber;
 
         const toCreate = {
                 ...body,
-                creatorEmail
+                creatorPhone
             };
-        
+
         let created = await Article.create(toCreate);
-        
+
         if (!created) {
             return NextResponse.json({ message: 'Failed to create article' }, { status: 500 });
         }
@@ -48,4 +48,4 @@ export async function POST(request: Request) {
             console.error("Error creating article:", error);
             return NextResponse.json({ message: "Error creating article", error: error.message }, { status: 500 });
     }
-} 
+}
