@@ -10,13 +10,13 @@ export default function ArticlePage({params}: {params: {slug: string} }) {
         return (
         <main className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-24">
             <div className="text-center space-y-6">
-                <h1 className="text-3xl font-bold text-white">Article not found</h1>
+                <h1 className="text-3xl font-bold text-white">Статтю не знайдено</h1>
                 <Link
                     href="/info"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-xl hover:bg-accent/90 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Info Center
+                    Назад до Інфо центру
                 </Link>
             </div>
         </main>
@@ -31,7 +31,7 @@ export default function ArticlePage({params}: {params: {slug: string} }) {
                 className="inline-flex items-center gap-2 text-secondary hover:text-white transition-colors mb-8 group"
             >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                Back to Info Center
+                Назад до Інфо центру
             </Link>
 
             <article className="bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md overflow-hidden">
@@ -49,7 +49,7 @@ export default function ArticlePage({params}: {params: {slug: string} }) {
                             </span>
                             <div className="flex items-center gap-2 text-white/80 text-sm">
                                 <Calendar className="w-4 h-4" />
-                                <span>Recently Published</span>
+                                <span>Нещодавно опубліковано</span>
                             </div>
                         </div>
                         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">

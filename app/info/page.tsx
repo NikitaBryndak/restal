@@ -27,13 +27,13 @@ export default function InfoPage() {
         {/* Header Section */}
         <div className="text-center space-y-6">
           <TextGenerateEffect
-            words="Info Center"
+            words="Інфо центр"
             className="text-4xl md:text-5xl lg:text-6xl font-light"
-            accentWords={["Center"]}
+            accentWords={["центр"]}
             accentClassName="text-accent font-bold"
           />
           <p className="text-secondary text-lg max-w-2xl mx-auto leading-relaxed">
-            Discover travel guides, tips, and stories from around the world.
+            Відкрийте для себе путівники, поради та історії подорожей з усього світу.
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export default function InfoPage() {
           <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary" />
             <Input
-              placeholder="Search articles..."
+              placeholder="Шукати статті..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-black/40 border-white/10 focus:border-accent/50 h-10 w-full"
@@ -103,10 +103,10 @@ export default function InfoPage() {
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-secondary">
                     <Calendar className="w-4 h-4" />
-                    <span>Recently</span>
+                    <span>Нещодавно</span>
                   </div>
                   <div className="flex items-center gap-1 text-accent font-medium group-hover:translate-x-1 transition-transform">
-                    Read Article
+                    Читати статтю
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -117,7 +117,7 @@ export default function InfoPage() {
 
         {filteredArticles.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-secondary text-lg">No articles found matching your criteria.</p>
+            <p className="text-secondary text-lg">Статей за вашими критеріями не знайдено.</p>
           </div>
         )}
       </div>

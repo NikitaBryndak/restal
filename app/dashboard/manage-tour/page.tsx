@@ -373,7 +373,7 @@ export default function ManageTourPage() {
 
             setTrip(normalizeTrip(data.trip));
             setPendingFiles(buildEmptyPendingFiles());
-            setSuccessMessage('Changes saved successfully.');
+            setSuccessMessage('Зміни успішно збережено.');
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unable to update the tour.';
             setErrorMessage(message);
@@ -601,28 +601,28 @@ export default function ManageTourPage() {
         <div className="min-h-screen bg-background py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Tours</p>
-                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Manage existing tour</h1>
-                    <p className="text-sm text-foreground/60">Find a tour by its public number (Trip #123456) or internal ID, adjust its details, and keep supporting documents up to date.</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Тури</p>
+                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Керування існуючим туром</h1>
+                    <p className="text-sm text-foreground/60">Знайдіть тур за його номером (Тур #123456) або внутрішнім ID, редагуйте деталі та оновлюйте документи.</p>
                 </header>
 
                 <section className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
                     <form onSubmit={handleLookup} className="flex flex-col gap-4 md:flex-row md:items-end">
                         <div className="w-full md:max-w-sm">
-                            <Label htmlFor="tour-identifier">Tour number or ID</Label>
+                            <Label htmlFor="tour-identifier">Номер туру або ID</Label>
                             <Input
                                 id="tour-identifier"
                                 value={searchValue}
                                 onChange={(event) => setSearchValue(event.target.value)}
-                                placeholder="e.g. Trip #5468189 or 6645cd8f..."
+                                placeholder="напр. Тур #5468189 або 6645cd8f..."
                                 autoComplete="off"
                             />
                         </div>
                         <Button type="submit" size="lg" disabled={isLoading}>
-                            {isLoading ? 'Searching…' : 'Find tour'}
+                            {isLoading ? 'Пошук…' : 'Знайти тур'}
                         </Button>
                         <div className="flex-1 text-sm text-foreground/60">
-                            Only managers with elevated access can edit existing tours. Document upload controls are placeholders.
+                            Тільки менеджери з підвищеним доступом можуть редагувати існуючі тури.
                         </div>
                     </form>
                     {errorMessage && (
@@ -642,25 +642,25 @@ export default function ManageTourPage() {
                         <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
                             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div>
-                                    <h2 className="text-2xl font-semibold text-foreground">General information</h2>
-                                    <p className="text-sm text-foreground/60">Update headline tour details and timelines.</p>
+                                    <h2 className="text-2xl font-semibold text-foreground">Загальна інформація</h2>
+                                    <p className="text-sm text-foreground/60">Оновіть основні деталі туру та терміни.</p>
                                 </div>
                                 <Button type="button" size="lg" onClick={handleSave} disabled={isSaving}>
-                                    {isSaving ? 'Saving…' : 'Save changes'}
+                                    {isSaving ? 'Збереження…' : 'Зберегти зміни'}
                                 </Button>
                             </div>
                             <div className="mt-6 grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="tour-number">Tour number</Label>
+                                    <Label htmlFor="tour-number">Номер туру</Label>
                                     <Input
                                         id="tour-number"
-                                        value={typeof trip.number === 'number' && !Number.isNaN(trip.number) ? `Trip #${trip.number}` : ''}
+                                        value={typeof trip.number === 'number' && !Number.isNaN(trip.number) ? `Тур #${trip.number}` : ''}
                                         disabled
                                     />
                                 </div>
                                 <FormInput
                                     id="booking-date"
-                                    labelText="Booking date"
+                                    labelText="Дата бронювання"
                                     value={trip.bookingDate ?? ''}
                                     onChange={(event) =>
                                         setTrip((prev) => (prev ? { ...prev, bookingDate: event.target.value } : prev))
@@ -669,7 +669,7 @@ export default function ManageTourPage() {
                                     formatType="date"
                                 />
                                 <div>
-                                    <Label htmlFor="manager-email">Last managed by</Label>
+                                    <Label htmlFor="manager-email">Останній менеджер</Label>
                                     <Input id="manager-email" value={trip.managerEmail ?? ''} disabled />
                                 </div>
                             </div>
@@ -686,15 +686,15 @@ export default function ManageTourPage() {
                                     showHotelNights={false}
                                     showMealPlan={false}
                                     showNumber={false}
-                                    title="Destination"
-                                    description="Update where and when the travellers are headed."
+                                    title="Напрямок"
+                                    description="Оновіть куди і коли вирушають подорожуючі."
                                 />
                                 <PhoneSection
                                     variant="edit"
                                     value={trip.ownerPhone ?? ''}
                                     onChange={handleOwnerPhoneChange}
-                                    title="Owner Phone"
-                                    description="Primary client contact used for confirmations and updates."
+                                    title="Телефон власника"
+                                    description="Основний контакт клієнта для підтверджень та оновлень."
                                 />
                             </div>
                         </div>
@@ -704,8 +704,8 @@ export default function ManageTourPage() {
                                 variant="edit"
                                 values={trip.flightInfo}
                                 onChange={handleFlightFieldChange}
-                                title="Flight information"
-                                description="Update outbound and inbound flight details."
+                                title="Інформація про рейси"
+                                description="Оновіть деталі рейсів туди та назад."
                             />
                         </div>
 
@@ -716,8 +716,8 @@ export default function ManageTourPage() {
                                 onChange={handleHotelFieldChange}
                                 includeMealPlan
                                 includeNights
-                                title="Accommodation"
-                                description="Capture hotel stay details and room allocation."
+                                title="Проживання"
+                                description="Деталі проживання в готелі та розподіл номерів."
                             />
                         </div>
 
@@ -726,16 +726,16 @@ export default function ManageTourPage() {
                                 variant="edit"
                                 values={trip.payment}
                                 onChange={handlePaymentFieldChange}
-                                title="Payment overview"
-                                description="Track outstanding balances and payment deadlines."
+                                title="Огляд оплати"
+                                description="Відстежуйте залишки та терміни оплати."
                             />
                             <div className="mt-6 border-t border-border/40 pt-6">
                                 <ExtrasSection
                                     variant="edit"
                                     values={trip.addons}
                                     onChange={handleAddonToggle}
-                                    title="Add-ons"
-                                    description="Toggle optional extras to reflect traveller preferences."
+                                    title="Додатково"
+                                    description="Перемикайте опціональні додатки згідно з побажаннями подорожуючих."
                                 />
                             </div>
                         </div>
@@ -760,13 +760,13 @@ export default function ManageTourPage() {
 
                         <div className="flex justify-end">
                             <Button type="button" size="lg" onClick={handleSave} disabled={isSaving}>
-                                {isSaving ? 'Saving…' : 'Save changes'}
+                                {isSaving ? 'Збереження…' : 'Зберегти зміни'}
                             </Button>
                         </div>
                     </section>
                 ) : (
                     <div className="mt-6 rounded-3xl border border-dashed border-border/50 p-8 text-center text-sm text-foreground/60">
-                        Search for a tour to unlock editing tools.
+                        Знайдіть тур, щоб розблокувати інструменти редагування.
                     </div>
                 )}
             </div>

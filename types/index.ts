@@ -112,14 +112,14 @@ export const DEFAULT_DOCUMENTS: Documents = {
 };
 
 export const DOCUMENT_LABELS: Record<keyof Documents, string> = {
-  contract: 'Contract',
-  invoice: 'Invoice',
-  confirmation: 'Booking confirmation',
-  tickets: 'Tickets',
-  voucher: 'Voucher',
-  insurancePolicy: 'Insurance policy',
-  tourProgram: 'Tour program',
-  memo: 'Manager memo',
+  contract: 'Договір',
+  invoice: 'Рахунок',
+  confirmation: 'Підтвердження бронювання',
+  tickets: 'Квитки',
+  voucher: 'Ваучер',
+  insurancePolicy: 'Страховий поліс',
+  tourProgram: 'Програма туру',
+  memo: "Пам'ятка менеджера",
 };
 
 export const DOCUMENT_KEYS = Object.keys(DEFAULT_DOCUMENTS) as (keyof Documents)[];

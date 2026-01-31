@@ -28,8 +28,8 @@ export const DocumentsSection = ({
 
     return (
         <section className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
-            <h2 className="text-2xl font-semibold text-foreground">Documents</h2>
-            <p className="text-sm text-foreground/60">Toggle availability and stage files for future upload. Selected files stay on this device until the upload flow is implemented.</p>
+            <h2 className="text-2xl font-semibold text-foreground">Документи</h2>
+            <p className="text-sm text-foreground/60">Перемикайте наявність та додавайте файли для майбутнього завантаження. Вибрані файли залишаються на цьому пристрої до моменту завантаження.</p>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {DOCUMENT_KEYS.map((key) => {
                     const document = documents[key] ?? DEFAULT_DOCUMENTS[key];
@@ -39,7 +39,7 @@ export const DocumentsSection = ({
                             <div className="flex items-center justify-between gap-3">
                                 <div>
                                     <h3 className="text-base font-semibold text-foreground">{DOCUMENT_LABELS[key]}</h3>
-                                    <p className="text-xs text-foreground/50">Stage the latest file and mark it ready when it&apos;s approved.</p>
+                                    <p className="text-xs text-foreground/50">Додайте останній файл та позначте готовим, коли він затверджений.</p>
                                 </div>
                                 <label className="flex items-center gap-2 text-xs font-medium text-foreground">
                                     <input
@@ -48,7 +48,7 @@ export const DocumentsSection = ({
                                         onChange={(event) => onToggleReady(key, event.target.checked)}
                                         className="h-4 w-4"
                                     />
-                                    Ready
+                                    Готово
                                 </label>
                             </div>
                             <div
@@ -76,17 +76,17 @@ export const DocumentsSection = ({
                                     className="flex cursor-pointer flex-col items-center gap-2 text-xs font-medium text-foreground"
                                 >
                                     <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
-                                        {pendingFile?.name ?? 'Select or drop a file'}
+                                        {pendingFile?.name ?? 'Виберіть або перетягніть файл'}
                                     </span>
                                     <span className="text-foreground/50">
-                                        {pendingFile ? 'File staged locally. Will be uploaded on save.' : 'Drag & drop or click to choose a file.'}
+                                        {pendingFile ? 'Файл додано локально. Буде завантажено при збереженні.' : 'Перетягніть або натисніть для вибору файлу.'}
                                     </span>
                                 </label>
                             </div>
                             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-foreground/60">
                                 {pendingFile && (
                                     <Button type="button" variant="ghost" size="sm" onClick={() => onFileClear(key)}>
-                                        Clear selection
+                                        Очистити вибір
                                     </Button>
                                 )}
                                 {document.url && (
@@ -96,7 +96,7 @@ export const DocumentsSection = ({
                                         rel="noreferrer"
                                         className="text-primary underline"
                                     >
-                                        View existing link
+                                        Переглянути наявне посилання
                                     </a>
                                 )}
                             </div>

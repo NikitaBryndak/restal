@@ -15,17 +15,17 @@ type PaymentSectionProps = {
 };
 
 const paymentConfig: Array<{ field: PaymentField; label: string; placeholder: string; name: keyof TourFormValues; type?: string; formatType?: 'date' }> = [
-    { field: 'totalAmount', label: 'Total amount', placeholder: 'e.g. 1299.99', name: 'paymentTotal', type: 'number' },
-    { field: 'paidAmount', label: 'Paid amount', placeholder: 'e.g. 500', name: 'paymentPaid', type: 'number' },
-    { field: 'deadline', label: 'Payment deadline', placeholder: '30/01/2021', name: 'paymentDeadline', formatType: 'date' },
+    { field: 'totalAmount', label: 'Загальна сума', placeholder: 'напр. 1299.99', name: 'paymentTotal', type: 'number' },
+    { field: 'paidAmount', label: 'Сплачено', placeholder: 'напр. 500', name: 'paymentPaid', type: 'number' },
+    { field: 'deadline', label: 'Термін оплати', placeholder: '30/01/2021', name: 'paymentDeadline', formatType: 'date' },
 ];
 
 export const PaymentSection = ({
     variant = 'create',
     values,
     onChange,
-    title = 'Payment',
-    description = 'Capture the financials to keep billing clear.',
+    title = 'Оплата',
+    description = 'Внесіть фінансову інформацію для прозорого розрахунку.',
 }: PaymentSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));

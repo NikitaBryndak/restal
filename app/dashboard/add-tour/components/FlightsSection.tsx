@@ -16,24 +16,24 @@ type FlightsSectionProps = {
 };
 
 const segmentCopy: Record<FlightSegment, { heading: string }> = {
-    departure: { heading: 'Departure' },
-    arrival: { heading: 'Return' },
+    departure: { heading: 'Виліт' },
+    arrival: { heading: 'Повернення' },
 };
 
 const fieldMeta: Record<FlightField, { label: string; placeholder: string; nameSuffix: string; formatType?: 'date' | 'time' }> = {
-    country: { label: 'Country', placeholder: 'e.g. Spain', nameSuffix: 'Country' },
-    airportCode: { label: 'Airport code', placeholder: 'e.g. MAD', nameSuffix: 'Airport' },
-    flightNumber: { label: 'Flight number', placeholder: 'e.g. IB1234', nameSuffix: 'Flight' },
-    date: { label: 'Date', placeholder: '30/01/2021', nameSuffix: 'Date', formatType: 'date' },
-    time: { label: 'Time', placeholder: '11:35', nameSuffix: 'Time', formatType: 'time' },
+    country: { label: 'Країна', placeholder: 'напр. Іспанія', nameSuffix: 'Country' },
+    airportCode: { label: 'Код аеропорту', placeholder: 'напр. MAD', nameSuffix: 'Airport' },
+    flightNumber: { label: 'Номер рейсу', placeholder: 'напр. IB1234', nameSuffix: 'Flight' },
+    date: { label: 'Дата', placeholder: '30/01/2021', nameSuffix: 'Date', formatType: 'date' },
+    time: { label: 'Час', placeholder: '11:35', nameSuffix: 'Time', formatType: 'time' },
 };
 
 export const FlightsSection = ({
     variant = 'create',
     values,
     onChange,
-    title = 'Flights',
-    description = 'Outbound and return flight details for the itinerary.',
+    title = 'Рейси',
+    description = 'Деталі рейсів туди та назад для маршруту.',
 }: FlightsSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));

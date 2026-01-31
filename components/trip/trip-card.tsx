@@ -11,8 +11,8 @@ export default function TripCard({ data }: { data: Trip }) {
     const cashback = totalAmount * CASHBACK_RATE;
 
     const addonItems = [
-        { label: "Insurance", value: data.addons.insurance, icon: "🛡️" },
-        { label: "Transfer", value: data.addons.transfer, icon: "🚗" },
+        { label: "Страхування", value: data.addons.insurance, icon: "🛡️" },
+        { label: "Трансфер", value: data.addons.transfer, icon: "🚗" },
     ];
 
     const [day, month, year] = data.tripEndDate.split('/').map((part: string) => parseInt(part, 10));
@@ -83,7 +83,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-blue-400/60 rounded-full"></div>
-                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Departure</p>
+                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Виліт</p>
                                 </div>
                                 <p className="text-base font-semibold pl-3">{data.flightInfo.departure.airportCode} · {data.flightInfo.departure.flightNumber}</p>
                                 <div className="flex items-center gap-2 text-white/80 pl-3">
@@ -97,7 +97,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-purple-400/60 rounded-full"></div>
-                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Return</p>
+                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Повернення</p>
                                 </div>
                                 <p className="text-base font-semibold pl-3">{data.flightInfo.arrival.airportCode} · {data.flightInfo.arrival.flightNumber}</p>
                                 <div className="flex items-center gap-2 text-white/80 pl-3">
@@ -111,7 +111,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-amber-400/60 rounded-full"></div>
-                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Stay</p>
+                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Проживання</p>
                                     <span className="w-6 h-6 rounded-full bg-linear-to-br from-amber-400/30 to-orange-400/30 border border-white/20 text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
                                         {data.hotel.nights}
                                     </span>
@@ -128,7 +128,7 @@ export default function TripCard({ data }: { data: Trip }) {
                                     </p>
                                     <div className="pt-1 border-t border-white/10 mt-2">
                                         <p className="flex justify-between">
-                                            <span className="text-white/60">Meal plan:</span>
+                                            <span className="text-white/60">Харчування:</span>
                                             <span className="font-medium">{data.hotel.food}</span>
                                         </p>
                                     </div>
@@ -139,7 +139,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-emerald-400/60 rounded-full"></div>
-                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Add-ons</p>
+                                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Додатково</p>
                                 </div>
                                 <div className="flex flex-col gap-2 pl-3">
                                     {addonItems.map((addon) => (
@@ -164,7 +164,7 @@ export default function TripCard({ data }: { data: Trip }) {
 
                     <div className="flex flex-[0_0_40%] flex-col gap-3">
                         <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-col justify-center">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center mb-2">Payment</p>
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center mb-2">Оплата</p>
                             <div className="flex flex-col gap-2">
                                 <div className="text-center">
                                     <div className="flex items-center justify-center gap-1">
@@ -182,7 +182,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             </div>
                         </div>
                         <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-[20%] flex-col gap-3">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center">Documents</p>
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center">Документи</p>
                             <div className='flex flex-row justify-around w-full'>
                                 {documentDownloadSection}
                             </div>

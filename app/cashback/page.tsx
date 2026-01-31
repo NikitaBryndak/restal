@@ -2,23 +2,32 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Gift, Percent, Star, Users, Copy, Check } from 'lucide-react';
 
 export default function CashbackPage() {
-    const [selectedTab, setSelectedTab] = useState<'overview' | 'claim'>('overview');
+    const [selectedTab, setSelectedTab] = useState<'bonuses' | 'overview' | 'claim'>('bonuses');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [copiedReferral, setCopiedReferral] = useState(false);
 
-    const cashbackBalance = 145.50;
-    const totalEarned = 892.30;
+    const cashbackBalance = 1450;
+    const totalEarned = 8920;
     const bookingsCount = 12;
+    const referralCode = "RESTAL-USER123";
+
+    const copyReferralCode = () => {
+        navigator.clipboard.writeText(referralCode);
+        setCopiedReferral(true);
+        setTimeout(() => setCopiedReferral(false), 2000);
+    };
 
     return (
         <div className="min-h-screen px-4 py-12 md:py-20">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-light mb-4">Cashback Program</h1>
+                    <h1 className="text-4xl md:text-5xl font-light mb-4">Бонусна програма</h1>
                     <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
-                        Earn rewards on every booking and use them for future travel discounts
+                        Отримуйте бонуси за кожне бронювання та використовуйте їх для знижок на майбутні подорожі
                     </p>
                 </div>
 
@@ -28,15 +37,15 @@ export default function CashbackPage() {
                     <div className="relative z-10">
                         <div className="grid md:grid-cols-3 gap-8">
                             <div>
-                                <p className="text-sm text-foreground/60 mb-2">Available Balance</p>
-                                <p className="text-4xl md:text-5xl font-light text-accent">${cashbackBalance.toFixed(2)}</p>
+                                <p className="text-sm text-foreground/60 mb-2">Доступний баланс</p>
+                                <p className="text-4xl md:text-5xl font-light text-accent">{cashbackBalance.toLocaleString()} грн</p>
                             </div>
                             <div>
-                                <p className="text-sm text-foreground/60 mb-2">Total Earned</p>
-                                <p className="text-3xl md:text-4xl font-light">${totalEarned.toFixed(2)}</p>
+                                <p className="text-sm text-foreground/60 mb-2">Всього зароблено</p>
+                                <p className="text-3xl md:text-4xl font-light">{totalEarned.toLocaleString()} грн</p>
                             </div>
                             <div>
-                                <p className="text-sm text-foreground/60 mb-2">Bookings Made</p>
+                                <p className="text-sm text-foreground/60 mb-2">Бронювань здійснено</p>
                                 <p className="text-3xl md:text-4xl font-light">{bookingsCount}</p>
                             </div>
                         </div>
@@ -46,6 +55,19 @@ export default function CashbackPage() {
                 {/* Tab Navigation */}
                 <div className="flex gap-4 mb-8 border-b border-foreground/10">
                     <button
+                        onClick={() => setSelectedTab('bonuses')}
+                        className={`pb-4 px-2 font-medium transition-colors relative ${
+                            selectedTab === 'bonuses'
+                                ? 'text-accent'
+                                : 'text-foreground/60 hover:text-foreground'
+                        }`}
+                    >
+                        Бонуси
+                        {selectedTab === 'bonuses' && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+                        )}
+                    </button>
+                    <button
                         onClick={() => setSelectedTab('overview')}
                         className={`pb-4 px-2 font-medium transition-colors relative ${
                             selectedTab === 'overview'
@@ -53,7 +75,7 @@ export default function CashbackPage() {
                                 : 'text-foreground/60 hover:text-foreground'
                         }`}
                     >
-                        How It Works
+                        Як це працює
                         {selectedTab === 'overview' && (
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                         )}
@@ -66,30 +88,238 @@ export default function CashbackPage() {
                                 : 'text-foreground/60 hover:text-foreground'
                         }`}
                     >
-                        Claim Cashback
+                        Отримати cashback
                         {selectedTab === 'claim' && (
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                         )}
                     </button>
                 </div>
 
+                {/* Bonuses Tab */}
+                {selectedTab === 'bonuses' && (
+                    <div className="space-y-8">
+                        {/* Bonus Cards Grid */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* Bonus 1 - Welcome Bonus */}
+                            <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="w-14 h-14 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center">
+                                            <Gift className="w-7 h-7 text-emerald-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-emerald-400 font-medium mb-1">Бонус №1</p>
+                                            <h3 className="text-xl font-semibold">Вітальний бонус</h3>
+                                        </div>
+                                    </div>
+                                    <div className="mb-4">
+                                        <p className="text-4xl font-light text-emerald-400 mb-2">1 000 грн</p>
+                                        <p className="text-foreground/70">
+                                            Отримайте вітальний бонус на ваш рахунок при першій реєстрації.
+                                            Використовуйте його для знижки на перше бронювання туру.
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-emerald-400">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        <span>Автоматично при реєстрації</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bonus 2 - Cashback for Booking */}
+                            <div className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent border border-blue-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-blue-500/20 transition-all" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="w-14 h-14 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
+                                            <Percent className="w-7 h-7 text-blue-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-blue-400 font-medium mb-1">Бонус №2</p>
+                                            <h3 className="text-xl font-semibold">Cash-back за бронювання</h3>
+                                        </div>
+                                    </div>
+                                    <div className="mb-4">
+                                        <p className="text-4xl font-light text-blue-400 mb-2">2%</p>
+                                        <p className="text-foreground/70">
+                                            Отримуйте 2% від суми туру назад на ваш бонусний рахунок.
+                                            Нарахування відбувається автоматично після завершення подорожі.
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-blue-400">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        <span>Після завершення туру</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bonus 3 - Activity Bonus */}
+                            <div className="bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-purple-500/20 transition-all" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="w-14 h-14 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center">
+                                            <Star className="w-7 h-7 text-purple-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-purple-400 font-medium mb-1">Бонус №3</p>
+                                            <h3 className="text-xl font-semibold">За активність туриста</h3>
+                                        </div>
+                                    </div>
+                                    <div className="mb-4">
+                                        <p className="text-4xl font-light text-purple-400 mb-2">+1%</p>
+                                        <p className="text-foreground/70">
+                                            Додатковий 1% cash-back при самостійному підборі туру.
+                                            Просто надайте менеджеру конкретний код туру, який ви знайшли.
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-purple-400">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        <span>Разом до 3% cash-back</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bonus 4 - Referral Bonus */}
+                            <div className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-amber-500/20 transition-all" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="w-14 h-14 bg-amber-500/20 border border-amber-500/30 rounded-xl flex items-center justify-center">
+                                            <Users className="w-7 h-7 text-amber-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-amber-400 font-medium mb-1">Бонус №4</p>
+                                            <h3 className="text-xl font-semibold">За залучення друга</h3>
+                                        </div>
+                                    </div>
+                                    <div className="mb-4">
+                                        <p className="text-4xl font-light text-amber-400 mb-2">до 2 000 грн</p>
+                                        <p className="text-foreground/70">
+                                            Отримайте до 2 000 грн за кожного друга, якого ви залучите.
+                                            А ваш друг отримає ваучер на 800 грн для першого бронювання.
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-amber-400">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        <span>Необмежена кількість друзів</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Referral Code Section */}
+                        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-8">
+                            <h3 className="text-xl font-semibold mb-4">Ваш реферальний код</h3>
+                            <p className="text-foreground/70 mb-6">
+                                Поділіться цим кодом з друзями. Коли вони зареєструються та здійснять перше бронювання,
+                                ви отримаєте бонус, а вони — знижку 800 грн.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 bg-background border border-foreground/20 rounded-xl p-4 flex items-center justify-between">
+                                    <span className="text-xl font-mono tracking-wider text-accent">{referralCode}</span>
+                                    <button
+                                        onClick={copyReferralCode}
+                                        className="ml-4 p-2 hover:bg-foreground/10 rounded-lg transition-colors"
+                                    >
+                                        {copiedReferral ? (
+                                            <Check className="w-5 h-5 text-green-500" />
+                                        ) : (
+                                            <Copy className="w-5 h-5 text-foreground/60" />
+                                        )}
+                                    </button>
+                                </div>
+                                <Button className="bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl px-6">
+                                    Поділитися
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Bonus Summary Table */}
+                        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden">
+                            <div className="p-6 border-b border-foreground/10">
+                                <h3 className="text-xl font-semibold">Зведена таблиця бонусів</h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b border-foreground/10">
+                                            <th className="text-left p-4 text-sm font-medium text-foreground/60">Бонус</th>
+                                            <th className="text-left p-4 text-sm font-medium text-foreground/60">Розмір</th>
+                                            <th className="text-left p-4 text-sm font-medium text-foreground/60">Умови</th>
+                                            <th className="text-left p-4 text-sm font-medium text-foreground/60">Коли нараховується</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="border-b border-foreground/10 hover:bg-foreground/5">
+                                            <td className="p-4 font-medium">Вітальний бонус</td>
+                                            <td className="p-4 text-emerald-400">1 000 грн</td>
+                                            <td className="p-4 text-foreground/70">Перша реєстрація</td>
+                                            <td className="p-4 text-foreground/70">Одразу</td>
+                                        </tr>
+                                        <tr className="border-b border-foreground/10 hover:bg-foreground/5">
+                                            <td className="p-4 font-medium">Cash-back за бронювання</td>
+                                            <td className="p-4 text-blue-400">2% від суми туру</td>
+                                            <td className="p-4 text-foreground/70">Будь-яке бронювання</td>
+                                            <td className="p-4 text-foreground/70">Після завершення туру</td>
+                                        </tr>
+                                        <tr className="border-b border-foreground/10 hover:bg-foreground/5">
+                                            <td className="p-4 font-medium">За активність туриста</td>
+                                            <td className="p-4 text-purple-400">+1% cash-back</td>
+                                            <td className="p-4 text-foreground/70">Самостійний підбір туру</td>
+                                            <td className="p-4 text-foreground/70">Після завершення туру</td>
+                                        </tr>
+                                        <tr className="hover:bg-foreground/5">
+                                            <td className="p-4 font-medium">За залучення друга</td>
+                                            <td className="p-4 text-amber-400">до 2 000 грн</td>
+                                            <td className="p-4 text-foreground/70">Друг здійснив бронювання</td>
+                                            <td className="p-4 text-foreground/70">Після оплати туру другом</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Overview Tab */}
                 {selectedTab === 'overview' && (
                     <div className="space-y-12">
                         {/* How Cashback Accumulates */}
                         <section>
-                            <h2 className="text-2xl font-light mb-6">How Cashback Accumulates</h2>
+                            <h2 className="text-2xl font-light mb-6">Як накопичується Cash-back</h2>
                             <div className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 md:p-8">
                                 <div className="space-y-6">
                                     <div className="flex gap-4">
                                         <div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
-                                            <span className="text-accent font-semibold">1%</span>
+                                            <span className="text-accent font-semibold">2%</span>
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold mb-2">Earn on Every Booking</h3>
+                                            <h3 className="font-semibold mb-2">Базовий Cash-back за кожне бронювання</h3>
                                             <p className="text-foreground/70">
-                                                Receive 1% cashback on the total value of every booking you make through our platform. 
-                                                The cashback is automatically credited to your account after the booking is confirmed.
+                                                Отримуйте 2% cash-back від загальної вартості кожного туру, який ви бронюєте через нашу платформу.
+                                                Cash-back автоматично зараховується на ваш рахунок після завершення подорожі.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                                            <span className="text-purple-400 font-semibold">+1%</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold mb-2">Додатковий бонус за активність</h3>
+                                            <p className="text-foreground/70">
+                                                Якщо ви самостійно підберете тур та надасте менеджеру конкретний код туру,
+                                                отримаєте додатковий 1% cash-back. Разом — до 3% від вартості туру!
                                             </p>
                                         </div>
                                     </div>
@@ -100,10 +330,11 @@ export default function CashbackPage() {
                                             </svg>
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold mb-2">Example Calculation</h3>
+                                            <h3 className="font-semibold mb-2">Приклад розрахунку</h3>
                                             <p className="text-foreground/70">
-                                                Book a tour worth $5,000 → Earn $50 cashback<br />
-                                                Book a package worth $10,000 → Earn $100 cashback
+                                                Тур вартістю 50 000 грн → Отримаєте 1 000 грн cash-back (2%)<br />
+                                                Тур вартістю 100 000 грн → Отримаєте 2 000 грн cash-back (2%)<br />
+                                                З бонусом за активність: 100 000 грн → 3 000 грн cash-back (3%)
                                             </p>
                                         </div>
                                     </div>
@@ -113,7 +344,7 @@ export default function CashbackPage() {
 
                         {/* Terms of Use */}
                         <section>
-                            <h2 className="text-2xl font-light mb-6">Terms of Use</h2>
+                            <h2 className="text-2xl font-light mb-6">Умови використання</h2>
                             <div className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 md:p-8">
                                 <ul className="space-y-4">
                                     <li className="flex gap-3">
@@ -121,7 +352,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
-                                            <strong className="text-foreground">No Cash Withdrawals:</strong> Cashback cannot be transferred to a bank account or withdrawn as cash
+                                            <strong className="text-foreground">Без виведення готівки:</strong> Cash-back не можна перевести на банківський рахунок або зняти готівкою
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -129,7 +360,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
-                                            <strong className="text-foreground">Discount on Future Bookings:</strong> Cashback can only be used as a discount on future tour bookings
+                                            <strong className="text-foreground">Знижка на майбутні бронювання:</strong> Cash-back можна використовувати лише як знижку на майбутні бронювання турів
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -137,7 +368,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
-                                            <strong className="text-foreground">Code Generation:</strong> To use your cashback, generate a unique discount code and provide it to our manager when making your next booking
+                                            <strong className="text-foreground">Генерація коду:</strong> Для використання cash-back згенеруйте унікальний код знижки та надайте його менеджеру при наступному бронюванні
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -145,7 +376,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
-                                            <strong className="text-foreground">One-Time Use:</strong> Each generated code can only be used once and expires after 30 days
+                                            <strong className="text-foreground">Одноразове використання:</strong> Кожен згенерований код можна використати лише один раз, термін дії — 30 днів
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -153,7 +384,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
-                                            <strong className="text-foreground">Minimum Redemption:</strong> A minimum cashback balance of $10 is required to generate a discount code
+                                            <strong className="text-foreground">Мінімальна сума:</strong> Для генерації коду знижки необхідний мінімальний баланс 100 грн
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
@@ -161,7 +392,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
-                                            <strong className="text-foreground">Non-Transferable:</strong> Cashback and discount codes are tied to your account and cannot be transferred to others
+                                            <strong className="text-foreground">Не передається:</strong> Cash-back та коди знижок прив&apos;язані до вашого облікового запису і не можуть бути передані іншим особам
                                         </span>
                                     </li>
                                 </ul>
@@ -170,39 +401,61 @@ export default function CashbackPage() {
 
                         {/* FAQ */}
                         <section>
-                            <h2 className="text-2xl font-light mb-6">Frequently Asked Questions</h2>
+                            <h2 className="text-2xl font-light mb-6">Часті запитання</h2>
                             <div className="space-y-4">
                                 <details className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 group">
                                     <summary className="cursor-pointer font-semibold list-none flex justify-between items-center">
-                                        <span>When is cashback credited to my account?</span>
+                                        <span>Коли cash-back зараховується на мій рахунок?</span>
                                         <svg className="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </summary>
                                     <p className="mt-4 text-foreground/70">
-                                        Cashback is automatically credited to your account within 24 hours after your booking is confirmed. You'll receive an email notification once it's added.
+                                        Cash-back автоматично зараховується на ваш рахунок після завершення туру. Ви отримаєте сповіщення електронною поштою, коли бонус буде додано.
                                     </p>
                                 </details>
                                 <details className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 group">
                                     <summary className="cursor-pointer font-semibold list-none flex justify-between items-center">
-                                        <span>Can I use multiple discount codes on one booking?</span>
+                                        <span>Чи можу я використати кілька кодів знижки на одне бронювання?</span>
                                         <svg className="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </summary>
                                     <p className="mt-4 text-foreground/70">
-                                        No, only one cashback discount code can be applied per booking. However, you can generate a code for your entire available balance.
+                                        Ні, на одне бронювання можна застосувати лише один код знижки cash-back. Проте ви можете згенерувати код на весь доступний баланс.
                                     </p>
                                 </details>
                                 <details className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 group">
                                     <summary className="cursor-pointer font-semibold list-none flex justify-between items-center">
-                                        <span>What happens if I cancel a booking?</span>
+                                        <span>Що станеться, якщо я скасую бронювання?</span>
                                         <svg className="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </summary>
                                     <p className="mt-4 text-foreground/70">
-                                        If you cancel a booking, the cashback earned from that booking will be deducted from your balance. If you used a discount code on the booking, the code value will be restored to your account.
+                                        Якщо ви скасуєте бронювання, cash-back, отриманий за це бронювання, буде знято з вашого балансу. Якщо ви використали код знижки для бронювання, сума коду буде повернута на ваш рахунок.
+                                    </p>
+                                </details>
+                                <details className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 group">
+                                    <summary className="cursor-pointer font-semibold list-none flex justify-between items-center">
+                                        <span>Як отримати вітальний бонус 1 000 грн?</span>
+                                        <svg className="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </summary>
+                                    <p className="mt-4 text-foreground/70">
+                                        Вітальний бонус автоматично зараховується на ваш рахунок при першій реєстрації на платформі. Ви можете використати його для знижки на перше бронювання туру.
+                                    </p>
+                                </details>
+                                <details className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 group">
+                                    <summary className="cursor-pointer font-semibold list-none flex justify-between items-center">
+                                        <span>Як працює реферальна програма?</span>
+                                        <svg className="w-5 h-5 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </summary>
+                                    <p className="mt-4 text-foreground/70">
+                                        Поділіться своїм реферальним кодом з друзями. Коли ваш друг зареєструється за вашим кодом та здійснить перше бронювання, ви отримаєте до 2 000 грн на свій бонусний рахунок, а ваш друг отримає ваучер на 800 грн для першого бронювання.
                                     </p>
                                 </details>
                             </div>
@@ -214,8 +467,8 @@ export default function CashbackPage() {
                 {selectedTab === 'claim' && (
                     <div className="max-w-2xl mx-auto">
                         <div className="bg-foreground/5 border border-foreground/10 rounded-xl p-8 md:p-10">
-                            <h2 className="text-2xl font-light mb-6">Claim Your Cashback</h2>
-                            
+                            <h2 className="text-2xl font-light mb-6">Отримати Cash-back</h2>
+
                             {/* Step-by-step guide */}
                             <div className="space-y-6 mb-8">
                                 <div className="flex gap-4">
@@ -223,9 +476,9 @@ export default function CashbackPage() {
                                         1
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold mb-1">Enter Amount</h3>
+                                        <h3 className="font-semibold mb-1">Вкажіть суму</h3>
                                         <p className="text-sm text-foreground/70">
-                                            Specify how much cashback you want to use (minimum $10, maximum: your available balance)
+                                            Вкажіть скільки cash-back ви хочете використати (мінімум 100 грн, максимум: ваш доступний баланс)
                                         </p>
                                     </div>
                                 </div>
@@ -234,9 +487,9 @@ export default function CashbackPage() {
                                         2
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold mb-1">Generate Code</h3>
+                                        <h3 className="font-semibold mb-1">Згенеруйте код</h3>
                                         <p className="text-sm text-foreground/70">
-                                            Click the button to generate a unique discount code
+                                            Натисніть кнопку для генерації унікального коду знижки
                                         </p>
                                     </div>
                                 </div>
@@ -245,9 +498,9 @@ export default function CashbackPage() {
                                         3
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold mb-1">Contact Manager</h3>
+                                        <h3 className="font-semibold mb-1">Зв&apos;яжіться з менеджером</h3>
                                         <p className="text-sm text-foreground/70">
-                                            Provide the generated code to our booking manager when making your next reservation
+                                            Надайте згенерований код нашому менеджеру при наступному бронюванні
                                         </p>
                                     </div>
                                 </div>
@@ -256,9 +509,9 @@ export default function CashbackPage() {
                                         4
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold mb-1">Enjoy Your Discount</h3>
+                                        <h3 className="font-semibold mb-1">Отримайте знижку</h3>
                                         <p className="text-sm text-foreground/70">
-                                            The manager will apply the discount to your booking total
+                                            Менеджер застосує знижку до загальної суми вашого бронювання
                                         </p>
                                     </div>
                                 </div>
@@ -268,23 +521,23 @@ export default function CashbackPage() {
                             <div className="border-t border-foreground/10 pt-8">
                                 <div className="mb-6">
                                     <label className="block text-sm font-medium mb-3">
-                                        Amount to Claim
+                                        Сума для використання
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/60">
-                                            $
-                                        </span>
                                         <input
                                             type="number"
-                                            min="10"
+                                            min="100"
                                             max={cashbackBalance}
-                                            step="0.01"
-                                            placeholder="0.00"
-                                            className="w-full h-12 bg-background border border-foreground/20 rounded-lg pl-8 pr-4 focus:outline-none focus:border-accent transition-colors"
+                                            step="1"
+                                            placeholder="0"
+                                            className="w-full h-12 bg-background border border-foreground/20 rounded-lg pl-4 pr-12 focus:outline-none focus:border-accent transition-colors"
                                         />
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/60">
+                                            грн
+                                        </span>
                                     </div>
                                     <p className="text-xs text-foreground/60 mt-2">
-                                        Available balance: ${cashbackBalance.toFixed(2)}
+                                        Доступний баланс: {cashbackBalance.toLocaleString()} грн
                                     </p>
                                 </div>
 
@@ -294,7 +547,7 @@ export default function CashbackPage() {
                                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                         </svg>
                                         <p className="text-sm text-foreground/80">
-                                            Once generated, the code will be valid for 30 days and can only be used once. The claimed amount will be deducted from your balance immediately.
+                                            Після генерації код буде дійсний протягом 30 днів і може бути використаний лише один раз. Вказана сума буде негайно списана з вашого балансу.
                                         </p>
                                     </div>
                                 </div>
@@ -308,7 +561,7 @@ export default function CashbackPage() {
                                             className="mt-1 w-4 h-4 rounded border-foreground/20 bg-background text-accent focus:ring-2 focus:ring-accent/20"
                                         />
                                         <span className="text-sm text-foreground/80 group-hover:text-foreground transition-colors">
-                                            I agree to the terms and understand that this cashback will be used as a discount on my next booking and cannot be withdrawn as cash
+                                            Я погоджуюся з умовами та розумію, що цей cash-back буде використано як знижку на моє наступне бронювання і не може бути виведено готівкою
                                         </span>
                                     </label>
                                 </div>
@@ -317,13 +570,13 @@ export default function CashbackPage() {
                                     disabled={!agreedToTerms}
                                     className="w-full h-12 bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Generate Discount Code
+                                    Згенерувати код знижки
                                 </Button>
 
                                 {/* Code Display Area (shown after generation) */}
                                 <div className="mt-8 p-6 bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/30 rounded-lg hidden">
                                     <p className="text-sm text-foreground/70 mb-3 text-center">
-                                        Your Discount Code
+                                        Ваш код знижки
                                     </p>
                                     <div className="bg-background border border-accent/20 rounded-lg p-4 mb-4">
                                         <p className="text-2xl font-mono text-center tracking-wider text-accent">
@@ -338,7 +591,7 @@ export default function CashbackPage() {
                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                             </svg>
-                                            Copy Code
+                                            Скопіювати
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -347,11 +600,11 @@ export default function CashbackPage() {
                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
-                                            Download
+                                            Завантажити
                                         </Button>
                                     </div>
                                     <p className="text-xs text-foreground/60 text-center mt-4">
-                                        Code expires in 30 days • Provide this to your booking manager
+                                        Код дійсний 30 днів • Надайте його менеджеру при бронюванні
                                     </p>
                                 </div>
                             </div>
@@ -359,36 +612,36 @@ export default function CashbackPage() {
 
                         {/* Recent Claims History */}
                         <div className="mt-8 bg-foreground/5 border border-foreground/10 rounded-xl p-8">
-                            <h3 className="text-lg font-semibold mb-4">Recent Claims</h3>
+                            <h3 className="text-lg font-semibold mb-4">Історія використання</h3>
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center py-3 border-b border-foreground/10">
                                     <div>
                                         <p className="font-medium">CASHBACK-A1B2-C3D4</p>
-                                        <p className="text-xs text-foreground/60">Generated on Oct 15, 2025</p>
+                                        <p className="text-xs text-foreground/60">Згенеровано 15 жовтня 2025</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">$50.00</p>
-                                        <p className="text-xs text-green-500">Active</p>
+                                        <p className="font-semibold">500 грн</p>
+                                        <p className="text-xs text-green-500">Активний</p>
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center py-3 border-b border-foreground/10">
                                     <div>
                                         <p className="font-medium">CASHBACK-E5F6-G7H8</p>
-                                        <p className="text-xs text-foreground/60">Generated on Sep 28, 2025</p>
+                                        <p className="text-xs text-foreground/60">Згенеровано 28 вересня 2025</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">$75.00</p>
-                                        <p className="text-xs text-foreground/60">Used</p>
+                                        <p className="font-semibold">750 грн</p>
+                                        <p className="text-xs text-foreground/60">Використано</p>
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center py-3">
                                     <div>
                                         <p className="font-medium">CASHBACK-I9J0-K1L2</p>
-                                        <p className="text-xs text-foreground/60">Generated on Aug 12, 2025</p>
+                                        <p className="text-xs text-foreground/60">Згенеровано 12 серпня 2025</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">$100.00</p>
-                                        <p className="text-xs text-foreground/60">Used</p>
+                                        <p className="font-semibold">1 000 грн</p>
+                                        <p className="text-xs text-foreground/60">Використано</p>
                                     </div>
                                 </div>
                             </div>

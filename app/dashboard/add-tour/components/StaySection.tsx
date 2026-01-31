@@ -19,10 +19,10 @@ type StaySectionProps = {
 type StayFieldConfig = { field: StayField; label: string; placeholder: string; name: keyof TourFormValues; formatType?: 'date' };
 
 const stayFieldConfig: StayFieldConfig[] = [
-    { field: 'name', label: 'Hotel name', placeholder: 'Resort or hotel name', name: 'hotelName' },
-    { field: 'checkIn', label: 'Check-in', placeholder: '30/01/2021', name: 'hotelCheckIn', formatType: 'date' },
-    { field: 'checkOut', label: 'Check-out', placeholder: '30/01/2021', name: 'hotelCheckOut', formatType: 'date' },
-    { field: 'roomType', label: 'Room type', placeholder: 'e.g. Double deluxe', name: 'roomType' },
+    { field: 'name', label: 'Назва готелю', placeholder: 'Назва курорту або готелю', name: 'hotelName' },
+    { field: 'checkIn', label: 'Заселення', placeholder: '30/01/2021', name: 'hotelCheckIn', formatType: 'date' },
+    { field: 'checkOut', label: 'Виселення', placeholder: '30/01/2021', name: 'hotelCheckOut', formatType: 'date' },
+    { field: 'roomType', label: 'Тип номеру', placeholder: 'напр. Двомісний делюкс', name: 'roomType' },
 ];
 
 export const StaySection = ({
@@ -31,8 +31,8 @@ export const StaySection = ({
     onChange,
     includeMealPlan = false,
     includeNights = false,
-    title = 'Stay',
-    description = 'Where travellers will be staying during the tour.',
+    title = 'Проживання',
+    description = 'Де мешкатимуть подорожуючі під час туру.',
 }: StaySectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));
@@ -54,11 +54,11 @@ export const StaySection = ({
     const optionalFields: StayFieldConfig[] = [];
 
     if (includeMealPlan) {
-        optionalFields.push({ field: 'food', label: 'Meal plan', placeholder: 'e.g. All inclusive', name: 'food' });
+        optionalFields.push({ field: 'food', label: 'Харчування', placeholder: 'напр. Все включено', name: 'food' });
     }
 
     if (includeNights) {
-        optionalFields.push({ field: 'nights', label: 'Nights', placeholder: 'e.g. 7', name: 'hotelNights' });
+        optionalFields.push({ field: 'nights', label: 'Ночей', placeholder: 'напр. 7', name: 'hotelNights' });
     }
 
     return (

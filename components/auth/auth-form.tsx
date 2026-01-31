@@ -45,7 +45,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               className="absolute top-6 left-6 text-sm text-foreground/60 flex items-center gap-2 transition-colors"
             >
               <span>&larr;</span>
-              <span className="hover:underline">Back</span>
+              <span className="hover:underline">Назад</span>
             </Link>
 
             {/* Logo */}
@@ -56,10 +56,10 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
             {/* Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-light mb-1.5">
-                {type === "login" ? "Welcome back" : "Create account"}
+                {type === "login" ? "Вітаємо знову" : "Створити акаунт"}
               </h1>
               <p className="text-foreground/60 text-sm">
-                {type === "login" ? "Sign in to continue" : "Start your journey"}
+                {type === "login" ? "Ввійдіть, щоб продовжити" : "Розпочніть свою подорож"}
               </p>
             </div>
 
@@ -80,26 +80,26 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               {type === "register" && (
                 <FormField
                   id="name"
-                  label="Name"
+                  label="Ім'я"
                   type="text"
                   required
                   disabled={isLoading}
-                  placeholder="Your name"
+                  placeholder="Ваше ім'я"
                 />
               )}
 
               <FormField
                 id="phoneNumber"
-                label="Phone Number"
+                label="Номер телефону"
                 type="tel"
                 required
                 disabled={isLoading}
-                placeholder="+1234567890"
+                placeholder="+380XXXXXXXXX"
               />
 
               <FormField
                 id="password"
-                label="Password"
+                label="Пароль"
                 type="password"
                 required
                 disabled={isLoading}
@@ -110,7 +110,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               {type === "register" && (
                 <FormField
                   id="confirmPassword"
-                  label="Confirm password"
+                  label="Підтвердіть пароль"
                   type="password"
                   required
                   disabled={isLoading}
@@ -126,7 +126,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                 variant="default"
                 className="w-full h-10 mt-2 text-black bg-white hover:bg-white/70 transition-colors text-sm"
               >
-                {isLoading ? "Loading..." : type === "login" ? "Sign in" : "Sign up"}
+                {isLoading ? "Завантаження..." : type === "login" ? "Увійти" : "Зареєструватися"}
               </Button>
 
               {/* Forgot Password Link */}
@@ -136,7 +136,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                     href="/forgot-password"
                     className="text-sm text-foreground/60 hover:text-foreground/80 underline underline-offset-4 transition-colors"
                   >
-                    Forgot password?
+                    Забули пароль?
                   </Link>
                 </div>
               )}
@@ -147,22 +147,22 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               <p className="text-sm text-foreground/60">
                 {type === "login" ? (
                   <>
-                    Don't have an account?{" "}
+                    Немає акаунту?{" "}
                     <Link
                       href="/register"
                       className="text-foreground hover:text-foreground/80 underline underline-offset-4 transition-colors"
                     >
-                      Sign up
+                      Зареєструватися
                     </Link>
                   </>
                 ) : (
                   <>
-                    Already have an account?{" "}
+                    Вже є акаунт?{" "}
                     <Link
                       href="/login"
                       className="text-foreground hover:text-foreground/80 underline underline-offset-4 transition-colors"
                     >
-                      Sign in
+                      Увійти
                     </Link>
                   </>
                 )}

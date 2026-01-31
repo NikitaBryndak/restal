@@ -22,7 +22,7 @@ export default function SearchSection() {
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <div className="flex justify-center">
         <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium border border-accent/20 animate-pulse">
-          ✨ AI Search Coming Soon
+          ✨ ШІ пошук скоро
         </span>
       </div>
 
@@ -44,7 +44,7 @@ export default function SearchSection() {
             href="/contact"
             className="hover:bg-accent hover:text-white hover:border-accent hidden p-2 bg-white/90 text-black rounded-md transition-colors sm:flex items-center justify-center gap-2 text-sm"
           >
-            Contact
+            Контакти
             <Send className="w-4 h-4 shrink-0" />
           </Link>
         </form>
@@ -53,7 +53,7 @@ export default function SearchSection() {
       {/* Search Suggestions */}
       <div className="space-y-2 opacity-50 pointer-events-none select-none">
         <p className="text-sm text-white/50">
-          For example:
+          Наприклад:
         </p>
         <SearchExamples handleSearch={handleSearch} />
       </div>

@@ -3,6 +3,15 @@ import Footer from "../components/navigation/Footer";
 import Navbar from "../components/navigation/Navbar";
 import "./globals.css";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "RestAll",
+  description: "RestAll - Your travel companion",
+  icons: {
+    icon: "/logo.png",
+  },
+};
 
 export default function RootLayout({
   children,

@@ -14,16 +14,16 @@ type ExtrasSectionProps = {
 };
 
 const extrasOptions: Array<{ field: ExtrasField; label: string; name: keyof TourFormValues }> = [
-    { field: 'insurance', label: 'Travel insurance', name: 'insurance' },
-    { field: 'transfer', label: 'Airport transfer', name: 'transfer' },
+    { field: 'insurance', label: 'Туристична страховка', name: 'insurance' },
+    { field: 'transfer', label: 'Трансфер з аеропорту', name: 'transfer' },
 ];
 
 export const ExtrasSection = ({
     variant = 'create',
     values,
     onChange,
-    title = 'Extras',
-    description = 'Optional add-ons for peace of mind.',
+    title = 'Додатково',
+    description = 'Опціональні доповнення для спокою.',
 }: ExtrasSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));

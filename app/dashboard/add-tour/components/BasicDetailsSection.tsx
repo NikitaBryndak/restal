@@ -27,23 +27,23 @@ const primaryFields: Array<{
     inputMode?: 'numeric';
     pattern?: string;
 }> = [
-    { field: 'number', label: 'Tour Number', placeholder: 'e.g. 12345', name: 'number', inputMode: 'numeric', pattern: '[0-9]*' },
-    { field: 'country', label: 'Destination', placeholder: 'Spain, Italy, Greece...', name: 'country' },
-    { field: 'region', label: 'Region', placeholder: 'Hurghada, Tuscany, Santorini...', name: 'region' },
-    { field: 'hotelNights', label: 'Hotel nights', placeholder: 'e.g. 7', name: 'hotelNights', inputMode: 'numeric', pattern: '[0-9]*' },
+    { field: 'number', label: 'Номер туру', placeholder: 'напр. 12345', name: 'number', inputMode: 'numeric', pattern: '[0-9]*' },
+    { field: 'country', label: 'Країна призначення', placeholder: 'Іспанія, Італія, Греція...', name: 'country' },
+    { field: 'region', label: 'Регіон', placeholder: 'Хургада, Тоскана, Санторіні...', name: 'region' },
+    { field: 'hotelNights', label: 'Ночей у готелі', placeholder: 'напр. 7', name: 'hotelNights', inputMode: 'numeric', pattern: '[0-9]*' },
 ];
 
 const dateFields: Array<{ field: Extract<BasicDetailsField, 'tripStartDate' | 'tripEndDate'>; label: string; name: keyof TourFormValues }> = [
-    { field: 'tripStartDate', label: 'Departure date', name: 'tripStartDate' },
-    { field: 'tripEndDate', label: 'Return date', name: 'tripEndDate' },
+    { field: 'tripStartDate', label: 'Дата вильоту', name: 'tripStartDate' },
+    { field: 'tripEndDate', label: 'Дата повернення', name: 'tripEndDate' },
 ];
 
 export const BasicDetailsSection = ({
     variant = 'create',
     values,
     onChange,
-    title = 'Basic details',
-    description = 'Start with the headline facts about this getaway.',
+    title = 'Основні деталі',
+    description = 'Почніть з головної інформації про цю подорож.',
     showHotelNights = true,
     showMealPlan = true,
     showNumber = true,
@@ -116,18 +116,18 @@ export const BasicDetailsSection = ({
             </div>
             {showMealPlan && (
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground/80">Meal plan</label>
+                    <label className="mb-2 block text-sm font-medium text-foreground/80">Харчування</label>
                     <select
                         className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                         {...mealPlanProps}
                     >
                         <option value="" disabled>
-                            Select an option
+                            Виберіть опцію
                         </option>
-                        <option value="Breakfast">Breakfast</option>
-                        <option value="Half Board">Half board</option>
-                        <option value="Full Board">Full board</option>
-                        <option value="All Inclusive">All inclusive</option>
+                        <option value="Breakfast">Сніданок</option>
+                        <option value="Half Board">Напівпансіон</option>
+                        <option value="Full Board">Повний пансіон</option>
+                        <option value="All Inclusive">Все включено</option>
                     </select>
                 </div>
             )}

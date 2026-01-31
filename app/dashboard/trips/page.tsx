@@ -9,7 +9,7 @@ export default async function TripsPage(){
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.phoneNumber) {
-        return <div>No trips. Please log in.</div>
+        return <div>Немає подорожей. Будь ласка, увійдіть.</div>
     }
 
     await connectToDatabase();
@@ -24,7 +24,7 @@ export default async function TripsPage(){
 
     return (
         <div className="px-6">
-            {tripCards.length ? <>{tripCards}</> : <p className="text-sm text-muted-foreground">You have no trips yet.</p>}
+            {tripCards.length ? <>{tripCards}</> : <p className="text-sm text-muted-foreground">У вас ще немає подорожей.</p>}
         </div>
     )
 }

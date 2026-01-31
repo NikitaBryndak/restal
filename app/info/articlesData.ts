@@ -1,31 +1,31 @@
 export const articlesData = [
   {
-    title: "Exploring Japan",
+    title: "Дослідження Японії",
     description:
-      "Discover the hidden gems of Japan, from Tokyo’s lights to Kyoto’s temples.",
+      "Відкрийте приховані перлини Японії, від вогнів Токіо до храмів Кіото.",
     image: "/images/japan.jpg",
     link: "/info/japan",
-    tag: "First",
+    tag: "Популярне",
     content: `
-      <p>Japan is a fascinating blend of ancient tradition and modern innovation...</p>
-      <p>From Tokyo’s neon lights to Kyoto’s tranquil temples...</p>
-    `,
-  },
-  
-  {
-    title: "Adventures in Iceland",
-    description:
-      "Experience waterfalls, glaciers, and the magical Northern Lights.",
-    image: "/images/iceland.webp",
-    link: "/info/iceland",
-    tag: "First",
-    content: `
-      <p>Iceland offers some of the most breathtaking landscapes in the world...</p>
+      <p>Японія — це захоплююче поєднання стародавніх традицій та сучасних інновацій...</p>
+      <p>Від неонових вогнів Токіо до спокійних храмів Кіото...</p>
     `,
   },
 
-  { title: "Wonders of Morocco", description: "A guide through Morocco’s deserts, markets, and rich culture.", image: "/images/morocco.jpg", link: "/info/morocco", tag: "Second" },
-  { title: "The Beauty of Italy", description: "From Venice canals to Roman ruins — Italy is a feast for the senses.", image: "/images/italy.jpg", link: "/info/italy", tag: "Third" },
-  { title: "Colors of India", description: "Dive into India’s festivals, food, and breathtaking landscapes.", image: "/images/india.jpg", link: "/info/india", tag: "Fourth" },
-  { title: "Hidden Trails of Peru", description: "Explore Machu Picchu and beyond — discover Peru’s ancient wonders.", image: "/images/peru.jpg", link: "/info/peru", tag: "Fifth" },
+  {
+    title: "Пригоди в Ісландії",
+    description:
+      "Відчуйте водоспади, льодовики та чарівне Північне сяйво.",
+    image: "/images/iceland.webp",
+    link: "/info/iceland",
+    tag: "Популярне",
+    content: `
+      <p>Ісландія пропонує одні з найбільш захоплюючих пейзажів у світі...</p>
+    `,
+  },
+
+  { title: "Дива Марокко", description: "Подорож пустелями, ринками та багатою культурою Марокко.", image: "/images/morocco.jpg", link: "/info/morocco", tag: "Екзотика" },
+  { title: "Краса Італії", description: "Від каналів Венеції до римських руїн — Італія це свято для почуттів.", image: "/images/italy.jpg", link: "/info/italy", tag: "Європа" },
+  { title: "Барви Індії", description: "Поринте у фестивалі, їжу та захоплюючі пейзажі Індії.", image: "/images/india.jpg", link: "/info/india", tag: "Азія" },
+  { title: "Приховані стежки Перу", description: "Досліджуйте Мачу-Пікчу та не тільки — відкрийте стародавні чуда Перу.", image: "/images/peru.jpg", link: "/info/peru", tag: "Америка" },
 ];

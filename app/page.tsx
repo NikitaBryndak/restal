@@ -21,10 +21,10 @@ export default async function Home() {
           <TextGenerateEffect
             className="text-4xl sm:text-5xl md:text-6xl tracking-tight font-light text-white
             text-balance leading-tight"
-            words="Find your perfect journey"
+            words="Знайдіть свою ідеальну подорож"
             duration={titleTextFadeDuration}
             accentClassName="text-accent font-bold"
-            accentWords={["perfect"]}
+            accentWords={["ідеальну"]}
           />
 
           {/* Search Section */}
@@ -40,7 +40,7 @@ export default async function Home() {
                 href="/contact"
                 className="hover:bg-accent hover:text-white hover:border-accent sm:hidden w-32 p-2 bg-white/90 text-black rounded-md transition-colors flex items-center justify-center gap-2 text-sm"
               >
-                Contact
+                Контакти
                 <Send className="w-4 h-4" />
             </Link>
           </div>

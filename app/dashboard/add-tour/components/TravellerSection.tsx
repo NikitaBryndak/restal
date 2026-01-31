@@ -42,8 +42,8 @@ const TravellerSectionCreate = ({
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h2 className="text-2xl font-semibold text-foreground">Travellers</h2>
-                    <p className="text-sm text-foreground/60">Main traveller details — at least name and passport expiry.</p>
+                    <h2 className="text-2xl font-semibold text-foreground">Подорожуючі</h2>
+                    <p className="text-sm text-foreground/60">Дані основного подорожуючого — мінімум імʼя та термін дії паспорта.</p>
                 </div>
                 <Button type="button" variant="outline" onClick={() => append({
                     firstName: '',
@@ -55,29 +55,29 @@ const TravellerSectionCreate = ({
                     passportSeries: '',
                     passportIssueDate: '',
                 })}>
-                    Add traveller
+                    Додати подорожуючого
                 </Button>
             </div>
             <div className="mt-6 grid gap-6">
                 {fields.map((field, index) => (
                     <div key={field.id} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-foreground">Traveller #{index + 1}</h3>
+                            <h3 className="text-lg font-semibold text-foreground">Подорожуючий #{index + 1}</h3>
                             {fields.length > 1 && (
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     onClick={() => remove(index)}
                                 >
-                                    Remove
+                                    Видалити
                                 </Button>
                             )}
                         </div>
                         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
                             <div className="space-y-1">
                                 <FormInput
-                                    labelText="First name"
-                                    placeholder="e.g. John"
+                                    labelText="Ім'я"
+                                    placeholder="напр. Іван"
                                     autoComplete="off"
                                     {...register(`travellers.${index}.firstName`)}
                                 />
@@ -87,8 +87,8 @@ const TravellerSectionCreate = ({
                             </div>
                             <div className="space-y-1">
                                 <FormInput
-                                    labelText="Surname"
-                                    placeholder="e.g. Doe"
+                                    labelText="Прізвище"
+                                    placeholder="напр. Шевченко"
                                     autoComplete="off"
                                     {...register(`travellers.${index}.lastName`)}
                                 />
@@ -98,23 +98,23 @@ const TravellerSectionCreate = ({
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium text-foreground/80">
-                                    Sex
+                                    Стать
                                 </label>
                                 <select
                                     className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                                     {...register(`travellers.${index}.sex`)}
                                 >
                                     <option value="unspecified" disabled>
-                                        Select an option
+                                        Виберіть опцію
                                     </option>
-                                    <option value="female">Female</option>
-                                    <option value="male">Male</option>
-                                    <option value="other">Other</option>
+                                    <option value="female">Жіноча</option>
+                                    <option value="male">Чоловіча</option>
+                                    <option value="other">Інша</option>
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <FormInput
-                                    labelText="Passport expiry"
+                                    labelText="Термін дії паспорта"
                                     placeholder='30/01/2021'
                                     autoComplete="off"
                                     formatType="date"
@@ -126,7 +126,7 @@ const TravellerSectionCreate = ({
                             </div>
                             <div className="space-y-1">
                                 <FormInput
-                                    labelText="DOB"
+                                    labelText="Дата народження"
                                     placeholder='30/01/2021'
                                     autoComplete="off"
                                     formatType="date"
@@ -137,19 +137,19 @@ const TravellerSectionCreate = ({
                                 )}
                             </div>
                             <FormInput
-                                labelText="Pasport number"
+                                labelText="Номер паспорта"
                                 placeholder='127485153'
                                 autoComplete="off"
                                 {...register(`travellers.${index}.passportNumber`)}
                             />
                             <FormInput
-                                labelText="Pasport series"
+                                labelText="Серія паспорта"
                                 placeholder='AA123456'
                                 autoComplete="off"
                                 {...register(`travellers.${index}.passportSeries`)}
                             />
                             <FormInput
-                                labelText="Pasport issue date"
+                                labelText="Дата видачі паспорта"
                                 placeholder='30/01/2021'
                                 autoComplete="off"
                                 formatType="date"
@@ -173,12 +173,12 @@ const TravellerSectionEdit = ({
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h2 className="text-2xl font-semibold text-foreground">Travellers</h2>
-                    <p className="text-sm text-foreground/60">Adjust traveller details or add new participants.</p>
+                    <h2 className="text-2xl font-semibold text-foreground">Подорожуючі</h2>
+                    <p className="text-sm text-foreground/60">Редагуйте дані подорожуючих або додайте нових учасників.</p>
                 </div>
                 {onAdd && (
                     <Button type="button" variant="outline" onClick={onAdd}>
-                        Add traveller
+                        Додати подорожуючого
                     </Button>
                 )}
             </div>
@@ -186,72 +186,72 @@ const TravellerSectionEdit = ({
                 {tourists?.map((tourist, index) => (
                     <div key={index} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-foreground">Traveller #{index + 1}</h3>
+                            <h3 className="text-lg font-semibold text-foreground">Подорожуючий #{index + 1}</h3>
                             {tourists.length > 1 && onRemove && (
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     onClick={() => onRemove(index)}
                                 >
-                                    Remove
+                                    Видалити
                                 </Button>
                             )}
                         </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <FormInput
-                                labelText="First name"
+                                labelText="Ім'я"
                                 value={tourist.name ?? ''}
                                 onChange={(e) => onChange?.(index, 'name', e.target.value)}
                                 required
                             />
                             <FormInput
-                                labelText="Surname"
+                                labelText="Прізвище"
                                 value={tourist.surname ?? ''}
                                 onChange={(e) => onChange?.(index, 'surname', e.target.value)}
                                 required
                             />
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-foreground/80">Sex</label>
+                                <label className="text-sm font-medium text-foreground/80">Стать</label>
                                 <select
                                     value={tourist.sex ?? ''}
                                     onChange={(e) => onChange?.(index, 'sex', e.target.value)}
                                     className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                                     required
                                 >
-                                    <option value="" disabled>Select an option</option>
-                                    <option value="female">Female</option>
-                                    <option value="male">Male</option>
-                                    <option value="other">Other</option>
+                                    <option value="" disabled>Виберіть опцію</option>
+                                    <option value="female">Жіноча</option>
+                                    <option value="male">Чоловіча</option>
+                                    <option value="other">Інша</option>
                                 </select>
                             </div>
                             <FormInput
-                                labelText="Date of birth"
+                                labelText="Дата народження"
                                 value={tourist.dob ?? ''}
                                 onChange={(e) => onChange?.(index, 'dob', e.target.value)}
                                 formatType="date"
                                 required
                             />
                             <FormInput
-                                labelText="Passport expiry"
+                                labelText="Термін дії паспорта"
                                 value={tourist.passportExpiryDate ?? ''}
                                 onChange={(e) => onChange?.(index, 'passportExpiryDate', e.target.value)}
                                 formatType="date"
                                 required
                             />
                             <FormInput
-                                labelText="Passport number"
+                                labelText="Номер паспорта"
                                 value={tourist.passportNumber ?? ''}
                                 onChange={(e) => onChange?.(index, 'passportNumber', e.target.value)}
                                 required
                             />
                             <FormInput
-                                labelText="Passport series"
+                                labelText="Серія паспорта"
                                 value={tourist.passportSeries ?? ''}
                                 onChange={(e) => onChange?.(index, 'passportSeries', e.target.value)}
                                 required
                             />
                             <FormInput
-                                labelText="Passport issue date"
+                                labelText="Дата видачі паспорта"
                                 value={tourist.passportIssueDate ?? ''}
                                 onChange={(e) => onChange?.(index, 'passportIssueDate', e.target.value)}
                                 formatType="date"

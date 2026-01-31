@@ -26,23 +26,23 @@ export default function AddTourPage() {
         <div className="min-h-screen bg-background py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Tours</p>
-                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Add a new tour</h1>
-                    <p className="text-sm text-foreground/60">Register a new tour for a client.</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Тури</p>
+                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Додати новий тур</h1>
+                    <p className="text-sm text-foreground/60">Зареєструйте новий тур для клієнта.</p>
                 </header>
 
                 <div className="grid gap-6">
                     <aside className="sticky top-24 h-fit space-y-4 z-10">
                         <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
                             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
-                                Live preview
+                                Попередній перегляд
                             </p>
                         </div>
                         {previewState.country ? (
                             <TripCard data={previewData} />
                         ) : (
                             <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
-                                Add a destination above to see the live preview.
+                                Додайте напрямок вище, щоб побачити попередній перегляд.
                             </div>
                         )}
                     </aside>
@@ -71,7 +71,7 @@ export default function AddTourPage() {
 
                             <div className="mt-10 flex justify-end border-t border-border/40 pt-6">
                                 <Button type="submit" size="lg" className="px-8" disabled={isUploading}>
-                                    {isUploading ? 'Uploading & Creating...' : 'Create tour'}
+                                    {isUploading ? 'Завантаження та створення...' : 'Створити тур'}
                                 </Button>
                             </div>
                         </form>

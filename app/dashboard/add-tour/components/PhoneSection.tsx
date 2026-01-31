@@ -15,8 +15,8 @@ export const PhoneSection = ({
     variant = 'create',
     value,
     onChange,
-    title = 'Phone',
-    description = 'Who is the primary contact for this tour?',
+    title = 'Телефон',
+    description = 'Хто є основним контактом для цього туру?',
 }: PhoneSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));
@@ -39,8 +39,8 @@ export const PhoneSection = ({
 
             <div>
                 <FormInput
-                    labelText="Phone"
-                    placeholder="e.g. +1 (555) 000-0000"
+                    labelText="Телефон"
+                    placeholder="напр. +380 (50) 000-0000"
                     type="tel"
                     autoComplete="off"
                     formatType="phone"

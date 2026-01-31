@@ -71,9 +71,9 @@ export default function ManagersPage() {
       <div className="w-full max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-6">
           <TextGenerateEffect
-            words="Meet Our Team"
+            words="Наша команда"
             className="text-4xl md:text-5xl lg:text-6xl font-light"
-            accentWords={["Team"]}
+            accentWords={["команда"]}
             accentClassName="text-accent font-bold"
           />
 
@@ -94,7 +94,7 @@ export default function ManagersPage() {
                   </div>
                   <p className="text-sm text-accent font-medium">{manager.role}</p>
                   <p className={`text-xs mt-0.5 ${manager.isOnline ? 'text-green-500/80' : 'text-red-500/80'}`}>
-                    {manager.isOnline ? 'Available now' : 'Offline'}
+                    {manager.isOnline ? 'Доступний зараз' : 'Не в мережі'}
                   </p>
                 </div>
               </div>
@@ -110,7 +110,7 @@ export default function ManagersPage() {
                 className="w-full px-5 py-3.5 bg-accent hover:bg-accent/90 text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn font-medium shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:scale-[1.02]"
               >
                 <MessageCircle className="w-5 h-5" />
-                <span>Request Consultation</span>
+                <span>Замовити консультацію</span>
               </button>
 
               {/* Contact Links - Secondary actions */}
@@ -143,22 +143,22 @@ export default function ManagersPage() {
           <div className="bg-black/80 border border-white/10 p-8 rounded-3xl backdrop-blur-md max-w-md w-full space-y-6 relative shadow-2xl">
             <div className="space-y-2 text-center">
               <h3 className="text-2xl font-light text-white">
-                Request Consultation
+                Замовити консультацію
               </h3>
               {selectedManager && (
                 <p className="text-accent text-sm">
-                  with {selectedManager}
+                  з {selectedManager}
                 </p>
               )}
               <p className="text-secondary text-sm">
-                Leave your number and we'll call you back.
+                Залиште свій номер і ми вам передзвонимо.
               </p>
             </div>
 
             <form className="space-y-4">
               <input
                 type="tel"
-                placeholder="Your phone number"
+                placeholder="Ваш номер телефону"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-accent transition-colors"
               />
               <div className="flex gap-3">
@@ -167,7 +167,7 @@ export default function ManagersPage() {
                   onClick={() => setIsModalOpen(false)}
                   className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors"
                 >
-                  Cancel
+                  Скасувати
                 </button>
                 <button
                   onClick={(e) => {
@@ -177,7 +177,7 @@ export default function ManagersPage() {
                   }}
                   className="flex-1 px-4 py-3 rounded-xl bg-accent text-white hover:bg-accent/90 transition-colors font-medium"
                 >
-                  Approve
+                  Підтвердити
                 </button>
               </div>
             </form>

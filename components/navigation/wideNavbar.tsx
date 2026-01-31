@@ -10,27 +10,27 @@ export default function WideNavbar() {
         <ul className="hidden sm:flex items-center gap-8 list-none m-0 p-0">
             <li>
                 <NavLink href="/tour-screener">
-                    Selection
+                    Підбір туру
                 </NavLink>
             </li>
             <li>
                 <NavLink href="/info">
-                    Info Center
+                    Інфо центр
                 </NavLink>
             </li>
             <li>
                 <NavLink href="/useful-info">
-                    Useful Info
+                    Корисне
                 </NavLink>
             </li>
             <li>
                 <NavLink href="/contact">
-                    Contact
+                    Контакти
                 </NavLink>
             </li>
             <li>
                 <NavLink href="/managers">
-                    Managers
+                    Менеджери
                 </NavLink>
             </li>
             <li>
@@ -38,7 +38,7 @@ export default function WideNavbar() {
                     <NavLink href="/cashback" className="bg-accent p-1 rounded-md mr-2 hover:text-black hover:bg-white">{(userProfile?.cashbackAmount ?? 0).toFixed(2)}₴</NavLink>
                 )}
                 <NavLink href="/login" variant="button">
-                    {session ? "Account" : "Become a client"}
+                    {session ? "Кабінет" : "Стати клієнтом"}
                 </NavLink>
             </li>
         </ul>

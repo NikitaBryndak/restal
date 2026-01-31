@@ -22,7 +22,7 @@ export default function TouristCard({ tourist }: { tourist: TouristInfo }) {
                     className="flex-1 border-blue-400/50 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400 rounded-lg font-medium transition-colors duration-200 bg-white/5"
                 >
                     <Edit3 className="w-4 h-4 mr-2" />
-                    Edit
+                    Редагувати
                 </Button>
                 <Button
                     variant="outline"

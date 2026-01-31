@@ -2,94 +2,94 @@ import { Quote } from "../types";
 
 export const quotes: Quote[] = [
     {
-        quote: "A journey of a thousand miles begins with a single step.",
-        author: "Lao Tzu"
+        quote: "Подорож у тисячу миль починається з одного кроку.",
+        author: "Лао-цзи"
     },
     {
-        quote: "The world is a book and those who do not travel read only one page.",
-        author: "Saint Augustine"
+        quote: "Світ — це книга, і ті, хто не подорожує, читають лише одну сторінку.",
+        author: "Святий Августин"
     },
     {
-        quote: "Travel is the only thing you buy that makes you richer.",
-        author: "Unknown"
+        quote: "Подорожі — єдине, що купуєш, а стаєш багатшим.",
+        author: "Невідомий"
     },
     {
-        quote: "Not all those who wander are lost.",
-        author: "J.R.R. Tolkien"
+        quote: "Не всі, хто блукає, загублені.",
+        author: "Дж. Р. Р. Толкін"
     },
     {
-        quote: "The traveler sees what he sees, the tourist sees what he has come to see.",
-        author: "Gilbert Keith Chesterton"
+        quote: "Подорожній бачить те, що бачить, а турист бачить те, що прийшов побачити.",
+        author: "Гілберт Кейт Честертон"
     },
     {
-        quote: "Life is either a daring adventure or nothing at all.",
-        author: "Helen Keller"
+        quote: "Життя — це або смілива пригода, або нічого.",
+        author: "Гелен Келлер"
     },
     {
-        quote: "Those who travel without passion travel twice as fast.",
-        author: "Thomas Tasso"
+        quote: "Ті, хто подорожує без пристрасті, подорожують вдвічі швидше.",
+        author: "Томас Тассо"
     },
     {
-        quote: "Travel opens new horizons not only on the map, but also in the soul.",
-        author: "Unknown"
+        quote: "Подорожі відкривають нові горизонти не лише на карті, але й у душі.",
+        author: "Невідомий"
     },
     {
-        quote: "When traveling, you never remain the same person you were at the beginning.",
-        author: "David Mitchell"
+        quote: "Подорожуючи, ти ніколи не залишаєшся таким, яким був на початку.",
+        author: "Девід Мітчелл"
     },
     {
-        quote: "Travel teaches more than any school.",
-        author: "Unknown"
+        quote: "Подорожі навчають більше, ніж будь-яка школа.",
+        author: "Невідомий"
     }
 ];
 
 export const searchTexts: string[] = [
-    "Weather in Egypt...",
-    "Best places to vacation in Italy...",
-    "Tours to Greece...",
-    "Weather in Turkey...",
-    "Vacation in Maldives...",
-    "Excursions in France...",
-    "Cheap flights to Spain...",
-    "Hotels in Barcelona...",
-    "What to see in London...",
-    "Tours to Dubai...",
-    "Weather in Thailand...",
-    "Vacation in Croatia...",
-    "Excursions in Rome...",
-    "Beaches of Portugal...",
-    "Best resorts in Mexico...",
-    "What to see in Vienna...",
-    "Hotels in Paris...",
-    "Tours to Bali...",
-    "Weather in Montenegro...",
-    "Best places in Amsterdam...",
-    "Vacation in the Carpathians...",
-    "Excursions in Prague...",
-    "Hotels in New York...",
-    "Weather in Cyprus...",
-    "Tours to Japan...",
-    "What to see in Berlin...",
-    "Vacation in Switzerland...",
-    "Beaches of Greece...",
-    "Hotels in Dubai...",
-    "Weather in the Canary Islands...",
-    "Best resorts in Turkey...",
-    "Tours to Morocco...",
-    "What to see in Warsaw...",
-    "Vacation in Georgia...",
-    "Excursions in Athens...",
-    "Weather in India...",
-    "Best hotels in Antalya...",
-    "Tours to Iceland...",
-    "Vacation in Bulgaria...",
-    "Hotels in Cyprus..."
+    "Погода в Єгипті...",
+    "Найкращі місця для відпочинку в Італії...",
+    "Тури до Греції...",
+    "Погода в Туреччині...",
+    "Відпочинок на Мальдівах...",
+    "Екскурсії у Франції...",
+    "Дешеві авіаквитки до Іспанії...",
+    "Готелі у Барселоні...",
+    "Що подивитися в Лондоні...",
+    "Тури до Дубая...",
+    "Погода в Тайланді...",
+    "Відпочинок у Хорватії...",
+    "Екскурсії в Римі...",
+    "Пляжі Португалії...",
+    "Найкращі курорти Мексики...",
+    "Що подивитися у Відні...",
+    "Готелі в Парижі...",
+    "Тури на Балі...",
+    "Погода в Чорногорії...",
+    "Найкращі місця в Амстердамі...",
+    "Відпочинок в Карпатах...",
+    "Екскурсії в Празі...",
+    "Готелі в Нью-Йорку...",
+    "Погода на Кіпрі...",
+    "Тури до Японії...",
+    "Що подивитися в Берліні...",
+    "Відпочинок у Швейцарії...",
+    "Пляжі Греції...",
+    "Готелі в Дубаї...",
+    "Погода на Канарських островах...",
+    "Найкращі курорти Туреччини...",
+    "Тури до Марокко...",
+    "Що подивитися у Варшаві...",
+    "Відпочинок у Грузії...",
+    "Екскурсії в Афінах...",
+    "Погода в Індії...",
+    "Найкращі готелі Анталії...",
+    "Тури до Ісландії...",
+    "Відпочинок у Болгарії...",
+    "Готелі на Кіпрі..."
 ];
 
 export const searchSuggestions: string[] = [
-    "🏖️ Where to travel in October",
-    "🏰 Travel news",
-    "🏔️ Discount tours"
+    "🏖️ Куди поїхати в жовтні",
+    "🏰 Новини туризму",
+    "🏔️ Гарячі тури"
 ];
 
 export const countriesAssociations = {

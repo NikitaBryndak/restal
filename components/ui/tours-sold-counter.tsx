@@ -21,7 +21,7 @@ export const ToursSoldCounter = ({ count = 0 }: { count?: number }) => {
         <span className="text-accent text-lg md:text-xl font-light">+</span>
       </div>
       <p className="text-xs md:text-sm text-white/60 uppercase tracking-[0.2em] font-medium group-hover:text-white/80 transition-colors duration-500">
-        Journeys Crafted
+        Подорожей організовано
       </p>
     </div>
   );

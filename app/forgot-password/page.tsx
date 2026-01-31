@@ -101,27 +101,27 @@ export default function ForgotPasswordPage() {
                     href="/login"
                     className="text-sm text-muted-foreground hover:text-foreground mb-6 block"
                 >
-                    &larr; Back to Login
+                    &larr; Назад до входу
                 </Link>
 
                 <h1 className="text-2xl font-bold mb-2">
-                    {step === "request" ? "Reset Password" : "Verify Code"}
+                    {step === "request" ? "Відновлення пароля" : "Підтвердження коду"}
                 </h1>
                 <p className="text-sm text-muted-foreground mb-6">
                     {step === "request"
-                        ? "Enter your phone number and we'll send you a verification code via SMS."
-                        : `We sent a code to ${phoneNumber}. Enter it below to reset your password.`
+                        ? "Введіть ваш номер телефону і ми надішлемо вам код підтвердження через SMS."
+                        : `Ми надіслали код на ${phoneNumber}. Введіть його нижче для відновлення пароля.`
                     }
                 </p>
 
                 {step === "request" ? (
                     <form onSubmit={handleRequestOTP} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="phoneNumber">Phone Number</Label>
+                            <Label htmlFor="phoneNumber">Номер телефону</Label>
                             <Input
                                 id="phoneNumber"
                                 type="tel"
-                                placeholder="+1234567890"
+                                placeholder="+380XXXXXXXXX"
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                                 required
@@ -132,13 +132,13 @@ export default function ForgotPasswordPage() {
                         {message && <div className="text-sm text-green-500">{message}</div>}
 
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Sending..." : "Send Verification Code"}
+                            {isLoading ? "Надсилання..." : "Надіслати код"}
                         </Button>
                     </form>
                 ) : (
                     <form onSubmit={handleResetPassword} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="otp">Verification Code</Label>
+                            <Label htmlFor="otp">Код підтвердження</Label>
                             <Input
                                 id="otp"
                                 type="text"
@@ -151,7 +151,7 @@ export default function ForgotPasswordPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="password">New Password</Label>
+                            <Label htmlFor="password">Новий пароль</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -163,7 +163,7 @@ export default function ForgotPasswordPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                            <Label htmlFor="confirmPassword">Підтвердіть новий пароль</Label>
                             <Input
                                 id="confirmPassword"
                                 type="password"
@@ -178,7 +178,7 @@ export default function ForgotPasswordPage() {
                         {message && <div className="text-sm text-green-500">{message}</div>}
 
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Resetting..." : "Set New Password"}
+                            {isLoading ? "Збереження..." : "Встановити новий пароль"}
                         </Button>
 
                         <button
@@ -186,7 +186,7 @@ export default function ForgotPasswordPage() {
                             onClick={() => setStep("request")}
                             className="text-sm text-muted-foreground underline w-full text-center mt-2 hover:text-foreground"
                         >
-                            Change phone number
+                            Змінити номер телефону
                         </button>
                     </form>
                 )}

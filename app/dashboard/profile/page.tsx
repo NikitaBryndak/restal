@@ -28,7 +28,7 @@ export default function ProfilePage() {
                     <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <User className="w-8 h-8 text-red-400" />
                     </div>
-                    <p className="text-lg font-semibold text-red-400 mb-2">Loading error</p>
+                    <p className="text-lg font-semibold text-red-400 mb-2">Помилка завантаження</p>
                     <p className="text-sm text-red-300">{error}</p>
                 </div>
             </div>
@@ -50,7 +50,7 @@ export default function ProfilePage() {
     ];
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString('uk-UA', {
             day: 'numeric',
             month: 'long',
             year: 'numeric'
@@ -65,9 +65,9 @@ export default function ProfilePage() {
                     {/* Header */}
                     <div className="mb-8 text-center lg:text-left">
                         <h1 className="text-4xl lg:text-5xl font-bold bg-linear-to-r from-white via-blue-200 to-accent bg-clip-text text-transparent mb-4">
-                            User Profile
+                            Профіль користувача
                         </h1>
-                        <p className="text-lg text-blue-200 font-medium">Manage your profile and tourists</p>
+                        <p className="text-lg text-blue-200 font-medium">Керуйте своїм профілем та туристами</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -80,7 +80,7 @@ export default function ProfilePage() {
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-bold text-white mb-1">{userProfile?.userName}</h2>
-                                        <p className="text-blue-200 font-medium">Basic information</p>
+                                        <p className="text-blue-200 font-medium">Основна інформація</p>
                                     </div>
                                 </div>
 
@@ -88,13 +88,13 @@ export default function ProfilePage() {
                                     <div>
                                         <Label htmlFor="name" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <User className="w-5 h-5 text-accent" />
-                                            Name
+                                            Ім'я
                                         </Label>
                                         <Input
                                             type="text"
                                             id="name"
                                             value={userProfile?.userName || ''}
-                                            placeholder="Name"
+                                            placeholder="Ім'я"
                                             readOnly
                                             className="bg-white/10 border-white/20 backdrop-blur-sm h-12 text-white font-medium rounded-xl placeholder:text-gray-400"
                                         />
@@ -103,13 +103,13 @@ export default function ProfilePage() {
                                     <div>
                                         <Label htmlFor="phone" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Phone className="w-5 h-5 text-accent" />
-                                            Phone Number
+                                            Номер телефону
                                         </Label>
                                         <Input
                                             type="tel"
                                             id="phone"
                                             value={userProfile?.phoneNumber || ''}
-                                            placeholder="Phone Number"
+                                            placeholder="Номер телефону"
                                             readOnly
                                             className="bg-white/10 border-white/20 backdrop-blur-sm h-12 text-white font-medium rounded-xl placeholder:text-gray-400"
                                         />
@@ -118,21 +118,21 @@ export default function ProfilePage() {
                                     <div>
                                         <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Calendar className="w-5 h-5 text-accent" />
-                                            Registration date
+                                            Дата реєстрації
                                         </Label>
                                         <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white font-medium">
-                                            {userProfile?.createdAt ? formatDate(userProfile.createdAt) : 'N/A'}
+                                            {userProfile?.createdAt ? formatDate(userProfile.createdAt) : 'Н/Д'}
                                         </div>
                                     </div>
 
                                     <div>
                                         <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Wallet className="w-5 h-5 text-accent" />
-                                            Cashback balance
+                                            Баланс бонусів
                                         </Label>
                                         <div className="p-4 bg-linear-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/30 backdrop-blur-sm rounded-xl">
                                             <span className="text-xl font-bold text-emerald-300">
-                                                ${userProfile?.cashbackAmount || 0}
+                                                {userProfile?.cashbackAmount || 0} грн
                                             </span>
                                         </div>
                                     </div>
@@ -140,10 +140,10 @@ export default function ProfilePage() {
                                     <div>
                                         <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Shield className="w-5 h-5 text-accent" />
-                                            Privilege Level
+                                            Рівень привілеїв
                                         </Label>
                                         <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white font-medium">
-                                            Level {userProfile?.privilegeLevel || 1}
+                                            Рівень {userProfile?.privilegeLevel || 1}
                                         </div>
                                     </div>
                                 </div>
