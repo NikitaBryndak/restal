@@ -70,11 +70,10 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const { id } = await context.params;
     const query = buildQuery(id);
 
-        // Attach manager metadata and remove immutable fields.
-        const { _id, createdAt, updatedAt, number, ...rest } = updates ?? {};
+        // Remove immutable fields but preserve managerPhone (set during creation only).
+        const { _id, createdAt, updatedAt, number, managerPhone, ...rest } = updates ?? {};
         const payload = {
             ...rest,
-            managerPhone: session.user.phoneNumber,
         };
 
         const updatedTrip = await Trip.findOneAndUpdate(query, payload, { new: true, runValidators: true });
