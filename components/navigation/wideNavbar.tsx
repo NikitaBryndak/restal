@@ -19,11 +19,6 @@ export default function WideNavbar() {
                 </NavLink>
             </li>
             <li>
-                <NavLink href="/useful-info">
-                    Корисне
-                </NavLink>
-            </li>
-            <li>
                 <NavLink href="/contact">
                     Контакти
                 </NavLink>

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Orelega+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap&subset=cyrillic');
 @import "tailwindcss";
 
 
@@ -25,7 +23,7 @@ body {
   color: var(--foreground);
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Arial', 'Helvetica', sans-serif;
   font-weight: 600;
   scroll-behavior: smooth;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

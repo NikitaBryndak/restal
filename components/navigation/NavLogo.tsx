@@ -13,7 +13,7 @@ export default function NavLogo(data: {className?: string}) {
                 alt="RestAll Logo"
                 className="w-10 h-10 object-contain"
             />
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight font-logo">
                 RestAll
             </h1>
         </Link>

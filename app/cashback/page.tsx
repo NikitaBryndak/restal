@@ -41,7 +41,7 @@ export default function CashbackPage() {
                                 <p className="text-4xl md:text-5xl font-light text-accent">{cashbackBalance.toLocaleString()} грн</p>
                             </div>
                             <div>
-                                <p className="text-sm text-foreground/60 mb-2">Всього зароблено</p>
+                                <p className="text-sm text-foreground/60 mb-2">Всього накопиченно</p>
                                 <p className="text-3xl md:text-4xl font-light">{totalEarned.toLocaleString()} грн</p>
                             </div>
                             <div>
@@ -145,7 +145,7 @@ export default function CashbackPage() {
                                     <div className="mb-4">
                                         <p className="text-4xl font-light text-blue-400 mb-2">2%</p>
                                         <p className="text-foreground/70">
-                                            Отримуйте 2% від суми туру назад на ваш бонусний рахунок.
+                                            Отримуйте 2% від суми туру на ваш бонусний рахунок.
                                             Нарахування відбувається автоматично після завершення подорожі.
                                         </p>
                                     </div>
@@ -174,8 +174,8 @@ export default function CashbackPage() {
                                     <div className="mb-4">
                                         <p className="text-4xl font-light text-purple-400 mb-2">+1%</p>
                                         <p className="text-foreground/70">
-                                            Додатковий 1% cash-back при самостійному підборі туру.
-                                            Просто надайте менеджеру конкретний код туру, який ви знайшли.
+                                            Додатковий 1% cash-back при самостійному підборі туру на нашому сайті.
+                                            Надайте менеджеру конкретний код туру, який Ви знайшли.
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-purple-400">
@@ -203,7 +203,7 @@ export default function CashbackPage() {
                                     <div className="mb-4">
                                         <p className="text-4xl font-light text-amber-400 mb-2">до 2 000 грн</p>
                                         <p className="text-foreground/70">
-                                            Отримайте до 2 000 грн за кожного друга, якого ви залучите.
+                                            Отримайте до 2 000 грн за кожного друга, якого Ви залучите.
                                             А ваш друг отримає ваучер на 800 грн для першого бронювання.
                                         </p>
                                     </div>

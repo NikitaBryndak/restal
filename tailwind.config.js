@@ -8,7 +8,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Orelega One', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Arial', 'Helvetica', 'sans-serif'],
+        logo: ['"Century Gothic"', 'sans-serif'],
       },
     },
   },

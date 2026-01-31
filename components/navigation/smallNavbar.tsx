@@ -34,9 +34,6 @@ export default function SmallNavbar() {
                                 <NavLink href="/info" onClick={toggleMobileMenu} className="text-lg font-medium">
                                     Інфо центр
                                 </NavLink>
-                                <NavLink href="/useful-info" onClick={toggleMobileMenu} className="text-lg font-medium">
-                                    Корисне
-                                </NavLink>
                                 <NavLink href="/contact" onClick={toggleMobileMenu} className="text-lg font-medium">
                                     Контакти
                                 </NavLink>
