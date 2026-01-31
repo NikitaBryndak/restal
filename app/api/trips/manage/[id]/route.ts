@@ -4,14 +4,24 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import mongoose from "mongoose";
 
 const buildQuery = (rawId: string) => {
-    const identifier = rawId.trim();
-    const numericId = Number(identifier);
-    if (!Number.isNaN(numericId) && identifier.trim() !== "") {
-        return { number: numericId };
+    // Strip leading # if present (e.g., "Trip #5468189" -> "5468189")
+    let identifier = rawId.trim().replace(/^#/, '');
+
+    // Check if it looks like a trip number (purely numeric string)
+    if (/^\d+$/.test(identifier)) {
+        return { number: identifier };
     }
-    return { _id: identifier };
+
+    // Check if it's a valid MongoDB ObjectId
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+        return { _id: identifier };
+    }
+
+    // Fallback: try as trip number anyway
+    return { number: identifier };
 };
 
 export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {

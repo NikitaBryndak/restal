@@ -16,7 +16,13 @@ export async function GET() {
 
         await connectToDatabase();
 
-        const trips = await Trip.find({ ownerPhone: session.user.phoneNumber }).sort({ createdAt: -1 }).lean();
+        const userPhone = session.user.phoneNumber;
+        const trips = await Trip.find({
+            $or: [
+                { ownerPhone: userPhone },
+                { managerPhone: userPhone }
+            ]
+        }).sort({ createdAt: -1 }).lean();
 
         return NextResponse.json({ trips }, { status: 200 });
     } catch {

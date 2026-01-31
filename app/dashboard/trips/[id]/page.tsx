@@ -29,9 +29,10 @@ async function getTripData(id: string): Promise<Trip | null> {
         const userPrivilegeLevel = session.user.privilegeLevel || 1;
 
         const isOwner = trip.ownerPhone === userPhone;
+        const isManager = trip.managerPhone === userPhone;
         const hasAdminAccess = userPrivilegeLevel > ADMIN_PRIVILEGE_LEVEL;
 
-        if (!isOwner && !hasAdminAccess) {
+        if (!isOwner && !isManager && !hasAdminAccess) {
             return null;
         }
 
