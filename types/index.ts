@@ -3,12 +3,6 @@ export type Quote = {
   author: string;
 };
 
-export type Company = {
-  name: string;
-  logoUrl: string;
-  websiteUrl: string;
-};
-
 export type Credential = {
   name?: string;
   phoneNumber: string;

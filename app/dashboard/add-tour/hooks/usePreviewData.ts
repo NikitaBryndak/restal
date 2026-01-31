@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import { PreviewState } from '../types';
-import { Trip } from '@/types';
+import { Trip, DEFAULT_DOCUMENTS } from '@/types';
+
+const PLACEHOLDER_DATE = '——/——/————';
+const PLACEHOLDER_TIME = '——:——';
+const PLACEHOLDER = '—';
 
 export const usePreviewData = (previewState: PreviewState): Trip => {
     return useMemo(() => {
@@ -8,67 +12,56 @@ export const usePreviewData = (previewState: PreviewState): Trip => {
         const primaryTraveller = previewState.tourists[0] ?? {
             name: 'Traveller',
             surname: 'Pending',
-            pasportExpiryDate: '——/——/————',
-            DOB: '——/——/————',
-            sex: '—',
+            pasportExpiryDate: PLACEHOLDER_DATE,
+            DOB: PLACEHOLDER_DATE,
+            sex: PLACEHOLDER,
         };
 
         return {
             number: previewState.number || 0,
             country: previewState.country || 'Destination',
-            bookingDate: previewState.bookingDate || '——/——/————',
-            tripStartDate: previewState.tripStartDate || '——/——/————',
-            tripEndDate: previewState.tripEndDate || '——/——/————',
+            bookingDate: previewState.bookingDate || PLACEHOLDER_DATE,
+            tripStartDate: previewState.tripStartDate || PLACEHOLDER_DATE,
+            tripEndDate: previewState.tripEndDate || PLACEHOLDER_DATE,
             flightInfo: {
                 departure: {
-                    airportCode: previewState.flightInfo.departure.airportCode || '—',
-                    country: previewState.flightInfo.departure.country || '—',
-                    flightNumber: previewState.flightInfo.departure.flightNumber || '—',
-                    date: previewState.flightInfo.departure.date || '——/——/————',
-                    time: previewState.flightInfo.departure.time || '——:——',
+                    airportCode: previewState.flightInfo.departure.airportCode || PLACEHOLDER,
+                    country: previewState.flightInfo.departure.country || PLACEHOLDER,
+                    flightNumber: previewState.flightInfo.departure.flightNumber || PLACEHOLDER,
+                    date: previewState.flightInfo.departure.date || PLACEHOLDER_DATE,
+                    time: previewState.flightInfo.departure.time || PLACEHOLDER_TIME,
                 },
                 arrival: {
-                    airportCode: previewState.flightInfo.arrival.airportCode || '—',
-                    country: previewState.flightInfo.arrival.country || '—',
-                    flightNumber: previewState.flightInfo.arrival.flightNumber || '—',
-                    date: previewState.flightInfo.arrival.date || '——/——/————',
-                    time: previewState.flightInfo.arrival.time || '——:——',
+                    airportCode: previewState.flightInfo.arrival.airportCode || PLACEHOLDER,
+                    country: previewState.flightInfo.arrival.country || PLACEHOLDER,
+                    flightNumber: previewState.flightInfo.arrival.flightNumber || PLACEHOLDER,
+                    date: previewState.flightInfo.arrival.date || PLACEHOLDER_DATE,
+                    time: previewState.flightInfo.arrival.time || PLACEHOLDER_TIME,
                 },
             },
             hotel: {
-                name: previewState.hotel.name || '—',
-                checkIn: previewState.hotel.checkIn || '——/——/————',
-                checkOut: previewState.hotel.checkOut || '——/——/————',
+                name: previewState.hotel.name || PLACEHOLDER,
+                checkIn: previewState.hotel.checkIn || PLACEHOLDER_DATE,
+                checkOut: previewState.hotel.checkOut || PLACEHOLDER_DATE,
                 nights: Number.isNaN(nights) ? 0 : nights,
                 food: previewState.hotel.food || 'Meal plan TBD',
-                roomType: previewState.hotel.roomType || '—',
+                roomType: previewState.hotel.roomType || PLACEHOLDER,
             },
-            tourists: [
-                {
-                    name: primaryTraveller.name || 'Traveller',
-                    surname: primaryTraveller.surname || 'Pending',
-                    sex: primaryTraveller.sex || '—',
-                    pasportExpiryDate: primaryTraveller.pasportExpiryDate || '——/——/————',
-                    DOB: primaryTraveller.DOB || '',
-                },
-            ],
+            tourists: [{
+                name: primaryTraveller.name || 'Traveller',
+                surname: primaryTraveller.surname || 'Pending',
+                sex: primaryTraveller.sex || PLACEHOLDER,
+                pasportExpiryDate: primaryTraveller.pasportExpiryDate || PLACEHOLDER_DATE,
+                DOB: primaryTraveller.DOB || '',
+            }],
             payment: {
                 totalAmount: previewState.payment.totalAmount || 0,
                 paidAmount: previewState.payment.paidAmount || 0,
-                deadline: previewState.payment.deadline || '——/——/————',
+                deadline: previewState.payment.deadline || PLACEHOLDER_DATE,
             },
             addons: previewState.addons,
-            documents: {
-                contract: { uploaded: false, url: '' },
-                invoice: { uploaded: false, url: '' },
-                confirmation: { uploaded: false, url: '' },
-                tickets: { uploaded: false, url: '' },
-                voucher: { uploaded: false, url: '' },
-                insurancePolicy: { uploaded: false, url: '' },
-                tourProgram: { uploaded: false, url: '' },
-                memo: { uploaded: false, url: '' },
-            },
-            ownerPhone: '', // Preview mode - no owner yet
+            documents: DEFAULT_DOCUMENTS,
+            ownerPhone: '',
         };
     }, [previewState]);
 };

@@ -139,16 +139,11 @@ export const useAddTourForm = () => {
     const onSubmit = async (data: TourFormValues) => {
         setIsUploading(true);
         try {
-            // Upload files
             const finalDocuments = { ...documents };
-
-
-            console.log('Starting upload process. Pending files:', pendingFiles);
 
             for (const key of DOCUMENT_KEYS) {
                 const file = pendingFiles[key];
                 if (file) {
-                    console.log(`Uploading file for ${key}:`, file.name);
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('folder', 'documents');
@@ -161,7 +156,6 @@ export const useAddTourForm = () => {
 
                         if (uploadRes.ok) {
                             const { url } = await uploadRes.json();
-                            console.log(`Upload successful for ${key}. URL:`, url);
                             finalDocuments[key] = {
                                 ...finalDocuments[key],
                                 url: url,
@@ -169,23 +163,17 @@ export const useAddTourForm = () => {
                             };
                         } else {
                             const errorText = await uploadRes.text();
-                            console.error(`Failed to upload ${key}`, errorText);
                             alert(`Failed to upload ${DOCUMENT_LABELS[key] || key}: ${errorText}`);
                             setIsUploading(false);
-                            return; // Stop submission on upload failure
+                            return;
                         }
-                    } catch (uploadErr) {
-                        console.error(`Error uploading ${key}`, uploadErr);
-                        alert(`Error uploading ${DOCUMENT_LABELS[key] || key}. Check console for details.`);
+                    } catch {
+                        alert(`Error uploading ${DOCUMENT_LABELS[key] || key}.`);
                         setIsUploading(false);
                         return;
                     }
-                } else {
-                     console.log(`No file pending for ${key}`);
                 }
             }
-
-            console.log('Final documents payload:', finalDocuments);
 
             const payload = {
             number: data.number,
@@ -257,18 +245,16 @@ export const useAddTourForm = () => {
             }
             alert('Trip created');
             router.push('/dashboard');
-        } catch (err) {
-            console.error('Create trip error', err);
+        } catch {
             alert('Error creating trip');
         } finally {
             setIsUploading(false);
         }
     };
 
-    const onError = (errors: any) => {
-        console.error('Form validation errors:', errors);
+    const onError = (errors: Record<string, { message?: string }>) => {
         const errorMessages = Object.values(errors)
-            .map((error: any) => error.message)
+            .map((error) => error.message)
             .filter(Boolean);
 
         if (errorMessages.length > 0) {

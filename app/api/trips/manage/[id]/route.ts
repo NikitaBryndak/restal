@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
-
-const ADMIN_PRIVILEGE_LEVEL = 2;
+import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 const buildQuery = (rawId: string) => {
     const identifier = rawId.trim();
@@ -17,7 +16,7 @@ const buildQuery = (rawId: string) => {
 
 export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
     try {
-        const session = (await getServerSession(authOptions as any)) as any;
+        const session = await getServerSession(authOptions);
 
         if (!session?.user?.phoneNumber) {
              return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
@@ -37,15 +36,14 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
         }
 
         return NextResponse.json({ trip }, { status: 200 });
-    } catch (error: any) {
-        console.error("Error fetching trip for manager:", error);
-        return NextResponse.json({ message: "Unable to fetch trip", error: error.message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Unable to fetch trip" }, { status: 500 });
     }
 }
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
     try {
-        const session = (await getServerSession(authOptions as any)) as any;
+        const session = await getServerSession(authOptions);
 
         if (!session?.user?.phoneNumber) {
              return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
@@ -76,8 +74,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         }
 
         return NextResponse.json({ trip: updatedTrip }, { status: 200 });
-    } catch (error: any) {
-        console.error("Error updating trip for manager:", error);
-        return NextResponse.json({ message: "Unable to update trip", error: error.message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Unable to update trip" }, { status: 500 });
     }
 }

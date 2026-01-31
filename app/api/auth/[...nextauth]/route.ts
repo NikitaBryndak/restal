@@ -1,11 +1,19 @@
-import NextAuth from "next-auth/next";
+import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { Credential } from "@/types";
 import User from "@/models/user";
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
 
-export const authOptions = {
+interface MongoUser {
+    _id: { toString: () => string };
+    password: string;
+    phoneNumber: string;
+    privelegeLevel?: number;
+    privilegeLevel?: number;
+}
+
+export const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
             name: "credentials",
@@ -14,26 +22,24 @@ export const authOptions = {
                 try {
                     await connectToDatabase();
                     const { phoneNumber, password } = credentials as Credential;
-                    const user = await User.findOne({ phoneNumber }).lean();
+                    const user = await User.findOne({ phoneNumber }).lean() as MongoUser | null;
 
                     if (!user) {
                         return null;
                     }
 
-                    const passwordMatch = await bcrypt.compare(password, (user as any).password);
+                    const passwordMatch = await bcrypt.compare(password, user.password);
 
                     if (!passwordMatch) {
                         return null;
                     }
 
-                    // Normalize privilege level (handle potential typo in DB vs Schema)
-                    const userAny = user as any;
-                    const level = userAny.privelegeLevel || userAny.privilegeLevel || 1;
+                    const level = user.privelegeLevel ?? user.privilegeLevel ?? 1;
 
                     return {
-                        ...userAny,
-                        id: userAny._id.toString(),
-                        privelegeLevel: level
+                        id: user._id.toString(),
+                        phoneNumber: user.phoneNumber,
+                        privelegeLevel: level,
                     };
                 } catch (error) {
                     console.error("Auth error:", error);
@@ -43,14 +49,14 @@ export const authOptions = {
         })
     ],
     callbacks: {
-        async jwt({ token, user }: any) {
+        async jwt({ token, user }) {
             if (user) {
                 token.privelegeLevel = user.privelegeLevel;
                 token.phoneNumber = user.phoneNumber;
             }
             return token;
         },
-        async session({ session, token }: any) {
+        async session({ session, token }) {
             if (session.user) {
                 session.user.privelegeLevel = token.privelegeLevel;
                 session.user.phoneNumber = token.phoneNumber;
@@ -59,7 +65,7 @@ export const authOptions = {
         }
     },
     session: {
-        strategy: "jwt" as const,
+        strategy: "jwt",
         maxAge: 24 * 60 * 60,
     },
     secret: process.env.NEXTAUTH_SECRET,
@@ -67,7 +73,7 @@ export const authOptions = {
         signIn: "/login",
         error: "/login"
     }
-}
+};
 
 const handler = NextAuth(authOptions);
 

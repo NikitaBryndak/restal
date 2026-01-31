@@ -4,10 +4,11 @@ import Trip from "@/models/trip";
 import User from "@/models/user";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { CASHBACK_RATE } from '@/config/constants';
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
-        const session = (await getServerSession(authOptions as any)) as any;
+        const session = await getServerSession(authOptions);
 
         if (!session?.user?.phoneNumber) {
             return NextResponse.json({ message: "Not authenticated", trips: [] }, { status: 401 });
@@ -18,15 +19,14 @@ export async function GET(request: Request) {
         const trips = await Trip.find({ ownerPhone: session.user.phoneNumber }).sort({ createdAt: -1 }).lean();
 
         return NextResponse.json({ trips }, { status: 200 });
-    } catch (error: any) {
-        console.error("Error fetching trips:", error);
-        return NextResponse.json({ message: "Error fetching trips", error: error.message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Error fetching trips" }, { status: 500 });
     }
 }
 
 export async function POST(request: Request) {
     try {
-        const session = (await getServerSession(authOptions as any)) as any;
+        const session = await getServerSession(authOptions);
 
         if (!session?.user?.phoneNumber) {
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
@@ -34,11 +34,9 @@ export async function POST(request: Request) {
 
         const body = await request.json();
 
-        console.log("Creating trip with documents:", JSON.stringify(body.documents, null, 2));
-
         await connectToDatabase();
 
-        const cashbackAmount = body.payment.totalAmount * 0.01;
+        const cashbackAmount = body.payment.totalAmount * CASHBACK_RATE;
 
         const payload = {
             ...body,
@@ -58,8 +56,7 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json({ trip: newTrip }, { status: 201 });
-    } catch (error: any) {
-        console.error("Error creating trip:", error);
-        return NextResponse.json({ message: "Error creating trip", error: error.message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Error creating trip" }, { status: 500 });
     }
 }

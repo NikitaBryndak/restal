@@ -147,81 +147,80 @@ const serialiseTourists = (tourists: EditableTourist[]) => {
 
 const isBlank = (value: unknown): boolean => typeof value !== 'string' || value.trim().length === 0;
 
+const checkRequired = (value: unknown, fieldName: string): string | null =>
+    isBlank(value) ? `${fieldName} is required.` : null;
+
+const checkDate = (value: string, fieldName: string): string | null => {
+    const error = validateDate(value);
+    return error ? `${fieldName}: ${error}` : null;
+};
+
+const checkPositiveNumber = (value: number, fieldName: string): string | null =>
+    !Number.isFinite(value) || value <= 0 ? `${fieldName} must be greater than zero.` : null;
+
 const validateTripData = (data: RawTrip): string | null => {
-    if (isBlank(data.ownerPhone)) return 'Owner phone is required.';
-    if (isBlank(data.country)) return 'Destination country is required.';
-    if (isBlank(data.region)) return 'Region is required.';
+    // Basic details
+    let error = checkRequired(data.ownerPhone, 'Owner phone')
+        || checkRequired(data.country, 'Destination country')
+        || checkRequired(data.region, 'Region')
+        || checkRequired(data.bookingDate, 'Booking date') || checkDate(data.bookingDate, 'Booking date')
+        || checkRequired(data.tripStartDate, 'Trip start date') || checkDate(data.tripStartDate, 'Trip start date')
+        || checkRequired(data.tripEndDate, 'Trip end date') || checkDate(data.tripEndDate, 'Trip end date');
+    if (error) return error;
 
-    if (isBlank(data.bookingDate)) return 'Booking date is required.';
-    if (validateDate(data.bookingDate)) return `Booking date: ${validateDate(data.bookingDate)}`;
-
-    if (isBlank(data.tripStartDate)) return 'Trip start date is required.';
-    if (validateDate(data.tripStartDate)) return `Trip start date: ${validateDate(data.tripStartDate)}`;
-
-    if (isBlank(data.tripEndDate)) return 'Trip end date is required.';
-    if (validateDate(data.tripEndDate)) return `Trip end date: ${validateDate(data.tripEndDate)}`;
-
+    // Flight info - departure
     const { flightInfo } = data;
-    if (isBlank(flightInfo.departure.country)) return 'Departure country is required.';
-    if (isBlank(flightInfo.departure.airportCode)) return 'Departure airport code is required.';
-    if (isBlank(flightInfo.departure.flightNumber)) return 'Departure flight number is required.';
+    error = checkRequired(flightInfo.departure.country, 'Departure country')
+        || checkRequired(flightInfo.departure.airportCode, 'Departure airport code')
+        || checkRequired(flightInfo.departure.flightNumber, 'Departure flight number')
+        || checkRequired(flightInfo.departure.date, 'Departure date') || checkDate(flightInfo.departure.date, 'Departure date')
+        || checkRequired(flightInfo.departure.time, 'Departure time');
+    if (error) return error;
 
-    if (isBlank(flightInfo.departure.date)) return 'Departure date is required.';
-    if (validateDate(flightInfo.departure.date)) return `Departure date: ${validateDate(flightInfo.departure.date)}`;
+    // Flight info - arrival
+    error = checkRequired(flightInfo.arrival.country, 'Return country')
+        || checkRequired(flightInfo.arrival.airportCode, 'Return airport code')
+        || checkRequired(flightInfo.arrival.flightNumber, 'Return flight number')
+        || checkRequired(flightInfo.arrival.date, 'Return date') || checkDate(flightInfo.arrival.date, 'Return date')
+        || checkRequired(flightInfo.arrival.time, 'Return time');
+    if (error) return error;
 
-    if (isBlank(flightInfo.departure.time)) return 'Departure time is required.';
-
-    if (isBlank(flightInfo.arrival.country)) return 'Return country is required.';
-    if (isBlank(flightInfo.arrival.airportCode)) return 'Return airport code is required.';
-    if (isBlank(flightInfo.arrival.flightNumber)) return 'Return flight number is required.';
-
-    if (isBlank(flightInfo.arrival.date)) return 'Return date is required.';
-    if (validateDate(flightInfo.arrival.date)) return `Return date: ${validateDate(flightInfo.arrival.date)}`;
-
-    if (isBlank(flightInfo.arrival.time)) return 'Return time is required.';
-
+    // Hotel
     const { hotel } = data;
-    if (isBlank(hotel.name)) return 'Hotel name is required.';
+    error = checkRequired(hotel.name, 'Hotel name')
+        || checkRequired(hotel.checkIn, 'Hotel check-in date') || checkDate(hotel.checkIn, 'Hotel check-in date')
+        || checkRequired(hotel.checkOut, 'Hotel check-out date') || checkDate(hotel.checkOut, 'Hotel check-out date')
+        || checkRequired(hotel.food, 'Meal plan')
+        || checkPositiveNumber(hotel.nights, 'Hotel nights')
+        || checkRequired(hotel.roomType, 'Room type');
+    if (error) return error;
 
-    if (isBlank(hotel.checkIn)) return 'Hotel check-in date is required.';
-    if (validateDate(hotel.checkIn)) return `Hotel check-in date: ${validateDate(hotel.checkIn)}`;
-
-    if (isBlank(hotel.checkOut)) return 'Hotel check-out date is required.';
-    if (validateDate(hotel.checkOut)) return `Hotel check-out date: ${validateDate(hotel.checkOut)}`;
-
-    if (isBlank(hotel.food)) return 'Meal plan is required.';
-    if (!Number.isFinite(hotel.nights) || hotel.nights <= 0) return 'Hotel nights must be greater than zero.';
-    if (isBlank(hotel.roomType)) return 'Room type is required.';
-
+    // Payment
     const { payment } = data;
-    if (!Number.isFinite(payment.totalAmount) || payment.totalAmount <= 0) return 'Total amount must be greater than zero.';
+    error = checkPositiveNumber(payment.totalAmount, 'Total amount');
+    if (error) return error;
     if (!Number.isFinite(payment.paidAmount) || payment.paidAmount < 0) return 'Paid amount must be zero or a positive number.';
     if (payment.paidAmount > payment.totalAmount) return 'Paid amount cannot exceed total amount.';
+    error = checkRequired(payment.deadline, 'Payment deadline') || checkDate(payment.deadline, 'Payment deadline');
+    if (error) return error;
 
-    if (isBlank(payment.deadline)) return 'Payment deadline is required.';
-    if (validateDate(payment.deadline)) return `Payment deadline: ${validateDate(payment.deadline)}`;
-
+    // Travellers
     if (!Array.isArray(data.tourists) || data.tourists.length === 0) {
         return 'At least one traveller is required.';
     }
 
-    for (let index = 0; index < data.tourists.length; index += 1) {
-        const traveller = data.tourists[index];
-        if (isBlank(traveller.name)) return `Traveller #${index + 1} first name is required.`;
-        if (isBlank(traveller.surname)) return `Traveller #${index + 1} surname is required.`;
-        if (isBlank(traveller.sex)) return `Traveller #${index + 1} sex is required.`;
-
-        if (isBlank(traveller.DOB)) return `Traveller #${index + 1} date of birth is required.`;
-        if (validateDate(traveller.DOB ?? '')) return `Traveller #${index + 1} DOB: ${validateDate(traveller.DOB ?? '')}`;
-
-        if (isBlank(traveller.pasportExpiryDate)) return `Traveller #${index + 1} passport expiry is required.`;
-        if (validateDate(traveller.pasportExpiryDate)) return `Traveller #${index + 1} passport expiry: ${validateDate(traveller.pasportExpiryDate)}`;
-
-        if (isBlank(traveller.PasportNumber)) return `Traveller #${index + 1} passport number is required.`;
-        if (isBlank(traveller.PasportSeries)) return `Traveller #${index + 1} passport series is required.`;
-
-        if (isBlank(traveller.PasportIsueDate)) return `Traveller #${index + 1} passport issue date is required.`;
-        if (validateDate(traveller.PasportIsueDate ?? '')) return `Traveller #${index + 1} passport issue date: ${validateDate(traveller.PasportIsueDate ?? '')}`;
+    for (let i = 0; i < data.tourists.length; i++) {
+        const t = data.tourists[i];
+        const prefix = `Traveller #${i + 1}`;
+        error = checkRequired(t.name, `${prefix} first name`)
+            || checkRequired(t.surname, `${prefix} surname`)
+            || checkRequired(t.sex, `${prefix} sex`)
+            || checkRequired(t.DOB, `${prefix} date of birth`) || checkDate(t.DOB ?? '', `${prefix} DOB`)
+            || checkRequired(t.pasportExpiryDate, `${prefix} passport expiry`) || checkDate(t.pasportExpiryDate, `${prefix} passport expiry`)
+            || checkRequired(t.PasportNumber, `${prefix} passport number`)
+            || checkRequired(t.PasportSeries, `${prefix} passport series`)
+            || checkRequired(t.PasportIsueDate, `${prefix} passport issue date`) || checkDate(t.PasportIsueDate ?? '', `${prefix} passport issue date`);
+        if (error) return error;
     }
 
     return null;
@@ -280,9 +279,9 @@ export default function ManageTourPage() {
             const nextTrip = normalizeTrip(payload.trip);
             setTrip(nextTrip);
             setActiveId(identifier);
-        } catch (error: any) {
-            console.error('Manager lookup failed', error);
-            setErrorMessage(error?.message ?? 'Unable to locate the requested tour.');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to locate the requested tour.';
+            setErrorMessage(message);
             setTrip(null);
             setActiveId(null);
         } finally {
@@ -313,7 +312,6 @@ export default function ManageTourPage() {
             for (const key of DOCUMENT_KEYS) {
                 const file = pendingFiles[key];
                 if (file) {
-                    console.log(`Uploading file for ${key}:`, file.name);
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('folder', 'documents');
@@ -326,22 +324,20 @@ export default function ManageTourPage() {
 
                         if (uploadRes.ok) {
                             const { url } = await uploadRes.json();
-                            console.log(`Upload successful for ${key}. URL:`, url);
                             currentDocuments[key] = {
                                 ...currentDocuments[key],
                                 url: url,
-                                uploaded: true // Mark as uploaded since we just did it
+                                uploaded: true
                             };
                         } else {
                             const errorText = await uploadRes.text();
-                            console.error(`Failed to upload ${key}`, errorText);
                             throw new Error(`Failed to upload ${DOCUMENT_LABELS[key]}: ${errorText}`);
                         }
-                    } catch (uploadError: any) {
-                         console.error(`Upload error for ${key}:`, uploadError);
-                         setErrorMessage(uploadError.message || `Error uploading ${DOCUMENT_LABELS[key]}`);
+                    } catch (uploadError) {
+                         const message = uploadError instanceof Error ? uploadError.message : `Error uploading ${DOCUMENT_LABELS[key]}`;
+                         setErrorMessage(message);
                          setIsSaving(false);
-                         return; // Abort save on upload failure
+                         return;
                     }
                 }
             }
@@ -376,11 +372,11 @@ export default function ManageTourPage() {
             }
 
             setTrip(normalizeTrip(data.trip));
-            setPendingFiles(buildEmptyPendingFiles()); // Clear pending files on success
+            setPendingFiles(buildEmptyPendingFiles());
             setSuccessMessage('Changes saved successfully.');
-        } catch (error: any) {
-            console.error('Manager update failed', error);
-            setErrorMessage(error?.message ?? 'Unable to update the tour.');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to update the tour.';
+            setErrorMessage(message);
         } finally {
             setIsSaving(false);
         }

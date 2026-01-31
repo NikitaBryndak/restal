@@ -36,6 +36,14 @@ const userSchema = new Schema({
         type: Date,
         required: false,
     },
+    resetPasswordAttempts: {
+        type: Number,
+        default: 0,
+    },
+    resetPasswordLockUntil: {
+        type: Date,
+        required: false,
+    },
 }, { timestamps: true });
 
 // Prevent Mongoose model recompilation error in development

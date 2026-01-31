@@ -3,12 +3,11 @@ import { Storage } from "@google-cloud/storage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// Prevent this route from being cached statically
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getServerSession(authOptions as any);
+        const session = await getServerSession(authOptions);
         if (!session) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
@@ -20,7 +19,6 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ message: "File path required" }, { status: 400 });
         }
 
-         // Initialize Google Cloud Storage
         const storage = new Storage({
             projectId: process.env.GCP_PROJECT_ID,
             credentials: {
@@ -31,7 +29,6 @@ export async function GET(request: NextRequest) {
 
         const bucketName = process.env.GCP_BUCKET_NAME;
         if (!bucketName) {
-             console.error("GCP_BUCKET_NAME not defined");
              return NextResponse.json({ message: "Configuration error" }, { status: 500 });
         }
 
@@ -47,11 +44,9 @@ export async function GET(request: NextRequest) {
         const contentType = metadata.contentType || 'application/octet-stream';
         const fileName = metadata.name?.split('/').pop() || 'document';
 
-        // Download file contents into memory (buffers are acceptable for typical documents)
         const [buffer] = await file.download();
 
-        // Return as a proper response
-        return new NextResponse(buffer as any, {
+        return new NextResponse(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': contentType,
                 'Content-Disposition': `inline; filename="${fileName}"`,
@@ -59,8 +54,7 @@ export async function GET(request: NextRequest) {
             }
         });
 
-    } catch (error: any) {
-        console.error("View document error:", error);
-        return NextResponse.json({ message: "Internal Server Error", error: error.message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }

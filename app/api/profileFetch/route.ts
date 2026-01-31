@@ -1,23 +1,26 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
-        await connectToDatabase();
+        const session = await getServerSession(authOptions);
 
-        const phoneNumber = request.headers.get("phoneNumber");
-
-        if (!phoneNumber) {
+        if (!session?.user?.phoneNumber) {
             return NextResponse.json({
-                message: "Phone number is required",
+                message: "Unauthorized",
                 user: null
             }, {
-                status: 400
+                status: 401
             });
         }
 
-        const user = await User.findOne({ phoneNumber }).select("name email phoneNumber createdAt cashbackAmount privelegeLevel");
+        await connectToDatabase();
+
+        const user = await User.findOne({ phoneNumber: session.user.phoneNumber })
+            .select("name email phoneNumber createdAt cashbackAmount privelegeLevel");
 
         if (!user) {
             return NextResponse.json({
@@ -40,11 +43,11 @@ export async function GET(request: Request) {
             status: 200
         });
 
-    } catch (error: any) {
-        console.error("Error fetching user profile:", error);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json({
             message: "Error fetching user profile",
-            error: error.message
+            error: message
         }, {
             status: 500
         });

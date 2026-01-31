@@ -6,16 +6,14 @@ import { connectToDatabase } from "@/lib/mongodb"
 import Trip from "@/models/trip"
 
 export default async function TripsPage(){
-    const session = (await getServerSession(authOptions as any)) as any;
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.phoneNumber) {
-        // If there's no session, render empty state (user should be redirected by higher-level layout)
         return <div>No trips. Please log in.</div>
     }
 
     await connectToDatabase();
 
-    // Fetch trips that belong to the logged-in user, sorted by createdAt desc
     const trips = await Trip.find({ ownerPhone: session.user.phoneNumber }).sort({ createdAt: -1 }).lean();
 
     const tripCards = trips.map((trip: any) => (

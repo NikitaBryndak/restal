@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { articlesData } from "@/app/info/articlesData";
 import { ArrowLeft, Calendar } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 
 export default function ArticlePage({params}: {params: {slug: string} }) {
     const article = articlesData.find((articleItem) => articleItem.link.endsWith(params.slug));
@@ -66,7 +67,7 @@ export default function ArticlePage({params}: {params: {slug: string} }) {
                         prose-headings:text-white prose-p:text-secondary prose-strong:text-white
                         prose-a:text-accent prose-a:no-underline hover:prose-a:underline
                         prose-li:text-secondary prose-blockquote:border-accent prose-blockquote:bg-white/5 prose-blockquote:p-4 prose-blockquote:rounded-r-lg"
-                        dangerouslySetInnerHTML={{ __html: article.content || "<p>No content available.</p>" }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || "<p>No content available.</p>") }}
                     />
                 </div>
             </article>

@@ -5,10 +5,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
+import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 
 async function getTripData(id: string): Promise<Trip | null> {
     try {
-        const session = (await getServerSession(authOptions as any)) as any;
+        const session = await getServerSession(authOptions);
 
         if (!session?.user?.phoneNumber) {
             return null;
@@ -20,16 +21,15 @@ async function getTripData(id: string): Promise<Trip | null> {
             ? { number: Number(id) }
             : { _id: id };
 
-        const trip = await TripModel.findOne(query).lean();
+        const trip = await TripModel.findOne(query).lean() as Trip | null;
 
         if (!trip) return null;
 
-        // Check authorization: user must be the owner OR have privilege level > 2
         const userPhone = session.user.phoneNumber;
         const userPrivilegeLevel = session.user.privelegeLevel || 1;
 
-        const isOwner = (trip as any).ownerPhone === userPhone;
-        const hasAdminAccess = userPrivilegeLevel > 2;
+        const isOwner = trip.ownerPhone === userPhone;
+        const hasAdminAccess = userPrivilegeLevel > ADMIN_PRIVILEGE_LEVEL;
 
         if (!isOwner && !hasAdminAccess) {
             return null;
@@ -60,7 +60,7 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
     const totalAmount = trip.payment?.totalAmount ?? 0;
     const paidAmount = trip.payment?.paidAmount ?? 0;
     const toPay = totalAmount - paidAmount;
-    const cashback = totalAmount * 0.01;
+    const cashback = totalAmount * CASHBACK_RATE;
 
     const documentArray = Object.entries(trip.documents).map(([name, doc]) => ({
         name: name.replace(/([A-Z])/g, ' $1').trim(),

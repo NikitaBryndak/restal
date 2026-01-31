@@ -85,7 +85,6 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="space-y-6">
-                                    { /* Name Field */ }
                                     <div>
                                         <Label htmlFor="name" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <User className="w-5 h-5 text-accent" />
@@ -101,7 +100,6 @@ export default function ProfilePage() {
                                         />
                                     </div>
 
-                                    { /* Phone Field */ }
                                     <div>
                                         <Label htmlFor="phone" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Phone className="w-5 h-5 text-accent" />
@@ -117,7 +115,6 @@ export default function ProfilePage() {
                                         />
                                     </div>
 
-                                    { /* Registration Date */ }
                                     <div>
                                         <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Calendar className="w-5 h-5 text-accent" />
@@ -128,7 +125,6 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    { /* Cashback Balance */ }
                                     <div>
                                         <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Wallet className="w-5 h-5 text-accent" />
@@ -141,7 +137,6 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    { /* Privilege Level */ }
                                     <div>
                                         <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <Shield className="w-5 h-5 text-accent" />

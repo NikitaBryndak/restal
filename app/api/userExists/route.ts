@@ -17,8 +17,7 @@ export async function POST(request: NextRequest) {
             status: 200
         });
 
-    } catch (error: any) {
-        console.error("Error checking user existence:", error);
+    } catch {
         return NextResponse.json({
             message: "Error checking user existence",
             exists: false

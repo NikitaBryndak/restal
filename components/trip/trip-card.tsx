@@ -2,19 +2,18 @@ import { Clock, Download } from 'lucide-react';
 import Image from 'next/image';
 import { Trip } from '@/types';
 import { cn } from '@/lib/utils';
+import { CASHBACK_RATE } from '@/config/constants';
 
 export default function TripCard({ data }: { data: Trip }) {
     const totalAmount = data.payment?.totalAmount ?? 0;
     const paidAmount = data.payment?.paidAmount ?? 0;
     const toPay = totalAmount - paidAmount;
-    const cashback = data.payment.totalAmount * 0.01;
+    const cashback = totalAmount * CASHBACK_RATE;
 
     const addonItems = [
         { label: "Insurance", value: data.addons.insurance, icon: "🛡️" },
         { label: "Transfer", value: data.addons.transfer, icon: "🚗" },
     ];
-
-    console.log('TripCard data:', data.tripEndDate);
 
     const [day, month, year] = data.tripEndDate.split('/').map((part: string) => parseInt(part, 10));
 

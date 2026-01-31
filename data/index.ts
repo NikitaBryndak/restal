@@ -1,4 +1,4 @@
-import { Quote, Company } from "../types";
+import { Quote } from "../types";
 
 export const quotes: Quote[] = [
     {
@@ -103,7 +103,7 @@ export const countriesAssociations = {
     "Великобританія": "United Kingdom",
     "Об'єднані Арабські Емірати": "United Arab Emirates",
     "Таїланд": "Thailand",
-    "Хорватія": "Croatia",    
+    "Хорватія": "Croatia",
     "Японія": "Japan",
     "Швейцарія": "Switzerland",
     "Грузія": "Georgia",

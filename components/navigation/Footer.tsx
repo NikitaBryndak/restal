@@ -8,8 +8,8 @@ export default function Footer() {
 
     return (
         pathname !== '/register' &&
-        pathname !== '/login' && 
-        
+        pathname !== '/login' &&
+
             <div className="bottom-0 left-0 right-0 flex flex-col items-center my-6 gap-4 text-sm text-white/50">
                 <div className="flex justify-center gap-8">
                     <NavLink href="/contact">Contacts</NavLink>
@@ -18,7 +18,7 @@ export default function Footer() {
                     <NavLink href="/">Help</NavLink>
                 </div>
                 <div className="text-center">
-                    © 2025 Restal. All rights reserved.
+                    © {new Date().getFullYear()} Restal. All rights reserved.
                 </div>
             </div>
         )

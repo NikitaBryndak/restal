@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions as any);
+    const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -62,10 +62,9 @@ export async function POST(request: NextRequest) {
         filename: destination
     });
 
-  } catch (error: any) {
-    console.error("Upload error:", error);
+  } catch {
     return NextResponse.json(
-      { message: "Upload failed", error: error.message },
+      { message: "Upload failed" },
       { status: 500 }
     );
   }

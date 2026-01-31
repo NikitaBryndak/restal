@@ -172,8 +172,7 @@ export default function ManagersPage() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    // User will handle logic
-                    console.log("Approve clicked");
+                    // TODO: Implement manager approval
                     setIsModalOpen(false);
                   }}
                   className="flex-1 px-4 py-3 rounded-xl bg-accent text-white hover:bg-accent/90 transition-colors font-medium"

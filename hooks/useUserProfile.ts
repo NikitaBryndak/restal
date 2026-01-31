@@ -30,7 +30,6 @@ export const useUserProfile = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "phoneNumber": session.user.phoneNumber
                 }
             });
 

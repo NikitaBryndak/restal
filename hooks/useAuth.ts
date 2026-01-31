@@ -74,7 +74,6 @@ export function useAuth({ type }: AuthFormProps) {
         });
 
         if (resLogin?.error) {
-            console.log(resLogin);
             const errorMessage = resLogin.error === "CredentialsSignin"
             ? "Invalid phone number or password"
             : resLogin.error;
@@ -84,9 +83,8 @@ export function useAuth({ type }: AuthFormProps) {
 
 
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError(`An error occurred during ${type}. Please try again.`);
-      console.error(`${type} error:`, err);
     } finally {
       setIsLoading(false);
     }

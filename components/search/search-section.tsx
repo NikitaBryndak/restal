@@ -7,10 +7,8 @@ import SearchExamples from "./search-examples";
 import Link from "next/link";
 
 export default function SearchSection() {
-  const handleSearch = (suggestion: string) => {
-    // TODO: Implement search functionality
-
-    console.log('Searching for:', suggestion);
+  const handleSearch = (_suggestion: string) => {
+    // Search functionality - coming soon
   };
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
