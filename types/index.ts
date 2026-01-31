@@ -82,7 +82,7 @@ export type Payment = {
 
 export type Trip = {
   _id?: string;
-  number: number;
+  number: string;
   bookingDate: string;
   tripStartDate: string;
   tripEndDate: string;

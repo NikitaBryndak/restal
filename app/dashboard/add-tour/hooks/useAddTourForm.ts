@@ -24,7 +24,7 @@ export const useAddTourForm = () => {
     const form = useForm<TourFormValues>({
         resolver: zodResolver(tourSchema) as any,
         defaultValues: {
-            number: 0,
+            number: '',
             country: '',
             region: '',
             hotelNights: 0,
@@ -76,7 +76,7 @@ export const useAddTourForm = () => {
         }];
 
         return {
-            number: values.number || 0,
+            number: values.number || '',
             country: values.country || '',
             bookingDate: values.bookingDate || curDate,
             tripStartDate: values.tripStartDate || '',

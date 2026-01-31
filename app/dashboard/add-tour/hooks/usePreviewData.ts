@@ -18,7 +18,7 @@ export const usePreviewData = (previewState: PreviewState): Trip => {
         };
 
         return {
-            number: previewState.number || 0,
+            number: previewState.number || '',
             country: previewState.country || 'Destination',
             bookingDate: previewState.bookingDate || PLACEHOLDER_DATE,
             tripStartDate: previewState.tripStartDate || PLACEHOLDER_DATE,

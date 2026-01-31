@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 const buildQuery = (rawId: string) => {
     const identifier = rawId.trim();
@@ -22,8 +22,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
              return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
         }
 
-        if ((session.user.privilegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
-             return NextResponse.json({ message: `Forbidden: Insufficient privileges (Level ${session.user.privilegeLevel ?? 0}). Required: ${ADMIN_PRIVILEGE_LEVEL}` }, { status: 403 });
+        if ((session.user.privilegeLevel ?? 0) < MANAGER_PRIVILEGE_LEVEL) {
+             return NextResponse.json({ message: `Forbidden: Insufficient privileges (Level ${session.user.privilegeLevel ?? 0}). Required: ${MANAGER_PRIVILEGE_LEVEL}` }, { status: 403 });
         }
 
         await connectToDatabase();
@@ -49,7 +49,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
              return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
         }
 
-        if ((session.user.privilegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
+        if ((session.user.privilegeLevel ?? 0) < MANAGER_PRIVILEGE_LEVEL) {
              return NextResponse.json({ message: "Forbidden: Insufficient privileges." }, { status: 403 });
         }
 

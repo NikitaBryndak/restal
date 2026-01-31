@@ -1,5 +1,6 @@
 // Business constants
 export const CASHBACK_RATE = 0.01;
+export const MANAGER_PRIVILEGE_LEVEL = 1;
 export const ADMIN_PRIVILEGE_LEVEL = 2;
 
 // UI constants

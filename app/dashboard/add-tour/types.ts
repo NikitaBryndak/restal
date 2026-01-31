@@ -3,7 +3,7 @@ import type { Tourist, FlightInfo, Hotel, Addons, Payment } from '@/types';
 export type PreviewTraveller = Pick<Tourist, 'name' | 'surname' | 'sex' | 'passportExpiryDate' | 'dob'>;
 
 export type PreviewState = {
-    number: number;
+    number: string;
     country: string;
     bookingDate: string;
     tripStartDate: string;

@@ -42,7 +42,7 @@ export default function AddTourPage() {
                             <TripCard data={previewData} />
                         ) : (
                             <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
-                                Додайте напрямок вище, щоб побачити попередній перегляд.
+                                Додайте напрямок, щоб побачити попередній перегляд.
                             </div>
                         )}
                     </aside>
@@ -55,7 +55,7 @@ export default function AddTourPage() {
                             <div className="space-y-10">
                                 <BasicDetailsSection />
                                 <FlightsSection />
-                                <TravellerSection />
+                                <TravellerSection variant="create" />
                                 <PhoneSection />
                                 <StaySection />
                                 <DocumentsSection

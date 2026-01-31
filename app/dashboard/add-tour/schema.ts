@@ -29,7 +29,7 @@ export const documentSchema = z.object({
 
 export const tourSchema = z.object({
     // Basic Details
-    number: z.coerce.number().min(0),
+    number: z.string().optional().default(''),
     country: z.string().min(1, "Destination is required"),
     region: z.string().optional(),
     hotelNights: z.coerce.number().min(0).default(0),

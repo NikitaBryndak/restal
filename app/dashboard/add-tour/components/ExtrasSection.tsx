@@ -23,7 +23,7 @@ export const ExtrasSection = ({
     values,
     onChange,
     title = 'Додатково',
-    description = 'Опціональні доповнення для спокою.',
+    description = 'Опціональні доповнення для туру.',
 }: ExtrasSectionProps) => {
     const context = useFormContext<TourFormValues>();
     const register = context?.register ?? (() => ({} as any));

@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 
 const tripSchema = new Schema({
     number: {
-        type: Number,
+        type: String,
         required: true,
     },
     bookingDate: {

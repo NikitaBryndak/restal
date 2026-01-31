@@ -1,7 +1,7 @@
 import { PreviewState } from './types';
 
 export const blankPreview: PreviewState = {
-    number: 0,
+    number: '',
     country: '',
     bookingDate: '',
     tripStartDate: '',

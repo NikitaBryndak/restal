@@ -62,9 +62,11 @@ export async function POST(request: NextRequest) {
         filename: destination
     });
 
-  } catch {
+  } catch (error) {
+    console.error("Upload error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Upload failed";
     return NextResponse.json(
-      { message: "Upload failed" },
+      { message: errorMessage },
       { status: 500 }
     );
   }

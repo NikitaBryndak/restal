@@ -27,7 +27,7 @@ export const DocumentsSection = ({
     };
 
     return (
-        <section className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+        <section className="space-y-6">
             <h2 className="text-2xl font-semibold text-foreground">Документи</h2>
             <p className="text-sm text-foreground/60">Перемикайте наявність та додавайте файли для майбутнього завантаження. Вибрані файли залишаються на цьому пристрої до моменту завантаження.</p>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
