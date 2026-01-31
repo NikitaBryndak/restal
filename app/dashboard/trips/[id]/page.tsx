@@ -26,7 +26,7 @@ async function getTripData(id: string): Promise<Trip | null> {
         if (!trip) return null;
 
         const userPhone = session.user.phoneNumber;
-        const userPrivilegeLevel = session.user.privelegeLevel || 1;
+        const userPrivilegeLevel = session.user.privilegeLevel || 1;
 
         const isOwner = trip.ownerPhone === userPhone;
         const hasAdminAccess = userPrivilegeLevel > ADMIN_PRIVILEGE_LEVEL;
@@ -78,7 +78,7 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                         fill
                         className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-8">
                         <div className="flex items-end justify-between">
                             <div>
@@ -223,7 +223,7 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                 {trip.tourists.map((tourist, index) => (
                                     <div key={index} className="bg-white/5 rounded-xl p-4 border border-white/10">
                                         <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400/30 to-blue-400/30 flex items-center justify-center">
+                                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-emerald-400/30 to-blue-400/30 flex items-center justify-center">
                                                 <span className="text-lg font-bold text-white">{tourist.name[0]}{tourist.surname[0]}</span>
                                             </div>
                                             <div>
@@ -232,13 +232,13 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                             </div>
                                         </div>
                                         <div className="space-y-1 pl-1">
-                                            {tourist.DOB && (
+                                            {tourist.dob && (
                                                 <p className="text-sm text-white/70">
-                                                    <span className="text-white/50">DOB:</span> {tourist.DOB}
+                                                    <span className="text-white/50">DOB:</span> {tourist.dob}
                                                 </p>
                                             )}
                                             <p className="text-sm text-white/70">
-                                                <span className="text-white/50">Passport expires:</span> {tourist.pasportExpiryDate}
+                                                <span className="text-white/50">Passport expires:</span> {tourist.passportExpiryDate}
                                             </p>
                                         </div>
                                     </div>
@@ -256,16 +256,16 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                 Payment
                             </h2>
                             <div className="space-y-4">
-                                <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl p-4">
+                                <div className="bg-linear-to-br from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl p-4">
                                     <p className="text-xs uppercase tracking-wider text-green-300 mb-2">Total Amount</p>
                                     <p className="text-3xl font-bold text-white">{totalAmount.toFixed(2)}₴</p>
                                     <p className="text-sm text-emerald-300 mt-2">💰 +{cashback.toFixed(2)}₴ cashback</p>
                                 </div>
-                                <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-400/30 rounded-xl p-4">
+                                <div className="bg-linear-to-br from-blue-500/10 to-cyan-500/10 border border-blue-400/30 rounded-xl p-4">
                                     <p className="text-xs uppercase tracking-wider text-blue-300 mb-2">Paid Amount</p>
                                     <p className="text-2xl font-bold text-white">{paidAmount.toFixed(2)}₴</p>
                                 </div>
-                                <div className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-400/30 rounded-xl p-4">
+                                <div className="bg-linear-to-br from-amber-500/10 to-orange-500/10 border border-amber-400/30 rounded-xl p-4">
                                     <p className="text-xs uppercase tracking-wider text-amber-300 mb-2">Amount to Pay</p>
                                     <p className="text-2xl font-bold text-white">{toPay.toFixed(2)}₴</p>
                                     <p className="text-xs text-white/60 mt-2">Deadline: {trip.payment.deadline}</p>

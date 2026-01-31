@@ -20,9 +20,9 @@ import {
 import type { BasicDetailsField } from '../add-tour/components';
 
 type EditableTourist = Tourist & {
-    PasportNumber?: string;
-    PasportSeries?: string;
-    PasportIsueDate?: string;
+    passportNumber?: string;
+    passportSeries?: string;
+    passportIssueDate?: string;
 };
 
 type EditableTrip = Omit<Trip, 'tourists' | 'documents'> & {
@@ -57,11 +57,11 @@ const normalizeTourists = (tourists: any[] | undefined): EditableTourist[] => {
                 name: '',
                 surname: '',
                 sex: '',
-                pasportExpiryDate: '',
-                DOB: '',
-                PasportNumber: '',
-                PasportSeries: '',
-                PasportIsueDate: '',
+                passportExpiryDate: '',
+                dob: '',
+                passportNumber: '',
+                passportSeries: '',
+                passportIssueDate: '',
             },
         ];
     }
@@ -70,11 +70,11 @@ const normalizeTourists = (tourists: any[] | undefined): EditableTourist[] => {
         name: tourist?.name ?? '',
         surname: tourist?.surname ?? '',
         sex: tourist?.sex ?? '',
-        pasportExpiryDate: tourist?.pasportExpiryDate ?? '',
-        DOB: tourist?.DOB ?? '',
-        PasportNumber: tourist?.PasportNumber ?? tourist?.passportNumber ?? '',
-        PasportSeries: tourist?.PasportSeries ?? tourist?.passportSeries ?? '',
-        PasportIsueDate: tourist?.PasportIsueDate ?? tourist?.passportIssueDate ?? '',
+        passportExpiryDate: tourist?.passportExpiryDate ?? tourist?.pasportExpiryDate ?? '',
+        dob: tourist?.dob ?? tourist?.DOB ?? '',
+        passportNumber: tourist?.passportNumber ?? tourist?.PasportNumber ?? '',
+        passportSeries: tourist?.passportSeries ?? tourist?.PasportSeries ?? '',
+        passportIssueDate: tourist?.passportIssueDate ?? tourist?.PasportIsueDate ?? '',
     }));
 };
 
@@ -137,11 +137,11 @@ const serialiseTourists = (tourists: EditableTourist[]) => {
         name: tourist.name ?? '',
         surname: tourist.surname ?? '',
         sex: tourist.sex ?? '',
-        pasportExpiryDate: tourist.pasportExpiryDate ?? '',
-        DOB: tourist.DOB ?? '',
-        PasportNumber: tourist.PasportNumber ?? '',
-        PasportSeries: tourist.PasportSeries ?? '',
-        PasportIsueDate: tourist.PasportIsueDate ?? '',
+        passportExpiryDate: tourist.passportExpiryDate ?? '',
+        dob: tourist.dob ?? '',
+        passportNumber: tourist.passportNumber ?? '',
+        passportSeries: tourist.passportSeries ?? '',
+        passportIssueDate: tourist.passportIssueDate ?? '',
     }));
 };
 
@@ -215,11 +215,11 @@ const validateTripData = (data: RawTrip): string | null => {
         error = checkRequired(t.name, `${prefix} first name`)
             || checkRequired(t.surname, `${prefix} surname`)
             || checkRequired(t.sex, `${prefix} sex`)
-            || checkRequired(t.DOB, `${prefix} date of birth`) || checkDate(t.DOB ?? '', `${prefix} DOB`)
-            || checkRequired(t.pasportExpiryDate, `${prefix} passport expiry`) || checkDate(t.pasportExpiryDate, `${prefix} passport expiry`)
-            || checkRequired(t.PasportNumber, `${prefix} passport number`)
-            || checkRequired(t.PasportSeries, `${prefix} passport series`)
-            || checkRequired(t.PasportIsueDate, `${prefix} passport issue date`) || checkDate(t.PasportIsueDate ?? '', `${prefix} passport issue date`);
+            || checkRequired(t.dob, `${prefix} date of birth`) || checkDate(t.dob ?? '', `${prefix} DOB`)
+            || checkRequired(t.passportExpiryDate, `${prefix} passport expiry`) || checkDate(t.passportExpiryDate, `${prefix} passport expiry`)
+            || checkRequired(t.passportNumber, `${prefix} passport number`)
+            || checkRequired(t.passportSeries, `${prefix} passport series`)
+            || checkRequired(t.passportIssueDate, `${prefix} passport issue date`) || checkDate(t.passportIssueDate ?? '', `${prefix} passport issue date`);
         if (error) return error;
     }
 
@@ -557,11 +557,11 @@ export default function ManageTourPage() {
                               name: '',
                               surname: '',
                               sex: '',
-                              pasportExpiryDate: '',
-                              DOB: '',
-                              PasportNumber: '',
-                              PasportSeries: '',
-                              PasportIsueDate: '',
+                              passportExpiryDate: '',
+                              dob: '',
+                              passportNumber: '',
+                              passportSeries: '',
+                              passportIssueDate: '',
                           },
                       ],
                   }

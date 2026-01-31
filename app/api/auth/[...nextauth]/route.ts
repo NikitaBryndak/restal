@@ -9,7 +9,6 @@ interface MongoUser {
     _id: { toString: () => string };
     password: string;
     phoneNumber: string;
-    privelegeLevel?: number;
     privilegeLevel?: number;
 }
 
@@ -34,12 +33,12 @@ export const authOptions: AuthOptions = {
                         return null;
                     }
 
-                    const level = user.privelegeLevel ?? user.privilegeLevel ?? 1;
+                    const level = user.privilegeLevel ?? 1;
 
                     return {
                         id: user._id.toString(),
                         phoneNumber: user.phoneNumber,
-                        privelegeLevel: level,
+                        privilegeLevel: level,
                     };
                 } catch (error) {
                     console.error("Auth error:", error);
@@ -51,14 +50,14 @@ export const authOptions: AuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.privelegeLevel = user.privelegeLevel;
+                token.privilegeLevel = user.privilegeLevel;
                 token.phoneNumber = user.phoneNumber;
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
-                session.user.privelegeLevel = token.privelegeLevel;
+                session.user.privilegeLevel = token.privilegeLevel;
                 session.user.phoneNumber = token.phoneNumber;
             }
             return session;

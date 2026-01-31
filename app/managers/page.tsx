@@ -84,13 +84,13 @@ export default function ManagersPage() {
             <div key={index} className="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-md hover:border-accent/50 transition-all duration-300 flex flex-col gap-5 group hover:shadow-xl hover:shadow-accent/10">
               {/* Header with avatar and name */}
               <div className="flex items-start gap-4">
-                <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 flex-shrink-0">
+                <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
                   <User className="w-12 h-12" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-xl font-semibold text-white truncate">{manager.name}</h3>
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${manager.isOnline ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500/80'}`}/>
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${manager.isOnline ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500/80'}`}/>
                   </div>
                   <p className="text-sm text-accent font-medium">{manager.role}</p>
                   <p className={`text-xs mt-0.5 ${manager.isOnline ? 'text-green-500/80' : 'text-red-500/80'}`}>
@@ -100,7 +100,7 @@ export default function ManagersPage() {
               </div>
 
               {/* Description */}
-              <p className="text-secondary/90 text-sm leading-relaxed flex-grow">
+              <p className="text-secondary/90 text-sm leading-relaxed grow">
                 {manager.description}
               </p>
 

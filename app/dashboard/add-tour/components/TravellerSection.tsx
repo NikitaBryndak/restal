@@ -226,34 +226,34 @@ const TravellerSectionEdit = ({
                             </div>
                             <FormInput
                                 labelText="Date of birth"
-                                value={tourist.DOB ?? ''}
-                                onChange={(e) => onChange?.(index, 'DOB', e.target.value)}
+                                value={tourist.dob ?? ''}
+                                onChange={(e) => onChange?.(index, 'dob', e.target.value)}
                                 formatType="date"
                                 required
                             />
                             <FormInput
                                 labelText="Passport expiry"
-                                value={tourist.pasportExpiryDate ?? ''}
-                                onChange={(e) => onChange?.(index, 'pasportExpiryDate', e.target.value)}
+                                value={tourist.passportExpiryDate ?? ''}
+                                onChange={(e) => onChange?.(index, 'passportExpiryDate', e.target.value)}
                                 formatType="date"
                                 required
                             />
                             <FormInput
                                 labelText="Passport number"
-                                value={tourist.PasportNumber ?? ''}
-                                onChange={(e) => onChange?.(index, 'PasportNumber', e.target.value)}
+                                value={tourist.passportNumber ?? ''}
+                                onChange={(e) => onChange?.(index, 'passportNumber', e.target.value)}
                                 required
                             />
                             <FormInput
                                 labelText="Passport series"
-                                value={tourist.PasportSeries ?? ''}
-                                onChange={(e) => onChange?.(index, 'PasportSeries', e.target.value)}
+                                value={tourist.passportSeries ?? ''}
+                                onChange={(e) => onChange?.(index, 'passportSeries', e.target.value)}
                                 required
                             />
                             <FormInput
                                 labelText="Passport issue date"
-                                value={tourist.PasportIsueDate ?? ''}
-                                onChange={(e) => onChange?.(index, 'PasportIsueDate', e.target.value)}
+                                value={tourist.passportIssueDate ?? ''}
+                                onChange={(e) => onChange?.(index, 'passportIssueDate', e.target.value)}
                                 formatType="date"
                                 required
                             />

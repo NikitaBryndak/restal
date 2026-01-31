@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-950 flex items-center justify-center">
+            <div className="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-950 flex items-center justify-center">
                 <div className="text-center backdrop-blur-sm bg-white/10 rounded-2xl p-8 border border-white/20 shadow-xl">
                     <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <User className="w-8 h-8 text-red-400" />
@@ -39,12 +39,12 @@ export default function ProfilePage() {
         {
             id: 1,
             name: "John Smith",
-            pasportExpiryDate: "2025-12-31"
+            passportExpiryDate: "2025-12-31"
         },
         {
             id: 2,
             name: "Mary Johnson",
-            pasportExpiryDate: "2026-06-15"
+            passportExpiryDate: "2026-06-15"
         },
 
     ];
@@ -64,7 +64,7 @@ export default function ProfilePage() {
 
                     {/* Header */}
                     <div className="mb-8 text-center lg:text-left">
-                        <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-accent bg-clip-text text-transparent mb-4">
+                        <h1 className="text-4xl lg:text-5xl font-bold bg-linear-to-r from-white via-blue-200 to-accent bg-clip-text text-transparent mb-4">
                             User Profile
                         </h1>
                         <p className="text-lg text-blue-200 font-medium">Manage your profile and tourists</p>
@@ -75,7 +75,7 @@ export default function ProfilePage() {
                         <div className="lg:col-span-1">
                             <div className="backdrop-blur-sm bg-white/5 rounded-3xl border border-white/10 shadow-xl p-8 hover:bg-white/10 transition-all duration-300">
                                 <div className="flex items-center mb-8">
-                                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-accent rounded-2xl flex items-center justify-center mr-5 shadow-lg">
+                                    <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-accent rounded-2xl flex items-center justify-center mr-5 shadow-lg">
                                         <User className="w-10 h-10 text-white" />
                                     </div>
                                     <div>
@@ -130,7 +130,7 @@ export default function ProfilePage() {
                                             <Wallet className="w-5 h-5 text-accent" />
                                             Cashback balance
                                         </Label>
-                                        <div className="p-4 bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/30 backdrop-blur-sm rounded-xl">
+                                        <div className="p-4 bg-linear-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/30 backdrop-blur-sm rounded-xl">
                                             <span className="text-xl font-bold text-emerald-300">
                                                 ${userProfile?.cashbackAmount || 0}
                                             </span>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
                                             Privilege Level
                                         </Label>
                                         <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white font-medium">
-                                            Level {userProfile?.privelegeLevel || 1}
+                                            Level {userProfile?.privilegeLevel || 1}
                                         </div>
                                     </div>
                                 </div>

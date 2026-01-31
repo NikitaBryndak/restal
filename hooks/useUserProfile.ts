@@ -9,7 +9,7 @@ interface UserProfile {
     phoneNumber: string;
     createdAt: string;
     cashbackAmount: number;
-    privelegeLevel: number;
+    privilegeLevel: number;
 }
 
 export const useUserProfile = () => {

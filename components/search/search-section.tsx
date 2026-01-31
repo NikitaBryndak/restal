@@ -45,7 +45,7 @@ export default function SearchSection() {
             className="hover:bg-accent hover:text-white hover:border-accent hidden p-2 bg-white/90 text-black rounded-md transition-colors sm:flex items-center justify-center gap-2 text-sm"
           >
             Contact
-            <Send className="w-4 h-4 flex-shrink-0" />
+            <Send className="w-4 h-4 shrink-0" />
           </Link>
         </form>
       </div>

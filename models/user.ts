@@ -15,7 +15,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    privelegeLevel: {
+    privilegeLevel: {
         type: Number,
         default: 1
     },

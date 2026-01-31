@@ -20,7 +20,7 @@ export default async function Home() {
 
           <TextGenerateEffect
             className="text-4xl sm:text-5xl md:text-6xl tracking-tight font-light text-white
-            [text-wrap:balance] leading-tight"
+            text-balance leading-tight"
             words="Find your perfect journey"
             duration={titleTextFadeDuration}
             accentClassName="text-accent font-bold"

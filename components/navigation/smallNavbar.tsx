@@ -51,7 +51,7 @@ export default function SmallNavbar() {
                                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b">
                                         Dashboard
                                     </h3>
-                                    {userProfile.privelegeLevel > 1 && (
+                                    {userProfile.privilegeLevel > 1 && (
                                         <>
                                             <NavLink href="/dashboard/add-tour" onClick={toggleMobileMenu} className="text-lg">
                                                 Add Tour

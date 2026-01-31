@@ -37,7 +37,7 @@ export default function TripCard({ data }: { data: Trip }) {
         "ПТУ"  // програма туру
         ];
     const documentDownloadSection = (documentArray as any[]).map((doc: any, index: number) => (
-        <div className={cn('flex flex-col justify-center items-center m-[2px]', doc?.uploaded ? 'opacity-100' : 'opacity-50')} key={index}>
+        <div className={cn('flex flex-col justify-center items-center m-0.5', doc?.uploaded ? 'opacity-100' : 'opacity-50')} key={index}>
             <Download className="w-4 h-4 text-white/70" />
             <span className='text-[10px] text-white/90 text-center'>{doc?.name ?? documentAbbreviations[index]}</span>
         </div>
@@ -61,7 +61,7 @@ export default function TripCard({ data }: { data: Trip }) {
             <div className="absolute inset-0 flex flex-col md:flex-[0_70%_0] md:flex-row md:items-stretch">
                 {/* Left Side - Photo and Country Name (30%) */}
                 <div className="flex-[0_0_30%] flex flex-col justify-center items-center p-6">
-                    <div className="h-[1.25rem]"></div>
+                    <div className="h-5"></div>
                     <div className="bg-white/20 backdrop-blur-md rounded-lg p-4 text-center">
                         <h2 className="text-4xl font-bold text-white drop-shadow-lg">
                             {data.country}
@@ -112,7 +112,7 @@ export default function TripCard({ data }: { data: Trip }) {
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-amber-400/60 rounded-full"></div>
                                     <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Stay</p>
-                                    <span className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-400/30 border border-white/20 text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
+                                    <span className="w-6 h-6 rounded-full bg-linear-to-br from-amber-400/30 to-orange-400/30 border border-white/20 text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
                                         {data.hotel.nights}
                                     </span>
                                 </div>

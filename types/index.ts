@@ -13,18 +13,18 @@ export type Credential = {
 export type TouristInfo = {
   id: number;
   name: string;
-  pasportExpiryDate: string;
+  passportExpiryDate: string;
 }
 
 export type Tourist = {
   name: string;
   surname: string;
   sex: string;
-  pasportExpiryDate: string;
-  DOB?: string;
-  PasportNumber?: string;
-  PasportSeries?: string;
-  PasportIsueDate?: string;
+  passportExpiryDate: string;
+  dob?: string;
+  passportNumber?: string;
+  passportSeries?: string;
+  passportIssueDate?: string;
 }
 
 export type FlightInfo = {

@@ -107,27 +107,27 @@ const tripSchema = new Schema({
             type: String,
             required: true,
         },
-        sex : {
+        sex: {
             type: String,
             required: true,
         },
-        pasportExpiryDate: {
+        passportExpiryDate: {
             type: String,
             required: true,
         },
-        DOB: {
+        dob: {
             type: String,
             required: false,
         },
-        PasportNumber: {
+        passportNumber: {
             type: String,
             required: true,
         },
-        PasportSeries: {
+        passportSeries: {
             type: String,
             required: true,
         },
-        PasportIsueDate: {
+        passportIssueDate: {
             type: String,
             required: true,
         }

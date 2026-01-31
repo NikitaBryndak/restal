@@ -20,7 +20,7 @@ export async function GET() {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber })
-            .select("name email phoneNumber createdAt cashbackAmount privelegeLevel");
+            .select("name email phoneNumber createdAt cashbackAmount privilegeLevel");
 
         if (!user) {
             return NextResponse.json({
@@ -38,7 +38,7 @@ export async function GET() {
             phoneNumber: user.phoneNumber,
             createdAt: user.createdAt,
             cashbackAmount: user.cashbackAmount,
-            privelegeLevel: user.privelegeLevel
+            privilegeLevel: user.privilegeLevel
         }, {
             status: 200
         });

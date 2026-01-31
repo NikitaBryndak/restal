@@ -65,14 +65,14 @@ export const useAddTourForm = () => {
             name: t.firstName || 'Traveller',
             surname: t.lastName || 'Pending',
             sex: t.sex || 'unspecified',
-            pasportExpiryDate: t.passportExpiry || '',
-            DOB: t.dob || '',
+            passportExpiryDate: t.passportExpiry || '',
+            dob: t.dob || '',
         })) : [{
             name: 'Traveller',
             surname: 'Pending',
             sex: 'unspecified',
-            pasportExpiryDate: '',
-            DOB: '',
+            passportExpiryDate: '',
+            dob: '',
         }];
 
         return {
@@ -210,11 +210,11 @@ export const useAddTourForm = () => {
                 name: t.firstName,
                 surname: t.lastName,
                 sex: t.sex,
-                pasportExpiryDate: t.passportExpiry,
-                DOB: t.dob,
-                PasportNumber: t.passportNumber,
-                PasportSeries: t.passportSeries,
-                PasportIsueDate: t.passportIssueDate,
+                passportExpiryDate: t.passportExpiry,
+                dob: t.dob,
+                passportNumber: t.passportNumber,
+                passportSeries: t.passportSeries,
+                passportIssueDate: t.passportIssueDate,
             })),
             addons: {
                 insurance: data.insurance,

@@ -12,8 +12,8 @@ export const usePreviewData = (previewState: PreviewState): Trip => {
         const primaryTraveller = previewState.tourists[0] ?? {
             name: 'Traveller',
             surname: 'Pending',
-            pasportExpiryDate: PLACEHOLDER_DATE,
-            DOB: PLACEHOLDER_DATE,
+            passportExpiryDate: PLACEHOLDER_DATE,
+            dob: PLACEHOLDER_DATE,
             sex: PLACEHOLDER,
         };
 
@@ -51,8 +51,8 @@ export const usePreviewData = (previewState: PreviewState): Trip => {
                 name: primaryTraveller.name || 'Traveller',
                 surname: primaryTraveller.surname || 'Pending',
                 sex: primaryTraveller.sex || PLACEHOLDER,
-                pasportExpiryDate: primaryTraveller.pasportExpiryDate || PLACEHOLDER_DATE,
-                DOB: primaryTraveller.DOB || '',
+                passportExpiryDate: primaryTraveller.passportExpiryDate || PLACEHOLDER_DATE,
+                dob: primaryTraveller.dob || '',
             }],
             payment: {
                 totalAmount: previewState.payment.totalAmount || 0,

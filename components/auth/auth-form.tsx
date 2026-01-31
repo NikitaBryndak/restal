@@ -143,7 +143,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
             </form>
 
             {/* Switch Auth Type Link */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 text-center bg-gradient-to-t from-background/80 to-transparent backdrop-blur-sm">
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-center bg-linear-to-t from-background/80 to-transparent backdrop-blur-sm">
               <p className="text-sm text-foreground/60">
                 {type === "login" ? (
                   <>
@@ -173,7 +173,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
 
         {/* Right Side - Image */}
         <div className="hidden lg:block lg:w-[55%] bg-cover bg-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-orange-900/20" />
+          <div className="absolute inset-0 bg-linear-to-br from-orange-500/20 to-orange-900/20" />
           <Image
             width={1365}
             height={1706}

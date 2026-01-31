@@ -12,7 +12,7 @@ export default function TouristCard({ tourist }: { tourist: TouristInfo }) {
                 </div>
                 <div>
                     <p className="font-bold text-white text-lg">{tourist.name}</p>
-                    <p className="text-blue-200 font-medium">{tourist.pasportExpiryDate}</p>
+                    <p className="text-blue-200 font-medium">{tourist.passportExpiryDate}</p>
                 </div>
             </div>
             <div className="flex gap-3">

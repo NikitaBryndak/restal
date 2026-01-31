@@ -1,10 +1,6 @@
-export type PreviewTraveller = {
-    name: string;
-    surname: string;
-    sex: string;
-    pasportExpiryDate: string;
-    DOB: string;
-};
+import type { Tourist, FlightInfo, Hotel, Addons, Payment } from '@/types';
+
+export type PreviewTraveller = Pick<Tourist, 'name' | 'surname' | 'sex' | 'passportExpiryDate' | 'dob'>;
 
 export type PreviewState = {
     number: number;
@@ -12,39 +8,10 @@ export type PreviewState = {
     bookingDate: string;
     tripStartDate: string;
     tripEndDate: string;
-    flightInfo: {
-        departure: {
-            country: string;
-            airportCode: string;
-            flightNumber: string;
-            date: string;
-            time: string;
-        };
-        arrival: {
-            country: string;
-            airportCode: string;
-            flightNumber: string;
-            date: string;
-            time: string;
-        };
-    };
-    hotel: {
-        name: string;
-        checkIn: string;
-        checkOut: string;
-        food: string;
-        nights: number;
-        roomType: string;
-    };
+    flightInfo: FlightInfo;
+    hotel: Hotel;
     tourists: PreviewTraveller[];
-    addons: {
-        insurance: boolean;
-        transfer: boolean;
-    };
-    payment: {
-        totalAmount: number;
-        paidAmount: number;
-        deadline: string;
-    };
+    addons: Addons;
+    payment: Payment;
     ownerPhone: string;
 };

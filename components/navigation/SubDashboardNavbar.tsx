@@ -12,7 +12,7 @@ export default function SubDashboardNavbar() {
             <div className="flex flex-col p-6">
                 <ul className="flex flex-col space-y-4">
                     { userProfile &&
-                        (userProfile?.privelegeLevel > 1 && (
+                        (userProfile?.privilegeLevel > 1 && (
                             <li>
                                 <NavLink href="/dashboard/add-tour" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
                                     Add Tour
@@ -20,7 +20,7 @@ export default function SubDashboardNavbar() {
                             </li>
                     ))}
 
-                    {userProfile && userProfile.privelegeLevel > 1 && (
+                    {userProfile && userProfile.privilegeLevel > 1 && (
                         <li>
                             <NavLink href="/dashboard/manage-tour" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
                                 Manage Tours

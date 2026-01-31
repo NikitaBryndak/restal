@@ -8,7 +8,7 @@ export default function UsefulInfoPage() {
   return (
     <div className="min-h-screen bg-black text-white relative">
        {/* Background gradient/glow similar to home page */}
-       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent/10 via-black to-black pointer-events-none" aria-hidden="true" />
+       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-accent/10 via-black to-black pointer-events-none" aria-hidden="true" />
 
       <Navbar />
 

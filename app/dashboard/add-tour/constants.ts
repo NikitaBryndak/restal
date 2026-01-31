@@ -35,8 +35,8 @@ export const blankPreview: PreviewState = {
             name: '',
             surname: '',
             sex: '',
-            pasportExpiryDate: '',
-            DOB: '',
+            passportExpiryDate: '',
+            dob: '',
         },
     ],
     addons: {

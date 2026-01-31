@@ -90,8 +90,8 @@ export default function InfoPage() {
               </div>
 
               {/* Content */}
-              <div className="p-6 flex flex-col flex-grow space-y-4">
-                <div className="space-y-2 flex-grow">
+              <div className="p-6 flex flex-col grow space-y-4">
+                <div className="space-y-2 grow">
                   <h3 className="text-xl font-semibold text-white group-hover:text-accent transition-colors line-clamp-2">
                     {article.title}
                   </h3>
