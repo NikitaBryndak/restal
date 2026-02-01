@@ -37,8 +37,8 @@ export const useAddArticleForm = () => {
     });
 
     const previewState = mapToPreview(formValues);
-    
-    
+
+
     const onSubmit = async (data: ArticleFormValues) => {
         const payload = {
             tag: data.tag,
@@ -48,7 +48,7 @@ export const useAddArticleForm = () => {
             content: data.content,
             creatorPhone: data.creatorPhone || session?.user?.phoneNumber,
         };
-        
+
         try {
             const res = await fetch('/api/articles', {
                 method: 'POST',
@@ -57,7 +57,7 @@ export const useAddArticleForm = () => {
                 },
                 body: JSON.stringify(payload)
             });
-            
+
             if (!res.ok) {
                 const resData = await res.json().catch(() => ({}));
                 alert('Error creating article: ' + (resData.message || res.statusText));
@@ -70,20 +70,20 @@ export const useAddArticleForm = () => {
             alert('Error creating article');
         }
     };
-    
+
     const onError = (errors: any) => {
         console.error('Form validation errors:', errors);
         const errorMessages = Object.values(errors)
         .map((error: any) => error.message)
         .filter(Boolean);
-        
+
         if (errorMessages.length > 0) {
             alert(`Please fix the following errors:\n${errorMessages.join('\n')}`);
         } else {
             alert('Please check the form for errors.');
         }
     };
-    
+
     return {
         form,
         previewState,
