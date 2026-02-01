@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Article from "@/models/article";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
+import Counter from "@/models/counter";
+import crypto from 'crypto';
 
 export async function GET() {
     try {
@@ -19,21 +21,29 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        //const session = (await getServerSession(authOptions as any) as any);
 
-        if (!session?.user?.phoneNumber) {
-            return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-        }
+        //if (!session?.user?.email) {
+        //    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+        // }
 
         const body = await request.json();
 
         await connectToDatabase();
 
-        const creatorPhone = session.user.phoneNumber;
+        const creatorEmail = "y@gmail.com"
+        const counter = await Counter.findOneAndUpdate(
+            { name: "articleID" },
+            { $inc: { value: 1 } },
+            { new: true, upsert: true }
+        );
+
+        const articleID = counter.value;
 
         const toCreate = {
                 ...body,
-                creatorPhone
+                articleID,
+                creatorEmail
             };
 
         const created = await Article.create(toCreate);

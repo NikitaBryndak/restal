@@ -1,19 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Input } from "@/components/ui/input";
 import { Search, ArrowRight, Calendar } from "lucide-react";
 import Link from "next/link";
-import { articlesData } from "@/app/info/articlesData";
 import { cn } from "@/lib/utils";
+import ArticleCard from "@/components/article/article-card";
 
 export default function InfoPage() {
   const categories = ["All", "First", "Second", "Third", "Fourth", "Fifth"];
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredArticles = articlesData.filter((item) => {
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const res = await fetch('/api/articles');
+        if (res.ok) {
+          const data = await res.json();
+          // Handle different response formats
+          const articlesArray = Array.isArray(data) ? data : (data?.articles || []);
+          setArticles(articlesArray);
+        }
+      } catch (err) {
+        console.error('Error fetching articles:', err);
+        setArticles([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  const filteredArticles = articles.filter((item) => {
     const matchesCategory = selectedCategory === "All" || item.tag === selectedCategory;
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           item.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -70,54 +93,19 @@ export default function InfoPage() {
         </div>
 
         {/* Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredArticles.map((article, index) => (
-            <Link
-              href={article.link}
-              key={index}
-              className="group bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md overflow-hidden hover:border-accent/50 transition-all duration-300 flex flex-col"
-            >
-              {/* Image Container */}
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">
-                  <span className="text-xs font-medium text-white">{article.tag}</span>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6 flex flex-col grow space-y-4">
-                <div className="space-y-2 grow">
-                  <h3 className="text-xl font-semibold text-white group-hover:text-accent transition-colors line-clamp-2">
-                    {article.title}
-                  </h3>
-                  <p className="text-secondary text-sm line-clamp-3 leading-relaxed">
-                    {article.description}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2 text-secondary">
-                    <Calendar className="w-4 h-4" />
-                    <span>Нещодавно</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-accent font-medium group-hover:translate-x-1 transition-transform">
-                    Читати статтю
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {filteredArticles.length === 0 && (
+        {loading ? (
           <div className="text-center py-20">
-            <p className="text-secondary text-lg">Статей за вашими критеріями не знайдено.</p>
+            <p className="text-secondary text-lg">Loading articles...</p>
+          </div>
+        ) : filteredArticles.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-secondary text-lg">No articles found matching your criteria.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredArticles.map((article: any) => (
+              <ArticleCard key={article._id} data={article} />
+            ))}
           </div>
         )}
       </div>
