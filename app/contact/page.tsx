@@ -49,12 +49,12 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-center gap-4 sm:gap-5 group">
-                     <Link href="https://t.me/RestAltravel" target="_blank" rel="noopener noreferrer" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
+                     <Link href="https://t.me/RestAL_travel" target="_blank" rel="noopener noreferrer" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
                         <Send className="w-5 h-5 sm:w-6 sm:h-6" />
                      </Link>
                      <div className="min-w-0">
                         <h3 className="font-medium text-base sm:text-lg">Telegram</h3>
-                        <p className="text-secondary text-sm sm:text-base">@RestAltravel</p>
+                        <p className="text-secondary text-sm sm:text-base">@RestAL_travel</p>
                      </div>
                   </div>
 
