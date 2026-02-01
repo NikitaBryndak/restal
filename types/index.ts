@@ -105,6 +105,15 @@ export type Trip = {
   updatedAt?: Date;
 }
 
+export type Article = {
+  images: string;
+  tag: string;
+  title: string;
+  description: string;
+  content: string;
+  creatorEmail: string; 
+}
+
 export const DEFAULT_DOCUMENTS: Documents = {
   contract: { uploaded: false, url: '' },
   invoice: { uploaded: false, url: '' },

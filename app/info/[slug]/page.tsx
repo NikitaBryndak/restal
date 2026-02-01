@@ -1,11 +1,74 @@
+"use client";
+
 import Link from "next/link";
-import { articlesData } from "@/app/info/articlesData";
 import { ArrowLeft, Calendar } from "lucide-react";
+import { useEffect, useState } from "react";
+import { use } from "react";
 
-export default function ArticlePage({params}: {params: {slug: string} }) {
-    const article = articlesData.find((articleItem) => articleItem.link.endsWith(params.slug));
+export default function ArticlePage({params}: {params: Promise<{slug: string}>}) {
+    const resolvedParams = use(params);
+    const [article, setArticle] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
 
-    if (!article){
+    useEffect(() => {
+        const fetchArticle = async () => {
+            try {
+                // Try fetching by ID first
+                console.log('Fetching article with slug:', resolvedParams.slug);
+                const res = await fetch(`/api/articles/${resolvedParams.slug}`);
+                console.log('Fetch response status:', res.status);
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log('Article data:', data);
+                    setArticle(data);
+                    setLoading(false);
+                    return;
+                } else if (res.status === 400 || res.status === 404) {
+                    // If not a valid ID, try fetching all articles and searching by title
+                    console.log('Slug not a valid ID, searching by title...');
+                    const allRes = await fetch('/api/articles');
+                    if (allRes.ok) {
+                        const allData = await allRes.json();
+                        const articlesArray = Array.isArray(allData) ? allData : (allData?.articles || []);
+                        console.log('All articles:', articlesArray);
+                        const found = articlesArray.find((a: any) => 
+                            a.title.toLowerCase().replace(/\s+/g, '-') === resolvedParams.slug.toLowerCase()
+                        );
+                        if (found) {
+                            console.log('Found article by title:', found);
+                            setArticle(found);
+                        } else {
+                            console.log('Article not found by title');
+                            setNotFound(true);
+                        }
+                    } else {
+                        setNotFound(true);
+                    }
+                } else {
+                    setNotFound(true);
+                }
+            } catch (err) {
+                console.error('Error fetching article:', err);
+                setNotFound(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchArticle();
+    }, [resolvedParams.slug]);
+
+    if (loading) {
+        return (
+            <main className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-24">
+                <p className="text-secondary text-lg">Loading article...</p>
+            </main>
+        );
+    }
+
+    if (notFound || !article){
         return (
         <main className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-24">
             <div className="text-center space-y-6">
@@ -35,11 +98,13 @@ export default function ArticlePage({params}: {params: {slug: string} }) {
 
             <article className="bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md overflow-hidden">
                 <div className="relative h-[400px] w-full">
-                    <img
-                        src={article.image}
-                        alt={article.title}
-                        className="w-full h-full object-cover"
-                    />
+                    {(article.images || article.image) && (
+                        <img
+                            src={article.images || article.image}
+                            alt={article.title}
+                            className="w-full h-full object-cover"
+                        />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
                         <div className="flex items-center gap-4 mb-4">
@@ -56,6 +121,9 @@ export default function ArticlePage({params}: {params: {slug: string} }) {
                         </h1>
                         <p className="text-lg text-white/90 max-w-2xl">
                             {article.description}
+                        </p>
+                        <p className="text-sm text-white/60 mt-4">
+                            By {article.creatorEmail}
                         </p>
                     </div>
                 </div>
