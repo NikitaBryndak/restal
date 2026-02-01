@@ -1,5 +1,3 @@
-"use server";
-
 import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema({
@@ -21,7 +19,7 @@ const userSchema = new Schema({
     },
     cashbackAmount: {
         type: Number,
-        default: 1000
+        default: 1000  // Welcome bonus for new users (in UAH)
     },
     phoneNumber: {
         type: String,

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { use } from "react";
+import DOMPurify from "dompurify";
 
 export default function ArticlePage({params}: {params: Promise<{slug: string}>}) {
     const resolvedParams = use(params);
@@ -121,9 +122,6 @@ export default function ArticlePage({params}: {params: Promise<{slug: string}>})
                         </h1>
                         <p className="text-lg text-white/90 max-w-2xl">
                             {article.description}
-                        </p>
-                        <p className="text-sm text-white/60 mt-4">
-                            By {article.creatorEmail}
                         </p>
                     </div>
                 </div>

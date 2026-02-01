@@ -7,6 +7,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
 import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL, SUPER_ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
+import { getCountryImageName } from '@/data';
 
 // Status color mapping
 const statusColors: Record<TourStatus, string> = {
@@ -111,7 +112,7 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                 {/* Header Section */}
                 <div className="relative h-72 rounded-2xl overflow-hidden">
                     <Image
-                        src={`/countryImages/${trip.country}.jpg`}
+                        src={`/countryImages/${getCountryImageName(trip.country)}.jpg`}
                         alt={trip.country}
                         fill
                         className="object-cover"

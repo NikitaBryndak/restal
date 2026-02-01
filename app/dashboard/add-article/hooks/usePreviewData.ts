@@ -12,7 +12,7 @@ export const usePreviewData = (
       title: previewState.title || "Untitled article",
       description: previewState.description || "No description provided",
       content: previewState.content || "",
-      creatorEmail: previewState.creatorEmail ?? "",
+      creatorPhone: previewState.creatorPhone ?? "",
     };
   }, [previewState]);
 }

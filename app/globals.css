@@ -9,6 +9,26 @@
   --input-bg: rgba(0, 0, 0, 0.8);
 }
 
+/* Style native select dropdowns for dark theme */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  padding: 8px;
+}
+
+select option:hover,
+select option:checked {
+  background-color: #2a2a2a;
+}
+
+select option:disabled {
+  color: #666666;
+}
+
 * {
   scroll-behavior: smooth;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

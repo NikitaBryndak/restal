@@ -19,7 +19,8 @@ export async function POST(request: Request) {
         const authHeader = request.headers.get('authorization');
         const cronSecret = process.env.CRON_SECRET;
 
-        if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+        // SECURITY: Fail closed - if no secret is configured, deny access
+        if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
@@ -93,7 +94,8 @@ export async function GET(request: Request) {
         const authHeader = request.headers.get('authorization');
         const cronSecret = process.env.CRON_SECRET;
 
-        if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+        // SECURITY: Fail closed - if no secret is configured, deny access
+        if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 

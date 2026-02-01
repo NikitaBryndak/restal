@@ -18,7 +18,10 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        if (!PHONE_REGEX.test(phoneNumber)) {
+        // Sanitize phone number - only allow digits and optional leading +
+        const sanitizedPhone = phoneNumber.replace(/[^\d+]/g, '');
+
+        if (!PHONE_REGEX.test(sanitizedPhone)) {
             return NextResponse.json({
                 message: "Invalid phone number format"
             }, { status: 400 });
@@ -30,10 +33,13 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
+        // Sanitize name to prevent XSS
+        const sanitizedName = name.trim().slice(0, 100);
+
         await connectToDatabase();
 
         // Check for existing user
-        const existingUser = await User.findOne({ phoneNumber }).select("_id");
+        const existingUser = await User.findOne({ phoneNumber: sanitizedPhone }).select("_id");
         if (existingUser) {
             return NextResponse.json({
                 message: "An account with this phone number already exists"
@@ -41,7 +47,12 @@ export async function POST(request: NextRequest) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ name, phoneNumber, email, password: hashedPassword });
+        await User.create({
+            name: sanitizedName,
+            phoneNumber: sanitizedPhone,
+            email: email?.trim().toLowerCase(),
+            password: hashedPassword
+        });
 
         return NextResponse.json({
             message: "User registered successfully"

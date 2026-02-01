@@ -5,5 +5,5 @@ export const blankPreview: PreviewState = {
     title: '',
     description: '',
     content: '',
-    creatorEmail: '',
+    creatorPhone: '',
 }

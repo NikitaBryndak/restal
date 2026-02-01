@@ -19,10 +19,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Password must be at least 8 characters" }, { status: 400 });
     }
 
+    // Sanitize inputs
+    const sanitizedPhone = phoneNumber.replace(/[^\d+]/g, '');
+    const sanitizedOtp = otp.replace(/\D/g, '').slice(0, 6);  // Only digits, max 6
+
     await connectToDatabase();
 
     // Find user by phone number first to check lockout
-    const userByPhone = await User.findOne({ phoneNumber });
+    const userByPhone = await User.findOne({ phoneNumber: sanitizedPhone });
 
     if (!userByPhone) {
       // Don't reveal if user exists
@@ -40,7 +44,7 @@ export async function POST(req: Request) {
     // Hash the otp to compare with stored hash
     const otpHash = crypto
       .createHash("sha256")
-      .update(otp)
+      .update(sanitizedOtp)
       .digest("hex");
 
     // Verify OTP matches and hasn't expired

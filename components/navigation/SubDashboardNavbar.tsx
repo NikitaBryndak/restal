@@ -54,6 +54,15 @@ export default function SubDashboardNavbar() {
                             Бонуси
                         </NavLink>
                     </li>
+
+                    {!loading && isAdmin && (
+                        <li>
+                            <NavLink href="/dashboard/add-article" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
+                                Додати статтю
+                            </NavLink>
+                        </li>
+                    )}
+
                     <li>
                         <div className="mt-auto pt-4 border-t border-gray-700">
                             <button

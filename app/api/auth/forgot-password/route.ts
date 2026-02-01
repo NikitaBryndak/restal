@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import { sendSMS } from "@/lib/sms";
-import crypto from "crypto";
+import crypto, { randomInt } from "crypto";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
@@ -13,17 +13,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Phone number is required" }, { status: 400 });
     }
 
+    // Sanitize phone number - only allow digits and optional leading +
+    const sanitizedPhone = phoneNumber.replace(/[^\d+]/g, '');
+
     await connectToDatabase();
 
-    const user = await User.findOne({ phoneNumber });
+    const user = await User.findOne({ phoneNumber: sanitizedPhone });
 
     if (!user) {
         // Safe fail - don't reveal if number exists or not
       return NextResponse.json({ message: "If an account with that number exists, we have sent a verification code." }, { status: 200 });
     }
 
-    // Generate 6 digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate 6 digit OTP using cryptographically secure random number
+    const otp = randomInt(100000, 999999).toString();
 
     // Hash it for storage (using simple sha256 like tokens)
     const otpHash = crypto

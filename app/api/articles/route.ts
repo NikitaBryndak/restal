@@ -4,7 +4,6 @@ import Article from "@/models/article";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import Counter from "@/models/counter";
-import crypto from 'crypto';
 
 export async function GET() {
     try {
@@ -21,17 +20,22 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        //const session = (await getServerSession(authOptions as any) as any);
+        const session = (await getServerSession(authOptions as any) as any);
 
-        //if (!session?.user?.email) {
-        //    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-        // }
+        if (!session?.user?.phoneNumber) {
+            return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+        }
+
+        // Check privilege level - must be tier 2 or above
+        if ((session.user.privilegeLevel ?? 1) < 2) {
+            return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
+        }
 
         const body = await request.json();
 
         await connectToDatabase();
 
-        const creatorEmail = "y@gmail.com"
+        const creatorPhone = session.user.phoneNumber;
         const counter = await Counter.findOneAndUpdate(
             { name: "articleID" },
             { $inc: { value: 1 } },
@@ -43,7 +47,7 @@ export async function POST(request: Request) {
         const toCreate = {
                 ...body,
                 articleID,
-                creatorEmail
+                creatorPhone
             };
 
         const created = await Article.create(toCreate);

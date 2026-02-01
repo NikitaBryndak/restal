@@ -6,11 +6,36 @@ import FormInput from "@/components/ui/form-input";
 import { FormProvider } from "react-hook-form";
 import { useAddArticleForm } from "./hooks/useAddArticleForm";
 import { usePreviewData } from './hooks/usePreviewData';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function AddArticlePage() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
     const { form, previewState, onSubmit } = useAddArticleForm();
-    const previewData = usePreviewData({ ...previewState, creatorEmail: previewState.creatorEmail || "" });
+    const previewData = usePreviewData({ ...previewState, creatorPhone: previewState.creatorPhone || "" });
     const { register } = form;
+
+    useEffect(() => {
+        if (status === "loading") return;
+        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+            router.replace("/dashboard");
+        }
+    }, [session, status, router]);
+
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen bg-background py-20 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-background py-20">
@@ -21,31 +46,30 @@ export default function AddArticlePage() {
                     <p className="text-sm text-foreground/60">Register a new article for a client.</p>
                 </header>
 
-                <div className="grid gap-6">
-                    <aside className="sticky top-24 h-fit space-y-4 z-10">
-                        <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
-                            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
-                                Live preview
-                            </p>
-                        </div>
+                <aside className="space-y-4">
+                    <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
+                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
+                            Live preview
+                        </p>
+                    </div>
 
-                        {previewState.title || previewState.description ? (
+                    {previewState.title || previewState.description ? (
                         <ArticleCard data={previewData} />
-                        ) : (
-                        <div className="text-sm text-muted">
+                    ) : (
+                        <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
                             Start filling the form to see preview
                         </div>
-                        )}
+                    )}
+                </aside>
 
-                        
-                    </aside>
+                <div>
                     <FormProvider {...form}>
                         <form
                             onSubmit={onSubmit}
                             className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8"
                         >
                             <div className="space-y-10">
-                                <section>  
+                                <section>
                                     <h2 className="text-2xl font-semibold text-foreground mb-6">Article Details</h2>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         <FormInput
@@ -69,13 +93,20 @@ export default function AddArticlePage() {
                                             required
                                             {...register("images")}
                                         />
-                                        <FormInput
-                                            labelText="Content"
-                                            type="text"
-                                            placeholder="Enter article content"
-                                            required
-                                            {...register("content")}
-                                        />
+                                        <div className="space-y-1.5 md:col-span-2">
+                                            <label className="text-sm font-medium text-foreground/80">
+                                                Content <span className="text-red-500">*</span>
+                                            </label>
+                                            <textarea
+                                                className="w-full min-h-[300px] rounded-lg border border-border/60 bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"
+                                                placeholder="Enter article content. You can use HTML tags for formatting:\n• <p>paragraph</p>\n• <strong>bold</strong>\n• <em>italic</em>\n• <h2>heading</h2>\n• <ul><li>list item</li></ul>"
+                                                required
+                                                {...register("content")}
+                                            />
+                                            <p className="text-xs text-foreground/50">
+                                                Supports HTML formatting: &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;h2&gt;, &lt;ul&gt;, &lt;li&gt;, etc.
+                                            </p>
+                                        </div>
                                         <div className="space-y-1.5">
                                             <label className="text-sm font-medium text-foreground/80">
                                                 Article Tag

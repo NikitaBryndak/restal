@@ -5,10 +5,24 @@ import TripCard from '@/components/trip/trip-card';
 import { Button } from '@/components/ui/button';
 import { usePreviewData } from './hooks/usePreviewData';
 import { useAddTourForm } from './hooks/useAddTourForm';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, DocumentsSection } from './components';
 
 export default function AddTourPage() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === "loading") return;
+        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+            router.replace("/dashboard");
+        }
+    }, [session, status, router]);
+
     const {
         form,
         previewState,
@@ -22,6 +36,18 @@ export default function AddTourPage() {
     } = useAddTourForm();
     const previewData = usePreviewData(previewState);
 
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen bg-background py-12 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        return null;
+    }
+
     return (
         <div className="min-h-screen bg-background py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
@@ -31,22 +57,22 @@ export default function AddTourPage() {
                     <p className="text-sm text-foreground/60">Зареєструйте новий тур для клієнта.</p>
                 </header>
 
-                <div className="grid gap-6">
-                    <aside className="sticky top-24 h-fit space-y-4 z-10">
-                        <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
-                            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
-                                Попередній перегляд
-                            </p>
+                <aside className="space-y-4">
+                    <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
+                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
+                            Попередній перегляд
+                        </p>
+                    </div>
+                    {previewState.country ? (
+                        <TripCard data={previewData} />
+                    ) : (
+                        <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
+                            Додайте напрямок, щоб побачити попередній перегляд.
                         </div>
-                        {previewState.country ? (
-                            <TripCard data={previewData} />
-                        ) : (
-                            <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
-                                Додайте напрямок, щоб побачити попередній перегляд.
-                            </div>
-                        )}
-                    </aside>
+                    )}
+                </aside>
 
+                <div>
                     <FormProvider {...form}>
                         <form
                             onSubmit={onSubmit}

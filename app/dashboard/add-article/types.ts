@@ -4,5 +4,5 @@ export type PreviewState= {
     content: string;
     images: string;
     tag?: "First" | "Second" | "Third" | "Fourth" | "Fifth" | "All";
-    creatorEmail: string;
+    creatorPhone: string;
 };

@@ -92,22 +92,39 @@ export const searchSuggestions: string[] = [
     "🏔️ Гарячі тури"
 ];
 
-export const countriesAssociations = {
-    "Єгипет": "Egypt",
-    "Італія": "Italy",
+// Ukrainian destination name -> English image filename mapping
+export const countriesAssociations: Record<string, string> = {
+    // Main destinations
+    "Авіаквитки": "Flights",
+    "Албанія": "Albania",
+    "Балі": "Bali",
+    "Болгарія": "Bulgaria",
+    "В'єтнам": "Vietnam",
     "Греція": "Greece",
-    "Туреччина": "Turkey",
-    "Мальдіви": "Maldives",
-    "Франція": "France",
+    "Домінікана": "Dominican",
+    "Європа": "Europe",
+    "Єгипет": "Egypt",
+    "Занзибар": "Zanzibar",
     "Іспанія": "Spain",
-    "Великобританія": "United Kingdom",
-    "Об'єднані Арабські Емірати": "United Arab Emirates",
-    "Таїланд": "Thailand",
+    "Кіпр": "Cyprus",
+    "Крит": "Crete",
+    "Круїз": "Cruise",
+    "Майорка": "Mallorca",
+    "Мальдіви": "Maldives",
+    "ОАЕ": "UAE",
+    "Тайланд": "Thailand",
+    "Тенеріфе": "Tenerife",
+    "Туніс": "Tunisia",
+    "Туреччина": "Turkey",
     "Хорватія": "Croatia",
-    "Японія": "Japan",
-    "Швейцарія": "Switzerland",
-    "Грузія": "Georgia",
-    "Індія": "India",
-    "Анталія": "Antalya",
-    "Кіпр": "Cyprus"
+    "Чорногорія": "Montenegro",
+    "Шрі-Ланка": "SriLanka",
+};
+
+// Get English image filename from Ukrainian country name
+export function getCountryImageName(ukrainianName: string): string {
+    return countriesAssociations[ukrainianName] || ukrainianName;
 }
+
+// List of all available destinations (Ukrainian)
+export const DESTINATIONS = Object.keys(countriesAssociations);

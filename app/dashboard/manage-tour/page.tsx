@@ -18,6 +18,9 @@ import {
     DocumentsSection,
 } from '../add-tour/components';
 import type { BasicDetailsField } from '../add-tour/components';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 type EditableTourist = Tourist & {
     passportNumber?: string;
@@ -231,6 +234,8 @@ const validateTripData = (data: RawTrip): string | null => {
 };
 
 export default function ManageTourPage() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
     const [searchValue, setSearchValue] = useState('');
     const [trip, setTrip] = useState<RawTrip | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -254,8 +259,27 @@ export default function ManageTourPage() {
     const [pendingFiles, setPendingFiles] = useState<Record<keyof Documents, File | null>>(buildEmptyPendingFiles);
 
     useEffect(() => {
+        if (status === "loading") return;
+        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+            router.replace("/dashboard");
+        }
+    }, [session, status, router]);
+
+    useEffect(() => {
         setPendingFiles(buildEmptyPendingFiles());
     }, [trip?._id, buildEmptyPendingFiles]);
+
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen bg-background py-12 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        return null;
+    }
 
     const handleLookup = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();

@@ -7,7 +7,7 @@ export const articleSchema = z.object({
     title: z.string(),
     description: z.string(),
     content: z.string(),
-    creatorEmail: z.string()
+    creatorPhone: z.string()
 });
 
 export type ArticleFormValues = z.infer<typeof articleSchema>;

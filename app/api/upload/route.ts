@@ -3,19 +3,57 @@ import { Storage } from "@google-cloud/storage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+// SECURITY: Allowed file types for upload
+const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+const ALLOWED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png', '.webp', '.gif', '.doc', '.docx'];
+
+// Max file size: 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!session?.user?.phoneNumber) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const folder = formData.get("folder") as string || "misc";
+    const tripNumber = formData.get("tripNumber") as string || "";
 
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
+    }
+
+    // SECURITY: Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ message: "File too large. Maximum size is 10MB" }, { status: 400 });
+    }
+
+    // SECURITY: Validate MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json({
+        message: "Invalid file type. Allowed: PDF, JPG, PNG, WEBP, GIF, DOC, DOCX"
+      }, { status: 400 });
+    }
+
+    // SECURITY: Validate file extension
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+      return NextResponse.json({
+        message: "Invalid file extension"
+      }, { status: 400 });
     }
 
     // Initialize Google Cloud Storage
@@ -32,19 +70,19 @@ export async function POST(request: NextRequest) {
         throw new Error("GCP_BUCKET_NAME is not defined");
     }
 
-    // console.log(`Uploading file ${file.name} to bucket ${bucketName}`);
-
     const bucket = storage.bucket(bucketName);
 
     // Create a buffer from the file
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate a unique filename
+    // Generate a unique filename with trip number for access control
     const timestamp = Date.now();
     // Sanitize filename to remove special chars
     const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const destination = `${folder}/${timestamp}-${sanitizedFilename}`;
+    // Include trip number in filename for access control verification
+    const tripPrefix = tripNumber ? `${tripNumber}_` : '';
+    const destination = `${folder}/${timestamp}-${tripPrefix}${sanitizedFilename}`;
 
     const blob = bucket.file(destination);
 

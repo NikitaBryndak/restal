@@ -140,6 +140,7 @@ export const useAddTourForm = () => {
         setIsUploading(true);
         try {
             const finalDocuments = { ...documents };
+            const tripNumber = data.number || '';
 
             for (const key of DOCUMENT_KEYS) {
                 const file = pendingFiles[key];
@@ -147,6 +148,7 @@ export const useAddTourForm = () => {
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('folder', 'documents');
+                    formData.append('tripNumber', tripNumber);  // Include trip number for access control
 
                     try {
                         const uploadRes = await fetch('/api/upload', {

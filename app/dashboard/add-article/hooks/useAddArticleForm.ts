@@ -1,11 +1,13 @@
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { articleSchema, ArticleFormValues } from '@/app/add-article/schema';
+import { articleSchema, ArticleFormValues } from '../schema';
 import { useRouter } from 'next/navigation';
 import { PreviewState } from '../types';
+import { useSession } from "next-auth/react";
 
 export const useAddArticleForm = () => {
     const router = useRouter();
+    const { data: session } = useSession();
 
     const form = useForm<ArticleFormValues>({
         resolver: zodResolver(articleSchema),
@@ -15,7 +17,7 @@ export const useAddArticleForm = () => {
             title: "",
             description: "",
             content: "",
-            creatorEmail: "",
+            creatorPhone: session?.user?.phoneNumber || "",
         },
         mode: 'onChange',
     });
@@ -31,7 +33,7 @@ export const useAddArticleForm = () => {
         content: (values.content as string) || "Start writing your article...",
         images: (values.images as string) || "",
         tag: (values.tag as "First" | "Second" | "Third" | "Fourth" | "Fifth" | "All") || "All",
-        creatorEmail: values.creatorEmail || "Unknown author",
+        creatorPhone: values.creatorPhone || session?.user?.phoneNumber || "",
     });
 
     const previewState = mapToPreview(formValues);
@@ -44,7 +46,7 @@ export const useAddArticleForm = () => {
             title: data.title,
             description: data.description,
             content: data.content,
-            creatorEmail: data.creatorEmail,
+            creatorPhone: data.creatorPhone || session?.user?.phoneNumber,
         };
         
         try {

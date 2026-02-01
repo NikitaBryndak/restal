@@ -1,5 +1,3 @@
-"use server"
-
 import mongoose, { Schema } from "mongoose";
 
 const articleSchema = new Schema({

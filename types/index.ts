@@ -149,7 +149,7 @@ export type Article = {
   title: string;
   description: string;
   content: string;
-  creatorEmail: string;
+  creatorPhone: string;
 }
 
 export const DEFAULT_DOCUMENTS: Documents = {

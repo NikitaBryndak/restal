@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { TourFormValues } from '../schema';
 import { Globe } from 'lucide-react';
+import { DESTINATIONS } from '@/data';
 
 export type BasicDetailsField = 'number' | 'country' | 'region' | 'hotelNights' | 'tripStartDate' | 'tripEndDate' | 'food';
 
@@ -27,9 +28,10 @@ const primaryFields: Array<{
     formatType?: 'date';
     inputMode?: 'numeric';
     pattern?: string;
+    isSelect?: boolean;
 }> = [
     { field: 'number', label: 'Номер туру', placeholder: 'напр. 12345', name: 'number', inputMode: 'numeric', pattern: '[0-9]*' },
-    { field: 'country', label: 'Країна призначення', placeholder: 'Іспанія, Італія, Греція...', name: 'country' },
+    { field: 'country', label: 'Країна призначення', placeholder: 'Виберіть країну', name: 'country', isSelect: true },
     { field: 'region', label: 'Регіон', placeholder: 'Хургада, Тоскана, Санторіні...', name: 'region' },
     { field: 'hotelNights', label: 'Ночей у готелі', placeholder: 'напр. 7', name: 'hotelNights', inputMode: 'numeric', pattern: '[0-9]*' },
 ];
@@ -67,6 +69,19 @@ export const BasicDetailsSection = ({
         return register(name);
     };
 
+    const buildSelectProps = (field: BasicDetailsField, name: keyof TourFormValues) => {
+        if (controlled) {
+            const rawValue = values?.[field];
+            const value = typeof rawValue === 'string' ? rawValue : '';
+            return {
+                value,
+                onChange: (event: ChangeEvent<HTMLSelectElement>) => onChange(field, event.target.value),
+            };
+        }
+
+        return register(name);
+    };
+
     const mealPlanProps = controlled
         ? {
               value: typeof values?.food === 'string' ? values.food : '',
@@ -87,17 +102,36 @@ export const BasicDetailsSection = ({
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {primaryFields
-                    .filter((field) => (field.field !== 'hotelNights' || showHotelNights) && (field.field !== 'number' || showNumber))
-                    .map(({ field, label, placeholder, name, inputMode, pattern }) => (
+                    .filter((f) => (f.field !== 'hotelNights' || showHotelNights) && (f.field !== 'number' || showNumber))
+                    .map(({ field, label, placeholder, name, inputMode, pattern, isSelect }) => (
                         <div key={field}>
-                            <FormInput
-                                labelText={label}
-                                placeholder={placeholder}
-                                autoComplete="off"
-                                inputMode={inputMode}
-                                pattern={pattern}
-                                {...buildInputProps(field, name)}
-                            />
+                            {isSelect ? (
+                                <>
+                                    <label className="mb-2 block text-sm font-medium text-foreground/80">{label}</label>
+                                    <select
+                                        className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                        {...buildSelectProps(field, name)}
+                                    >
+                                        <option value="" disabled>
+                                            {placeholder}
+                                        </option>
+                                        {DESTINATIONS.map((destination) => (
+                                            <option key={destination} value={destination}>
+                                                {destination}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </>
+                            ) : (
+                                <FormInput
+                                    labelText={label}
+                                    placeholder={placeholder}
+                                    autoComplete="off"
+                                    inputMode={inputMode}
+                                    pattern={pattern}
+                                    {...buildInputProps(field, name)}
+                                />
+                            )}
                             {!controlled && errors[name] && (
                                 <p className="text-xs text-red-500 mt-1">{errors[name]?.message as string}</p>
                             )}

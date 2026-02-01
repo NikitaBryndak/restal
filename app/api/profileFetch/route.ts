@@ -44,10 +44,10 @@ export async function GET() {
         });
 
     } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        // Log error server-side but don't expose details to client
+        console.error("Profile fetch error:", error instanceof Error ? error.message : 'Unknown error');
         return NextResponse.json({
-            message: "Error fetching user profile",
-            error: message
+            message: "Error fetching user profile"
         }, {
             status: 500
         });

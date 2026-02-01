@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Trip, TOUR_STATUS_LABELS, TourStatus } from '@/types';
 import { cn } from '@/lib/utils';
 import { CASHBACK_RATE } from '@/config/constants';
+import { getCountryImageName } from '@/data';
 
 // Status color mapping
 const statusColors: Record<TourStatus, string> = {
@@ -48,7 +49,7 @@ export default function TripCard({ data }: { data: Trip }) {
     <div className={rootClass}>
             {/* Background Image */}
             <Image
-                src={`/countryImages/${data.country}.jpg`}
+                src={`/countryImages/${getCountryImageName(data.country)}.jpg`}
                 alt={`Trip to ${data.country}`}
                 fill
                 className="object-cover"
