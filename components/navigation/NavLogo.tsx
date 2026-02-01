@@ -10,11 +10,11 @@ export default function NavLogo(data: {className?: string}) {
                 width={512}
                 height={512}
                 src="/logo.png"
-                alt="RestAll Logo"
+                alt="RestAL Logo"
                 className="w-10 h-10 object-contain"
             />
             <h1 className="text-3xl font-bold tracking-tight font-logo">
-                RestAll
+                RestAL
             </h1>
         </Link>
     )

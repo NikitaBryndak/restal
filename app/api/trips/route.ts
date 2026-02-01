@@ -4,7 +4,7 @@ import Trip from "@/models/trip";
 import User from "@/models/user";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { CASHBACK_RATE } from '@/config/constants';
+import { CASHBACK_RATE, SUPER_ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 
 export async function GET() {
     try {
@@ -17,12 +17,18 @@ export async function GET() {
         await connectToDatabase();
 
         const userPhone = session.user.phoneNumber;
-        const trips = await Trip.find({
+        const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
+        const isSuperAdmin = userPrivilegeLevel >= SUPER_ADMIN_PRIVILEGE_LEVEL;
+
+        // Super admins (level 4+) can see all trips
+        const query = isSuperAdmin ? {} : {
             $or: [
                 { ownerPhone: userPhone },
                 { managerPhone: userPhone }
             ]
-        }).sort({ createdAt: -1 }).lean();
+        };
+
+        const trips = await Trip.find(query).sort({ createdAt: -1 }).lean();
 
         return NextResponse.json({ trips }, { status: 200 });
     } catch {

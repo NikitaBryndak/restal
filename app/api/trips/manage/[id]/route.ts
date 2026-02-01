@@ -5,7 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import Notification from "@/models/notification";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { MANAGER_PRIVILEGE_LEVEL, SUPER_ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import { DOCUMENT_LABELS, TOUR_STATUS_LABELS, TourStatus } from "@/types";
 import mongoose from "mongoose";
 
@@ -73,6 +73,17 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
             return NextResponse.json({ message: "Trip not found" }, { status: 404 });
         }
 
+        // Check if user has access to this trip
+        const userPhone = session.user.phoneNumber;
+        const userPrivilegeLevel = session.user.privilegeLevel ?? 0;
+        const isSuperAdmin = userPrivilegeLevel >= SUPER_ADMIN_PRIVILEGE_LEVEL;
+        const isOwnerOrManager = trip.ownerPhone === userPhone || trip.managerPhone === userPhone;
+
+        // Super admins (level 4+) can access any trip, others need ownership/manager access
+        if (!isSuperAdmin && !isOwnerOrManager) {
+            return NextResponse.json({ message: "Forbidden: You don't have access to this trip." }, { status: 403 });
+        }
+
         // Get manager name from User model if managerPhone exists
         let managerName = '';
         if (trip.managerPhone) {
@@ -112,6 +123,17 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
         if (!existingTrip) {
             return NextResponse.json({ message: "Trip not found" }, { status: 404 });
+        }
+
+        // Check if user has access to modify this trip
+        const userPhone = session.user.phoneNumber;
+        const userPrivilegeLevel = session.user.privilegeLevel ?? 0;
+        const isSuperAdmin = userPrivilegeLevel >= SUPER_ADMIN_PRIVILEGE_LEVEL;
+        const isOwnerOrManager = existingTrip.ownerPhone === userPhone || existingTrip.managerPhone === userPhone;
+
+        // Super admins (level 4+) can modify any trip, others need ownership/manager access
+        if (!isSuperAdmin && !isOwnerOrManager) {
+            return NextResponse.json({ message: "Forbidden: You don't have access to modify this trip." }, { status: 403 });
         }
 
         // Remove immutable fields but allow number to be updated, update managerPhone to current manager

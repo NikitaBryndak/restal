@@ -8,21 +8,21 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   metadataBase: new URL("https://restal.in.ua"), // Update with your actual domain
   title: {
-    default: "RestAll",
-    template: "%s | RestAll",
+    default: "RestAL",
+    template: "%s | RestAL",
   },
   description:
     "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
   keywords: [
     "Надійність", "безпека", "експертність"
   ],
-  authors: [{ name: "RestAll" }],
-  creator: "RestAll",
+  authors: [{ name: "RestAL" }],
+  creator: "RestAL",
   openGraph: {
     type: "website",
     locale: "uk_UA",
     url: "https://restal.in.ua",
-    siteName: "RestAll",
+    siteName: "RestAL",
     title: "Турагенція RestAL — Експертне планування вашого відпочинку",
     description:
       "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "RestAll",
+        alt: "RestAL",
       },
     ],
   },
