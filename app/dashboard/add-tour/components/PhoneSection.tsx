@@ -2,6 +2,7 @@ import { ChangeEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { TourFormValues } from '../schema';
+import { Phone } from 'lucide-react';
 
 type PhoneSectionProps = {
     variant?: 'create' | 'edit';
@@ -32,14 +33,19 @@ export const PhoneSection = ({
 
     return (
         <section className="space-y-6">
-            <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                <p className="text-sm text-foreground/60">{description}</p>
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-sky-500/10 border border-teal-500/20">
+                <div className="p-2 rounded-lg bg-teal-500/20">
+                    <Phone className="w-5 h-5 text-teal-400" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                    <p className="text-sm text-foreground/60">{description}</p>
+                </div>
             </div>
 
-            <div>
+            <div className="max-w-md">
                 <FormInput
-                    labelText="Телефон"
+                    labelText="Номер телефону клієнта"
                     placeholder="напр. +380 (50) 000-0000"
                     type="tel"
                     autoComplete="off"

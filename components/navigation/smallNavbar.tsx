@@ -3,6 +3,7 @@ import { useSession, signOut } from "next-auth/react";
 import React from "react";
 import { NavLink } from "./nav-link";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import NotificationBell from "./NotificationBell";
 
 export default function SmallNavbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -14,7 +15,10 @@ export default function SmallNavbar() {
     }
 
     return (
-        <div className="sm:hidden flex items-center">
+        <div className="sm:hidden flex items-center gap-2">
+            {/* Notification bell for mobile - visible outside menu */}
+            {session && userProfile && <NotificationBell />}
+
             <button onClick={toggleMobileMenu} className="z-50 text-white">
                 {isMobileMenuOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
             </button>

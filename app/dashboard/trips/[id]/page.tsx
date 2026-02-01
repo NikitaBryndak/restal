@@ -1,13 +1,30 @@
-import { Clock, Calendar, MapPin, User, FileText, CreditCard, Plane, Hotel, Shield, Car, Download } from 'lucide-react';
+import { Clock, Calendar, MapPin, User, FileText, CreditCard, Plane, Hotel, Shield, Car, Download, Phone, UserCircle } from 'lucide-react';
 import Image from 'next/image';
-import { Trip } from '@/types';
+import { Trip, TOUR_STATUS_LABELS, TourStatus, DOCUMENT_LABELS, Documents } from '@/types';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
+import UserModel from "@/models/user";
 import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 
-async function getTripData(id: string): Promise<Trip | null> {
+// Status color mapping
+const statusColors: Record<TourStatus, string> = {
+    "In Booking": "bg-yellow-500/20 text-yellow-300 border-yellow-400/40",
+    "Booked": "bg-blue-500/20 text-blue-300 border-blue-400/40",
+    "Paid": "bg-emerald-500/20 text-emerald-300 border-emerald-400/40",
+    "In Progress": "bg-purple-500/20 text-purple-300 border-purple-400/40",
+    "Completed": "bg-green-500/20 text-green-300 border-green-400/40",
+    "Archived": "bg-gray-500/20 text-gray-300 border-gray-400/40",
+};
+
+// Type for enriched trip with manager/client names
+type EnrichedTrip = Trip & {
+    managerName?: string;
+    clientName?: string;
+};
+
+async function getTripData(id: string): Promise<EnrichedTrip | null> {
     try {
         const session = await getServerSession(authOptions);
 
@@ -36,7 +53,21 @@ async function getTripData(id: string): Promise<Trip | null> {
             return null;
         }
 
-        return JSON.parse(JSON.stringify(trip));
+        // Fetch manager and client names securely (only after access check passes)
+        let managerName = '';
+        let clientName = '';
+
+        if (trip.managerPhone) {
+            const manager = await UserModel.findOne({ phoneNumber: trip.managerPhone }).select('name').lean();
+            managerName = (manager as { name?: string })?.name || '';
+        }
+
+        if (trip.ownerPhone) {
+            const client = await UserModel.findOne({ phoneNumber: trip.ownerPhone }).select('name').lean();
+            clientName = (client as { name?: string })?.name || '';
+        }
+
+        return JSON.parse(JSON.stringify({ ...trip, managerName, clientName }));
     } catch (error) {
         console.error('Error fetching trip:', error);
         return null;
@@ -63,32 +94,39 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
     const toPay = totalAmount - paidAmount;
     const cashback = totalAmount * CASHBACK_RATE;
 
-    const documentArray = Object.entries(trip.documents).map(([name, doc]) => ({
-        name: name.replace(/([A-Z])/g, ' $1').trim(),
-        ...doc
-    }));
+    const status = (trip.status || 'In Booking') as TourStatus;
+
+    // Group documents
+    const mainDocKeys: (keyof Documents)[] = ['contract', 'invoice', 'confirmation', 'voucher', 'insurancePolicy', 'tourProgram', 'memo'];
+    const departureTicketKeys: (keyof Documents)[] = ['departureTicket1', 'departureTicket2', 'departureTicket3', 'departureTicket4'];
+    const arrivalTicketKeys: (keyof Documents)[] = ['arrivalTicket1', 'arrivalTicket2', 'arrivalTicket3', 'arrivalTicket4'];
+
+    const docs = trip.documents as Documents;
 
     return (
         <div className="min-h-screen p-6">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
-                <div className="relative h-64 rounded-2xl overflow-hidden">
+                <div className="relative h-72 rounded-2xl overflow-hidden">
                     <Image
                         src={`/countryImages/${trip.country}.jpg`}
                         alt={trip.country}
                         fill
                         className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-8">
-                        <div className="flex items-end justify-between">
+                        <div className="flex items-end justify-between gap-4">
                             <div>
+                                <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border mb-3 ${statusColors[status]}`}>
+                                    {TOUR_STATUS_LABELS[status]}
+                                </div>
                                 <h1 className="text-5xl font-bold text-white mb-2">{trip.country}</h1>
                                 <p className="text-white/80 text-lg">Тур #{trip.number}</p>
                             </div>
-                            <div className="bg-white/20 backdrop-blur-md rounded-xl px-6 py-3 border border-white/30">
-                                <p className="text-sm text-white/70">Заброньовано</p>
-                                <p className="text-xl font-bold text-white">{trip.bookingDate}</p>
+                            <div className="bg-white/20 backdrop-blur-md rounded-xl px-4 py-2 border border-white/30">
+                                <p className="text-xs text-white/70">Заброньовано</p>
+                                <p className="text-lg font-bold text-white">{trip.bookingDate}</p>
                             </div>
                         </div>
                     </div>
@@ -320,26 +358,87 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                 <FileText className="w-5 h-5 text-blue-400" />
                                 Документи
                             </h2>
-                            <div className="grid grid-cols-2 gap-3">
-                                {documentArray.map((doc, index) => (
-                                    <a
-                                        key={index}
-                                        href={doc.uploaded ? doc.url : '#'}
-                                        className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${
-                                            doc.uploaded
-                                                ? 'bg-blue-500/10 border-blue-400/30 hover:bg-blue-500/20 cursor-pointer'
-                                                : 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
-                                        }`}
-                                        target={doc.uploaded ? '_blank' : undefined}
-                                        rel={doc.uploaded ? 'noopener noreferrer' : undefined}
-                                    >
-                                        <Download className="w-5 h-5 text-white/70 mb-2" />
-                                        <span className="text-xs text-center text-white/90 capitalize">{doc.name}</span>
-                                        {doc.uploaded && (
-                                            <span className="text-[10px] text-emerald-300 mt-1">Доступно</span>
-                                        )}
-                                    </a>
-                                ))}
+
+                            {/* Main Documents */}
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                {mainDocKeys.map((key) => {
+                                    const doc = docs[key];
+                                    return (
+                                        <a
+                                            key={key}
+                                            href={doc?.uploaded ? doc.url : '#'}
+                                            className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${
+                                                doc?.uploaded
+                                                    ? 'bg-blue-500/10 border-blue-400/30 hover:bg-blue-500/20 cursor-pointer'
+                                                    : 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
+                                            }`}
+                                            target={doc?.uploaded ? '_blank' : undefined}
+                                            rel={doc?.uploaded ? 'noopener noreferrer' : undefined}
+                                        >
+                                            <Download className="w-5 h-5 text-white/70 mb-2" />
+                                            <span className="text-xs text-center text-white/90">{DOCUMENT_LABELS[key]}</span>
+                                            {doc?.uploaded && (
+                                                <span className="text-[10px] text-emerald-300 mt-1">Доступно</span>
+                                            )}
+                                        </a>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Tickets Section */}
+                            <div className="border-t border-white/10 pt-4">
+                                <h3 className="text-sm font-semibold text-white/70 mb-3 flex items-center gap-2">
+                                    <Plane className="w-4 h-4" />
+                                    Авіаквитки
+                                </h3>
+
+                                {/* Departure Tickets */}
+                                <p className="text-xs text-white/50 mb-2">Квитки на виліт</p>
+                                <div className="grid grid-cols-4 gap-2 mb-4">
+                                    {departureTicketKeys.map((key, index) => {
+                                        const doc = docs[key];
+                                        return (
+                                            <a
+                                                key={key}
+                                                href={doc?.uploaded ? doc.url : '#'}
+                                                className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
+                                                    doc?.uploaded
+                                                        ? 'bg-blue-500/10 border-blue-400/30 hover:bg-blue-500/20 cursor-pointer'
+                                                        : 'bg-white/5 border-white/10 opacity-40 cursor-not-allowed'
+                                                }`}
+                                                target={doc?.uploaded ? '_blank' : undefined}
+                                                rel={doc?.uploaded ? 'noopener noreferrer' : undefined}
+                                            >
+                                                <Download className="w-3 h-3 text-white/70" />
+                                                <span className="text-[10px] text-white/70 mt-1">#{index + 1}</span>
+                                            </a>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Arrival Tickets */}
+                                <p className="text-xs text-white/50 mb-2">Квитки на повернення</p>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {arrivalTicketKeys.map((key, index) => {
+                                        const doc = docs[key];
+                                        return (
+                                            <a
+                                                key={key}
+                                                href={doc?.uploaded ? doc.url : '#'}
+                                                className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
+                                                    doc?.uploaded
+                                                        ? 'bg-purple-500/10 border-purple-400/30 hover:bg-purple-500/20 cursor-pointer'
+                                                        : 'bg-white/5 border-white/10 opacity-40 cursor-not-allowed'
+                                                }`}
+                                                target={doc?.uploaded ? '_blank' : undefined}
+                                                rel={doc?.uploaded ? 'noopener noreferrer' : undefined}
+                                            >
+                                                <Download className="w-3 h-3 text-white/70" />
+                                                <span className="text-[10px] text-white/70 mt-1">#{index + 1}</span>
+                                            </a>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
 
@@ -349,15 +448,43 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
                                 <MapPin className="w-5 h-5 text-red-400" />
                                 Деталі туру
                             </h2>
-                            <div className="space-y-3 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-white/60">Телефон власника:</span>
-                                    <span className="text-white font-medium">{trip.ownerPhone}</span>
+
+                            {/* Manager Contact */}
+                            <div className="mb-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-400/30">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                                        <UserCircle className="w-5 h-5 text-cyan-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs uppercase tracking-wider text-cyan-300">Менеджер</p>
+                                        <p className="text-lg font-semibold text-white">{trip.managerName || '—'}</p>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-white/60">Телефон менеджера:</span>
-                                    <span className="text-white font-medium">{trip.managerPhone}</span>
+                                <a href={`tel:${trip.managerPhone}`} className="flex items-center gap-2 text-cyan-300 hover:text-cyan-200 transition-colors">
+                                    <Phone className="w-4 h-4" />
+                                    <span>{trip.managerPhone || '—'}</span>
+                                </a>
+                            </div>
+
+                            {/* Client Contact */}
+                            <div className="mb-4 p-4 rounded-xl bg-pink-500/10 border border-pink-400/30">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
+                                        <User className="w-5 h-5 text-pink-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs uppercase tracking-wider text-pink-300">Клієнт</p>
+                                        <p className="text-lg font-semibold text-white">{trip.clientName || '—'}</p>
+                                    </div>
                                 </div>
+                                <a href={`tel:${trip.ownerPhone}`} className="flex items-center gap-2 text-pink-300 hover:text-pink-200 transition-colors">
+                                    <Phone className="w-4 h-4" />
+                                    <span>{trip.ownerPhone || '—'}</span>
+                                </a>
+                            </div>
+
+                            {/* Other Details */}
+                            <div className="space-y-3 text-sm border-t border-white/10 pt-4">
                                 {trip.createdAt && (
                                     <div className="flex justify-between">
                                         <span className="text-white/60">Створено:</span>

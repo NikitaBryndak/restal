@@ -1,8 +1,18 @@
 import { Clock, Download } from 'lucide-react';
 import Image from 'next/image';
-import { Trip } from '@/types';
+import { Trip, TOUR_STATUS_LABELS, TourStatus } from '@/types';
 import { cn } from '@/lib/utils';
 import { CASHBACK_RATE } from '@/config/constants';
+
+// Status color mapping
+const statusColors: Record<TourStatus, string> = {
+    "In Booking": "bg-yellow-500/20 text-yellow-300 border-yellow-400/40",
+    "Booked": "bg-blue-500/20 text-blue-300 border-blue-400/40",
+    "Paid": "bg-emerald-500/20 text-emerald-300 border-emerald-400/40",
+    "In Progress": "bg-purple-500/20 text-purple-300 border-purple-400/40",
+    "Completed": "bg-green-500/20 text-green-300 border-green-400/40",
+    "Archived": "bg-gray-500/20 text-gray-300 border-gray-400/40",
+};
 
 export default function TripCard({ data }: { data: Trip }) {
     const totalAmount = data.payment?.totalAmount ?? 0;
@@ -23,26 +33,16 @@ export default function TripCard({ data }: { data: Trip }) {
 
     const rootClass = `w-full h-[900px] md:h-84 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
 
-    const documentArray = Array.isArray(data.documents) ? data.documents : Object.values(data.documents ?? {});
+    // Get main documents (non-ticket) count
+    const mainDocKeys = ['contract', 'invoice', 'confirmation', 'voucher', 'insurancePolicy', 'tourProgram', 'memo'];
+    const ticketKeys = ['departureTicket1', 'departureTicket2', 'departureTicket3', 'departureTicket4', 'arrivalTicket1', 'arrivalTicket2', 'arrivalTicket3', 'arrivalTicket4'];
 
-    const documentAbbreviations: string[] = [
-        "ДОГ", // договір
-        "ПТВ", // підтвердження
-        "ВАУ", // ваучер
-        "АВК", // авіаквитки
-        "СТП", // страховий поліс
-        "МКВ", // маршрутна квитанція
-        "ТРЛ", // трансферний лист
-        "ПТА", // посадковий талон
-        "ПТУ"  // програма туру
-        ];
-    const documentDownloadSection = (documentArray as any[]).map((doc: any, index: number) => (
-        <div className={cn('flex flex-col justify-center items-center m-0.5', doc?.uploaded ? 'opacity-100' : 'opacity-50')} key={index}>
-            <Download className="w-4 h-4 text-white/70" />
-            <span className='text-[10px] text-white/90 text-center'>{doc?.name ?? documentAbbreviations[index]}</span>
-        </div>
-    ));
+    const docs = data.documents as Record<string, { uploaded?: boolean; url?: string }> || {};
 
+    const uploadedMainDocs = mainDocKeys.filter(key => docs[key]?.uploaded).length;
+    const uploadedTickets = ticketKeys.filter(key => docs[key]?.uploaded).length;
+
+    const status = (data.status || 'In Booking') as TourStatus;
 
     return (
     <div className={rootClass}>
@@ -61,7 +61,10 @@ export default function TripCard({ data }: { data: Trip }) {
             <div className="absolute inset-0 flex flex-col md:flex-[0_70%_0] md:flex-row md:items-stretch">
                 {/* Left Side - Photo and Country Name (30%) */}
                 <div className="flex-[0_0_30%] flex flex-col justify-center items-center p-6">
-                    <div className="h-5"></div>
+                    {/* Status Badge */}
+                    <div className={cn("px-3 py-1 rounded-full text-xs font-semibold border mb-3", statusColors[status])}>
+                        {TOUR_STATUS_LABELS[status]}
+                    </div>
                     <div className="bg-white/20 backdrop-blur-md rounded-lg p-4 text-center">
                         <h2 className="text-4xl font-bold text-white drop-shadow-lg">
                             {data.country}
@@ -181,10 +184,27 @@ export default function TripCard({ data }: { data: Trip }) {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-[20%] flex-col gap-3">
+                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-[20%] flex-col gap-2">
                             <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center">Документи</p>
-                            <div className='flex flex-row justify-around w-full'>
-                                {documentDownloadSection}
+                            <div className='flex flex-row justify-around items-center gap-2'>
+                                <div className="flex flex-col items-center">
+                                    <div className={cn(
+                                        "flex items-center justify-center w-8 h-8 rounded-full",
+                                        uploadedMainDocs > 0 ? "bg-emerald-500/20 border border-emerald-400/40" : "bg-white/10 border border-white/20"
+                                    )}>
+                                        <Download className={cn("w-4 h-4", uploadedMainDocs > 0 ? "text-emerald-300" : "text-white/40")} />
+                                    </div>
+                                    <span className="text-[9px] text-white/70 mt-1">{uploadedMainDocs}/7</span>
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <div className={cn(
+                                        "flex items-center justify-center w-8 h-8 rounded-full",
+                                        uploadedTickets > 0 ? "bg-blue-500/20 border border-blue-400/40" : "bg-white/10 border border-white/20"
+                                    )}>
+                                        <span className="text-xs">✈️</span>
+                                    </div>
+                                    <span className="text-[9px] text-white/70 mt-1">{uploadedTickets}/8</span>
+                                </div>
                             </div>
                         </div>
 

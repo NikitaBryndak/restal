@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://restall.com"; // Update with your actual domain
+  const baseUrl = "https://restal.in.ua"; // Update with your actual domain
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

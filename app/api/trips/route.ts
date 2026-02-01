@@ -42,11 +42,42 @@ export async function POST(request: Request) {
 
         await connectToDatabase();
 
+        // Calculate cashback amount (will be processed one day after tour ends)
         const cashbackAmount = body.payment.totalAmount * CASHBACK_RATE;
+
+        // Get current manager's name
+        const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
+
+        // Auto-fill flight dates from tour dates and return country from tour country
+        const flightInfo = body.flightInfo || {};
+        if (body.tripStartDate) {
+            flightInfo.departure = {
+                ...flightInfo.departure,
+                date: body.tripStartDate,
+            };
+        }
+        if (body.tripEndDate) {
+            flightInfo.arrival = {
+                ...flightInfo.arrival,
+                date: body.tripEndDate,
+            };
+        }
+        if (body.country) {
+            flightInfo.arrival = {
+                ...flightInfo.arrival,
+                country: body.country,
+            };
+        }
 
         const payload = {
             ...body,
+            flightInfo,
             managerPhone: session.user.phoneNumber,
+            managerName: currentManager?.name || '',
+            status: 'In Booking',
+            // Store cashback amount for later processing (one day after tour ends)
+            cashbackAmount: cashbackAmount,
+            cashbackProcessed: false,
         };
 
         const newTrip = new Trip({
@@ -54,12 +85,9 @@ export async function POST(request: Request) {
         });
         await newTrip.save();
 
-        // Update user's cashback directly
-        const user = await User.findOne({ phoneNumber: body.ownerPhone });
-        if (user) {
-            user.cashbackAmount = (user.cashbackAmount || 0) + cashbackAmount;
-            await user.save();
-        }
+        // NOTE: Cashback is now added one day after the tour ends (tripEndDate)
+        // This is handled by the /api/cron/process-cashback endpoint
+        // which should be called daily by a cron job or scheduled task
 
         return NextResponse.json({ trip: newTrip }, { status: 201 });
     } catch {

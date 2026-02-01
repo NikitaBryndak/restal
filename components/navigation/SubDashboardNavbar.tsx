@@ -49,16 +49,22 @@ export default function SubDashboardNavbar() {
                             Профіль
                         </NavLink>
                     </li>
+                    <li>
+                        <NavLink href="/cashback" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
+                            Бонуси
+                        </NavLink>
+                    </li>
+                    <li>
+                        <div className="mt-auto pt-4 border-t border-gray-700">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-left text-base text-red-400 hover:text-red-300 transition-colors py-2 px-3 rounded hover:bg-red-900/20"
+                            >
+                                Вийти
+                            </button>
+                        </div>
+                    </li>
                 </ul>
-
-                <div className="mt-auto pt-4 border-t border-gray-700">
-                    <button
-                        onClick={handleLogout}
-                        className="w-full text-left text-base text-red-400 hover:text-red-300 transition-colors py-2 px-3 rounded hover:bg-red-900/20"
-                    >
-                        Вийти
-                    </button>
-                </div>
             </div>
         </nav>
     )

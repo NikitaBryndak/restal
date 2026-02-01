@@ -3,7 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
+import User from "@/models/user";
+import Notification from "@/models/notification";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { DOCUMENT_LABELS, TOUR_STATUS_LABELS, TourStatus } from "@/types";
 import mongoose from "mongoose";
 
 const buildQuery = (rawId: string) => {
@@ -24,6 +27,31 @@ const buildQuery = (rawId: string) => {
     return { number: identifier };
 };
 
+// Helper to create notification
+async function createNotification(
+    userPhone: string,
+    tripId: string,
+    tripNumber: string,
+    type: 'document_upload' | 'status_change',
+    message: string,
+    data?: { documentKey?: string; oldStatus?: string; newStatus?: string }
+) {
+    try {
+        const notification = new Notification({
+            userPhone,
+            tripId,
+            tripNumber,
+            type,
+            message,
+            data,
+            read: false,
+        });
+        await notification.save();
+    } catch (error) {
+        console.error('Failed to create notification:', error);
+    }
+}
+
 export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
@@ -39,13 +67,22 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
         await connectToDatabase();
 
         const { id } = await context.params;
-        const trip = await Trip.findOne(buildQuery(id)).lean();
+        const trip = await Trip.findOne(buildQuery(id)).lean() as any;
 
         if (!trip) {
             return NextResponse.json({ message: "Trip not found" }, { status: 404 });
         }
 
-        return NextResponse.json({ trip }, { status: 200 });
+        // Get manager name from User model if managerPhone exists
+        let managerName = '';
+        if (trip.managerPhone) {
+            const manager = await User.findOne({ phoneNumber: trip.managerPhone }).lean() as any;
+            if (manager) {
+                managerName = manager.name || '';
+            }
+        }
+
+        return NextResponse.json({ trip: { ...trip, managerName } }, { status: 200 });
     } catch {
         return NextResponse.json({ message: "Unable to fetch trip" }, { status: 500 });
     }
@@ -67,19 +104,91 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
         await connectToDatabase();
 
-    const { id } = await context.params;
-    const query = buildQuery(id);
+        const { id } = await context.params;
+        const query = buildQuery(id);
 
-        // Remove immutable fields but preserve managerPhone (set during creation only).
-        const { _id, createdAt, updatedAt, number, managerPhone, ...rest } = updates ?? {};
+        // Get the existing trip to compare for notifications
+        const existingTrip = await Trip.findOne(query).lean() as any;
+
+        if (!existingTrip) {
+            return NextResponse.json({ message: "Trip not found" }, { status: 404 });
+        }
+
+        // Remove immutable fields but allow number to be updated, update managerPhone to current manager
+        const { _id, createdAt, updatedAt, managerName, ...rest } = updates ?? {};
+
+        // Get current manager's name
+        const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
+
         const payload = {
             ...rest,
+            managerPhone: session.user.phoneNumber, // Update to current manager
+            managerName: currentManager?.name || '',
         };
+
+        // Auto-fill flight dates and return country based on tour dates and country
+        if (payload.flightInfo) {
+            if (payload.tripStartDate) {
+                payload.flightInfo.departure = {
+                    ...payload.flightInfo.departure,
+                    date: payload.tripStartDate,
+                };
+            }
+            if (payload.tripEndDate) {
+                payload.flightInfo.arrival = {
+                    ...payload.flightInfo.arrival,
+                    date: payload.tripEndDate,
+                };
+            }
+            if (payload.country) {
+                payload.flightInfo.arrival = {
+                    ...payload.flightInfo.arrival,
+                    country: payload.country,
+                };
+            }
+        }
 
         const updatedTrip = await Trip.findOneAndUpdate(query, payload, { new: true, runValidators: true });
 
         if (!updatedTrip) {
             return NextResponse.json({ message: "Trip not found" }, { status: 404 });
+        }
+
+        // Create notifications for status change
+        if (existingTrip.status !== updates.status && updates.status) {
+            const oldStatusLabel = TOUR_STATUS_LABELS[existingTrip.status as TourStatus] || existingTrip.status;
+            const newStatusLabel = TOUR_STATUS_LABELS[updates.status as TourStatus] || updates.status;
+
+            await createNotification(
+                existingTrip.ownerPhone,
+                existingTrip._id.toString(),
+                existingTrip.number,
+                'status_change',
+                `Статус туру #${existingTrip.number} змінено з "${oldStatusLabel}" на "${newStatusLabel}"`,
+                { oldStatus: existingTrip.status, newStatus: updates.status }
+            );
+        }
+
+        // Create notifications for new document uploads
+        if (updates.documents) {
+            const documentKeys = Object.keys(updates.documents) as (keyof typeof DOCUMENT_LABELS)[];
+            for (const key of documentKeys) {
+                const existingDoc = (existingTrip.documents as any)?.[key];
+                const newDoc = updates.documents[key];
+
+                // Check if document was just uploaded (url changed and now has uploaded=true)
+                if (newDoc?.uploaded && newDoc?.url && (!existingDoc?.url || existingDoc.url !== newDoc.url)) {
+                    const docLabel = DOCUMENT_LABELS[key] || key;
+                    await createNotification(
+                        existingTrip.ownerPhone,
+                        existingTrip._id.toString(),
+                        existingTrip.number,
+                        'document_upload',
+                        `Новий документ "${docLabel}" завантажено для туру #${existingTrip.number}`,
+                        { documentKey: key }
+                    );
+                }
+            }
         }
 
         return NextResponse.json({ trip: updatedTrip }, { status: 200 });

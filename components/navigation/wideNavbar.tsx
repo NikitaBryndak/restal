@@ -1,6 +1,7 @@
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { NavLink } from "./nav-link";
 import { useSession } from "next-auth/react";
+import NotificationBell from "./NotificationBell";
 
 export default function WideNavbar() {
     const { data: session } = useSession();
@@ -28,9 +29,12 @@ export default function WideNavbar() {
                     Менеджери
                 </NavLink>
             </li>
-            <li>
+            <li className="flex items-center gap-4">
                 {session && userProfile && (
-                    <NavLink href="/cashback" className="bg-accent p-1 rounded-md mr-2 hover:text-black hover:bg-white">{(userProfile?.cashbackAmount ?? 0).toFixed(2)}₴</NavLink>
+                    <>
+                        <NotificationBell />
+                        <NavLink href="/cashback" className="bg-accent p-1 rounded-md hover:text-black hover:bg-white">{(userProfile?.cashbackAmount ?? 0).toFixed(2)}₴</NavLink>
+                    </>
                 )}
                 <NavLink href="/login" variant="button">
                     {session ? "Кабінет" : "Стати клієнтом"}

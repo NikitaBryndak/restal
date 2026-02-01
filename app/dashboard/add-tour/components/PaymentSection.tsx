@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { Payment } from '@/types';
 import { TourFormValues } from '../schema';
+import { CreditCard } from 'lucide-react';
 
 type PaymentField = keyof Payment;
 
@@ -46,9 +47,14 @@ export const PaymentSection = ({
 
     return (
         <section className="space-y-6">
-            <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                <p className="text-sm text-foreground/60">{description}</p>
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-teal-500/10 border border-emerald-500/20">
+                <div className="p-2 rounded-lg bg-emerald-500/20">
+                    <CreditCard className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                    <p className="text-sm text-foreground/60">{description}</p>
+                </div>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {paymentConfig.map(({ field, label, placeholder, name, type, formatType }) => (

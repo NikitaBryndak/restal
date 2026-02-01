@@ -2,6 +2,7 @@ import { ChangeEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/ui/form-input';
 import { TourFormValues } from '../schema';
+import { Globe } from 'lucide-react';
 
 export type BasicDetailsField = 'number' | 'country' | 'region' | 'hotelNights' | 'tripStartDate' | 'tripEndDate' | 'food';
 
@@ -75,9 +76,14 @@ export const BasicDetailsSection = ({
 
     return (
         <section className="space-y-6">
-            <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                <p className="text-sm text-foreground/60">{description}</p>
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-teal-500/10 border border-blue-500/20">
+                <div className="p-2 rounded-lg bg-blue-500/20">
+                    <Globe className="w-5 h-5 text-blue-400" />
+                </div>
+                <div className="space-y-1">
+                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                    <p className="text-sm text-foreground/60">{description}</p>
+                </div>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {primaryFields

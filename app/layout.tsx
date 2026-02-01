@@ -6,32 +6,26 @@ import { Spotlight } from "@/components/ui/spotlight-new";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://restall.com"), // Update with your actual domain
+  metadataBase: new URL("https://restal.in.ua"), // Update with your actual domain
   title: {
     default: "RestAll",
     template: "%s | RestAll",
   },
   description:
-    "RestAll - Your ultimate travel companion. Discover amazing tours, packages, and travel experiences.",
+    "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
   keywords: [
-    "travel",
-    "tours",
-    "vacation",
-    "packages",
-    "trips",
-    "travel companion",
-    "holiday",
+    "Надійність", "безпека", "експертність"
   ],
   authors: [{ name: "RestAll" }],
   creator: "RestAll",
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: "https://restall.com",
+    locale: "uk_UA",
+    url: "https://restal.in.ua",
     siteName: "RestAll",
-    title: "RestAll - Your Travel Companion",
+    title: "Турагенція RestAL — Експертне планування вашого відпочинку",
     description:
-      "Discover amazing tours, packages, and travel experiences with RestAll.",
+      "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
     images: [
       {
         url: "/logo.png",
@@ -43,9 +37,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RestAll - Your Travel Companion",
+    title: "Турагенція RestAL — Експертне планування вашого відпочинку",
     description:
-      "Discover amazing tours, packages, and travel experiences with RestAll.",
+      "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
     images: ["/logo.png"],
   },
   robots: {
@@ -75,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="uk">
       <body
         className="flex antialiased min-h-screen flex-col w-full smooth-scroll"
         suppressHydrationWarning={true} // Suppresses hydration warnings

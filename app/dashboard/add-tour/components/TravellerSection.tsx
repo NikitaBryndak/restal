@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import FormInput from '@/components/ui/form-input';
 import { TourFormValues } from '../schema';
 import { Tourist } from '@/types';
+import { Users, UserPlus } from 'lucide-react';
 
 type TravellerSectionProps = {
     variant?: 'create' | 'edit';
@@ -41,11 +42,16 @@ const TravellerSectionCreate = ({
     return (
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h2 className="text-2xl font-semibold text-foreground">Подорожуючі</h2>
-                    <p className="text-sm text-foreground/60">Дані основного подорожуючого — мінімум імʼя та термін дії паспорта.</p>
+                <div className="flex items-start gap-4 flex-1 p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 border border-rose-500/20">
+                    <div className="p-2 rounded-lg bg-rose-500/20">
+                        <Users className="w-5 h-5 text-rose-400" />
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-lg font-semibold text-foreground">Подорожуючі</h2>
+                        <p className="text-sm text-foreground/60">Дані основного подорожуючого — мінімум імʼя та термін дії паспорта.</p>
+                    </div>
                 </div>
-                <Button type="button" variant="outline" onClick={() => append({
+                <Button type="button" variant="outline" className="flex items-center gap-2" onClick={() => append({
                     firstName: '',
                     lastName: '',
                     sex: 'unspecified',
@@ -55,6 +61,7 @@ const TravellerSectionCreate = ({
                     passportSeries: '',
                     passportIssueDate: '',
                 })}>
+                    <UserPlus className="w-4 h-4" />
                     Додати подорожуючого
                 </Button>
             </div>
@@ -172,19 +179,25 @@ const TravellerSectionEdit = ({
     return (
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h2 className="text-2xl font-semibold text-foreground">Подорожуючі</h2>
-                    <p className="text-sm text-foreground/60">Редагуйте дані подорожуючих або додайте нових учасників.</p>
+                <div className="flex items-start gap-4 flex-1 p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 border border-rose-500/20">
+                    <div className="p-2 rounded-lg bg-rose-500/20">
+                        <Users className="w-5 h-5 text-rose-400" />
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-lg font-semibold text-foreground">Подорожуючі</h2>
+                        <p className="text-sm text-foreground/60">Редагуйте дані подорожуючих або додайте нових учасників.</p>
+                    </div>
                 </div>
                 {onAdd && (
-                    <Button type="button" variant="outline" onClick={onAdd}>
+                    <Button type="button" variant="outline" className="flex items-center gap-2" onClick={onAdd}>
+                        <UserPlus className="w-4 h-4" />
                         Додати подорожуючого
                     </Button>
                 )}
             </div>
             <div className="mt-6 grid gap-6">
                 {tourists?.map((tourist, index) => (
-                    <div key={index} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
+                    <div key={index} className="rounded-2xl border border-border/40 bg-gradient-to-br from-white/70 to-white/50 p-4 dark:from-white/10 dark:to-white/5 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
                             <h3 className="text-lg font-semibold text-foreground">Подорожуючий #{index + 1}</h3>
                             {tourists.length > 1 && onRemove && (

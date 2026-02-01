@@ -1,24 +1,148 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { Gift, Percent, Star, Users, Copy, Check } from 'lucide-react';
+import { Gift, Percent, Star, Users, Copy, Check, LogIn } from 'lucide-react';
+import { LoaderOne } from '@/components/ui/loader';
+import Link from 'next/link';
+
+interface UserCashbackData {
+    cashbackAmount: number;
+    phoneNumber: string;
+    userName: string;
+}
+
+interface TripCashbackInfo {
+    tripNumber: string;
+    country: string;
+    totalAmount: number;
+    cashbackAmount: number;
+    status: string;
+    completedAt?: string;
+}
 
 export default function CashbackPage() {
+    const { data: session, status: sessionStatus } = useSession();
     const [selectedTab, setSelectedTab] = useState<'bonuses' | 'overview' | 'claim'>('bonuses');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [copiedReferral, setCopiedReferral] = useState(false);
+    const [userData, setUserData] = useState<UserCashbackData | null>(null);
+    const [tripHistory, setTripHistory] = useState<TripCashbackInfo[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const cashbackBalance = 1450;
-    const totalEarned = 8920;
-    const bookingsCount = 12;
-    const referralCode = "RESTAL-USER123";
+    // Generate referral code from phone number
+    const referralCode = userData?.phoneNumber
+        ? `RESTAL-${userData.phoneNumber.slice(-6).toUpperCase()}`
+        : "RESTAL-XXXXXX";
+
+    useEffect(() => {
+        const fetchCashbackData = async () => {
+            if (sessionStatus === 'loading') return;
+
+            if (!session?.user?.phoneNumber) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                // Fetch user profile data
+                const profileResponse = await fetch('/api/profileFetch');
+                if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    setUserData({
+                        cashbackAmount: profileData.cashbackAmount || 0,
+                        phoneNumber: profileData.phoneNumber || '',
+                        userName: profileData.userName || ''
+                    });
+                }
+
+                // Fetch completed trips for cashback history
+                const tripsResponse = await fetch('/api/trips?status=Completed');
+                if (tripsResponse.ok) {
+                    const tripsData = await tripsResponse.json();
+                    const completedTrips = tripsData.trips?.filter((t: { cashbackProcessed?: boolean }) => t.cashbackProcessed) || [];
+                    setTripHistory(completedTrips.map((trip: { number: string; country: string; payment?: { totalAmount?: number }; cashbackAmount?: number; status: string; updatedAt?: string }) => ({
+                        tripNumber: trip.number,
+                        country: trip.country,
+                        totalAmount: trip.payment?.totalAmount || 0,
+                        cashbackAmount: trip.cashbackAmount || 0,
+                        status: trip.status,
+                        completedAt: trip.updatedAt
+                    })));
+                }
+            } catch (error) {
+                console.error('Error fetching cashback data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCashbackData();
+    }, [session, sessionStatus]);
+
+    const cashbackBalance = userData?.cashbackAmount || 0;
+    const totalEarned = tripHistory.reduce((sum, trip) => sum + trip.cashbackAmount, 0) + 1000; // +1000 welcome bonus
+    const bookingsCount = tripHistory.length;
 
     const copyReferralCode = () => {
         navigator.clipboard.writeText(referralCode);
         setCopiedReferral(true);
         setTimeout(() => setCopiedReferral(false), 2000);
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <LoaderOne />
+            </div>
+        );
+    }
+
+    // Show login prompt for unauthenticated users
+    if (!session?.user) {
+        return (
+            <div className="min-h-screen px-4 py-12 md:py-20">
+                <div className="max-w-6xl mx-auto">
+                    {/* Header */}
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-5xl font-light mb-4">Бонусна програма</h1>
+                        <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+                            Отримуйте бонуси за кожне бронювання та використовуйте їх для знижок на майбутні подорожі
+                        </p>
+                    </div>
+
+                    {/* Login Prompt */}
+                    <div className="max-w-md mx-auto text-center">
+                        <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-transparent border border-accent/20 rounded-2xl p-8 md:p-12 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -mr-32 -mt-32" />
+                            <div className="relative z-10">
+                                <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <LogIn className="w-10 h-10 text-accent" />
+                                </div>
+                                <h2 className="text-2xl font-semibold mb-4">Увійдіть в акаунт</h2>
+                                <p className="text-foreground/70 mb-6">
+                                    Щоб переглянути свій баланс бонусів та історію кешбеку, увійдіть у свій обліковий запис.
+                                </p>
+                                <div className="flex flex-col gap-3">
+                                    <Link href="/login">
+                                        <Button className="w-full bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl h-12">
+                                            Увійти
+                                        </Button>
+                                    </Link>
+                                    <Link href="/register">
+                                        <Button variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/10 rounded-xl h-12">
+                                            Зареєструватися
+                                        </Button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen px-4 py-12 md:py-20">

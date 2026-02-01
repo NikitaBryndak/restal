@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FormInput from '@/components/ui/form-input';
 import { Label } from '@/components/ui/label';
-import { Trip, Documents, Tourist, FlightInfo, Hotel, Payment, Addons, DEFAULT_DOCUMENTS, DOCUMENT_KEYS, DOCUMENT_LABELS } from '@/types';
+import { Trip, Documents, Tourist, FlightInfo, Hotel, Payment, Addons, DEFAULT_DOCUMENTS, DOCUMENT_KEYS, DOCUMENT_LABELS, TourStatus, TOUR_STATUSES, TOUR_STATUS_LABELS } from '@/types';
 import { validateDate } from '@/lib/utils';
 import {
     BasicDetailsSection,
@@ -30,6 +30,8 @@ type EditableTrip = Omit<Trip, 'tourists' | 'documents'> & {
     documents: Documents;
     managerEmail?: string;
     region?: string;
+    status: TourStatus;
+    managerName?: string;
 };
 
 type RawTrip = EditableTrip & {
@@ -84,24 +86,25 @@ const normalizeTrip = (raw: any): RawTrip => {
 
     return {
         _id: raw?._id ?? undefined,
-        number: raw?.number ?? 0,
+        number: raw?.number ?? '',
         bookingDate: raw?.bookingDate ?? '',
         tripStartDate: raw?.tripStartDate ?? '',
         tripEndDate: raw?.tripEndDate ?? '',
         country: raw?.country ?? '',
+        status: raw?.status ?? 'In Booking',
         flightInfo: {
             departure: {
                 airportCode: raw?.flightInfo?.departure?.airportCode ?? '',
                 country: raw?.flightInfo?.departure?.country ?? '',
                 flightNumber: raw?.flightInfo?.departure?.flightNumber ?? '',
-                date: raw?.flightInfo?.departure?.date ?? '',
+                date: raw?.flightInfo?.departure?.date ?? raw?.tripStartDate ?? '',
                 time: raw?.flightInfo?.departure?.time ?? '',
             },
             arrival: {
                 airportCode: raw?.flightInfo?.arrival?.airportCode ?? '',
-                country: raw?.flightInfo?.arrival?.country ?? '',
+                country: raw?.flightInfo?.arrival?.country ?? raw?.country ?? '',
                 flightNumber: raw?.flightInfo?.arrival?.flightNumber ?? '',
-                date: raw?.flightInfo?.arrival?.date ?? '',
+                date: raw?.flightInfo?.arrival?.date ?? raw?.tripEndDate ?? '',
                 time: raw?.flightInfo?.arrival?.time ?? '',
             },
         },
@@ -126,6 +129,7 @@ const normalizeTrip = (raw: any): RawTrip => {
         },
         ownerPhone: raw?.ownerPhone ?? '',
         managerPhone: raw?.managerPhone ?? raw?.ownerPhone ?? undefined,
+        managerName: raw?.managerName ?? '',
         region: raw?.region ?? '',
         createdAt: raw?.createdAt ?? undefined,
         updatedAt: raw?.updatedAt ?? undefined,
@@ -654,8 +658,11 @@ export default function ManageTourPage() {
                                     <Label htmlFor="tour-number">Номер туру</Label>
                                     <Input
                                         id="tour-number"
-                                        value={typeof trip.number === 'number' && !Number.isNaN(trip.number) ? `Тур #${trip.number}` : ''}
-                                        disabled
+                                        value={trip.number ?? ''}
+                                        onChange={(event) =>
+                                            setTrip((prev) => (prev ? { ...prev, number: event.target.value } : prev))
+                                        }
+                                        placeholder="напр. 5468189"
                                     />
                                 </div>
                                 <FormInput
@@ -669,8 +676,25 @@ export default function ManageTourPage() {
                                     formatType="date"
                                 />
                                 <div>
-                                    <Label htmlFor="manager-email">Останній менеджер</Label>
-                                    <Input id="manager-email" value={trip.managerEmail ?? ''} disabled />
+                                    <Label htmlFor="manager-name">Менеджер туру</Label>
+                                    <Input id="manager-name" value={trip.managerName ?? 'Не вказано'} disabled className="bg-foreground/5" />
+                                </div>
+                                <div>
+                                    <Label htmlFor="tour-status">Статус туру</Label>
+                                    <select
+                                        id="tour-status"
+                                        value={trip.status ?? 'In Booking'}
+                                        onChange={(event) =>
+                                            setTrip((prev) => (prev ? { ...prev, status: event.target.value as TourStatus } : prev))
+                                        }
+                                        className="w-full h-10 px-3 py-2 text-sm border border-border/40 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    >
+                                        {TOUR_STATUSES.map((status) => (
+                                            <option key={status} value={status}>
+                                                {TOUR_STATUS_LABELS[status]}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="mt-8 space-y-8">
@@ -705,7 +729,7 @@ export default function ManageTourPage() {
                                 values={trip.flightInfo}
                                 onChange={handleFlightFieldChange}
                                 title="Інформація про рейси"
-                                description="Оновіть деталі рейсів туди та назад."
+                                description="Дата вильоту = дата початку туру, дата прильоту = дата закінчення, країна повернення = країна туру."
                             />
                         </div>
 

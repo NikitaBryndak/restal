@@ -1,6 +1,23 @@
 
 import mongoose, { Schema } from "mongoose";
 
+// Tour status types
+export const TOUR_STATUSES = [
+    "In Booking",
+    "Booked",
+    "Paid",
+    "In Progress",
+    "Completed",
+    "Archived"
+] as const;
+
+// Ticket file schema for individual ticket uploads
+const ticketFileSchema = new Schema({
+    uploaded: { type: Boolean, default: false },
+    url: { type: String, default: "" },
+    fileName: { type: String, default: "" }
+}, { _id: false });
+
 const tripSchema = new Schema({
     number: {
         type: String,
@@ -25,6 +42,11 @@ const tripSchema = new Schema({
     region: {
         type: String,
         required: false,
+    },
+    status: {
+        type: String,
+        enum: TOUR_STATUSES,
+        default: "In Booking",
     },
     flightInfo: {
         departure: {
@@ -155,10 +177,16 @@ const tripSchema = new Schema({
             uploaded: { type: Boolean, default: false },
             url: { type: String, default: "" }
         },
-        tickets: {
-            uploaded: { type: Boolean, default: false },
-            url: { type: String, default: "" }
-        },
+        // Departure tickets (4 files max)
+        departureTicket1: ticketFileSchema,
+        departureTicket2: ticketFileSchema,
+        departureTicket3: ticketFileSchema,
+        departureTicket4: ticketFileSchema,
+        // Arrival/Return tickets (4 files max)
+        arrivalTicket1: ticketFileSchema,
+        arrivalTicket2: ticketFileSchema,
+        arrivalTicket3: ticketFileSchema,
+        arrivalTicket4: ticketFileSchema,
         voucher: {
             uploaded: { type: Boolean, default: false },
             url: { type: String, default: "" }
@@ -199,6 +227,20 @@ const tripSchema = new Schema({
     managerPhone: {
         type: String,
         required: true,
+    },
+    managerName: {
+        type: String,
+        required: false,
+        default: "",
+    },
+    // Cashback tracking
+    cashbackProcessed: {
+        type: Boolean,
+        default: false,
+    },
+    cashbackAmount: {
+        type: Number,
+        default: 0,
     }
 }, { timestamps: true });
 
