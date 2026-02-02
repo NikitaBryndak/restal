@@ -4,6 +4,7 @@ import Navbar from "../components/navigation/Navbar";
 import "./globals.css";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://restal.in.ua"), // Update with your actual domain
@@ -82,6 +83,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
