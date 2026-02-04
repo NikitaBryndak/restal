@@ -1,218 +1,48 @@
-import Script from "next/script";
+'use client';
 
-const hotToursStyles = `
-body .hot-block_tiles .hot-wrapper {
-    margin-top: 0px;
-    margin-left: 0px;
-    margin-bottom: 0px;
-    margin-right: -10px !important;
-}
-body .hot-block_tiles .hot-otp-form-wrap {
-    margin-top: 10px;
-    margin-right: 10px;
-}
-body .hot-block_tiles .hot-otp-img,
-body .hot-block_tiles .hot-otp-tour-block {
-    width: 300px !important;
-}
-body .hot-block_tiles .hot-otp-tour-block {
-    background: linear-gradient(170deg, rgba(32,32,32,0.75) 0%,rgba(32,32,32,0) 50%), linear-gradient(10deg, rgba(32,32,32,0.75) 0%,rgba(32,32,32,0) 50%);
-}
-body .hot-block_tiles .hot-otp-form-wrap {
-    border-radius: 4px;
-}
-body .hot-block_tiles .hot-otp-img:after {
-    background: rgba(255,0,0,.7);
-    height: 0;
-}
-body .hot-block_tiles .hot-otp-form-wrap:hover .hot-otp-img {
-    opacity: .8;
-}
-body .hot-block_tiles .hot-otp-description {
-    font-family: arial;
-    font-size: 18px;
-    line-height: 21px;
-    font-weight: bold;
-    color: #fff !important;
-    padding-top: 18px;
-    padding-left: 20px;
-    padding-right: 20px;
-}
-body .hot-block_tiles .hot-otp-tour-block:hover .hot-otp-description {
-    text-decoration: none !important;
-    color: #fff !important;
-}
-body .hot-block_tiles .hot-otp-place {
-    font-family: arial;
-    font-size: 13px;
-    line-height: 15px;
-    font-weight: bold;
-    color: #fff !important;
-    padding-top: 0;
-    padding-left: 20px;
-    padding-right: 20px;
-}
-body .hot-block_tiles .hot-otp-tour-block:hover .hot-otp-place {
-    text-decoration: none !important;
-    color: #fff !important;
-}
-body .hot-block_tiles .hot-otp-tour-info {
-    font-family: arial;
-    font-size: 13px;
-    line-height: 16px;
-    font-weight: normal;
-    font-style: italic;
-    color: #fff;
-    left: 20px;
-    bottom: 13px;
-    width: 130px;
-}
-body .hot-block_tiles .hot-otp-tour-block:hover .hot-otp-tour-info {
-    text-decoration: none !important;
-    color: #fff !important;
-}
-body .hot-block_tiles .hot-price-block {
-    padding-right: 20px;
-    padding-bottom: 11px;
-}
-body .hot-block_tiles .hot-otp-price-count,
-body .hot-block_tiles .hot-otp-price-count nobr {
-    font-family: arial;
-    font-size: 11px;
-    line-height: 10px;
-    color: #fff !important;
-}
-body .hot-block_tiles .hot-otp-price-count {
-    width: 60px;
-}
-body .hot-block_tiles .hot-otp-tour-block:hover .hot-otp-price-count,
-body .hot-block_tiles .hot-otp-tour-block:hover .hot-otp-price-count nobr {
-    text-decoration: none !important;
-    color: #fff !important;
-}
-body .hot-block_tiles .hot-otp-price a {
-    font-family: arial;
-    font-size: 24px;
-    line-height: 28px;
-    font-weight: bold;
-    color: #fff !important;
-}
-body .hot-block_tiles .hot-otp-tour-block:hover .hot-otp-price a {
-    text-decoration: none !important;
-    color: #fff !important;
-}
-`;
+import Script from 'next/script';
 
 export default function TourScreenerPage() {
     return (
-        <main className="flex-1 container mx-auto px-4 py-8">
-            <style dangerouslySetInnerHTML={{ __html: hotToursStyles }} />
-            <link
-                href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic"
-                rel="stylesheet"
-            />
-            <link
-                rel="stylesheet"
-                href="https://export.otpusk.com/os/onsite/form.css"
-                type="text/css"
-            />
-            <link
-                rel="stylesheet"
-                href="https://export.otpusk.com/os/onsite/result.css"
-                type="text/css"
-            />
-            <link
-                rel="stylesheet"
-                href="https://export.otpusk.com/os/onsite/tour.css"
-                type="text/css"
-            />
+        <div className="min-h-[800px] w-full bg-background p-4">
+            <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic" rel="stylesheet" />
+            <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/form.css" type="text/css" />
+            <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/result.css" type="text/css" />
+            <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/tour.css" type="text/css" />
 
-            <h1 className="text-4xl font-bold mb-6 text-white">Підбір туру</h1>
+            {/* Container for the search form and results */}
+            <div id="otpusk-container" className="otpusk-widget w-full"></div>
 
-            {/* Контейнер для горящих туров */}
-            <div className="hot-size-checker" id="otpusk_onsite_hot27865">
-                <img
-                    src="https://export.otpusk.com/os/ajax-loader.gif"
-                    alt="Loading..."
-                />
-                <span></span>
-            </div>
+            {/* Container for tour details (if separate) */}
+            <div id="otpusk-tour-container" className="otpusk-widget w-full mt-8"></div>
 
-            {/* Конфигурация поиска туров */}
-            <Script id="otpusk-config" strategy="beforeInteractive">
+            <Script id="otpusk-config" strategy="afterInteractive">
                 {`
-                    var osGeo = '';
-                    var osDefaultDeparture = '';
-                    var osDefaultDuration = '';
-                    var osDateFrom = '';
-                    var osDateTo = '';
-                    var osHotelCategory = '';
-                    var osFood = '';
-                    var osTransport = '';
-                    var osTarget = '';
-                    var osContainer = null;
-                    var osTourContainer = null;
-                    var osLang = 'ua';
-                    var osTourTargetBlank = false;
-                    var osOrderUrl = null;
-                    var osCurrency = 'converted';
-                    var osAutoStart = false;
+                    window.osGeo = '';
+                    window.osDefaultDeparture = 2025;
+                    window.osDefaultDuration = '';
+                    window.osDateFrom = '';
+                    window.osDateTo = '';
+                    window.osHotelCategory = '';
+                    window.osFood = '';
+                    window.osTransport = '';
+                    window.osTarget = '';
+                    window.osContainer = document.getElementById('otpusk-container');
+                    window.osTourContainer = document.getElementById('otpusk-tour-container');
+                    window.osLang = 'ua';
+                    window.osTourTargetBlank = false;
+                    window.osOrderUrl = null;
+                    window.osCurrency = 'converted';
+                    window.osAutoStart = false;
                 `}
             </Script>
 
-            {/* Конфигурация горящих туров */}
-            <Script id="hot-tours-config" strategy="beforeInteractive">
-                {`
-                    var osTarget27865 = "https://restal-git-otpusk-nikita-bryndaks-projects.vercel.app/tour-screener";
-                    var osLang = "ua";
-                    var osCurrency = "converted";
-                    var osTargetBlank27865 = false;
-                `}
-            </Script>
-
-            {/* Скрипты для поиска туров */}
             <Script
                 src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"
                 strategy="afterInteractive"
             />
-            <Script
-                src="https://export.otpusk.com/js/onsite/"
-                strategy="afterInteractive"
-            />
-            <Script
-                src="https://export.otpusk.com/js/order"
-                strategy="afterInteractive"
-            />
-
-            {/* Скрипты для горящих туров */}
-            <Script id="hot-tours-loader" strategy="afterInteractive">
-                {`
-                    (function (d, s) {
-                        function loadScript(src, id, callback) {
-                            if (d.getElementById(id)) {
-                                if (typeof callback === "function") callback();
-                                return;
-                            }
-                            var js = d.createElement(s);
-                            js.id = id;
-                            js.src = src;
-                            js.defer = true;
-                            js.onload = function () {
-                                if (typeof callback === "function") callback();
-                            };
-                            d.head.appendChild(js);
-                        }
-                        if (!window._otpuskApiLoaded) {
-                            window._otpuskApiLoaded = true;
-                            loadScript("https://export.otpusk.com/api/session?access_token=3f80a-01423-b3ca6-0bbab-1a284", "OShotApi27865", function () {
-                                loadScript("https://export.otpusk.com/js/view?id=27865", "OShotGetData27865");
-                            });
-                        } else {
-                            loadScript("https://export.otpusk.com/js/view?id=27865", "OShotGetData27865");
-                        }
-                    }(document, "script"));
-                `}
-            </Script>
-        </main>
+            <Script src="https://export.otpusk.com/js/onsite/" strategy="afterInteractive" />
+            <Script src="https://export.otpusk.com/js/order" strategy="afterInteractive" />
+        </div>
     );
 }
