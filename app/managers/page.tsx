@@ -1,7 +1,7 @@
 "use client";
 
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { Phone, Send, User, MessageCircle } from "lucide-react";
+import { Phone, Send, User, MessageCircle, MessageSquareMore } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -52,7 +52,7 @@ const managers = [
     name: "ШІ Менеджер",
     role: "Віртуальний асистент",
     phone: "",
-    telegram: "",
+    telegram: "OlenaBryndak",
     description: "Не п'є, не їсть, тільки допомагає вам знайти ідеальний тур за лічені секунди!",
     isHuman: false,
     alwaysOnline: true,
@@ -61,7 +61,7 @@ const managers = [
     name: "Ви!",
     role: "Вакансія",
     phone: "+380677668584",
-    telegram: "",
+    telegram: "OlenaBryndak",
     description: "Амбіційний та молодий турагент, який віртуозно володіє сучасними трендами туризму та знає, що таке сервіс нового покоління. Це вакантне місце чекає на того, хто не просто продає тури, а створює стиль життя, сповнений яскравих вражень.",
     isHuman: false,
     isVacancy: true,
@@ -149,11 +149,20 @@ export default function ManagersPage() {
               {manager.phone && manager.telegram && (
               <div className="pt-4 border-t border-white/10 flex items-center justify-center gap-6">
                 <Link
+                  href={`tel:${manager.phone}`}
+                  className="flex items-center gap-2 text-secondary hover:text-accent transition-colors group/link"
+                  title="Зателефонувати"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="text-xs font-medium">Телефон</span>
+                </Link>
+                <div className="w-px h-4 bg-white/10"/>
+                <Link
                   href={`viber://chat?number=${manager.phone}`}
                   className="flex items-center gap-2 text-secondary hover:text-accent transition-colors group/link"
                   title="Call via Viber"
                 >
-                  <Phone className="w-4 h-4" />
+                  <MessageSquareMore className="w-4 h-4" />
                   <span className="text-xs font-medium">Viber</span>
                 </Link>
                 <div className="w-px h-4 bg-white/10"/>
