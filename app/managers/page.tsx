@@ -5,14 +5,38 @@ import { Phone, Send, User, MessageCircle, MessageSquareMore } from "lucide-reac
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-// Check if current time is within working hours (9:00-18:00 Kyiv time)
-const isWithinWorkingHours = () => {
+// Day names mapping for display
+const dayNames: Record<number, string> = {
+  0: "Нд",
+  1: "Пн",
+  2: "Вт",
+  3: "Ср",
+  4: "Чт",
+  5: "Пт",
+  6: "Сб",
+};
+
+// Check if current time is within working hours (9:00-18:00 Kyiv time) for specific working days
+const isWithinWorkingHours = (workingDays?: number[]) => {
   const now = new Date();
   const kyivTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Kyiv" }));
   const hours = kyivTime.getHours();
   const day = kyivTime.getDay();
-  // Working hours: 9:00-18:00, Monday-Friday (day 1-5)
-  return hours >= 9 && hours < 18 && day >= 1 && day <= 5;
+  // Working hours: 9:00-18:00, on specified working days
+  if (!workingDays) return false;
+  return hours >= 9 && hours < 18 && workingDays.includes(day);
+};
+
+// Format working days for display
+const formatWorkingDays = (workingDays?: number[]) => {
+  if (!workingDays || workingDays.length === 0) return "";
+  // Sort days starting from Monday (1) to Sunday (0 at end)
+  const sortedDays = [...workingDays].sort((a, b) => {
+    const orderA = a === 0 ? 7 : a;
+    const orderB = b === 0 ? 7 : b;
+    return orderA - orderB;
+  });
+  return sortedDays.map(d => dayNames[d]).join(", ") + ", 9:00-18:00";
 };
 
 const managers = [
@@ -23,6 +47,7 @@ const managers = [
     telegram: "OlenaBryndak",
     description: "10 років присвячені тому, щоб турист отримував не просто тур, а бездоганний сервіс. Моя роль — бути гарантом вашого комфорту та головним ідеологом подорожей, які надихають. Я знаю, що розкіш полягає в деталях і відсутності турбот. Ваша задача лише одна – обрати напрямок. Про все інше потурбуюсь я.",
     isHuman: true,
+    workingDays: [1, 2, 3, 4, 5, 6], // Пн, Вт, Ср, Чт, Пт, Сб
   },
   {
     name: "Ірина Смагач",
@@ -31,6 +56,7 @@ const managers = [
     telegram: "Iryna_Smagach",
     description: "Роки практики та тисячі вирішених завдань. Досвідчений агент — це ваша головна страховка від несподіванок. Чи то гаряче літо на узбережжі, чи засніжені гори взимку, підбере напрямок, який відгукнеться саме вам. Окрім пошуку туру можна придбати вигідні авіаквитки та страхування. Вам залишається тільки зібрати валізу.",
     isHuman: true,
+    workingDays: [1, 2, 4, 5, 6], // Пн, Вт, Чт, Пт, Сб
   },
   {
     name: "Юлія Свідницька",
@@ -39,6 +65,7 @@ const managers = [
     telegram: "Julia_Svidnitska",
     description: "Знає особливості Таїланду і Занзибару та знайде ідеальне «all inclusive» у Домінікані. Допоможе зорієнтуватися у розкоші Еміратів та розкриє всі секрети відпочинку в Іспанії, яку знає та обожнює. Працює для того, щоб ви не просто побачили нову країну, а відчули її ритм, не відволікаючись на організаційні дрібниці.",
     isHuman: true,
+    workingDays: [1, 2, 3, 4, 0], // Пн, Вт, Ср, Чт, Нд
   },
   {
     name: "Юлія Левадна",
@@ -47,6 +74,7 @@ const managers = [
     telegram: "Yuliia_Levadna",
     description: "Спеціалізується на популярних напрямках, тому проконсультує, який готель Єгипту справді оновив номери, а де в Туреччині найкраща анімація для дітей. Також допомагає закохатися в автобусні подорожі, зробивши ваш шлях за кордон легким та організованим. Дбає про ваші враження, як про власні!",
     isHuman: true,
+    workingDays: [3, 4, 5, 6, 0], // Ср, Чт, Пт, Сб, Нд
   },
   {
     name: "ШІ Менеджер",
@@ -71,13 +99,12 @@ const managers = [
 export default function ManagersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedManager, setSelectedManager] = useState<string | null>(null);
-  const [isWorkingHours, setIsWorkingHours] = useState(false);
+  const [, forceUpdate] = useState({});
 
   useEffect(() => {
-    setIsWorkingHours(isWithinWorkingHours());
-    // Update every minute
+    // Force re-render every minute to update online status
     const interval = setInterval(() => {
-      setIsWorkingHours(isWithinWorkingHours());
+      forceUpdate({});
     }, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -85,7 +112,7 @@ export default function ManagersPage() {
   const getOnlineStatus = (manager: typeof managers[0]) => {
     if ('alwaysOnline' in manager && manager.alwaysOnline) return true;
     if ('isVacancy' in manager && manager.isVacancy) return false;
-    return manager.isHuman && isWorkingHours;
+    return manager.isHuman && 'workingDays' in manager && isWithinWorkingHours(manager.workingDays);
   };
 
   const handleConsultationClick = (managerName: string) => {
@@ -124,7 +151,7 @@ export default function ManagersPage() {
                   </div>
                   <p className="text-sm text-accent font-medium">{manager.role}</p>
                   <p className={`text-xs mt-0.5 ${isOnline ? 'text-green-500/80' : 'text-red-500/80'}`}>
-                    {isOnline ? 'Доступний зараз' : manager.isHuman ? 'Пн-Пт, 9:00-18:00' : 'Не в мережі'}
+                    {isOnline ? 'Доступний зараз' : manager.isHuman && 'workingDays' in manager ? formatWorkingDays(manager.workingDays) : 'Не в мережі'}
                   </p>
                 </div>
               </div>
