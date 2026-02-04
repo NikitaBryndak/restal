@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { useEffect, useRef } from "react";
 
@@ -16,7 +17,7 @@ export default function TourScreenerPage() {
         // Define global variables expected by the script
         const win = window as any;
         win.osGeo = '';
-        win.osDefaultDeparture = 2014; // City ID for Amsterdam (from Otpusk)
+        win.osDefaultDeparture = 2025;
         win.osDefaultDuration = '';
         win.osDateFrom = '';
         win.osDateTo = '';
@@ -24,15 +25,14 @@ export default function TourScreenerPage() {
         win.osFood = '';
         win.osTransport = '';
         win.osTarget = '';
-        
-        // Set container IDs as strings (widget looks for elements by ID)
-        win.osContainer = 'otpusk-container';
-        win.osTourContainer = 'otpusk-tour-container';
+        // Explicitly set the container elements
+        win.osContainer = containerRef.current;
+        win.osTourContainer = tourContainerRef.current;
 
         win.osLang = 'ua';
         win.osTourTargetBlank = false;
         win.osOrderUrl = null;
-        win.osCurrency = 'uah'; // Ukrainian hryvnia
+        win.osCurrency = 'converted';
         win.osAutoStart = false;
 
         // Keep track of loaded scripts for cleanup
@@ -61,8 +61,8 @@ export default function TourScreenerPage() {
                 // 1. Session script
                 await loadScript("https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284");
 
-                // 2. Onsite script - append to body, widget finds containers by ID
-                await loadScript("https://export.otpusk.com/js/onsite/", document.body);
+                // 2. Onsite script
+                await loadScript("https://export.otpusk.com/js/onsite/", containerRef.current);
 
                 // 3. Order script
                 await loadScript("https://export.otpusk.com/js/order");
@@ -427,107 +427,6 @@ export default function TourScreenerPage() {
 .new_f-ext-bl-price .slider-container input {
     color: #fff !important;
     background: transparent !important;
-}
-
-/* 7. TOUR DETAILS MODAL */
-.new_t-container,
-.new_t-modal-body {
-    background-color: #1a1a1a !important;
-    color: #fff !important;
-}
-.new_t-modal-body-top {
-    background-color: #222 !important;
-    color: #fff !important;
-}
-.new_t-modal-body-close {
-    color: #fff !important;
-}
-.new_t-tab-content {
-    background-color: #1a1a1a !important;
-    color: #fff !important;
-}
-.new_t-tab-btn {
-    background-color: #2a2a2a !important;
-    color: #bbb !important;
-    border-color: #333 !important;
-}
-.new_t-tab-btn.active {
-    background-color: #0fa4e6 !important;
-    color: #fff !important;
-}
-.new_t-hotel-name {
-    color: #fff !important;
-}
-.new_t-hotel-geo,
-.new_t-hotel-info {
-    color: #bbb !important;
-}
-.new_t-tour-item {
-    background-color: #222 !important;
-    border: 1px solid #333 !important;
-}
-.new_t-tour-item:hover {
-    border-color: #0fa4e6 !important;
-}
-.new_t-tour-price {
-    color: #0fa4e6 !important;
-}
-.new_t-tour-order {
-    background-color: #0fa4e6 !important;
-    color: #fff !important;
-}
-
-/* 8. ORDER FORM */
-.os-order-form-wrap {
-    background-color: #1a1a1a !important;
-}
-.os-order-header-title {
-    color: #fff !important;
-}
-.os-order-input-name input,
-.os-order-input-phone input,
-.os-order-input-email input,
-.os-order-input-comment textarea {
-    background-color: #2a2a2a !important;
-    border: 1px solid #444 !important;
-    color: #fff !important;
-}
-.os-order-input-name input::placeholder,
-.os-order-input-phone input::placeholder,
-.os-order-input-email input::placeholder {
-    color: #888 !important;
-}
-.os-order-form-submit_button {
-    background-color: #0fa4e6 !important;
-    color: #fff !important;
-}
-.os-order-info {
-    color: #bbb !important;
-}
-
-/* 9. TITLE STYLING */
-.new_f-title {
-    color: #fff !important;
-}
-
-/* 10. SCROLLBAR STYLING */
-#otpusk-container ::-webkit-scrollbar,
-#otpusk-tour-container ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-#otpusk-container ::-webkit-scrollbar-track,
-#otpusk-tour-container ::-webkit-scrollbar-track {
-    background: #1a1a1a;
-}
-#otpusk-container ::-webkit-scrollbar-thumb,
-#otpusk-tour-container ::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 4px;
-}
-#otpusk-container ::-webkit-scrollbar-thumb:hover,
-#otpusk-tour-container ::-webkit-scrollbar-thumb:hover {
-    background: #555;
 }
 `}} />
                 <div className="w-full max-w-6xl mx-auto">
