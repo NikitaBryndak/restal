@@ -62,6 +62,29 @@ export default function TourScreenerPage() {
 
                 // 3. Order script
                 await loadScript("https://export.otpusk.com/js/order");
+
+                // Watch for results being added anywhere in DOM and move them to our container
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node instanceof HTMLElement) {
+                                // Check if this is a results container added outside our container
+                                if (node.classList?.contains('new_r-container') ||
+                                    node.classList?.contains('new_r-wrapper') ||
+                                    node.id === 'new_os-result') {
+                                    const container = document.getElementById('new_os');
+                                    if (container && !container.contains(node)) {
+                                        console.log('Moving results to container:', node);
+                                        container.appendChild(node);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                });
+
+                observer.observe(document.body, { childList: true, subtree: true });
+
             } catch (error) {
                 console.error("Error loading tour screener scripts:", error);
             }
@@ -99,11 +122,28 @@ export default function TourScreenerPage() {
 
             <main className="min-h-screen w-full flex flex-col items-center px-4 py-16 sm:py-24">
 <style dangerouslySetInnerHTML={{ __html: `
-/* --- Ensure all widget elements are visible --- */
+/* --- Fix widget positioning --- */
 #new_os {
+    position: relative !important;
     min-height: 300px;
+    width: 100% !important;
 }
 
+/* Override any fixed/absolute positioning from the widget */
+.new_f-wrapper,
+.new_f-container,
+.new_os-wrapper {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Ensure visibility */
 #new_os *,
 [class*="new_os"],
 [class*="new_r-"],
@@ -112,14 +152,17 @@ export default function TourScreenerPage() {
     opacity: 1 !important;
 }
 
-/* Results container */
-.new_r-container {
+/* Results container - MUST be visible and in flow */
+.new_r-container,
+.new_r-wrapper {
+    position: relative !important;
     display: block !important;
     min-height: 100px !important;
-}
-
-.new_r-wrapper {
-    display: block !important;
+    width: 100% !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
 }
 
 .new_r-items {
@@ -131,6 +174,7 @@ export default function TourScreenerPage() {
 .new_r-item {
     display: flex !important;
     min-height: 150px !important;
+    position: relative !important;
 }
 
 /* --- GLOBAL WIDGET OVERRIDES FOR DARK THEME --- */
