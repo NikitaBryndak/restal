@@ -22,9 +22,9 @@ const isWithinWorkingHours = (workingDays?: number[]) => {
   const kyivTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Kyiv" }));
   const hours = kyivTime.getHours();
   const day = kyivTime.getDay();
-  // Working hours: 9:00-18:00, on specified working days
+  // Working hours: 9:00-20:00, on specified working days
   if (!workingDays) return false;
-  return hours >= 9 && hours < 18 && workingDays.includes(day);
+  return hours >= 9 && hours < 20 && workingDays.includes(day);
 };
 
 // Format working days for display
