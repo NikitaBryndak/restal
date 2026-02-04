@@ -36,7 +36,7 @@ const formatWorkingDays = (workingDays?: number[]) => {
     const orderB = b === 0 ? 7 : b;
     return orderA - orderB;
   });
-  return sortedDays.map(d => dayNames[d]).join(", ") + ", 9:00-18:00";
+  return sortedDays.map(d => dayNames[d]).join(", ") + ", 9:00-20:00";
 };
 
 const managers = [
