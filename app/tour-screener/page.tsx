@@ -7,8 +7,13 @@ import { useEffect, useRef } from "react";
 export default function TourScreenerPage() {
     const containerRef = useRef<HTMLDivElement>(null);
     const tourContainerRef = useRef<HTMLDivElement>(null);
+    const initializedRef = useRef(false);
 
     useEffect(() => {
+        // Prevent double initialization in React StrictMode
+        if (initializedRef.current) return;
+        initializedRef.current = true;
+
         // Define global variables expected by the script
         const win = window as any;
         win.osGeo = '';
@@ -42,8 +47,6 @@ export default function TourScreenerPage() {
                 script.onload = () => resolve(script);
                 script.onerror = () => reject(new Error(`Failed to load ${src}`));
 
-                // If specific container is provided and valid, append there. Otherwise body.
-                // Appending the main widget script to the container helps if it falls back to script location.
                 if (container) {
                     container.appendChild(script);
                 } else {
@@ -55,15 +58,13 @@ export default function TourScreenerPage() {
 
         const initScripts = async () => {
             try {
-                // 1. Session script (Append to body)
+                // 1. Session script
                 await loadScript("https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284");
 
-                // 2. Onsite script (Append to the container div directly to ensure position)
-                // We pass containerRef.current to append the script TAG inside the container.
-                // The script execution will likely render the widget nearby or use the osContainer variable.
+                // 2. Onsite script
                 await loadScript("https://export.otpusk.com/js/onsite/", containerRef.current);
 
-                // 3. Order script (Append to body)
+                // 3. Order script
                 await loadScript("https://export.otpusk.com/js/order");
             } catch (error) {
                 console.error("Error loading tour screener scripts:", error);
@@ -72,20 +73,10 @@ export default function TourScreenerPage() {
 
         // Initialize
         if (containerRef.current && tourContainerRef.current) {
-             initScripts();
+            initScripts();
         }
 
-        return () => {
-            // Cleanup scripts
-            scripts.forEach(script => {
-                if (script.parentNode) {
-                    script.parentNode.removeChild(script);
-                }
-            });
-            // Also try to clean up the generated content if possible,
-            // though the widgets might leave leftovers.
-            // When the component unmounts, the container divs are removed, so that handles most visual cleanup.
-        };
+        // No cleanup - widget creates global state that can't be cleanly removed
     }, []);
 
     return (
@@ -112,212 +103,332 @@ export default function TourScreenerPage() {
 
             <main className="min-h-screen w-full flex flex-col items-center px-4 py-16 sm:py-24">
 <style dangerouslySetInnerHTML={{ __html: `
-/* --- Heavy Overrides for Otpusk Widget to match Dark Theme --- */
+/* --- GLOBAL WIDGET OVERRIDES FOR DARK THEME --- */
 
-/* 1. General Container & Text */
-#otpusk-container .new_f-container,
-#otpusk-container .new_os {
+/* 1. General Container & Reset */
+#otpusk-container *, #otpusk-tour-container *, .new_os *, .new_r-container * {
     font-family: inherit !important;
-    color: #ffffff !important;
 }
 
-/* Remove default gradients and backgrounds */
-#otpusk-container .new_f-container {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-/* 2. Input Fields Styling */
-#otpusk-container .new_f-form-field {
+/* 2. Form Fields (Inputs) */
+#otpusk-container .new_f-form-field,
+.new_f-form-field {
     background-color: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: none !important;
-    transition: all 0.2s ease !important;
-    border-radius: 0 !important; /* Reset radius for middle items */
+    color: #fff !important;
 }
-
-/* Field corners - First and Last */
-#otpusk-container .new_f-form-field:first-child {
-    border-top-left-radius: 12px !important;
-    border-bottom-left-radius: 12px !important;
-}
-/* The submit button is usually the last, but let's check field types */
-#otpusk-container .new_f-form-field.people {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important; /* Because button is properly separate or next to it */
-}
-
 #otpusk-container .new_f-form-field:hover,
-#otpusk-container .new_f-form-field:focus-within {
+.new_f-form-field:hover {
     background-color: rgba(255, 255, 255, 0.1) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
 }
-
-/* Text Colors in Inputs */
 #otpusk-container .new_f-autocomplete-input,
-#otpusk-container .new_f-dropdown-btn,
+#otpusk-container input,
 #otpusk-container .new_f-dropdown-btn span,
-#otpusk-container input {
-    color: #ffffff !important;
-    font-family: inherit !important;
+.new_f-autocomplete-input,
+.new_f-dropdown-btn span {
+    color: #fff !important;
+}
+#otpusk-container .new_f-autocomplete-input::placeholder,
+.new_f-autocomplete-input::placeholder {
+    color: rgba(255,255,255,0.5) !important;
 }
 
-#otpusk-container .new_f-autocomplete-input::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Remove vertical separators */
-#otpusk-container .new_f-form-field::before {
-    display: none !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    /* If we want separators, uncomment and adjust color: */
-    /* display: block !important; */
-}
-
-/* 3. Dropdowns & Popups */
+/* 3. Dropdowns (Popups) - STRONGER SELECTORS */
 .new_f-dropdown-body,
 .new_f-dropdown-body.popup,
 #ctyList,
 #cntList,
-.ui-autocomplete {
+.ui-autocomplete,
+.new_f-dropdown-list {
     background-color: #1a1a1a !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
-    border-radius: 12px !important;
-    color: #fff !important;
-}
-
-/* Dropdown Items */
-.new_f-dropdown-item,
-.ui-menu-item a,
-#ctyList li,
-#cntList li {
-    color: #e0e0e0 !important;
-    background-color: transparent !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-
-.new_f-dropdown-item:hover,
-.ui-menu-item a:hover,
-#ctyList li:hover,
-#cntList li:hover,
-.ui-state-focus,
-.ui-state-active,
-.new_f-dropdown-item.selected {
-    background-color: rgba(15, 164, 230, 0.2) !important; /* Accent with opacity */
-    color: #fff !important;
-}
-
-/* Specific Dropdown Headers/Footers */
-#ctyList .new_f-dropdown-body-bottom,
-.new_f-dropdown-body-top {
-    background-color: #222 !important;
-    color: #fff !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-/* 4. Submit Button */
-#otpusk-container .new_f-form .new_f-form-submit,
-#otpusk-container .os-order-form-submit_button {
-    background: #0fa4e6 !important; /* Site accent */
-    color: #fff !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    border-radius: 0 12px 12px 0 !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 0 20px rgba(15, 164, 230, 0.3) !important;
-}
-
-#otpusk-container .new_f-form .new_f-form-submit:hover {
-    background: #0d8bc3 !important;
-    box-shadow: 0 0 30px rgba(15, 164, 230, 0.5) !important;
-}
-
-/* 5. Datepicker / Calendar */
-.new_f-dates-container#new_f-dates-container .dp-container {
-    background-color: #1a1a1a !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div {
-    background-color: #1a1a1a !important;
-}
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-header {
-    color: #0fa4e6 !important; /* header text accent */
-}
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div th {
-    color: #888 !important;
-}
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td {
-    background: #222 !important;
     border: 1px solid #333 !important;
-}
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td a,
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td span {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
     color: #fff !important;
 }
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-highlight,
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-active {
-    background-color: #0fa4e6 !important;
-}
-.new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-active a {
-    color: #fff !important;
-    font-weight: bold !important;
+
+/* List Items in Dropdowns - STRONGER */
+.new_f-dropdown-item,
+.ui-menu-item,
+.ui-menu-item a,
+.ui-menu-item .label,
+.ui-menu-item .price-from,
+#ctyList li,
+#ctyList li label,
+#ctyList .labelName,
+#cntList li,
+#cntList li a,
+#cntList .ui-corner-all,
+#new_os-to .ui-menu .ui-menu-item .label,
+#new_os-to .ui-menu .ui-menu-item .noplace {
+    background-color: transparent !important;
+    color: #ddd !important;
 }
 
-/* 6. Icons & Arrows */
-#otpusk-container .new_f-dropdown-btn .cnt,
-#otpusk-container .new_f-dropdown-btn::after {
-    border-color: rgba(255,255,255,0.5) transparent transparent !important;
-    /* Optional: Replace with SVG or filter if needed, but border hack works for arrows */
-}
-#otpusk-container .new_f-dropdown-btn .cnt {
-    background: transparent !important;
-}
-
-/* 7. Hide "Compass" and "Plane" background images */
-#otpusk-container .new_f-wrapper-bg-imgs {
-    background: none !important;
-    display: none !important;
-}
-#otpusk-container .new_f-ext-container {
-    background: #1a1a1a !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    padding-top: 20px !important;
-}
-
-/* 8. Labels inside extended search */
-.new_f-ext-bl label {
-    color: #ccc !important;
-}
-.new_f-ext-bl-title {
-    color: #0fa4e6 !important;
-}
-
-/* 9. Checkboxes/Radio custom style fix */
-[class*='new_f-'] input[type="checkbox"] + *::before {
+/* Hover states for dropdowns */
+.new_f-dropdown-item:hover,
+.new_f-dropdown-item.selected,
+#ctyList li:hover,
+#ctyList li label:hover,
+#cntList li:hover,
+.ui-menu-item a:hover,
+.ui-menu-item.active a,
+.ui-state-focus,
+#new_os-to .ui-menu .ui-menu-item .ui-corner-all:hover,
+#new_os-to .ui-menu .ui-menu-item .ui-state-focus {
     background-color: #333 !important;
-    border-color: #555 !important;
+    color: #fff !important;
 }
-[class*='new_f-'] input[type="checkbox"]:checked + *::after {
-    /* Checkmark color or background */
-    filter: invert(1) !important;
+#ctyList li:hover .labelName,
+#ctyList li:hover .itemPrice,
+#cntList li:hover .label {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+/* Resort list background fix */
+#ctyList,
+#ctyList .ctyLists-wrapper {
+    background-color: #1a1a1a !important;
+}
+#ctyList .new_f-dropdown-body-bottom {
+    background-color: #222 !important;
+}
+
+/* 4. CHECKBOXES (The blue/white squares) */
+[class*='new_f-'] input[type="checkbox"] + *::before {
+    background-color: #2a2a2a !important;
+    border: 1px solid #555 !important;
 }
 [class*='new_f-'] input[type="checkbox"]:checked + *::before {
     background-color: #0fa4e6 !important;
     border-color: #0fa4e6 !important;
 }
+[class*='new_f-'] input[type="checkbox"]:checked + *::after {
+    filter: invert(1) brightness(2) !important;
+}
 
-
-/* Make sure result container text is readable if results load */
-#otpusk-tour-container {
+/* 5. Datepicker (Global UI) */
+#ui-datepicker-div,
+.new_f-dropdown-body-date,
+.new_f-dates-container .dp-container {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    z-index: 9999 !important;
+}
+#ui-datepicker-div .ui-datepicker-header,
+.new_f-dropdown-body-top {
+    background: #222 !important;
+    border-bottom: 1px solid #333 !important;
     color: #fff !important;
 }
-#otpusk-tour-container .result-item {
-    background: #1a1a1a !important;
+#ui-datepicker-div .ui-datepicker-title {
+    color: #0fa4e6 !important;
 }
-            `}} />
+#ui-datepicker-div th {
+    color: #888 !important;
+}
+#ui-datepicker-div .ui-datepicker-calendar td {
+    background-color: #222 !important;
+    border: 1px solid #333 !important;
+}
+#ui-datepicker-div .ui-datepicker-calendar td a,
+#ui-datepicker-div .ui-datepicker-calendar td span {
+    color: #ddd !important;
+    background: transparent !important;
+    text-align: center !important;
+}
+#ui-datepicker-div .ui-datepicker-calendar td.ui-state-highlight,
+#ui-datepicker-div .ui-datepicker-calendar td.ui-state-active,
+#ui-datepicker-div .ui-datepicker-calendar td:hover {
+    background-color: #0fa4e6 !important;
+}
+#ui-datepicker-div .ui-datepicker-calendar td.ui-state-active a,
+#ui-datepicker-div .ui-datepicker-calendar td:hover a {
+    color: #fff !important;
+    font-weight: bold !important;
+}
+#ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled span {
+    color: #444 !important;
+}
+
+/* 6. SEARCH RESULTS - COMPREHENSIVE FIX */
+/* Main results container */
+.new_r-container,
+.new_r-wrapper {
+    background: transparent !important;
+}
+
+/* Result Card */
+.new_r-item {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+    margin-bottom: 20px !important;
+}
+.new_r-item:hover {
+    border-color: #0fa4e6 !important;
+}
+/* Result card body */
+.new_r-item-body {
+    background-color: #1a1a1a !important;
+    border-color: transparent !important;
+}
+/* Texts */
+.new_r-item-hotel {
+    color: #fff !important;
+}
+.new_r-item-geo,
+.new_r-item-geo span,
+.new_r-item-info,
+.new_r-item-from,
+.new_r-item-date,
+.new_r-item-food {
+    color: #bbb !important;
+}
+/* Stars */
+.new_r-item-star {
+    fill: #ffca1e !important;
+}
+/* Price */
+.new_r-item-price {
+    background-color: #0fa4e6 !important;
+    border-color: #0fa4e6 !important;
+    color: #fff !important;
+}
+/* Ratings bubble */
+.new_r-item-rating-container {
+    background-color: #333 !important;
+}
+.new_r-item-rating-container::after {
+    background-color: #1a1a1a !important;
+}
+.new_r-item-rating-value,
+.new_r-item-rating-rev {
+    color: #fff !important;
+}
+
+/* Show More Button */
+.new_r-show-more-results {
+    background-color: #1a1a1a !important;
+    border: 1px solid #0fa4e6 !important;
+    color: #0fa4e6 !important;
+}
+.new_r-show-more-results:hover {
+    background-color: #0fa4e6 !important;
+    color: #fff !important;
+}
+
+/* Loader/Spinner */
+.new_spinner-wrap {
+    color: #fff !important;
+}
+.new_progressbar-text,
+.new_progressbar-text span {
+    color: #fff !important;
+}
+.new_progress-container {
+    background-color: #333 !important;
+}
+.new_logo-bl {
+    filter: brightness(0.8) !important;
+}
+
+/* Filters */
+.new_r-panel {
+    color: #fff !important;
+}
+.new_r-filters-title {
+    color: #fff !important;
+    background-color: transparent !important;
+}
+.new_r-filter {
+    background-color: #2a2a2a !important;
+    border: 1px solid #444 !important;
+    color: #ddd !important;
+}
+.new_r-filter-label {
+    color: #aaa !important;
+}
+.new_r-filter-value {
+    color: #0fa4e6 !important;
+}
+.new_r-filter-reset {
+    color: #888 !important;
+}
+.new_r-filters-reset {
+    color: #0fa4e6 !important;
+}
+
+/* Currency Switch */
+.new_r-currency-switch label input + span {
+    background-color: #333 !important;
+    color: #888 !important;
+    box-shadow: none !important;
+}
+.new_r-currency-switch label input:checked + span {
+    background-color: #0fa4e6 !important;
+    color: #fff !important;
+}
+
+/* Info messages */
+.new_result-info,
+.new_result-info .new_result-span {
+    background-color: #2a2a2a !important;
+    color: #fff !important;
+}
+.new_result-info a {
+    color: #0fa4e6 !important;
+}
+
+/* Not found message */
+.new_not-found-message,
+.new_not-found-message .new_not-found-text {
+    background-color: #333 !important;
+    color: #fff !important;
+    border: 1px solid #444 !important;
+}
+
+/* Hide Default Images/Backgrounds */
+.new_f-wrapper-bg-imgs {
+    display: none !important;
+}
+.new_f-container {
+    background: transparent !important;
+}
+
+/* Extended Search Panel */
+.new_f-ext-container {
+    background-color: #151515 !important;
+    border: 1px solid #333 !important;
+    margin-top: 10px !important;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.3) !important;
+}
+.new_f-ext-container::before {
+    display: none !important;
+}
+.new_f-ext-bl-title {
+    color: #0fa4e6 !important;
+}
+.new_f-ext-bl label {
+    color: #ccc !important;
+}
+.new_f-ext-scale-item {
+    color: #888 !important;
+}
+/* Slider */
+.ui-slider-handle {
+    background: #0fa4e6 !important;
+    border-color: #fff !important;
+}
+.ui-slider-range {
+    background: #0fa4e6 !important;
+}
+.new_f-ext-bl-price .slider-container input {
+    color: #fff !important;
+    background: transparent !important;
+}
+`}} />
                 <div className="w-full max-w-6xl mx-auto">
                     <div className="text-center mb-8 sm:mb-12">
                         <TextGenerateEffect
