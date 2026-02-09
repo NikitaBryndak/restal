@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пошук турів</title>
+
+    <script>
+        var osGeo = '';                    /* Країна, курорт або готель (напр. 43 або Єгипет) */
+        var osDefaultDeparture = 2025;     /* ID міста відправлення (2025 — потрібне місто) */
+        var osDefaultDuration = '';        /* Тривалість туру в днях */
+        var osDateFrom = '';               /* Початок туру «від» (напр. '2026-02-15') */
+        var osDateTo = '';                 /* Початок туру «до» (напр. '2026-03-15') */
+        var osHotelCategory = '';          /* Категорія готелю (напр. '4,5') */
+        var osFood = '';                   /* Харчування (напр. 'fb,ai,uai') */
+        var osTransport = '';              /* Транспорт */
+        var osTarget = '';                 /* URL сторінки результатів (порожній = на цій сторінці) */
+        var osContainer = 'os-search-results';   /* DIV для результатів пошуку */
+        var osTourContainer = 'os-tour-details'; /* DIV для детальної інформації про тур */
+        var osLang = 'ua';                 /* Мова інтерфейсу: ru / ua */
+        var osTourTargetBlank = false;     /* Відкривати сторінку туру в новому вікні? */
+        var osOrderUrl = null;             /* Замість форми замовлення переходити на вказаний URL */
+        var osCurrency = 'converted';      /* Валюта: converted — гривня, original — $ або € */
+        var osAutoStart = false;           /* Автостарт пошуку */
+    </script>
+
+    <!-- Fonts & Widget CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic" rel="stylesheet">
+    <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/form.css" type="text/css" />
+    <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/result.css" type="text/css" />
+    <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/tour.css" type="text/css" />
+
+    <style>
+        /* Reset & basic styling so the widget looks clean inside the iframe */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+            background: #ffffff;
+            color: #333;
+            overflow-x: hidden;
+        }
+        body {
+            padding: 0;
+        }
+        #os-search-results,
+        #os-tour-details {
+            padding: 0 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- The widget renders its search form here automatically -->
+    <div id="os-form"></div>
+
+    <!-- Search results will appear here -->
+    <div id="os-search-results"></div>
+
+    <!-- Tour details will appear here -->
+    <div id="os-tour-details"></div>
+
+    <!-- Widget scripts (must load after the config vars and container divs exist) -->
+    <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
+    <script src="https://export.otpusk.com/js/onsite/"></script>
+    <script src="https://export.otpusk.com/js/order"></script>
+
+    <!-- Auto-resize: notify parent iframe about content height changes -->
+    <script>
+        (function() {
+            function postHeight() {
+                var h = document.documentElement.scrollHeight;
+                window.parent.postMessage({ type: 'resize', height: h }, '*');
+            }
+            // Post height on load and periodically (widget dynamically adds content)
+            window.addEventListener('load', function() {
+                postHeight();
+                setInterval(postHeight, 500);
+            });
+            // Also observe DOM mutations
+            if (window.MutationObserver) {
+                var observer = new MutationObserver(postHeight);
+                observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+            }
+        })();
+    </script>
+</body>
+</html>
