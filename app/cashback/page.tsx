@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Gift, Percent, Star, Users, Copy, Check, LogIn } from 'lucide-react';
@@ -22,6 +22,15 @@ interface TripCashbackInfo {
     completedAt?: string;
 }
 
+interface PromoCodeEntry {
+    code: string;
+    amount: number;
+    status: 'active' | 'used' | 'expired';
+    createdAt: string;
+    expiresAt: string;
+    usedAt: string | null;
+}
+
 export default function CashbackPage() {
     const { data: session, status: sessionStatus } = useSession();
     const [selectedTab, setSelectedTab] = useState<'bonuses' | 'overview' | 'claim'>('bonuses');
@@ -31,10 +40,32 @@ export default function CashbackPage() {
     const [tripHistory, setTripHistory] = useState<TripCashbackInfo[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Promo code generation state
+    const [claimAmount, setClaimAmount] = useState<string>('');
+    const [generatedCode, setGeneratedCode] = useState<{ code: string; amount: number; expiresAt: string } | null>(null);
+    const [generating, setGenerating] = useState(false);
+    const [generateError, setGenerateError] = useState<string | null>(null);
+    const [copiedCode, setCopiedCode] = useState(false);
+
+    // Promo code history
+    const [promoHistory, setPromoHistory] = useState<PromoCodeEntry[]>([]);
+
     // Generate referral code from phone number
     const referralCode = userData?.phoneNumber
         ? `RESTAL-${userData.phoneNumber.slice(-6).toUpperCase()}`
         : "RESTAL-XXXXXX";
+
+    const fetchPromoHistory = useCallback(async () => {
+        try {
+            const res = await fetch('/api/promo-codes');
+            if (res.ok) {
+                const data = await res.json();
+                setPromoHistory(data.codes || []);
+            }
+        } catch (err) {
+            console.error('Error fetching promo history:', err);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchCashbackData = async () => {
@@ -71,6 +102,9 @@ export default function CashbackPage() {
                         completedAt: trip.updatedAt
                     })));
                 }
+
+                // Fetch promo code history
+                await fetchPromoHistory();
             } catch (error) {
                 console.error('Error fetching cashback data:', error);
             } finally {
@@ -79,7 +113,7 @@ export default function CashbackPage() {
         };
 
         fetchCashbackData();
-    }, [session, sessionStatus]);
+    }, [session, sessionStatus, fetchPromoHistory]);
 
     const cashbackBalance = userData?.cashbackAmount || 0;
     const totalEarned = tripHistory.reduce((sum, trip) => sum + trip.cashbackAmount, 0) + 1000; // +1000 welcome bonus
@@ -89,6 +123,83 @@ export default function CashbackPage() {
         navigator.clipboard.writeText(referralCode);
         setCopiedReferral(true);
         setTimeout(() => setCopiedReferral(false), 2000);
+    };
+
+    const copyPromoCode = (code: string) => {
+        navigator.clipboard.writeText(code);
+        setCopiedCode(true);
+        setTimeout(() => setCopiedCode(false), 2000);
+    };
+
+    const handleGenerateCode = async () => {
+        const numAmount = Number(claimAmount);
+        if (!numAmount || numAmount < 100) {
+            setGenerateError('Мінімальна сума — 100 грн');
+            return;
+        }
+        if (numAmount > cashbackBalance) {
+            setGenerateError('Недостатньо коштів на бонусному рахунку');
+            return;
+        }
+
+        setGenerating(true);
+        setGenerateError(null);
+        setGeneratedCode(null);
+
+        try {
+            const res = await fetch('/api/promo-codes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: numAmount }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setGenerateError(data.message || 'Помилка генерації');
+                return;
+            }
+
+            setGeneratedCode({ code: data.code, amount: data.amount, expiresAt: data.expiresAt });
+
+            // Update local balance
+            setUserData(prev => prev ? { ...prev, cashbackAmount: prev.cashbackAmount - numAmount } : prev);
+            setClaimAmount('');
+            setAgreedToTerms(false);
+
+            // Refresh promo history
+            await fetchPromoHistory();
+        } catch {
+            setGenerateError('Помилка мережі. Спробуйте пізніше.');
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString('uk-UA', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+    };
+
+    const statusLabel = (status: string) => {
+        switch (status) {
+            case 'active': return 'Активний';
+            case 'used': return 'Використано';
+            case 'expired': return 'Прострочено';
+            default: return status;
+        }
+    };
+
+    const statusColor = (status: string) => {
+        switch (status) {
+            case 'active': return 'text-green-500';
+            case 'used': return 'text-foreground/60';
+            case 'expired': return 'text-red-400';
+            default: return 'text-foreground/60';
+        }
     };
 
     if (loading) {
@@ -653,6 +764,8 @@ export default function CashbackPage() {
                                             min="100"
                                             max={cashbackBalance}
                                             step="1"
+                                            value={claimAmount}
+                                            onChange={(e) => { setClaimAmount(e.target.value); setGenerateError(null); }}
                                             placeholder="0"
                                             className="w-full h-12 bg-background border border-foreground/20 rounded-lg pl-4 pr-12 focus:outline-none focus:border-accent transition-colors"
                                         />
@@ -664,6 +777,12 @@ export default function CashbackPage() {
                                         Доступний баланс: {cashbackBalance.toLocaleString()} грн
                                     </p>
                                 </div>
+
+                                {generateError && (
+                                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+                                        <p className="text-sm text-red-400">{generateError}</p>
+                                    </div>
+                                )}
 
                                 <div className="bg-accent/5 border border-accent/20 rounded-lg p-4 mb-6">
                                     <div className="flex items-start gap-3">
@@ -691,84 +810,76 @@ export default function CashbackPage() {
                                 </div>
 
                                 <Button
-                                    disabled={!agreedToTerms}
+                                    disabled={!agreedToTerms || generating || cashbackBalance < 100}
+                                    onClick={handleGenerateCode}
                                     className="w-full h-12 bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Згенерувати код знижки
+                                    {generating ? 'Генерація...' : 'Згенерувати код знижки'}
                                 </Button>
 
-                                {/* Code Display Area (shown after generation) */}
-                                <div className="mt-8 p-6 bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/30 rounded-lg hidden">
-                                    <p className="text-sm text-foreground/70 mb-3 text-center">
-                                        Ваш код знижки
-                                    </p>
-                                    <div className="bg-background border border-accent/20 rounded-lg p-4 mb-4">
-                                        <p className="text-2xl font-mono text-center tracking-wider text-accent">
-                                            CASHBACK-XXXX-YYYY
+                                {/* Generated Code Display */}
+                                {generatedCode && (
+                                    <div className="mt-8 p-6 bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/30 rounded-lg">
+                                        <p className="text-sm text-foreground/70 mb-1 text-center">
+                                            Ваш код знижки
+                                        </p>
+                                        <p className="text-xs text-foreground/50 mb-3 text-center">
+                                            на суму {generatedCode.amount.toLocaleString()} грн
+                                        </p>
+                                        <div className="bg-background border border-accent/20 rounded-lg p-4 mb-4">
+                                            <p className="text-2xl font-mono text-center tracking-wider text-accent">
+                                                {generatedCode.code}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1 border-accent/30 hover:bg-accent/10"
+                                                onClick={() => copyPromoCode(generatedCode.code)}
+                                            >
+                                                {copiedCode ? (
+                                                    <Check className="w-4 h-4 mr-2 text-green-500" />
+                                                ) : (
+                                                    <Copy className="w-4 h-4 mr-2" />
+                                                )}
+                                                {copiedCode ? 'Скопійовано' : 'Скопіювати'}
+                                            </Button>
+                                        </div>
+                                        <p className="text-xs text-foreground/60 text-center mt-4">
+                                            Дійсний до {formatDate(generatedCode.expiresAt)} &bull; Надайте його менеджеру при бронюванні
                                         </p>
                                     </div>
-                                    <div className="flex gap-3">
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1 border-accent/30 hover:bg-accent/10"
-                                        >
-                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                            </svg>
-                                            Скопіювати
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1 border-accent/30 hover:bg-accent/10"
-                                        >
-                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            Завантажити
-                                        </Button>
-                                    </div>
-                                    <p className="text-xs text-foreground/60 text-center mt-4">
-                                        Код дійсний 30 днів • Надайте його менеджеру при бронюванні
-                                    </p>
-                                </div>
+                                )}
                             </div>
                         </div>
 
-                        {/* Recent Claims History */}
+                        {/* Real Claims History */}
                         <div className="mt-8 bg-foreground/5 border border-foreground/10 rounded-xl p-8">
-                            <h3 className="text-lg font-semibold mb-4">Історія використання</h3>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center py-3 border-b border-foreground/10">
-                                    <div>
-                                        <p className="font-medium">CASHBACK-A1B2-C3D4</p>
-                                        <p className="text-xs text-foreground/60">Згенеровано 15 жовтня 2025</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold">500 грн</p>
-                                        <p className="text-xs text-green-500">Активний</p>
-                                    </div>
+                            <h3 className="text-lg font-semibold mb-4">Історія кодів</h3>
+                            {promoHistory.length === 0 ? (
+                                <p className="text-foreground/60 text-sm">Ви ще не генерували жодного коду.</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {promoHistory.map((entry) => (
+                                        <div key={entry.code} className="flex justify-between items-center py-3 border-b border-foreground/10 last:border-b-0">
+                                            <div>
+                                                <p className="font-medium font-mono">{entry.code}</p>
+                                                <p className="text-xs text-foreground/60">
+                                                    Згенеровано {formatDate(entry.createdAt)}
+                                                    {entry.status === 'active' && ` • Дійсний до ${formatDate(entry.expiresAt)}`}
+                                                    {entry.usedAt && ` • Використано ${formatDate(entry.usedAt)}`}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-semibold">{entry.amount.toLocaleString()} грн</p>
+                                                <p className={`text-xs ${statusColor(entry.status)}`}>
+                                                    {statusLabel(entry.status)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="flex justify-between items-center py-3 border-b border-foreground/10">
-                                    <div>
-                                        <p className="font-medium">CASHBACK-E5F6-G7H8</p>
-                                        <p className="text-xs text-foreground/60">Згенеровано 28 вересня 2025</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold">750 грн</p>
-                                        <p className="text-xs text-foreground/60">Використано</p>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center py-3">
-                                    <div>
-                                        <p className="font-medium">CASHBACK-I9J0-K1L2</p>
-                                        <p className="text-xs text-foreground/60">Згенеровано 12 серпня 2025</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold">1 000 грн</p>
-                                        <p className="text-xs text-foreground/60">Використано</p>
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 )}

@@ -63,6 +63,14 @@ export default function SubDashboardNavbar() {
                         </li>
                     )}
 
+                    {!loading && isAdmin && (
+                        <li>
+                            <NavLink href="/dashboard/promo-codes" className="block text-base text-white hover:text-blue-400 transition-colors py-2 px-3 rounded">
+                                Промокоди
+                            </NavLink>
+                        </li>
+                    )}
+
                     <li>
                         <div className="mt-auto pt-4 border-t border-gray-700">
                             <button

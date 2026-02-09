@@ -54,10 +54,10 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
+  // icons: {
+  //   icon: "/logo.png",
+  //   apple: "/logo.png",
+  // },
   verification: {
     // Add your verification codes here after setting up Google Search Console
     // google: "your-google-verification-code",
