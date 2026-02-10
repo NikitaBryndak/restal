@@ -49,31 +49,43 @@ export default function SmallNavbar() {
                             {/* Dashboard Navigation - Only if logged in */}
                             {session && userProfile && (
                                 <div className="flex flex-col space-y-4 pt-4">
-                                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b">
-                                        Кабінет
-                                    </h3>
+                                    <div className="flex flex-col space-y-2">
+                                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b">
+                                            Кабінет
+                                        </h3>
+                                        <NavLink href="/dashboard/profile" onClick={toggleMobileMenu} className="text-lg">
+                                            Профіль
+                                        </NavLink>
+                                        <NavLink href="/dashboard/trips" onClick={toggleMobileMenu} className="text-lg">
+                                            Мої подорожі
+                                        </NavLink>
+                                        <NavLink href="/cashback" onClick={toggleMobileMenu} className="text-lg">
+                                            Бонуси
+                                        </NavLink>
+                                        <NavLink href="/dashboard/settings" onClick={toggleMobileMenu} className="text-lg">
+                                            Налаштування
+                                        </NavLink>
+                                    </div>
+
                                     {userProfile.privilegeLevel > 1 && (
-                                        <>
+                                        <div className="flex flex-col space-y-2 pt-2">
+                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                                Admin
+                                            </h3>
+                                            <NavLink href="/dashboard/manage-tour" onClick={toggleMobileMenu} className="text-lg">
+                                                Керування турами
+                                            </NavLink>
                                             <NavLink href="/dashboard/add-tour" onClick={toggleMobileMenu} className="text-lg">
                                                 Додати тур
                                             </NavLink>
-                                            <NavLink href="/dashboard/manage-tour" onClick={toggleMobileMenu} className="text-lg">
-                                                Керувати турами
+                                            <NavLink href="/dashboard/add-article" onClick={toggleMobileMenu} className="text-lg">
+                                                Додати статтю
                                             </NavLink>
                                             <NavLink href="/dashboard/promo-codes" onClick={toggleMobileMenu} className="text-lg">
                                                 Промокоди
                                             </NavLink>
-                                        </>
+                                        </div>
                                     )}
-                                    <NavLink href="/dashboard/trips" onClick={toggleMobileMenu} className="text-lg">
-                                        Мої подорожі
-                                    </NavLink>
-                                    <NavLink href="/dashboard/settings" onClick={toggleMobileMenu} className="text-lg">
-                                        Налаштування
-                                    </NavLink>
-                                    <NavLink href="/dashboard/profile" onClick={toggleMobileMenu} className="text-lg">
-                                        Профіль
-                                    </NavLink>
                                 </div>
                             )}
                         </div>
