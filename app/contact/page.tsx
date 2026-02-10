@@ -5,10 +5,57 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import FormInput from "@/components/ui/form-input";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function ContactPage() {
+   const [firstName, setFirstName] = useState("");
+   const [lastName, setLastName] = useState("");
+   const [phone, setPhone] = useState("");
+   const [message, setMessage] = useState("");
+   const [submitting, setSubmitting] = useState(false);
+   const [success, setSuccess] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+
+   const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!phone.trim()) {
+         setError("Введіть номер телефону");
+         return;
+      }
+      setSubmitting(true);
+      setError(null);
+      try {
+         const res = await fetch("/api/contact-requests", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+               source: "contact",
+               firstName,
+               lastName,
+               phone,
+               message,
+            }),
+         });
+         const data = await res.json();
+         if (!res.ok) {
+            setError(data.message || "Помилка надсилання");
+            return;
+         }
+         setSuccess(true);
+         setFirstName("");
+         setLastName("");
+         setPhone("");
+         setMessage("");
+         setTimeout(() => setSuccess(false), 5000);
+      } catch {
+         setError("Помилка з'єднання з сервером");
+      } finally {
+         setSubmitting(false);
+      }
+   };
+
    return (
       <main className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-16 sm:py-24 relative overflow-hidden">
 
@@ -87,13 +134,15 @@ export default function ContactPage() {
 
             {/* Right Column: Form */}
             <div className="bg-white/5 p-6 sm:p-8 md:p-10 rounded-3xl border border-white/10 backdrop-blur-md shadow-2xl">
-               <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+               <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div className="space-y-2">
                         <Label htmlFor="firstName" className="text-white/80">Ім'я</Label>
                         <Input
                            id="firstName"
                            placeholder="Іван"
+                           value={firstName}
+                           onChange={(e) => setFirstName(e.target.value)}
                            className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
                         />
                      </div>
@@ -102,6 +151,8 @@ export default function ContactPage() {
                         <Input
                            id="lastName"
                            placeholder="Петренко"
+                           value={lastName}
+                           onChange={(e) => setLastName(e.target.value)}
                            className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
                         />
                      </div>
@@ -110,8 +161,8 @@ export default function ContactPage() {
                   <FormInput
                      labelText="Телефон"
                      placeholder="+38 (XXX) XXX-XXXX"
-                     // TODO: implement phone formatting
-                     // formatType="phone"
+                     value={phone}
+                     onChange={(e) => setPhone(e.target.value)}
                      containerClassName="space-y-2"
                      className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
                   />
@@ -120,14 +171,40 @@ export default function ContactPage() {
                      <Label htmlFor="message" className="text-white/80">Повідомлення</Label>
                      <textarea
                         id="message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
                         className="flex min-h-[150px] w-full rounded-md border border-white/10 bg-black/40 px-3 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/50 resize-none"
                         placeholder="Розкажіть нам про ваші плани подорожі..."
                      />
                   </div>
 
-                  <Button className="w-full bg-accent hover:bg-accent/90 text-white h-12 text-base font-medium rounded-xl mt-2">
-                     Надіслати повідомлення
-                     <Send className="w-4 h-4 ml-2" />
+                  {error && (
+                     <p className="text-red-400 text-sm text-center">{error}</p>
+                  )}
+
+                  {success && (
+                     <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Повідомлення надіслано! Ми зв'яжемося з вами найближчим часом.</span>
+                     </div>
+                  )}
+
+                  <Button
+                     type="submit"
+                     disabled={submitting}
+                     className="w-full bg-accent hover:bg-accent/90 text-white h-12 text-base font-medium rounded-xl mt-2 disabled:opacity-50"
+                  >
+                     {submitting ? (
+                        <>
+                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                           Надсилання...
+                        </>
+                     ) : (
+                        <>
+                           Надіслати повідомлення
+                           <Send className="w-4 h-4 ml-2" />
+                        </>
+                     )}
                   </Button>
                </form>
             </div>

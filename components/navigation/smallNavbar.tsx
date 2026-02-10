@@ -84,6 +84,9 @@ export default function SmallNavbar() {
                                             <NavLink href="/dashboard/promo-codes" onClick={toggleMobileMenu} className="text-lg">
                                                 Промокоди
                                             </NavLink>
+                                            <NavLink href="/dashboard/contact-requests" onClick={toggleMobileMenu} className="text-lg">
+                                                Запити
+                                            </NavLink>
                                         </div>
                                     )}
                                 </div>

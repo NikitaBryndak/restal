@@ -70,6 +70,10 @@ export default function SubDashboardNavbar() {
                             <NavLink href="/dashboard/promo-codes" className={NAV_ITEM_CLASS}>
                                 Промокоди
                             </NavLink>
+
+                            <NavLink href="/dashboard/contact-requests" className={NAV_ITEM_CLASS}>
+                                Запити
+                            </NavLink>
                         </div>
                     )}
 

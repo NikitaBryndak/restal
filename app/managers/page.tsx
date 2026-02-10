@@ -1,7 +1,7 @@
 "use client";
 
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { Phone, Send, User, MessageCircle, MessageSquareMore } from "lucide-react";
+import { Phone, Send, User, MessageCircle, MessageSquareMore, Loader2, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -100,6 +100,10 @@ export default function ManagersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedManager, setSelectedManager] = useState<string | null>(null);
   const [, forceUpdate] = useState({});
+  const [consultPhone, setConsultPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     // Force re-render every minute to update online status
@@ -117,7 +121,45 @@ export default function ManagersPage() {
 
   const handleConsultationClick = (managerName: string) => {
     setSelectedManager(managerName);
+    setConsultPhone("");
+    setSubmitError(null);
+    setSubmitSuccess(false);
     setIsModalOpen(true);
+  };
+
+  const handleConsultationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!consultPhone.trim()) {
+      setSubmitError("Введіть номер телефону");
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/contact-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "manager",
+          phone: consultPhone,
+          managerName: selectedManager,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubmitError(data.message || "Помилка надсилання");
+        return;
+      }
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setSubmitSuccess(false);
+      }, 2500);
+    } catch {
+      setSubmitError("Помилка з'єднання з сервером");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -225,12 +267,26 @@ export default function ManagersPage() {
               </p>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleConsultationSubmit}>
               <input
                 type="tel"
                 placeholder="Ваш номер телефону"
+                value={consultPhone}
+                onChange={(e) => setConsultPhone(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-accent transition-colors"
               />
+
+              {submitError && (
+                <p className="text-red-400 text-sm text-center">{submitError}</p>
+              )}
+
+              {submitSuccess && (
+                <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Запит надіслано! Ми зв'яжемося з вами.</span>
+                </div>
+              )}
+
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -240,14 +296,15 @@ export default function ManagersPage() {
                   Скасувати
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // TODO: Implement manager approval
-                    setIsModalOpen(false);
-                  }}
-                  className="flex-1 px-4 py-3 rounded-xl bg-accent text-white hover:bg-accent/90 transition-colors font-medium"
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 px-4 py-3 rounded-xl bg-accent text-white hover:bg-accent/90 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  Підтвердити
+                  {submitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Підтвердити"
+                  )}
                 </button>
               </div>
             </form>
