@@ -982,6 +982,299 @@
             background: #1a1a1a !important;
             color: #e0e0e0 !important;
         }
+
+        /* ====== MOBILE RESPONSIVE ====== */
+
+        /* --- Tablet breakpoint --- */
+        @media (max-width: 768px) {
+            #os-form {
+                margin-bottom: 30px !important;
+            }
+
+            /* Tour detail — stack order section below content */
+            .new_t-content-table {
+                display: block !important;
+            }
+            .new_t-content-col {
+                display: block !important;
+                width: 100% !important;
+            }
+            .new_t-order-content {
+                display: block !important;
+                width: 100% !important;
+                padding-left: 0 !important;
+                margin-top: 16px !important;
+            }
+            .new_t-order-table {
+                max-width: 100% !important;
+                margin: 0 auto !important;
+            }
+
+            /* Tour code adjust for narrower screens */
+            .new_t-order-code {
+                font-size: 16px !important;
+                letter-spacing: 0.5px !important;
+            }
+        }
+
+        /* --- Mobile breakpoint — matches widget's own 478px breakpoint --- */
+        @media (max-width: 478px) {
+
+            /* CRITICAL: Remove the nuclear overflow:visible fix on mobile.
+               Widget uses position:fixed fullscreen overlays for dropdowns,
+               date picker, and extended search. They need overflow:auto for scrolling. */
+            #os-form,
+            #os-form *:not(#cntList):not(#ctyList):not(.ctyLists-wrapper):not(.new_f-dropdown-list) {
+                overflow: unset !important;
+                overflow-x: unset !important;
+                overflow-y: unset !important;
+                clip: unset !important;
+                clip-path: unset !important;
+            }
+
+            /* CRITICAL: Don't force extended search open on mobile.
+               On mobile it becomes a fullscreen overlay — forcing it open
+               would permanently take over the screen. Let the widget toggle it. */
+            .new_f-ext-container {
+                display: none !important;
+                position: fixed !important;
+            }
+            .ext-opened .new_f-ext-container {
+                display: block !important;
+            }
+
+            /* Form z-index — mobile overlays use z-index: 999,
+               form shouldn't compete or block them */
+            #os-form {
+                z-index: auto !important;
+                margin-bottom: 20px !important;
+                border-radius: 12px !important;
+            }
+
+            /* Form fields — keep dark styling with mobile-appropriate radius */
+            .new_f-form-field {
+                border-radius: 8px !important;
+            }
+            .new_f-form-submit {
+                border-radius: 8px !important;
+            }
+
+            /* Dropdown spacer irrelevant on mobile (overlays are fullscreen) */
+            #os-dropdown-spacer {
+                display: none !important;
+            }
+
+            /* --- MOBILE FULLSCREEN OVERLAYS — DARK THEME --- */
+
+            /* Overlay header bar */
+            .new_f-dropdown-body-top,
+            .new_t-tab-content-top {
+                background: #0fa4e6 !important;
+                color: #ffffff !important;
+            }
+            .new_f-dropdown-body-close,
+            .new_t-tab-content-close {
+                color: #ffffff !important;
+            }
+
+            /* Overlay bottom bar with Cancel/Apply buttons */
+            .new_f-dropdown-body-bottom {
+                background: #1a1a1a !important;
+                border-top: 1px solid rgba(255,255,255,0.1) !important;
+            }
+            .new_f-dropdown-btn-cancel,
+            .new_f-dropdown-bottom-btn:first-child {
+                background: #2a2a2a !important;
+                color: #e0e0e0 !important;
+                border-color: rgba(255,255,255,0.1) !important;
+            }
+            .new_f-dropdown-btn-apply,
+            .new_f-dropdown-bottom-btn:last-child {
+                background: #0fa4e6 !important;
+                color: #ffffff !important;
+            }
+
+            /* Fullscreen dropdown/overlay body — dark bg */
+            .new_f-dropdown-body,
+            .new_f-dropdown-body.popup {
+                background: #1a1a1a !important;
+                background-color: #1a1a1a !important;
+            }
+            .new_f-dropdown-list {
+                background: #1a1a1a !important;
+            }
+            .new_f-dropdown-item {
+                color: #e0e0e0 !important;
+            }
+            .new_f-dropdown-item.selected {
+                background: rgba(15,164,230,0.2) !important;
+            }
+
+            /* Extended search overlay dark bg */
+            .new_f-ext-body {
+                background: #1a1a1a !important;
+            }
+            .ext-opened .new_f-ext-container {
+                background: #1a1a1a !important;
+                background-image: none !important;
+            }
+            .new_f-ext-container .new_f-dropdown-body-bottom {
+                background: #1a1a1a !important;
+            }
+
+            /* Country/Resort lists in fullscreen — keep overflow scrolling */
+            #cntList {
+                overflow-y: auto !important;
+                max-height: none !important;
+            }
+            #ctyList {
+                overflow-y: auto !important;
+                overflow: auto !important;
+                background: #1a1a1a !important;
+            }
+            #ctyList .ctyLists-wrapper {
+                background: #1a1a1a !important;
+            }
+            #cntList li,
+            #ctyList li {
+                background: transparent !important;
+            }
+            #cntList li label,
+            #ctyList li label {
+                color: #e0e0e0 !important;
+            }
+            .labelName,
+            .itemPrice {
+                background: transparent !important;
+            }
+
+            /* Date picker mobile overlay — dark */
+            .new_f-dates-container .dp-container {
+                background: #1a1a1a !important;
+            }
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div {
+                background: #1a1a1a !important;
+            }
+            .mobile-calendar-days {
+                background-color: rgba(26, 26, 26, 0.95) !important;
+            }
+            .mobile-calendar-day {
+                color: #888 !important;
+            }
+            .calendar-tip {
+                background-color: #0fa4e6 !important;
+                color: #ffffff !important;
+            }
+            /* Date cells dark theme for mobile */
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td {
+                background: #2a2a2a !important;
+                border-color: #1a1a1a !important;
+            }
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td a,
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td span {
+                color: #0fa4e6 !important;
+            }
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled {
+                background-color: #1e1e1e !important;
+            }
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled .ui-state-default {
+                color: #555 !important;
+            }
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-other-month {
+                background-color: #1a1a1a !important;
+            }
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-title {
+                color: #0fa4e6 !important;
+            }
+            /* Highlight / active dates */
+            .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-highlight {
+                background-color: rgba(15,164,230,0.2) !important;
+            }
+
+            /* People selector mobile — dark */
+            .new_f-people-item {
+                background-color: #2a2a2a !important;
+                color: #e0e0e0 !important;
+            }
+            .new_f-people-item.active {
+                background-color: #0fa4e6 !important;
+                color: #ffffff !important;
+            }
+            .new_f-people-title {
+                color: #e0e0e0 !important;
+            }
+            .new_f-children-accordion-btn {
+                border-color: rgba(255,255,255,0.15) !important;
+                background: #2a2a2a !important;
+                color: #e0e0e0 !important;
+            }
+            .new_f-children-age-item {
+                background-color: #2a2a2a !important;
+                color: #e0e0e0 !important;
+                border: 1px solid rgba(255,255,255,0.15) !important;
+            }
+            .new_f-children-accordion-body {
+                background: #222 !important;
+                border-color: rgba(255,255,255,0.15) !important;
+            }
+
+            /* Result cards on mobile — dark theme with rounded corners */
+            .new_r-item {
+                border-radius: 12px !important;
+                background-color: rgba(255,255,255,0.04) !important;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+            }
+            .new_r-item,
+            .new_r-item-img {
+                border-radius: 12px !important;
+            }
+            .new_r-item-img {
+                border-radius: 12px 12px 0 0 !important;
+            }
+            .new_r-item-body {
+                border-radius: 0 0 12px 12px !important;
+            }
+
+            /* Price badge */
+            .new_r-item-price {
+                border-radius: 8px !important;
+            }
+
+            /* Filters dark */
+            .new_r-filters-title {
+                background-color: #0fa4e6 !important;
+                color: #ffffff !important;
+            }
+            .new_r-filter {
+                background-color: rgba(255,255,255,0.08) !important;
+                box-shadow: none !important;
+            }
+            .new_r-filter-label {
+                color: #b0b0b0 !important;
+            }
+            .new_r-filter-value {
+                color: #0fa4e6 !important;
+            }
+
+            /* Tour code smaller on mobile */
+            .new_t-order-code {
+                font-size: 14px !important;
+                padding: 6px 8px !important;
+                letter-spacing: 0.5px !important;
+            }
+
+            /* Results/tour details padding on mobile */
+            #os-search-results,
+            #os-tour-details {
+                padding: 0 4px !important;
+            }
+
+            /* Show more results button */
+            .new_r-show-more-results {
+                margin-left: 6px !important;
+                margin-right: 6px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1014,7 +1307,9 @@
                 // Use the wrapper div's total height — simple, no feedback loop
                 var wrapper = document.getElementById('os-content-wrapper');
                 if (!wrapper) return;
-                var h = wrapper.offsetHeight + 40;
+                // Less padding on mobile
+                var padding = window.innerWidth <= 478 ? 20 : 40;
+                var h = wrapper.offsetHeight + padding;
                 // Only resize if height grew, or shrank by more than 100px
                 // This prevents jitter while still allowing real shrinks
                 if (h > lastSentHeight || (lastSentHeight - h) > 100) {
@@ -1036,7 +1331,10 @@
     <script>
         (function() {
             // 1. Fix overflow on form so dropdowns are not clipped
+            // SKIP on mobile (≤478px) — widget uses fullscreen overlays that need overflow:auto
             function fixOverflow() {
+                if (window.innerWidth <= 478) return;
+
                 var formEl = document.getElementById('os-form');
                 if (!formEl) return;
                 formEl.style.setProperty('overflow', 'visible', 'important');
@@ -1194,7 +1492,12 @@
                     formEl.style.setProperty('background-color', 'rgba(255,255,255,0.04)', 'important');
                     formEl.style.setProperty('background-image', 'none', 'important');
                     formEl.style.setProperty('border', '1px solid rgba(255,255,255,0.08)', 'important');
-                    formEl.style.setProperty('border-radius', '16px', 'important');
+                    formEl.style.setProperty('border-radius', window.innerWidth <= 478 ? '12px' : '16px', 'important');
+
+                    // z-index only matters on desktop (mobile overlays manage their own)
+                    if (window.innerWidth > 478) {
+                        formEl.style.setProperty('z-index', '1000', 'important');
+                    }
 
                     // Target the specific widget container — make transparent (no double border)
                     var fContainer = formEl.querySelector('.new_f-container');
@@ -1213,15 +1516,22 @@
                     // Dark bg on extended search container
                     var extContainer = formEl.querySelector('.new_f-ext-container');
                     if (extContainer) {
-                        extContainer.style.setProperty('background', 'rgba(255,255,255,0.03)', 'important');
+                        // On mobile, ext search is fullscreen — use opaque dark bg
+                        // On desktop, it's inline — use subtle transparent bg
+                        var extBg = window.innerWidth <= 478 ? '#1a1a1a' : 'rgba(255,255,255,0.03)';
+                        extContainer.style.setProperty('background', extBg, 'important');
                         extContainer.style.setProperty('background-image', 'none', 'important');
                         extContainer.style.setProperty('box-shadow', 'none', 'important');
-                        extContainer.style.setProperty('display', 'block', 'important');
-                        extContainer.style.setProperty('position', 'relative', 'important');
+                        // Only force extended search open on desktop
+                        // On mobile (≤478px) it becomes a fullscreen overlay
+                        if (window.innerWidth > 478) {
+                            extContainer.style.setProperty('display', 'block', 'important');
+                            extContainer.style.setProperty('position', 'relative', 'important');
+                        }
                     }
 
-                    // Force ext-opened class on container so extended search is visible
-                    if (fContainer && !fContainer.classList.contains('ext-opened')) {
+                    // Force ext-opened class on container so extended search is visible (desktop only)
+                    if (window.innerWidth > 478 && fContainer && !fContainer.classList.contains('ext-opened')) {
                         fContainer.classList.add('ext-opened');
                     }
 
@@ -1304,6 +1614,7 @@
                 }
 
                 // Dropdowns / autocomplete dark theme
+                var isMobile = window.innerWidth <= 478;
                 var dropdowns = document.querySelectorAll(
                     '.ui-autocomplete, .ui-menu, .ui-datepicker,' +
                     '[class*="dropdown"], [class*="autocomplete"], [class*="popup"], [class*="suggestion"]'
@@ -1312,7 +1623,10 @@
                     dropdowns[i].style.setProperty('background-color', '#1a1a1a', 'important');
                     dropdowns[i].style.setProperty('border-color', 'rgba(255,255,255,0.15)', 'important');
                     dropdowns[i].style.setProperty('color', '#e0e0e0', 'important');
-                    dropdowns[i].style.setProperty('z-index', '99999', 'important');
+                    // Only force z-index on desktop — mobile overlays manage their own stacking
+                    if (!isMobile) {
+                        dropdowns[i].style.setProperty('z-index', '99999', 'important');
+                    }
                     // Force ALL children dark too
                     var ddChildren = dropdowns[i].querySelectorAll('*');
                     for (var j = 0; j < ddChildren.length; j++) {
@@ -1361,20 +1675,25 @@
 
             // 3. Tour code — big and prominent
             function styleTourCodes() {
+                var isMobile = window.innerWidth <= 478;
+                var codeFontSize = isMobile ? '14px' : '18px';
+                var codePadding = isMobile ? '6px 8px' : '8px 10px';
+                var codeLetterSpacing = isMobile ? '0.5px' : '1px';
+
                 // Specifically target the widget's tour code element
                 var tourCodes = document.querySelectorAll('.new_t-order-code');
                 for (var i = 0; i < tourCodes.length; i++) {
                     var el = tourCodes[i];
-                    if (el.dataset.codeStyled) continue;
-                    el.style.fontSize = '18px';
+                    if (el.dataset.codeStyled && !isMobile) continue;
+                    el.style.fontSize = codeFontSize;
                     el.style.fontWeight = '800';
                     el.style.color = '#0fa4e6';
                     el.style.background = 'rgba(15,164,230,0.15)';
                     el.style.border = '2px solid rgba(15,164,230,0.35)';
                     el.style.borderRadius = '10px';
-                    el.style.padding = '8px 10px';
+                    el.style.padding = codePadding;
                     el.style.display = 'block';
-                    el.style.letterSpacing = '1px';
+                    el.style.letterSpacing = codeLetterSpacing;
                     el.style.margin = '8px 0';
                     el.style.textAlign = 'center';
                     el.style.lineHeight = '1.3';
@@ -1399,15 +1718,15 @@
                     var text = (el.textContent || '').trim();
 
                     if (el.children.length <= 1 && /Код\s*[:：]?\s*\d{4,}/.test(text) && text.length < 40) {
-                        el.style.fontSize = '18px';
+                        el.style.fontSize = codeFontSize;
                         el.style.fontWeight = '800';
                         el.style.color = '#0fa4e6';
                         el.style.background = 'rgba(15,164,230,0.15)';
                         el.style.border = '2px solid rgba(15,164,230,0.35)';
                         el.style.borderRadius = '10px';
-                        el.style.padding = '8px 10px';
+                        el.style.padding = codePadding;
                         el.style.display = 'block';
-                        el.style.letterSpacing = '1px';
+                        el.style.letterSpacing = codeLetterSpacing;
                         el.style.margin = '8px 0';
                         el.style.textAlign = 'center';
                         el.style.lineHeight = '1.3';
@@ -1769,6 +2088,120 @@
         html body .new_r-item:hover .new_r-item-price {
             background: #0d8fca !important;
             color: #ffffff !important;
+        }
+
+        /* ====== POST-LOAD MOBILE OVERRIDES — max specificity ====== */
+
+        @media (max-width: 768px) {
+            /* Tour detail stacking — post-load specificity */
+            html body .new_t-content-table {
+                display: block !important;
+            }
+            html body .new_t-content-col {
+                display: block !important;
+                width: 100% !important;
+            }
+            html body .new_t-order-content {
+                display: block !important;
+                width: 100% !important;
+                padding-left: 0 !important;
+            }
+            html body .new_t-order-table {
+                max-width: 100% !important;
+            }
+        }
+
+        @media (max-width: 478px) {
+            /* Undo overflow fix with post-load specificity */
+            html body #os-form,
+            html body #os-form * {
+                overflow: unset !important;
+                clip: unset !important;
+                clip-path: unset !important;
+            }
+
+            /* Scrollable lists still keep scroll behavior */
+            html body #cntList {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                max-height: none !important;
+            }
+            html body #ctyList {
+                overflow: auto !important;
+            }
+            html body .new_f-dropdown-list {
+                overflow: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            /* Extended search NOT forced open */
+            html body .new_f-ext-container {
+                display: none !important;
+            }
+            html body .ext-opened .new_f-ext-container {
+                display: block !important;
+            }
+
+            /* Extended search always visible override disabled */
+            html body .new_f-ext-container::before {
+                display: none !important;
+            }
+
+            /* Form z-index reset */
+            html body #os-form {
+                z-index: auto !important;
+            }
+
+            /* Fullscreen overlays dark bg — high specificity */
+            html body .new_f-dropdown-body,
+            html body .new_f-dropdown-body.popup {
+                background: #1a1a1a !important;
+                background-color: #1a1a1a !important;
+            }
+            html body .new_f-ext-body {
+                background: #1a1a1a !important;
+            }
+            html body .new_f-ext-container {
+                background: #1a1a1a !important;
+                background-image: none !important;
+            }
+
+            /* Mobile date picker dark */
+            html body .new_f-dates-container .dp-container {
+                background: #1a1a1a !important;
+            }
+            html body .new_f-dates-container#new_f-dates-container #ui-datepicker-div {
+                background: #1a1a1a !important;
+            }
+            html body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td {
+                background: #2a2a2a !important;
+                border-color: #1a1a1a !important;
+            }
+            html body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled {
+                background-color: #1e1e1e !important;
+            }
+            html body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-other-month {
+                background-color: #1a1a1a !important;
+            }
+
+            /* People selector dark */
+            html body .new_f-people-item {
+                background-color: #2a2a2a !important;
+                color: #e0e0e0 !important;
+            }
+            html body .new_f-people-item.active {
+                background-color: #0fa4e6 !important;
+                color: #ffffff !important;
+            }
+            html body .new_f-children-accordion-btn {
+                border-color: rgba(255,255,255,0.15) !important;
+                background: #2a2a2a !important;
+                color: #e0e0e0 !important;
+            }
+            html body .new_f-children-accordion-body {
+                background: #222 !important;
+                border-color: rgba(255,255,255,0.15) !important;
+            }
         }
     </style>
 </body>

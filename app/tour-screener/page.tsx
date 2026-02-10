@@ -18,12 +18,12 @@ export default function TourScreenerPage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4">
+    <main className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4 md:pt-24 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-6">
       <div className="w-full max-w-6xl mx-auto">
         <iframe
           ref={iframeRef}
           src="/tour-screener.html"
-          className="w-full border-0 rounded-2xl"
+          className="w-full border-0 rounded-2xl max-sm:rounded-xl"
           style={{ minHeight: "80vh", background: "transparent", overflow: "visible" }}
           title="Пошук турів"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
