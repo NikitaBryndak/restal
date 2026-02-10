@@ -641,25 +641,37 @@
 
         /* ====== TOUR CODE — BIG AND PROMINENT ====== */
         .new_t-order-code {
-            font-size: 22px !important;
+            font-size: 18px !important;
             font-weight: 800 !important;
             color: #0fa4e6 !important;
             background: rgba(15,164,230,0.15) !important;
             border: 2px solid rgba(15,164,230,0.35) !important;
             border-radius: 10px !important;
-            padding: 10px 14px !important;
+            padding: 8px 10px !important;
             display: block !important;
-            letter-spacing: 2px !important;
+            letter-spacing: 1px !important;
             margin: 8px 0 !important;
             text-align: center !important;
             line-height: 1.3 !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
+            word-break: break-all !important;
+            overflow-wrap: break-word !important;
         }
 
         /* Order section alignment */
+        .new_t-content-table {
+            display: table !important;
+            width: 100% !important;
+        }
+        .new_t-content-col {
+            display: table-cell !important;
+            vertical-align: top !important;
+        }
         .new_t-order-table {
             text-align: center !important;
+            position: relative !important;
+            max-width: 210px !important;
         }
         .new_t-order-price {
             font-size: 20px !important;
@@ -674,8 +686,11 @@
         }
         /* Keep original table-cell layout — only override text alignment */
         .new_t-order-content {
+            display: table-cell !important;
             text-align: center !important;
             vertical-align: top !important;
+            width: 210px !important;
+            padding-left: 17px !important;
         }
 
         /* --- Tour Detail Page --- */
@@ -692,6 +707,11 @@
             background-color: rgba(255,255,255,0.05) !important;
             border-radius: 12px !important;
             color: #e0e0e0 !important;
+            overflow: visible !important;
+        }
+        .new_t-content-table {
+            display: table !important;
+            width: 100% !important;
         }
 
         /* Tour header */
@@ -1346,20 +1366,22 @@
                 for (var i = 0; i < tourCodes.length; i++) {
                     var el = tourCodes[i];
                     if (el.dataset.codeStyled) continue;
-                    el.style.fontSize = '22px';
+                    el.style.fontSize = '18px';
                     el.style.fontWeight = '800';
                     el.style.color = '#0fa4e6';
                     el.style.background = 'rgba(15,164,230,0.15)';
                     el.style.border = '2px solid rgba(15,164,230,0.35)';
                     el.style.borderRadius = '10px';
-                    el.style.padding = '10px 14px';
+                    el.style.padding = '8px 10px';
                     el.style.display = 'block';
-                    el.style.letterSpacing = '2px';
+                    el.style.letterSpacing = '1px';
                     el.style.margin = '8px 0';
                     el.style.textAlign = 'center';
                     el.style.lineHeight = '1.3';
                     el.style.maxWidth = '100%';
                     el.style.boxSizing = 'border-box';
+                    el.style.wordBreak = 'break-all';
+                    el.style.overflowWrap = 'break-word';
                     el.dataset.codeStyled = 'true';
                 }
 
@@ -1377,15 +1399,15 @@
                     var text = (el.textContent || '').trim();
 
                     if (el.children.length <= 1 && /Код\s*[:：]?\s*\d{4,}/.test(text) && text.length < 40) {
-                        el.style.fontSize = '22px';
+                        el.style.fontSize = '18px';
                         el.style.fontWeight = '800';
                         el.style.color = '#0fa4e6';
                         el.style.background = 'rgba(15,164,230,0.15)';
                         el.style.border = '2px solid rgba(15,164,230,0.35)';
                         el.style.borderRadius = '10px';
-                        el.style.padding = '10px 14px';
+                        el.style.padding = '8px 10px';
                         el.style.display = 'block';
-                        el.style.letterSpacing = '2px';
+                        el.style.letterSpacing = '1px';
                         el.style.margin = '8px 0';
                         el.style.textAlign = 'center';
                         el.style.lineHeight = '1.3';
