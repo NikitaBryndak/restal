@@ -9,7 +9,7 @@ export default function TourScreenerPage() {
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === "resize" && typeof e.data.height === "number") {
         if (iframeRef.current) {
-          iframeRef.current.style.height = `${e.data.height + 40}px`;
+          iframeRef.current.style.height = `${e.data.height}px`;
         }
       }
     };

@@ -966,83 +966,49 @@
 </head>
 <body>
 
-    <!-- The widget renders its search form here automatically -->
-    <div id="os-form"></div>
+    <div id="os-content-wrapper">
+        <!-- The widget renders its search form here automatically -->
+        <div id="os-form"></div>
 
-    <!-- Spacer to prevent dropdown from being covered (JS manages height dynamically) -->
-    <div id="os-dropdown-spacer" style="height:0px;position:relative;z-index:0;pointer-events:none;"></div>
+        <!-- Spacer for dropdown overflow -->
+        <div id="os-dropdown-spacer" style="height:0px;position:relative;z-index:0;pointer-events:none;"></div>
 
-    <!-- Search results will appear here -->
-    <div id="os-search-results"></div>
+        <!-- Search results will appear here -->
+        <div id="os-search-results"></div>
 
-    <!-- Tour details will appear here -->
-    <div id="os-tour-details"></div>
+        <!-- Tour details will appear here -->
+        <div id="os-tour-details"></div>
+    </div>
 
     <!-- Widget scripts (must load after the config vars and container divs exist) -->
     <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
     <script src="https://export.otpusk.com/js/onsite/"></script>
     <script src="https://export.otpusk.com/js/order"></script>
 
-    <!-- Auto-resize: notify parent iframe about content height changes -->
+    <!-- Auto-resize: simple and stable -->
     <script>
         (function() {
             var lastSentHeight = 0;
-            var debounceTimer = null;
-
-            function measureContentHeight() {
-                // Measure actual content element bottoms — NOT scrollHeight (avoids feedback loop)
-                var h = 0;
-                var ids = ['os-form', 'os-dropdown-spacer', 'os-search-results', 'os-tour-details'];
-                for (var i = 0; i < ids.length; i++) {
-                    var el = document.getElementById(ids[i]);
-                    if (el && (el.offsetHeight > 0 || el.scrollHeight > 0)) {
-                        var rect = el.getBoundingClientRect();
-                        var bottom = window.scrollY + rect.top + rect.height;
-                        if (bottom > h) h = bottom;
-                    }
-                }
-                // Account for absolutely-positioned dropdowns extending below
-                var formEl = document.getElementById('os-form');
-                if (formEl) {
-                    var ddBodies = formEl.querySelectorAll('.new_f-dropdown-body');
-                    for (var d = 0; d < ddBodies.length; d++) {
-                        var dd = ddBodies[d];
-                        if (dd.offsetHeight > 0 && dd.offsetWidth > 0) {
-                            var ddRect = dd.getBoundingClientRect();
-                            var ddBottom = window.scrollY + ddRect.top + ddRect.height;
-                            if (ddBottom > h) h = ddBottom + 40;
-                        }
-                    }
-                }
-                return Math.ceil(h) + 20; // small bottom padding
-            }
 
             function postHeight() {
-                var h = measureContentHeight();
-                // Only send if height changed by more than 5px (prevents jitter)
-                if (Math.abs(h - lastSentHeight) > 5) {
+                // Use the wrapper div's total height — simple, no feedback loop
+                var wrapper = document.getElementById('os-content-wrapper');
+                if (!wrapper) return;
+                var h = wrapper.offsetHeight + 40;
+                // Only resize if height grew, or shrank by more than 100px
+                // This prevents jitter while still allowing real shrinks
+                if (h > lastSentHeight || (lastSentHeight - h) > 100) {
                     lastSentHeight = h;
                     window.parent.postMessage({ type: 'resize', height: h }, '*');
                 }
             }
 
-            function debouncedPostHeight() {
-                if (debounceTimer) clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(postHeight, 150);
-            }
-
-            // Post height on load and periodically
             window.addEventListener('load', function() {
-                postHeight();
-                setInterval(postHeight, 1000);
+                // Initial delay to let widget render
+                setTimeout(postHeight, 1500);
+                // Check every 2 seconds — infrequent to avoid jitter
+                setInterval(postHeight, 2000);
             });
-            // Observe DOM mutations — debounced to avoid style-change storm
-            if (window.MutationObserver) {
-                var observer = new MutationObserver(debouncedPostHeight);
-                observer.observe(document.body, { childList: true, subtree: true });
-                // NOTE: removed attributes: true — our applyDarkTheme sets styles every 600ms
-                // which would trigger infinite resize loops
-            }
         })();
     </script>
 
@@ -1069,28 +1035,9 @@
                     if (cs.clip && cs.clip !== 'auto') el.style.clip = 'auto';
                 }
 
-                // Dynamically adjust spacer based on whether dropdown is open
+                // Spacer — just a small fixed gap, dropdowns use overflow:visible + z-index
                 var spacer = document.getElementById('os-dropdown-spacer');
-                if (spacer) {
-                    // Check if any dropdown body is actually visible
-                    var maxDdBottom = 0;
-                    var formRect = formEl.getBoundingClientRect();
-                    var formBottom = formRect.top + formRect.height;
-                    var ddBodies = formEl.querySelectorAll('.new_f-dropdown-body');
-                    for (var d = 0; d < ddBodies.length; d++) {
-                        if (ddBodies[d].offsetHeight > 0 && ddBodies[d].offsetWidth > 0) {
-                            var ddRect = ddBodies[d].getBoundingClientRect();
-                            var ddBottom = ddRect.top + ddRect.height;
-                            if (ddBottom > maxDdBottom) maxDdBottom = ddBottom;
-                        }
-                    }
-                    // Only add spacer if dropdown extends below the form
-                    if (maxDdBottom > formBottom) {
-                        spacer.style.height = Math.ceil(maxDdBottom - formBottom + 20) + 'px';
-                    } else {
-                        spacer.style.height = '0px';
-                    }
-                }
+                if (spacer) spacer.style.height = '10px';
             }
 
             // 2. Apply dark theme to widget-generated elements via inline styles
