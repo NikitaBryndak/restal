@@ -61,7 +61,7 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
         }
 
         if ((session.user.privilegeLevel ?? 0) < MANAGER_PRIVILEGE_LEVEL) {
-             return NextResponse.json({ message: `Forbidden: Insufficient privileges (Level ${session.user.privilegeLevel ?? 0}). Required: ${MANAGER_PRIVILEGE_LEVEL}` }, { status: 403 });
+             return NextResponse.json({ message: "Forbidden: Insufficient privileges." }, { status: 403 });
         }
 
         await connectToDatabase();
@@ -136,8 +136,15 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             return NextResponse.json({ message: "Forbidden: You don't have access to modify this trip." }, { status: 403 });
         }
 
-        // Remove immutable fields but allow number to be updated, update managerPhone to current manager
-        const { _id, createdAt, updatedAt, managerName, ...rest } = updates ?? {};
+        // SECURITY: Remove immutable and sensitive fields to prevent mass assignment
+        const {
+            _id, createdAt, updatedAt, managerName,
+            ownerPhone: _ownerPhone,           // Immutable - set at creation
+            cashbackProcessed: _cbProcessed,    // Only set by cron job
+            cashbackAmount: _cbAmount,           // Only set at creation
+            managerPhone: _mgrPhone,            // Auto-set to current user below
+            ...rest
+        } = updates ?? {};
 
         // Get current manager's name
         const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;

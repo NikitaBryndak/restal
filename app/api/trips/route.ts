@@ -116,21 +116,29 @@ export async function POST(request: Request) {
             };
         }
 
+        // SECURITY: Whitelist only allowed fields to prevent mass assignment
         const payload = {
-            ...body,
-            ownerPhone: sanitizedOwnerPhone,  // Use sanitized phone
+            number: body.number,
+            bookingDate: body.bookingDate,
+            tripStartDate: body.tripStartDate,
+            tripEndDate: body.tripEndDate,
+            country: body.country,
+            region: body.region,
             flightInfo,
+            hotel: body.hotel,
+            tourists: body.tourists,
+            addons: body.addons,
+            documents: body.documents,
+            payment: body.payment,
+            ownerPhone: sanitizedOwnerPhone,
             managerPhone: session.user.phoneNumber,
             managerName: currentManager?.name || '',
             status: 'In Booking',
-            // Store cashback amount for later processing (one day after tour ends)
             cashbackAmount: cashbackAmount,
             cashbackProcessed: false,
         };
 
-        const newTrip = new Trip({
-            ...payload,
-        });
+        const newTrip = new Trip(payload);
         await newTrip.save();
 
         // NOTE: Cashback is now added one day after the tour ends (tripEndDate)

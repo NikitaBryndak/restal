@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import ContactRequest from "@/models/contactRequest";
 import User from "@/models/user";
+import mongoose from "mongoose";
 
 // Rate limit: max 5 requests per IP per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -63,14 +64,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Create contact request
+        // Create contact request with sanitized inputs
         const contactRequest = await ContactRequest.create({
             source,
-            firstName: firstName?.trim() || "",
-            lastName: lastName?.trim() || "",
+            firstName: firstName?.trim().slice(0, 100) || "",
+            lastName: lastName?.trim().slice(0, 100) || "",
             phone: phoneClean,
-            message: message?.trim() || "",
-            managerName: managerName?.trim() || "",
+            message: message?.trim().slice(0, 2000) || "",
+            managerName: managerName?.trim().slice(0, 100) || "",
             ip,
         });
 
@@ -106,8 +107,9 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url);
         const status = searchParams.get("status");
-        const page = parseInt(searchParams.get("page") || "1", 10);
-        const limit = parseInt(searchParams.get("limit") || "20", 10);
+        const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+        // SECURITY: Bound limit to prevent memory exhaustion (max 100)
+        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
 
         const filter: Record<string, unknown> = {};
         if (status && status !== "all") {
@@ -167,8 +169,9 @@ export async function PUT(request: NextRequest) {
 
         const { id, status, adminNote } = await request.json();
 
-        if (!id) {
-            return NextResponse.json({ message: "ID запиту є обов'язковим" }, { status: 400 });
+        // SECURITY: Validate ObjectId format to prevent injection/crashes
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ message: "Невірний ID запиту" }, { status: 400 });
         }
 
         const updateData: Record<string, unknown> = {};
@@ -176,7 +179,7 @@ export async function PUT(request: NextRequest) {
             updateData.status = status;
         }
         if (typeof adminNote === "string") {
-            updateData.adminNote = adminNote;
+            updateData.adminNote = adminNote.slice(0, 1000);
         }
 
         if (Object.keys(updateData).length === 0) {

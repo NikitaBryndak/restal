@@ -56,13 +56,15 @@ export async function POST(request: Request) {
                     continue; // Not yet time to process this trip
                 }
 
-                // Find the user and add cashback
-                const user = await User.findOne({ phoneNumber: trip.ownerPhone });
-                if (user) {
-                    user.cashbackAmount = (user.cashbackAmount || 0) + (trip.cashbackAmount || 0);
-                    await user.save();
+                // Find the user and add cashback atomically
+                const updatedUser = await User.findOneAndUpdate(
+                    { phoneNumber: trip.ownerPhone },
+                    { $inc: { cashbackAmount: (trip.cashbackAmount || 0) } },
+                    { new: true }
+                );
 
-                    // Mark trip as processed
+                if (updatedUser) {
+                    // Mark trip as processed atomically
                     await Trip.findByIdAndUpdate(trip._id, {
                         cashbackProcessed: true,
                     });

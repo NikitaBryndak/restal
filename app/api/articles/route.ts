@@ -5,6 +5,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import Counter from "@/models/counter";
 
+// SECURITY: Maximum allowed lengths for article fields
+const MAX_TITLE_LENGTH = 200;
+const MAX_DESCRIPTION_LENGTH = 500;
+const MAX_CONTENT_LENGTH = 50000;
+const MAX_TAG_LENGTH = 50;
+const MAX_IMAGE_URL_LENGTH = 2000;
+
 export async function GET() {
     try {
         await connectToDatabase();
@@ -12,9 +19,8 @@ export async function GET() {
         const articles = await Article.find().sort({ createdAt: -1 }).lean();
 
         return NextResponse.json({ articles }, { status: 200 });
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        return NextResponse.json({ message: "Error fetching articles", error: message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Error fetching articles" }, { status: 500 });
     }
 }
 
@@ -33,6 +39,23 @@ export async function POST(request: Request) {
 
         const body = await request.json();
 
+        // SECURITY: Validate required fields
+        if (!body.title || typeof body.title !== 'string') {
+            return NextResponse.json({ message: "Title is required" }, { status: 400 });
+        }
+        if (!body.content || typeof body.content !== 'string') {
+            return NextResponse.json({ message: "Content is required" }, { status: 400 });
+        }
+        if (!body.tag || typeof body.tag !== 'string') {
+            return NextResponse.json({ message: "Tag is required" }, { status: 400 });
+        }
+        if (!body.description || typeof body.description !== 'string') {
+            return NextResponse.json({ message: "Description is required" }, { status: 400 });
+        }
+        if (!body.images || typeof body.images !== 'string') {
+            return NextResponse.json({ message: "Image URL is required" }, { status: 400 });
+        }
+
         await connectToDatabase();
 
         const creatorPhone = session.user.phoneNumber;
@@ -44,11 +67,16 @@ export async function POST(request: Request) {
 
         const articleID = counter.value;
 
+        // SECURITY: Whitelist only allowed fields to prevent mass assignment
         const toCreate = {
-                ...body,
-                articleID,
-                creatorPhone
-            };
+            articleID,
+            creatorPhone,
+            title: body.title.trim().slice(0, MAX_TITLE_LENGTH),
+            description: body.description.trim().slice(0, MAX_DESCRIPTION_LENGTH),
+            content: body.content.slice(0, MAX_CONTENT_LENGTH),
+            tag: body.tag.trim().slice(0, MAX_TAG_LENGTH),
+            images: body.images.trim().slice(0, MAX_IMAGE_URL_LENGTH),
+        };
 
         const created = await Article.create(toCreate);
 
@@ -57,8 +85,7 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json({ article: created }, { status: 201 });
-    } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Unknown error';
-            return NextResponse.json({ message: "Error creating article", error: message }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Error creating article" }, { status: 500 });
     }
 }

@@ -30,8 +30,15 @@ export async function GET(request: NextRequest) {
         }
 
         // SECURITY: Prevent path traversal attacks
-        if (filePath.includes('..') || filePath.startsWith('/')) {
+        if (filePath.includes('..') || filePath.startsWith('/') || filePath.includes('\\')) {
             return NextResponse.json({ message: "Invalid file path" }, { status: 400 });
+        }
+
+        // SECURITY: Only allow access to known folder prefixes
+        const ALLOWED_PREFIXES = ['documents/', 'articles/'];
+        const hasAllowedPrefix = ALLOWED_PREFIXES.some(prefix => filePath.startsWith(prefix));
+        if (!hasAllowedPrefix) {
+            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
         // SECURITY: Verify user has access to this document
@@ -40,8 +47,12 @@ export async function GET(request: NextRequest) {
             await connectToDatabase();
 
             const tripNumber = extractTripNumberFromPath(filePath);
-            if (tripNumber) {
-                const trip = await Trip.findOne({ number: tripNumber }).lean() as any;
+            if (!tripNumber) {
+                // SECURITY: If we can't determine the trip number, deny access
+                return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+            }
+
+            const trip = await Trip.findOne({ number: tripNumber }).lean() as any;
 
                 if (!trip) {
                     return NextResponse.json({ message: "Document not found" }, { status: 404 });
@@ -82,7 +93,9 @@ export async function GET(request: NextRequest) {
 
         const [metadata] = await file.getMetadata();
         const contentType = metadata.contentType || 'application/octet-stream';
-        const fileName = metadata.name?.split('/').pop() || 'document';
+        // SECURITY: Sanitize filename to prevent header injection
+        const rawFileName = metadata.name?.split('/').pop() || 'document';
+        const fileName = rawFileName.replace(/[^\w.-]/g, '_');
 
         const [buffer] = await file.download();
 
@@ -90,7 +103,8 @@ export async function GET(request: NextRequest) {
             headers: {
                 'Content-Type': contentType,
                 'Content-Disposition': `inline; filename="${fileName}"`,
-                'Cache-Control': 'private, max-age=3600'
+                'Cache-Control': 'private, no-store',
+                'X-Content-Type-Options': 'nosniff',
             }
         });
 

@@ -39,18 +39,6 @@ export async function POST(request: Request) {
 
         await connectToDatabase();
 
-        const user = await User.findOne({ phoneNumber: session.user.phoneNumber });
-        if (!user) {
-            return NextResponse.json({ message: "Користувача не знайдено" }, { status: 404 });
-        }
-
-        if (user.cashbackAmount < numericAmount) {
-            return NextResponse.json(
-                { message: "Недостатньо коштів на бонусному рахунку" },
-                { status: 400 }
-            );
-        }
-
         // Generate a unique code (retry on collision)
         let code = generateCode();
         let attempts = 0;
@@ -65,9 +53,28 @@ export async function POST(request: Request) {
             }
         }
 
-        // Deduct amount from user balance
-        user.cashbackAmount -= numericAmount;
-        await user.save();
+        // SECURITY: Use atomic operation to prevent race condition (double-spend)
+        // This atomically checks balance and deducts in a single operation
+        const user = await User.findOneAndUpdate(
+            {
+                phoneNumber: session.user.phoneNumber,
+                cashbackAmount: { $gte: numericAmount }  // Only deduct if sufficient balance
+            },
+            { $inc: { cashbackAmount: -numericAmount } },
+            { new: true }
+        );
+
+        if (!user) {
+            // Either user not found or insufficient balance
+            const existingUser = await User.findOne({ phoneNumber: session.user.phoneNumber });
+            if (!existingUser) {
+                return NextResponse.json({ message: "Користувача не знайдено" }, { status: 404 });
+            }
+            return NextResponse.json(
+                { message: "Недостатньо коштів на бонусному рахунку" },
+                { status: 400 }
+            );
+        }
 
         // Set expiry to 30 days from now
         const expiresAt = new Date();

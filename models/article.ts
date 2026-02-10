@@ -29,7 +29,7 @@ const articleSchema = new Schema({
         type: String,
         required: true
     }
-});
+}, { timestamps: true });
 
 articleSchema.index({ articleID: 1 }, { unique: true });
 
