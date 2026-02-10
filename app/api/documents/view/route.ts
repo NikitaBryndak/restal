@@ -67,7 +67,6 @@ export async function GET(request: NextRequest) {
                 if (!isSuperAdmin && !isOwnerOrManager) {
                     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
                 }
-            }
         }
 
         const storage = new Storage({
