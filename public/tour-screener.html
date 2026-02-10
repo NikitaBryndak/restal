@@ -31,14 +31,14 @@
     <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/tour.css" type="text/css" />
 
     <style>
-        /* Reset & basic styling so the widget looks clean inside the iframe */
+        /* Reset & basic styling — dark theme matching the main website */
         *, *::before, *::after { box-sizing: border-box; }
         html, body {
             margin: 0;
             padding: 0;
-            font-family: 'Open Sans', sans-serif;
-            background: #ffffff;
-            color: #333;
+            font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+            background: transparent;
+            color: #e0e0e0;
             overflow-x: hidden;
         }
         body {
@@ -48,12 +48,805 @@
         #os-tour-details {
             padding: 0 8px;
         }
+
+        /* ====== DARK THEME OVERRIDES FOR OTPUSK WIDGET ====== */
+        /* Using actual widget class names: new_f-container, new_f-wrapper, etc. */
+
+        /* --- Main form container: kill blue gradient and bg images --- */
+        .new_f-container,
+        .new_os,
+        #os-form,
+        #os-form > div {
+            background: rgba(255,255,255,0.05) !important;
+            background-image: none !important;
+            background-color: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 16px !important;
+            color: #e0e0e0 !important;
+            filter: none !important;
+        }
+
+        /* Kill ALL background images in the form (compass, airplane decorations) */
+        #os-form *,
+        .new_f-container *,
+        .new_f-wrapper-bg-imgs,
+        .new_f-ext-container,
+        .new_f-ext-container::before {
+            background-image: none !important;
+        }
+
+        /* Decorative background image overlay — hide it completely */
+        .new_f-wrapper-bg-imgs {
+            display: none !important;
+        }
+
+        /* Form wrapper — transparent */
+        .new_f-wrapper,
+        .new_f-form,
+        .new_f-form > .clearfix,
+        .new_f-ext-btn-container {
+            background: transparent !important;
+            background-color: transparent !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Form fields (white boxes around inputs) */
+        .new_f-form-field {
+            background-color: rgba(0,0,0,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            border-radius: 8px !important;
+            color: #e0e0e0 !important;
+        }
+        .new_f-form-field::before {
+            background-color: rgba(255,255,255,0.1) !important;
+        }
+
+        /* Dropdown button inside form fields */
+        .new_f-dropdown-btn {
+            color: #e0e0e0 !important;
+        }
+        .new_f-dropdown-btn span,
+        .new_f-dropdown-btn-text {
+            color: #e0e0e0 !important;
+        }
+        .new_f-dropdown-btn .cnt {
+            background-color: rgba(255,255,255,0.1) !important;
+        }
+        .new_f-dropdown-btn::after,
+        .new_f-dropdown-btn .cnt::after {
+            border-color: #0fa4e6 transparent transparent !important;
+        }
+
+        /* Autocomplete input inside form */
+        .new_f-autocomplete-input {
+            color: #e0e0e0 !important;
+            background: transparent !important;
+        }
+        .new_f-autocomplete-input::-webkit-input-placeholder { color: rgba(255,255,255,0.4) !important; }
+        .new_f-autocomplete-input::-moz-placeholder { color: rgba(255,255,255,0.4) !important; }
+        .new_f-autocomplete-input:-ms-input-placeholder { color: rgba(255,255,255,0.4) !important; }
+        .new_input-mask { color: #e0e0e0 !important; }
+        .new_input-mask-country { color: #e0e0e0 !important; }
+
+        /* Date picker buttons */
+        .new_f-datepicker-wrap button {
+            background: rgba(255,255,255,0.08) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_f-datepicker-wrap:hover button {
+            background-color: rgba(255,255,255,0.15) !important;
+        }
+        .new_f-search-dates-wrap svg {
+            fill: #0fa4e6 !important;
+        }
+        .new_f-search-dates-popup {
+            background-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_f-search-dates-popup::before,
+        .new_f-search-dates-popup::after {
+            border-color: rgba(255,255,255,0.1) transparent transparent !important;
+        }
+        /* Date separator line */
+        .new_f-datepicker-wrap-2::before {
+            background-color: rgba(255,255,255,0.3) !important;
+        }
+
+        /* Form title "Пошук туру" */
+        .new_f-title {
+            color: #ffffff !important;
+        }
+
+        /* Submit / search button */
+        .new_f-form .new_f-form-submit {
+            background: #0fa4e6 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+        .new_f-form .new_f-form-submit:hover {
+            background: #0d8fca !important;
+        }
+
+        /* "Розширений пошук" link */
+        .new_f-ext-btn,
+        .new_f-ext-btn-text {
+            color: #0fa4e6 !important;
+        }
+        .new_f-ext-btn-text::before {
+            border-color: #0fa4e6 transparent transparent !important;
+        }
+        .ext-opened .new_f-ext-btn-text::before {
+            border-color: transparent transparent #0fa4e6 !important;
+        }
+
+        /* Extended search container */
+        .new_f-ext-container {
+            background: rgba(255,255,255,0.03) !important;
+            background-image: none !important;
+            box-shadow: none !important;
+            color: #e0e0e0 !important;
+        }
+        .new_f-ext-container::before {
+            display: none !important;
+        }
+        .new_f-ext-bl-title {
+            color: #0fa4e6 !important;
+        }
+        .new_f-ext-bl-title span {
+            color: #888 !important;
+        }
+        .new_f-ext-bl label {
+            color: #e0e0e0 !important;
+        }
+        .new_f-label-name {
+            color: #0fa4e6 !important;
+        }
+
+        /* Extended search dropdowns */
+        .new_f-dropdown-body {
+            background: #1a1a1a !important;
+            border-color: rgba(255,255,255,0.15) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_f-dropdown-body-top {
+            background: #0fa4e6 !important;
+            color: #fff !important;
+        }
+        .new_f-dropdown-item {
+            color: #e0e0e0 !important;
+        }
+        .new_f-dropdown-item.selected {
+            background-color: rgba(15,164,230,0.2) !important;
+        }
+        .new_f-dropdown-item:hover {
+            background-color: rgba(15,164,230,0.15) !important;
+        }
+
+        /* People selector */
+        .new_f-people-item {
+            color: #e0e0e0 !important;
+        }
+        .new_f-people-item.active {
+            background-color: #0fa4e6 !important;
+            color: #fff !important;
+        }
+        .new_f-children-accordion-btn {
+            border-color: rgba(255,255,255,0.15) !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Country list dropdown */
+        #cntList {
+            background: #1a1a1a !important;
+        }
+        #cntList .ui-menu-item a *,
+        #cntList li {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        #cntList .ui-menu-item.active a,
+        #cntList .ui-menu-item.active a * {
+            background: rgba(15,164,230,0.2) !important;
+        }
+        .new_type-item,
+        #new_os-to .type-item {
+            background-color: #222 !important;
+            color: #888 !important;
+        }
+
+        /* Resort list */
+        #ctyList {
+            background: #1a1a1a !important;
+        }
+        #ctyList li {
+            background-color: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        #ctyList .labelName,
+        #ctyList .itemPrice {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        .ctyLists-wrapper {
+            background: #1a1a1a !important;
+        }
+        #ctyList::before {
+            background-color: #1a1a1a !important;
+        }
+        #ctyList .new_f-dropdown-body-bottom {
+            background-color: #222 !important;
+        }
+        #ctyList .new_f-dropdown-btn-apply {
+            background-color: #0fa4e6 !important;
+        }
+
+        /* Checkboxes in dark theme */
+        [class*='new_f-'] input[type="checkbox"] + *::before,
+        [class*='new_f-'] input[type="radio"] + *::before {
+            background-color: #333 !important;
+            border-color: rgba(255,255,255,0.25) !important;
+        }
+
+        /* Date picker dark override */
+        .new_f-dropdown-body-date {
+            background-color: #1a1a1a !important;
+        }
+        #new_f-dates-container.new_f-dates-container #ui-datepicker-div {
+            background: #1a1a1a !important;
+        }
+        #new_f-dates-container.new_f-dates-container #ui-datepicker-div .ui-datepicker-header {
+            color: #0fa4e6 !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-title {
+            color: #0fa4e6 !important;
+        }
+        #new_f-dates-container.new_f-dates-container #ui-datepicker-div th {
+            color: #888 !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td {
+            background: #2a2a2a !important;
+            border-color: #1a1a1a !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td a {
+            color: #0fa4e6 !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td span {
+            color: #0fa4e6 !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled {
+            background-color: #1e1e1e !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div::after {
+            background-color: #1a1a1a !important;
+        }
+        .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-highlight {
+            background-color: rgba(15,164,230,0.2) !important;
+        }
+
+        /* --- Dropdown / Autocomplete overlays --- */
+        .ui-autocomplete,
+        .ui-menu {
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            border-radius: 8px !important;
+            color: #e0e0e0 !important;
+            z-index: 99999 !important;
+        }
+
+        .ui-autocomplete .ui-menu-item a,
+        .ui-menu .ui-menu-item a,
+        #new_os-to .ui-menu .ui-menu-item .label,
+        #new_os-to .ui-menu .ui-menu-item .noplace {
+            color: #e0e0e0 !important;
+            background: transparent !important;
+        }
+
+        body:not(.iOS) .new_f-container #new_os-to .ui-menu-item a:hover *,
+        body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-corner-all:hover,
+        body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-corner-all:hover *,
+        body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-state-focus,
+        body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-state-focus * {
+            background: rgba(15,164,230,0.15) !important;
+        }
+
+        /* Category headers in dropdown */
+        .ui-autocomplete .ui-autocomplete-category {
+            color: #888 !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            padding: 6px 12px !important;
+        }
+
+        /* Datepicker dark theme */
+        .ui-datepicker {
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: #e0e0e0 !important;
+        }
+        .ui-datepicker .ui-datepicker-header {
+            background: #222 !important;
+            color: #fff !important;
+            border: none !important;
+        }
+        .ui-datepicker td a,
+        .ui-datepicker td span {
+            color: #e0e0e0 !important;
+            background: transparent !important;
+        }
+        .ui-datepicker td a:hover {
+            background: rgba(15,164,230,0.3) !important;
+            color: #fff !important;
+        }
+        .ui-datepicker .ui-state-active {
+            background: #0fa4e6 !important;
+            color: #fff !important;
+        }
+
+        /* --- Results Section --- */
+        #os-search-results {
+            color: #e0e0e0 !important;
+        }
+
+        /* Results container */
+        .new_r-container {
+            background: transparent !important;
+            color: #e0e0e0 !important;
+            padding-bottom: 30px !important;
+        }
+
+        /* Results wrapper */
+        .new_r-wrapper {
+            background: transparent !important;
+        }
+
+        /* Individual result card */
+        .new_r-item {
+            background-color: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+            overflow: visible !important;
+        }
+
+        .new_r-item:hover {
+            border-color: rgba(15,164,230,0.3) !important;
+            background-color: rgba(255,255,255,0.08) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+        }
+
+        .new_r-item-body {
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+        .new_r-item:hover .new_r-item-body {
+            border-color: rgba(15,164,230,0.3) transparent rgba(15,164,230,0.3) transparent !important;
+        }
+
+        /* Hotel name */
+        .new_r-item-hotel {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        /* Location */
+        .new_r-item-geo {
+            color: #0fa4e6 !important;
+        }
+        .new_r-item-geo span {
+            color: #0fa4e6 !important;
+        }
+        .new_r-item-geo svg {
+            fill: #0fa4e6 !important;
+        }
+
+        /* Info text (room, food) */
+        .new_r-item-info,
+        .new_r-item-from,
+        .new_r-item-date {
+            color: #b0b0b0 !important;
+        }
+
+        /* Price badge */
+        .new_r-item-price {
+            background: #0fa4e6 !important;
+            border-color: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+        .new_r-item:hover .new_r-item-price {
+            background: #fff !important;
+            color: #0fa4e6 !important;
+        }
+
+        /* Rating circle */
+        .new_r-item-rating-container {
+            background-color: rgba(255,255,255,0.1) !important;
+        }
+        .new_r-item-rating-container::after {
+            background-color: #1a1a1a !important;
+        }
+        .new_r-item-rating-value {
+            color: #e0e0e0 !important;
+        }
+        .new_r-item-rating-rev {
+            color: #0fa4e6 !important;
+        }
+
+        /* Show more button */
+        .new_r-show-more-results {
+            color: #0fa4e6 !important;
+            background-color: rgba(15,164,230,0.08) !important;
+            border: 1px solid #0fa4e6 !important;
+            border-radius: 8px !important;
+        }
+        .new_r-show-more-results:hover {
+            background-color: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+
+        /* Filter panel */
+        .new_r-panel {
+            color: #e0e0e0 !important;
+        }
+        .new_r-filter {
+            background-color: rgba(255,255,255,0.08) !important;
+            box-shadow: none !important;
+        }
+        .new_r-filter-label {
+            color: #b0b0b0 !important;
+        }
+        .new_r-filter-value {
+            color: #0fa4e6 !important;
+        }
+        .new_r-filters-title {
+            color: #e0e0e0 !important;
+        }
+        .new_r-filters-reset {
+            color: #0fa4e6 !important;
+        }
+
+        /* Currency switch */
+        .new_r-currency-switch label input + span {
+            background-color: rgba(255,255,255,0.1) !important;
+            color: #b0b0b0 !important;
+            box-shadow: none !important;
+        }
+        .new_r-currency-switch label input:checked + span {
+            background-color: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+
+        /* Progress bar (loading) */
+        .new_spinner-wrap {
+            color: #e0e0e0 !important;
+        }
+        .new_progressbar-text,
+        .new_progressbar-text span {
+            color: #b0b0b0 !important;
+        }
+        .new_progress-container {
+            background-color: rgba(255,255,255,0.1) !important;
+        }
+        .new_logo-image-wrap {
+            filter: brightness(0.8) !important;
+        }
+
+        /* Result info text */
+        .new_result-info {
+            color: #e0e0e0 !important;
+        }
+        .new_result-info > .new_result-span {
+            background: rgba(255,100,100,0.15) !important;
+            color: #ffb0b0 !important;
+        }
+
+        /* Links inside results */
+        #os-search-results a,
+        #os-tour-details a {
+            color: #0fa4e6 !important;
+        }
+        #os-search-results a:hover,
+        #os-tour-details a:hover {
+            color: #3dbbf0 !important;
+        }
+
+        /* ====== TOUR CODE — BIG AND PROMINENT ====== */
+        .new_t-order-code {
+            font-size: 26px !important;
+            font-weight: 800 !important;
+            color: #0fa4e6 !important;
+            background: rgba(15,164,230,0.15) !important;
+            border: 2px solid rgba(15,164,230,0.35) !important;
+            border-radius: 12px !important;
+            padding: 14px 22px !important;
+            display: inline-block !important;
+            letter-spacing: 2px !important;
+            margin: 10px 0 !important;
+            text-align: center !important;
+            line-height: 1.3 !important;
+        }
+
+        /* --- Tour Detail Page --- */
+        #os-tour-details {
+            color: #e0e0e0 !important;
+        }
+
+        .new_t-container {
+            color: #e0e0e0 !important;
+        }
+
+        /* Tour content area */
+        .new_t-content {
+            background-color: rgba(255,255,255,0.05) !important;
+            border-radius: 12px !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Tour header */
+        .new_t-header-title {
+            color: #ffffff !important;
+        }
+        .new_t-header-geo {
+            color: #b0b0b0 !important;
+        }
+        .new_t-header-geo.new_t-geo-with-map {
+            color: #0fa4e6 !important;
+        }
+        .new_t-header-desc {
+            color: #b0b0b0 !important;
+        }
+
+        /* Tour menu tabs */
+        .new_t-menu-item {
+            color: #0fa4e6 !important;
+            border-bottom-color: rgba(15,164,230,0.3) !important;
+        }
+        .new_t-menu-item.selected {
+            background: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+        .new_t-menu-back-link {
+            color: #0fa4e6 !important;
+        }
+        .new_t-menu-wrap::after {
+            background: rgba(15,164,230,0.3) !important;
+        }
+
+        /* Tour tab content columns */
+        .new_t-tour-tab-col-1 {
+            background: rgba(255,255,255,0.05) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_t-tour-tab-col-1 svg {
+            fill: #666 !important;
+        }
+        .new_t-tour-tab-col-1-title {
+            color: #e0e0e0 !important;
+        }
+        .new_t-tour-tab-col-2 {
+            background-color: rgba(255,255,255,0.03) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_t-important {
+            color: #0fa4e6 !important;
+        }
+
+        /* Tour order section */
+        .new_t-order-price {
+            color: #0fa4e6 !important;
+        }
+        .new_t-order-table {
+            color: #b0b0b0 !important;
+        }
+        .new_t-order-btn,
+        .new_t-order-btn-book {
+            background-color: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+        .new_t-order-btn-book:hover {
+            background-color: #0d8fca !important;
+        }
+        .new_t-order-btn-gray {
+            background-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_t-order-return {
+            border-color: #0fa4e6 !important;
+            color: #0fa4e6 !important;
+        }
+
+        /* Services icons */
+        .new_t-service-item {
+            color: #b0b0b0 !important;
+        }
+        .new_t-service-item-yes svg {
+            fill: #a4c758 !important;
+        }
+        .new_t-service-item-no svg {
+            fill: #c45555 !important;
+        }
+
+        /* Duration display */
+        .new_t-duration-icons {
+            background-color: rgba(255,255,255,0.2) !important;
+        }
+        .new_t-duration-icon {
+            border-color: rgba(255,255,255,0.3) !important;
+            background-color: #1a1a1a !important;
+        }
+        .new_t-duration-text span {
+            color: #b0b0b0 !important;
+        }
+
+        /* Descriptions tab */
+        .new_serv-cols .new_h6 {
+            color: #e0e0e0 !important;
+        }
+        .new_serv-cols .new_serv-list > li {
+            color: #b0b0b0 !important;
+        }
+        .new_serv-cols .new_serv-list > li::before {
+            background-color: #b0b0b0 !important;
+        }
+        .new_serv-cols a {
+            color: #0fa4e6 !important;
+        }
+
+        /* Rating containers in tour detail */
+        .new_t-rating-tab-container {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+
+        /* Modals */
+        .new_t-modal-body {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        .new_t-modal-body-item.date .new_t-modal-body-middle {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+        .new_t-date_link {
+            background-color: rgba(255,255,255,0.03) !important;
+            color: #0fa4e6 !important;
+        }
+        .new_t-date_link,
+        .new_t-date_link * {
+            color: #0fa4e6 !important;
+        }
+        .new_t-date_link.selected {
+            background-color: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+        .new_t-date-modal-table td {
+            border-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Food modal */
+        .food .new_t-modal-table {
+            background-color: rgba(255,255,255,0.03) !important;
+        }
+        .food .new_t-modal-table td {
+            border-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+        .food .new_t-room-price {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+        .new_t-modal-room-title {
+            color: #0fa4e6 !important;
+        }
+        .new_t-food-abbr ~ span,
+        .new_t-modal-room-desc,
+        .new_t-modal-room-title span {
+            color: #b0b0b0 !important;
+        }
+
+        /* Change button */
+        .new_t-change-btn {
+            border-color: rgba(255,255,255,0.1) !important;
+            color: #0fa4e6 !important;
+            background: rgba(255,255,255,0.03) !important;
+        }
+        .new_t-change-btn svg {
+            fill: #0fa4e6 !important;
+        }
+
+        /* Not found message */
+        .new_not-found-text {
+            background: rgba(255,100,100,0.15) !important;
+            color: #ffb0b0 !important;
+        }
+
+        /* Notice message */
+        .new_t-notice-msg {
+            background: rgba(255,183,77,0.12) !important;
+            color: #ffb74d !important;
+        }
+
+        /* Order form modal */
+        .new_t-order-book-modal-header {
+            background: #0fa4e6 !important;
+        }
+        .new_t-order-book-modal-body {
+            background: #1a1a1a !important;
+        }
+
+        /* Similar/viewed tours */
+        .new_t-similar-viewed-wrapper {
+            color: #e0e0e0 !important;
+        }
+
+        /* Map */
+        .new_t-map-wrapper {
+            background-color: #2a2a2a !important;
+        }
+
+        /* --- CRITICAL: Ensure overflow is visible for dropdowns --- */
+        #os-form,
+        #os-form > *,
+        #os-form > * > *,
+        #os-form > * > * > *,
+        .new_f-container,
+        .new_f-wrapper,
+        .new_f-form,
+        .new_f-form > .clearfix,
+        .new_os {
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+            clip: auto !important;
+            clip-path: none !important;
+        }
+
+        #os-form {
+            position: relative !important;
+            z-index: 1000 !important;
+            margin-bottom: 60px !important;
+        }
+
+        /* Results must sit below form — prevent covering dropdowns */
+        #os-search-results {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        #os-tour-details {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.03);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Select option styling */
+        select option {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
     </style>
 </head>
 <body>
 
     <!-- The widget renders its search form here automatically -->
     <div id="os-form"></div>
+
+    <!-- Spacer to prevent dropdown from being covered -->
+    <div id="os-dropdown-spacer" style="height:20px;position:relative;z-index:0;pointer-events:none;"></div>
 
     <!-- Search results will appear here -->
     <div id="os-search-results"></div>
@@ -85,5 +878,601 @@
             }
         })();
     </script>
+
+    <!-- Dark theme runtime fixes + tour code emphasis + results positioning -->
+    <script>
+        (function() {
+            // 1. Fix overflow on form so dropdowns are not clipped
+            function fixOverflow() {
+                var formEl = document.getElementById('os-form');
+                if (!formEl) return;
+                formEl.style.overflow = 'visible';
+                formEl.style.position = 'relative';
+                formEl.style.zIndex = '1000';
+                var children = formEl.querySelectorAll('*');
+                for (var i = 0; i < children.length; i++) {
+                    var el = children[i];
+                    var cs = window.getComputedStyle(el);
+                    if (cs.overflow === 'hidden' || cs.overflowY === 'hidden' || cs.overflowX === 'hidden') {
+                        el.style.overflow = 'visible';
+                        el.style.overflowX = 'visible';
+                        el.style.overflowY = 'visible';
+                    }
+                    if (cs.clip && cs.clip !== 'auto') el.style.clip = 'auto';
+                }
+            }
+
+            // 2. Apply dark theme to widget-generated elements via inline styles
+            function applyDarkTheme() {
+                // Dark backgrounds for result cards (use real widget classes)
+                var cards = document.querySelectorAll(
+                    '.new_r-item, .new_t-container, .new_t-content,' +
+                    '#os-search-results > div, #os-tour-details > div'
+                );
+                for (var i = 0; i < cards.length; i++) {
+                    var c = cards[i];
+                    if (c.id === 'os-dropdown-spacer') continue;
+                    if (c.classList.contains('new_r-item')) {
+                        c.style.setProperty('background-color', 'rgba(255,255,255,0.05)', 'important');
+                        c.style.setProperty('box-shadow', '0 2px 8px rgba(0,0,0,0.3)', 'important');
+                    }
+                    if (c.classList.contains('new_t-content')) {
+                        c.style.setProperty('background-color', 'rgba(255,255,255,0.05)', 'important');
+                    }
+                    c.style.setProperty('color', '#e0e0e0', 'important');
+                }
+
+                // Hotel names white
+                var hotelNames = document.querySelectorAll('.new_r-item-hotel, .new_t-header-title');
+                for (var i = 0; i < hotelNames.length; i++) {
+                    hotelNames[i].style.setProperty('color', '#ffffff', 'important');
+                }
+
+                // Result item body transparent background
+                var itemBodies = document.querySelectorAll('.new_r-item-body');
+                for (var i = 0; i < itemBodies.length; i++) {
+                    itemBodies[i].style.setProperty('background', 'transparent', 'important');
+                }
+
+                // Rating circles dark background
+                var ratingCircles = document.querySelectorAll('.new_r-item-rating-container');
+                for (var i = 0; i < ratingCircles.length; i++) {
+                    ratingCircles[i].style.setProperty('background-color', 'rgba(255,255,255,0.1)', 'important');
+                }
+
+                // Tour tab columns dark
+                var tabCols1 = document.querySelectorAll('.new_t-tour-tab-col-1');
+                for (var i = 0; i < tabCols1.length; i++) {
+                    tabCols1[i].style.setProperty('background', 'rgba(255,255,255,0.05)', 'important');
+                    tabCols1[i].style.setProperty('border-color', 'rgba(255,255,255,0.1)', 'important');
+                    tabCols1[i].style.setProperty('color', '#e0e0e0', 'important');
+                }
+                var tabCols2 = document.querySelectorAll('.new_t-tour-tab-col-2');
+                for (var i = 0; i < tabCols2.length; i++) {
+                    tabCols2[i].style.setProperty('background-color', 'rgba(255,255,255,0.03)', 'important');
+                    tabCols2[i].style.setProperty('border-color', 'rgba(255,255,255,0.1)', 'important');
+                    tabCols2[i].style.setProperty('color', '#e0e0e0', 'important');
+                }
+
+                // All text in results/tour details
+                var allText = document.querySelectorAll('#os-search-results *, #os-tour-details *');
+                for (var i = 0; i < allText.length; i++) {
+                    var el = allText[i];
+                    var tag = el.tagName;
+                    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+                    var cs = window.getComputedStyle(el);
+                    // Fix light backgrounds
+                    var bg = cs.backgroundColor;
+                    if (bg && isLightBg(bg)) {
+                        el.style.backgroundColor = 'transparent';
+                    }
+                    // Fix dark text on dark bg
+                    var col = cs.color;
+                    if (col && isDarkText(col)) {
+                        el.style.color = '#e0e0e0';
+                    }
+                }
+
+                // Headings white
+                var headings = document.querySelectorAll(
+                    '#os-search-results h1, #os-search-results h2, #os-search-results h3, #os-search-results h4,' +
+                    '#os-tour-details h1, #os-tour-details h2, #os-tour-details h3, #os-tour-details h4'
+                );
+                for (var i = 0; i < headings.length; i++) headings[i].style.color = '#ffffff';
+
+                // Links accent
+                var links = document.querySelectorAll('#os-search-results a, #os-tour-details a');
+                for (var i = 0; i < links.length; i++) links[i].style.color = '#0fa4e6';
+
+                // Tables
+                var cells = document.querySelectorAll(
+                    '#os-search-results td, #os-search-results th, #os-tour-details td, #os-tour-details th'
+                );
+                for (var i = 0; i < cells.length; i++) {
+                    cells[i].style.borderColor = 'rgba(255,255,255,0.08)';
+                    cells[i].style.color = '#e0e0e0';
+                }
+
+                // Buttons
+                var btns = document.querySelectorAll(
+                    '#os-search-results button, #os-search-results input[type="submit"],' +
+                    '#os-search-results [class*="order"], #os-search-results [class*="book"],' +
+                    '#os-tour-details button, #os-tour-details input[type="submit"]'
+                );
+                for (var i = 0; i < btns.length; i++) {
+                    btns[i].style.background = '#0fa4e6';
+                    btns[i].style.color = '#ffffff';
+                    btns[i].style.border = 'none';
+                    btns[i].style.borderRadius = '8px';
+                }
+
+                // Form elements dark theme — AGGRESSIVE
+                var formEl = document.getElementById('os-form');
+                if (formEl) {
+                    // Force dark bg on form container
+                    formEl.style.setProperty('background', 'rgba(255,255,255,0.05)', 'important');
+                    formEl.style.setProperty('background-color', 'rgba(255,255,255,0.05)', 'important');
+                    formEl.style.setProperty('background-image', 'none', 'important');
+                    formEl.style.setProperty('border', '1px solid rgba(255,255,255,0.1)', 'important');
+                    formEl.style.setProperty('border-radius', '16px', 'important');
+
+                    // Target the specific widget container with the blue gradient
+                    var fContainer = formEl.querySelector('.new_f-container');
+                    if (fContainer) {
+                        fContainer.style.setProperty('background', 'rgba(255,255,255,0.05)', 'important');
+                        fContainer.style.setProperty('background-color', 'rgba(255,255,255,0.05)', 'important');
+                        fContainer.style.setProperty('background-image', 'none', 'important');
+                        fContainer.style.setProperty('filter', 'none', 'important');
+                        fContainer.style.setProperty('border', '1px solid rgba(255,255,255,0.1)', 'important');
+                        fContainer.style.setProperty('border-radius', '16px', 'important');
+                    }
+
+                    // Hide the decorative compass/airplane background overlay
+                    var bgImgs = formEl.querySelector('.new_f-wrapper-bg-imgs');
+                    if (bgImgs) bgImgs.style.setProperty('display', 'none', 'important');
+
+                    // Dark bg on extended search container
+                    var extContainer = formEl.querySelector('.new_f-ext-container');
+                    if (extContainer) {
+                        extContainer.style.setProperty('background', 'rgba(255,255,255,0.03)', 'important');
+                        extContainer.style.setProperty('background-image', 'none', 'important');
+                        extContainer.style.setProperty('box-shadow', 'none', 'important');
+                    }
+
+                    // Form field boxes
+                    var fields = formEl.querySelectorAll('.new_f-form-field');
+                    for (var i = 0; i < fields.length; i++) {
+                        fields[i].style.setProperty('background-color', 'rgba(0,0,0,0.5)', 'important');
+                        fields[i].style.setProperty('border-color', 'rgba(255,255,255,0.15)', 'important');
+                        fields[i].style.setProperty('border-radius', '8px', 'important');
+                    }
+
+                    // Strip backgrounds from ALL descendants
+                    var allFormEls = formEl.querySelectorAll('*');
+                    for (var i = 0; i < allFormEls.length; i++) {
+                        var fe = allFormEls[i];
+                        var feTag = fe.tagName;
+
+                        // Skip inputs/buttons/selects and form-field boxes
+                        if (feTag === 'INPUT' || feTag === 'SELECT' || feTag === 'TEXTAREA' || feTag === 'IMG') continue;
+                        if (fe.classList.contains('new_f-form-field')) continue;
+                        if (fe.classList.contains('new_f-container')) continue;
+
+                        var feCs = window.getComputedStyle(fe);
+
+                        // Remove any background-image
+                        if (feCs.backgroundImage && feCs.backgroundImage !== 'none') {
+                            fe.style.setProperty('background-image', 'none', 'important');
+                        }
+
+                        // Remove light backgrounds
+                        if (isLightBg(feCs.backgroundColor)) {
+                            if (feTag === 'BUTTON') {
+                                fe.style.setProperty('background-color', '#0fa4e6', 'important');
+                            } else {
+                                fe.style.setProperty('background-color', 'transparent', 'important');
+                                fe.style.setProperty('background', 'transparent', 'important');
+                            }
+                        }
+
+                        // Fix dark text
+                        if (isDarkText(feCs.color)) {
+                            fe.style.setProperty('color', '#e0e0e0', 'important');
+                        }
+                    }
+
+                    // Inputs get dark bg
+                    var inputs = formEl.querySelectorAll('input, select, textarea');
+                    for (var i = 0; i < inputs.length; i++) {
+                        // Skip autocomplete input which should be transparent
+                        if (inputs[i].classList.contains('new_f-autocomplete-input')) {
+                            inputs[i].style.setProperty('color', '#e0e0e0', 'important');
+                            continue;
+                        }
+                        inputs[i].style.setProperty('background-color', 'rgba(0,0,0,0.6)', 'important');
+                        inputs[i].style.setProperty('background-image', 'none', 'important');
+                        inputs[i].style.setProperty('border-color', 'rgba(255,255,255,0.15)', 'important');
+                        inputs[i].style.setProperty('color', '#e0e0e0', 'important');
+                        inputs[i].style.setProperty('border-radius', '8px', 'important');
+                    }
+
+                    // Submit button gets accent color
+                    var submitBtn = formEl.querySelector('.new_f-form-submit');
+                    if (submitBtn) {
+                        submitBtn.style.setProperty('background', '#0fa4e6', 'important');
+                        submitBtn.style.setProperty('background-image', 'none', 'important');
+                        submitBtn.style.setProperty('color', '#ffffff', 'important');
+                        submitBtn.style.setProperty('border', 'none', 'important');
+                        submitBtn.style.setProperty('border-radius', '8px', 'important');
+                    }
+
+                    // Other buttons
+                    var formBtns = formEl.querySelectorAll('button');
+                    for (var i = 0; i < formBtns.length; i++) {
+                        // Date buttons in the form field
+                        if (formBtns[i].closest('.new_f-datepicker-wrap')) {
+                            formBtns[i].style.setProperty('background', 'rgba(255,255,255,0.08)', 'important');
+                            formBtns[i].style.setProperty('color', '#e0e0e0', 'important');
+                        }
+                    }
+                }
+
+                // Dropdowns / autocomplete dark theme
+                var dropdowns = document.querySelectorAll(
+                    '.ui-autocomplete, .ui-menu, .ui-datepicker,' +
+                    '[class*="dropdown"], [class*="autocomplete"], [class*="popup"], [class*="suggestion"]'
+                );
+                for (var i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].style.backgroundColor = '#1a1a1a';
+                    dropdowns[i].style.borderColor = 'rgba(255,255,255,0.15)';
+                    dropdowns[i].style.color = '#e0e0e0';
+                    dropdowns[i].style.zIndex = '99999';
+                }
+                var ddItems = document.querySelectorAll(
+                    '.ui-menu-item, .ui-menu-item a, .ui-autocomplete li, .ui-autocomplete li a,' +
+                    '[class*="autocomplete"] li, [class*="suggestion"] div'
+                );
+                for (var i = 0; i < ddItems.length; i++) {
+                    ddItems[i].style.color = '#e0e0e0';
+                    var dBg = window.getComputedStyle(ddItems[i]).backgroundColor;
+                    if (isLightBg(dBg)) ddItems[i].style.backgroundColor = 'transparent';
+                }
+            }
+
+            // 3. Tour code — big and prominent
+            function styleTourCodes() {
+                // Specifically target the widget's tour code element
+                var tourCodes = document.querySelectorAll('.new_t-order-code');
+                for (var i = 0; i < tourCodes.length; i++) {
+                    var el = tourCodes[i];
+                    if (el.dataset.codeStyled) continue;
+                    el.style.fontSize = '26px';
+                    el.style.fontWeight = '800';
+                    el.style.color = '#0fa4e6';
+                    el.style.background = 'rgba(15,164,230,0.15)';
+                    el.style.border = '2px solid rgba(15,164,230,0.35)';
+                    el.style.borderRadius = '12px';
+                    el.style.padding = '14px 22px';
+                    el.style.display = 'inline-block';
+                    el.style.letterSpacing = '2px';
+                    el.style.margin = '10px 0';
+                    el.style.textAlign = 'center';
+                    el.style.lineHeight = '1.3';
+                    el.style.whiteSpace = 'nowrap';
+                    el.dataset.codeStyled = 'true';
+                }
+
+                // Also scan for any text containing "Код: XXXXX" pattern
+                var containers = document.querySelectorAll('#os-search-results *, #os-tour-details *');
+                for (var i = 0; i < containers.length; i++) {
+                    var el = containers[i];
+                    if (el.dataset.codeStyled) continue;
+                    var text = (el.textContent || '').trim();
+
+                    if (el.children.length <= 1 && /Код\s*[:：]?\s*\d{4,}/.test(text) && text.length < 40) {
+                        el.style.fontSize = '26px';
+                        el.style.fontWeight = '800';
+                        el.style.color = '#0fa4e6';
+                        el.style.background = 'rgba(15,164,230,0.15)';
+                        el.style.border = '2px solid rgba(15,164,230,0.35)';
+                        el.style.borderRadius = '12px';
+                        el.style.padding = '14px 22px';
+                        el.style.display = 'inline-block';
+                        el.style.letterSpacing = '2px';
+                        el.style.margin = '10px 0';
+                        el.style.textAlign = 'center';
+                        el.style.lineHeight = '1.3';
+                        el.style.whiteSpace = 'nowrap';
+                        el.dataset.codeStyled = 'true';
+                    }
+
+                    // Airport warning
+                    if (el.children.length <= 1 && /Прибуття до іншого/.test(text) && text.length < 60) {
+                        if (el.dataset.warnStyled) continue;
+                        el.style.color = '#ffb74d';
+                        el.style.fontWeight = '700';
+                        el.style.fontSize = '15px';
+                        el.style.background = 'rgba(255,183,77,0.12)';
+                        el.style.border = '1px solid rgba(255,183,77,0.3)';
+                        el.style.padding = '8px 14px';
+                        el.style.borderRadius = '8px';
+                        el.style.display = 'inline-block';
+                        el.style.marginTop = '6px';
+                        el.dataset.warnStyled = 'true';
+                    }
+                }
+            }
+
+            // 4. Ensure results appear BELOW the form
+            function fixResultsPosition() {
+                var formDiv = document.getElementById('os-form');
+                var spacerDiv = document.getElementById('os-dropdown-spacer');
+                var resultsDiv = document.getElementById('os-search-results');
+                var tourDiv = document.getElementById('os-tour-details');
+                if (!formDiv || !resultsDiv) return;
+                var parent = formDiv.parentNode;
+
+                // Ensure correct order: form -> spacer -> results -> tour
+                var expectedAfterForm = spacerDiv || resultsDiv;
+                if (formDiv.compareDocumentPosition(resultsDiv) & Node.DOCUMENT_POSITION_PRECEDING) {
+                    if (spacerDiv) {
+                        parent.insertBefore(spacerDiv, formDiv.nextSibling);
+                        parent.insertBefore(resultsDiv, spacerDiv.nextSibling);
+                    } else {
+                        parent.insertBefore(resultsDiv, formDiv.nextSibling);
+                    }
+                    if (tourDiv) parent.insertBefore(tourDiv, resultsDiv.nextSibling);
+                }
+
+                // Also check if widget injected extra result containers outside the designated div
+                var extraResults = parent.querySelectorAll(':scope > div:not(#os-form):not(#os-search-results):not(#os-tour-details):not(#os-dropdown-spacer):not(script)');
+                for (var i = 0; i < extraResults.length; i++) {
+                    var er = extraResults[i];
+                    if (er.tagName === 'SCRIPT' || er.tagName === 'STYLE') continue;
+                    // Move stray content into the results container
+                    if (er.querySelector && (er.querySelector('[class*="result"]') || er.querySelector('[class*="tour"]'))) {
+                        resultsDiv.appendChild(er);
+                    }
+                }
+            }
+
+            // Helpers
+            function isLightBg(bg) {
+                if (!bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') return false;
+                var m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                if (!m) return false;
+                var brightness = (parseInt(m[1]) * 299 + parseInt(m[2]) * 587 + parseInt(m[3]) * 114) / 1000;
+                return brightness > 180;
+            }
+            function isDarkText(col) {
+                if (!col) return false;
+                var m = col.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                if (!m) return false;
+                var brightness = (parseInt(m[1]) * 299 + parseInt(m[2]) * 587 + parseInt(m[3]) * 114) / 1000;
+                return brightness < 100;
+            }
+
+            // Run all fixes
+            function runAll() {
+                fixOverflow();
+                applyDarkTheme();
+                styleTourCodes();
+                fixResultsPosition();
+            }
+
+            // Periodic run since widget loads content dynamically
+            setInterval(runAll, 600);
+
+            // Also observe DOM mutations
+            if (window.MutationObserver) {
+                document.addEventListener('DOMContentLoaded', function() {
+                    var observer = new MutationObserver(function() {
+                        setTimeout(runAll, 100);
+                    });
+                    observer.observe(document.body, { childList: true, subtree: true });
+                });
+            }
+        })();
+    </script>
+
+    <!-- Post-load CSS: loads after all widget styles for maximum override priority -->
+    <style>
+        /* === NUCLEAR: strip the blue gradient from the real widget container === */
+        html body .new_f-container,
+        html body #os-form .new_f-container {
+            background: rgba(255,255,255,0.05) !important;
+            background-color: rgba(255,255,255,0.05) !important;
+            background-image: none !important;
+            filter: none !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 16px !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Kill decorative compass/airplane overlay */
+        html body .new_f-wrapper-bg-imgs {
+            display: none !important;
+        }
+
+        /* Strip bg from all non-input descendants */
+        html body .new_f-container *:not(input):not(select):not(textarea):not(button):not(img):not(.new_f-form-field):not(.new_f-form-submit) {
+            background-image: none !important;
+        }
+
+        /* Wrapper itself */
+        html body .new_f-wrapper {
+            background: transparent !important;
+            background-image: none !important;
+        }
+
+        /* Extended search section */
+        html body .new_f-ext-container {
+            background: rgba(255,255,255,0.03) !important;
+            background-image: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Form field boxes (country, date, etc.) */
+        html body .new_f-form-field {
+            background-color: rgba(0,0,0,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            border-radius: 8px !important;
+        }
+
+        /* All text inside form */
+        html body .new_f-container label,
+        html body .new_f-container span,
+        html body .new_f-container div,
+        html body .new_f-container td,
+        html body .new_f-container th,
+        html body .new_f-container p,
+        html body .new_f-container li,
+        html body .new_f-container a,
+        html body .new_f-container dt,
+        html body .new_f-container dd {
+            color: #e0e0e0 !important;
+        }
+
+        html body .new_f-container h1,
+        html body .new_f-container h2,
+        html body .new_f-container h3,
+        html body .new_f-container h4,
+        html body .new_f-title {
+            color: #ffffff !important;
+        }
+
+        /* Inputs */
+        html body .new_f-container input,
+        html body .new_f-container select,
+        html body .new_f-container textarea {
+            background: rgba(0,0,0,0.6) !important;
+            background-color: rgba(0,0,0,0.6) !important;
+            background-image: none !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: #e0e0e0 !important;
+            border-radius: 8px !important;
+        }
+
+        /* Autocomplete input stays transparent (inside form-field) */
+        html body .new_f-autocomplete-input {
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+        }
+
+        /* Submit button */
+        html body .new_f-form-submit {
+            background: #0fa4e6 !important;
+            background-color: #0fa4e6 !important;
+            background-image: none !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+
+        /* Country / resort dropdowns */
+        html body #cntList,
+        html body #ctyList,
+        html body .new_f-autocomplete-list {
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: #e0e0e0 !important;
+            z-index: 99999 !important;
+        }
+        html body #cntList li,
+        html body #ctyList li,
+        html body .new_f-autocomplete-list li {
+            color: #e0e0e0 !important;
+            background: transparent !important;
+        }
+        html body #cntList li:hover,
+        html body #ctyList li:hover,
+        html body .new_f-autocomplete-list li:hover,
+        html body #cntList .selected,
+        html body #ctyList .selected {
+            background: rgba(15,164,230,0.2) !important;
+            color: #ffffff !important;
+        }
+
+        /* Date picker */
+        html body .new_f-datepicker-wrap {
+            background: rgba(0,0,0,0.5) !important;
+            border-color: rgba(255,255,255,0.15) !important;
+        }
+        html body .new_f-datepicker-wrap button {
+            background: rgba(255,255,255,0.08) !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* jQuery UI elements if present */
+        html body .ui-autocomplete,
+        html body .ui-menu,
+        html body .ui-datepicker {
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: #e0e0e0 !important;
+            z-index: 99999 !important;
+        }
+        html body .ui-menu-item,
+        html body .ui-menu-item a {
+            color: #e0e0e0 !important;
+        }
+        html body .ui-state-focus,
+        html body .ui-state-active,
+        html body .ui-menu-item:hover a {
+            background: rgba(15,164,230,0.2) !important;
+            color: #ffffff !important;
+        }
+
+        /* === RESULTS === */
+        html body #os-search-results > div,
+        html body #os-tour-details > div,
+        html body [class*="new_r-"],
+        html body [class*="new_t-"] {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 12px !important;
+            color: #e0e0e0 !important;
+        }
+
+        html body #os-search-results td,
+        html body #os-search-results th,
+        html body #os-tour-details td,
+        html body #os-tour-details th {
+            border-color: rgba(255,255,255,0.08) !important;
+            color: #e0e0e0 !important;
+        }
+
+        html body #os-search-results h1,
+        html body #os-search-results h2,
+        html body #os-search-results h3,
+        html body #os-search-results h4,
+        html body #os-tour-details h1,
+        html body #os-tour-details h2,
+        html body #os-tour-details h3,
+        html body #os-tour-details h4 {
+            color: #ffffff !important;
+        }
+
+        html body #os-search-results a,
+        html body #os-tour-details a {
+            color: #0fa4e6 !important;
+        }
+
+        html body #os-search-results button,
+        html body #os-search-results input[type="submit"],
+        html body #os-tour-details button {
+            background: #0fa4e6 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+
+        /* Price styling */
+        html body [class*="price"] {
+            color: #0fa4e6 !important;
+            font-weight: 700 !important;
+        }
+    </style>
 </body>
 </html>

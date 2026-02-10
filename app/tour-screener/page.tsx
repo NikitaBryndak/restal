@@ -9,7 +9,7 @@ export default function TourScreenerPage() {
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === "resize" && typeof e.data.height === "number") {
         if (iframeRef.current) {
-          iframeRef.current.style.height = `${e.data.height}px`;
+          iframeRef.current.style.height = `${e.data.height + 40}px`;
         }
       }
     };
@@ -23,8 +23,8 @@ export default function TourScreenerPage() {
         <iframe
           ref={iframeRef}
           src="/tour-screener.html"
-          className="w-full border-0 rounded-2xl overflow-hidden"
-          style={{ minHeight: "80vh", background: "white" }}
+          className="w-full border-0 rounded-2xl"
+          style={{ minHeight: "80vh", background: "transparent", overflow: "visible" }}
           title="Пошук турів"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         />
