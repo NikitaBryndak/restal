@@ -82,7 +82,7 @@ export function useAuth({ type }: AuthFormProps) {
         }
 
 
-      router.push("/dashboard");
+      router.push("/dashboard/profile");
     } catch {
       setError(`An error occurred during ${type}. Please try again.`);
     } finally {

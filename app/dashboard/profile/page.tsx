@@ -7,7 +7,7 @@ import { LoaderOne } from "@/components/ui/loader";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { User, Phone, Calendar, Wallet, Shield, Plus,  } from "lucide-react";
 import type { TouristInfo } from "@/types";
-import TouristCard from "@/components/profile/touristCard";
+
 import Link from "next/link";
 
 export default function ProfilePage() {
