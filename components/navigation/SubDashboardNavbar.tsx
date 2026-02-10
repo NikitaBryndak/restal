@@ -17,7 +17,7 @@ export default function SubDashboardNavbar() {
     const isAdmin = userProfile && userProfile.privilegeLevel >= 2;
 
     return (
-        <nav className="hidden sm:flex sm:flex-col sticky top-20 w-40 z-10 min-h-[calc(100vh-5rem)]">
+        <nav className="hidden sm:flex sm:flex-col sticky top-20 w-40 z-10 h-[calc(100vh-7rem)]">
             <div className="flex flex-col p-6 flex-1">
                 <div className="flex flex-col space-y-6 flex-1">
 

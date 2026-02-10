@@ -136,16 +136,6 @@ export default function ProfilePage() {
                                             </span>
                                         </div>
                                     </div>
-
-                                    <div>
-                                        <Label className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
-                                            <Shield className="w-5 h-5 text-accent" />
-                                            Рівень привілеїв
-                                        </Label>
-                                        <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white font-medium">
-                                            Рівень {userProfile?.privilegeLevel || 1}
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
