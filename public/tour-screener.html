@@ -969,8 +969,8 @@
     <!-- The widget renders its search form here automatically -->
     <div id="os-form"></div>
 
-    <!-- Spacer to prevent dropdown from being covered -->
-    <div id="os-dropdown-spacer" style="height:350px;position:relative;z-index:0;pointer-events:none;"></div>
+    <!-- Spacer to prevent dropdown from being covered (JS manages height dynamically) -->
+    <div id="os-dropdown-spacer" style="height:0px;position:relative;z-index:0;pointer-events:none;"></div>
 
     <!-- Search results will appear here -->
     <div id="os-search-results"></div>
@@ -986,9 +986,22 @@
     <!-- Auto-resize: notify parent iframe about content height changes -->
     <script>
         (function() {
-            function postHeight() {
-                var h = document.documentElement.scrollHeight;
-                // Account for absolutely-positioned dropdowns that extend beyond scrollHeight
+            var lastSentHeight = 0;
+            var debounceTimer = null;
+
+            function measureContentHeight() {
+                // Measure actual content element bottoms — NOT scrollHeight (avoids feedback loop)
+                var h = 0;
+                var ids = ['os-form', 'os-dropdown-spacer', 'os-search-results', 'os-tour-details'];
+                for (var i = 0; i < ids.length; i++) {
+                    var el = document.getElementById(ids[i]);
+                    if (el && (el.offsetHeight > 0 || el.scrollHeight > 0)) {
+                        var rect = el.getBoundingClientRect();
+                        var bottom = window.scrollY + rect.top + rect.height;
+                        if (bottom > h) h = bottom;
+                    }
+                }
+                // Account for absolutely-positioned dropdowns extending below
                 var formEl = document.getElementById('os-form');
                 if (formEl) {
                     var ddBodies = formEl.querySelectorAll('.new_f-dropdown-body');
@@ -1001,17 +1014,34 @@
                         }
                     }
                 }
-                window.parent.postMessage({ type: 'resize', height: h }, '*');
+                return Math.ceil(h) + 20; // small bottom padding
             }
-            // Post height on load and periodically (widget dynamically adds content)
+
+            function postHeight() {
+                var h = measureContentHeight();
+                // Only send if height changed by more than 5px (prevents jitter)
+                if (Math.abs(h - lastSentHeight) > 5) {
+                    lastSentHeight = h;
+                    window.parent.postMessage({ type: 'resize', height: h }, '*');
+                }
+            }
+
+            function debouncedPostHeight() {
+                if (debounceTimer) clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(postHeight, 150);
+            }
+
+            // Post height on load and periodically
             window.addEventListener('load', function() {
                 postHeight();
-                setInterval(postHeight, 500);
+                setInterval(postHeight, 1000);
             });
-            // Also observe DOM mutations
+            // Observe DOM mutations — debounced to avoid style-change storm
             if (window.MutationObserver) {
-                var observer = new MutationObserver(postHeight);
-                observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+                var observer = new MutationObserver(debouncedPostHeight);
+                observer.observe(document.body, { childList: true, subtree: true });
+                // NOTE: removed attributes: true — our applyDarkTheme sets styles every 600ms
+                // which would trigger infinite resize loops
             }
         })();
     </script>
@@ -1041,18 +1071,25 @@
 
                 // Dynamically adjust spacer based on whether dropdown is open
                 var spacer = document.getElementById('os-dropdown-spacer');
-                var dropdownOpen = formEl.querySelector('.new_f-dropdown-body[style*="display: block"], .new_f-dropdown-body[style*="display: flex"], .new_f-dropdown-body:not([style*="display: none"])');
                 if (spacer) {
-                    // Check if any dropdown body is visible
-                    var anyOpen = false;
+                    // Check if any dropdown body is actually visible
+                    var maxDdBottom = 0;
+                    var formRect = formEl.getBoundingClientRect();
+                    var formBottom = formRect.top + formRect.height;
                     var ddBodies = formEl.querySelectorAll('.new_f-dropdown-body');
                     for (var d = 0; d < ddBodies.length; d++) {
                         if (ddBodies[d].offsetHeight > 0 && ddBodies[d].offsetWidth > 0) {
-                            anyOpen = true;
-                            break;
+                            var ddRect = ddBodies[d].getBoundingClientRect();
+                            var ddBottom = ddRect.top + ddRect.height;
+                            if (ddBottom > maxDdBottom) maxDdBottom = ddBottom;
                         }
                     }
-                    spacer.style.height = anyOpen ? '350px' : '20px';
+                    // Only add spacer if dropdown extends below the form
+                    if (maxDdBottom > formBottom) {
+                        spacer.style.height = Math.ceil(maxDdBottom - formBottom + 20) + 'px';
+                    } else {
+                        spacer.style.height = '0px';
+                    }
                 }
             }
 
