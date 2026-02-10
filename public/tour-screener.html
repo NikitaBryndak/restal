@@ -457,8 +457,8 @@
             border: 1px solid rgba(255,255,255,0.08) !important;
             border-radius: 12px !important;
             box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
-            overflow: hidden !important;
-            height: auto !important;
+            overflow: visible !important;
+            height: 165px !important;
         }
 
         .new_r-item:hover {
@@ -619,18 +619,34 @@
 
         /* ====== TOUR CODE — BIG AND PROMINENT ====== */
         .new_t-order-code {
-            font-size: 26px !important;
+            font-size: 22px !important;
             font-weight: 800 !important;
             color: #0fa4e6 !important;
             background: rgba(15,164,230,0.15) !important;
             border: 2px solid rgba(15,164,230,0.35) !important;
-            border-radius: 12px !important;
-            padding: 14px 22px !important;
-            display: inline-block !important;
+            border-radius: 10px !important;
+            padding: 10px 14px !important;
+            display: block !important;
             letter-spacing: 2px !important;
-            margin: 10px 0 !important;
+            margin: 8px 0 !important;
             text-align: center !important;
             line-height: 1.3 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Order section alignment */
+        .new_t-order-table {
+            text-align: center !important;
+        }
+        .new_t-order-price {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #0fa4e6 !important;
+            margin-bottom: 6px !important;
+        }
+        .new_t-order-btn-book {
+            margin-bottom: 8px !important;
         }
 
         /* --- Tour Detail Page --- */
@@ -817,26 +833,8 @@
             color: #0fa4e6 !important;
             background: rgba(255,255,255,0.03) !important;
         }
-        .new_t-change-btn:hover {
-            background: rgba(255,255,255,0.08) !important;
-        }
         .new_t-change-btn svg {
             fill: #0fa4e6 !important;
-        }
-
-        /* People dropdown in tour detail */
-        .new_t-change-people .new_f-dropdown-body-wrap {
-            background: #1a1a1a !important;
-            color: #e0e0e0 !important;
-        }
-        .new_t-change-people .new_f-dropdown-btn-cancel {
-            background-color: rgba(255,255,255,0.08) !important;
-            border-color: rgba(255,255,255,0.1) !important;
-            color: #e0e0e0 !important;
-        }
-        .new_t-change-people .new_f-dropdown-btn-apply {
-            background-color: #0fa4e6 !important;
-            color: #ffffff !important;
         }
 
         /* Not found message */
@@ -858,75 +856,10 @@
         .new_t-order-book-modal-body {
             background: #1a1a1a !important;
         }
-        .os-order-form-wrap {
-            background: #1a1a1a !important;
-            color: #e0e0e0 !important;
-        }
-        .os-order-form-wrap input,
-        .os-order-form-wrap textarea,
-        .os-order-form-wrap select {
-            background-color: rgba(255,255,255,0.08) !important;
-            color: #e0e0e0 !important;
-            border-color: rgba(255,255,255,0.15) !important;
-        }
-        .os-order-select-wrapper {
-            background: rgba(255,255,255,0.08) !important;
-        }
-        .os-order-select-wrapper:after {
-            background: rgba(255,255,255,0.08) !important;
-        }
-        .os-order-form-submit_button {
-            background: #0fa4e6 !important;
-            color: #ffffff !important;
-        }
-
-        /* Credit modal dark theme */
-        .new_credit-modal-body {
-            background-color: #1a1a1a !important;
-            color: #e0e0e0 !important;
-        }
-        .new_credit-modal, .new_credit-modal * {
-            color: #e0e0e0 !important;
-        }
-        .new_credit-modal-select::before {
-            background: #1a1a1a !important;
-        }
-        .new_credit-modal-row-count-item {
-            background: rgba(255,255,255,0.05) !important;
-        }
-        .new_credit-modal-row-count-item__btn {
-            background: rgba(255,255,255,0.08) !important;
-            border-color: #0fa4e6 !important;
-            color: #e0e0e0 !important;
-        }
 
         /* Similar/viewed tours */
         .new_t-similar-viewed-wrapper {
             color: #e0e0e0 !important;
-        }
-        .new_t-similar-viewed-wrapper h2,
-        .new_t-similar-viewed-wrapper h3 {
-            color: #ffffff !important;
-        }
-        .new_t-similar-viewed-gallery-item {
-            background: transparent !important;
-        }
-        .new_t-similar-viewed-gallery-item .new_r-item {
-            background-color: rgba(255,255,255,0.04) !important;
-            border: 1px solid rgba(255,255,255,0.08) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
-        }
-        /* Owl carousel dots and nav */
-        .new_t-container .owl-dots {
-            background-color: rgba(255,255,255,0.1) !important;
-        }
-        .new_t-container .owl-dot.active {
-            background-color: #0fa4e6 !important;
-        }
-        .new_t-similar-viewed-wrapper .owl-prev,
-        .new_t-similar-viewed-wrapper .owl-next {
-            filter: invert(1) !important;
         }
 
         /* Map */
@@ -939,16 +872,32 @@
         #os-form > *,
         #os-form > * > *,
         #os-form > * > * > *,
+        #os-form > * > * > * > *,
+        #os-form > * > * > * > * > *,
         .new_f-container,
         .new_f-wrapper,
         .new_f-form,
         .new_f-form > .clearfix,
+        .new_f-form-field,
+        .new_f-dropdown-container,
+        #new_os-to,
         .new_os {
             overflow: visible !important;
             overflow-x: visible !important;
             overflow-y: visible !important;
             clip: auto !important;
             clip-path: none !important;
+        }
+
+        /* Dropdown body must be visible and above everything */
+        .new_f-dropdown-body,
+        .new_f-dropdown-body.popup {
+            z-index: 9999 !important;
+            overflow: visible !important;
+        }
+        #cntList {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
         }
 
         #os-form {
@@ -996,7 +945,7 @@
     <div id="os-form"></div>
 
     <!-- Spacer to prevent dropdown from being covered -->
-    <div id="os-dropdown-spacer" style="height:20px;position:relative;z-index:0;pointer-events:none;"></div>
+    <div id="os-dropdown-spacer" style="height:350px;position:relative;z-index:0;pointer-events:none;"></div>
 
     <!-- Search results will appear here -->
     <div id="os-search-results"></div>
@@ -1036,19 +985,36 @@
             function fixOverflow() {
                 var formEl = document.getElementById('os-form');
                 if (!formEl) return;
-                formEl.style.overflow = 'visible';
+                formEl.style.setProperty('overflow', 'visible', 'important');
                 formEl.style.position = 'relative';
                 formEl.style.zIndex = '1000';
                 var children = formEl.querySelectorAll('*');
                 for (var i = 0; i < children.length; i++) {
                     var el = children[i];
+                    // Keep scrollable lists scrollable
+                    if (el.id === 'cntList' || el.classList.contains('new_f-dropdown-list')) continue;
                     var cs = window.getComputedStyle(el);
-                    if (cs.overflow === 'hidden' || cs.overflowY === 'hidden' || cs.overflowX === 'hidden') {
-                        el.style.overflow = 'visible';
-                        el.style.overflowX = 'visible';
-                        el.style.overflowY = 'visible';
+                    if (cs.overflow === 'hidden' || cs.overflowY === 'hidden' || cs.overflowX === 'hidden' ||
+                        cs.overflow === 'auto' || cs.overflow === 'scroll') {
+                        el.style.setProperty('overflow', 'visible', 'important');
                     }
                     if (cs.clip && cs.clip !== 'auto') el.style.clip = 'auto';
+                }
+
+                // Dynamically adjust spacer based on whether dropdown is open
+                var spacer = document.getElementById('os-dropdown-spacer');
+                var dropdownOpen = formEl.querySelector('.new_f-dropdown-body[style*="display: block"], .new_f-dropdown-body[style*="display: flex"], .new_f-dropdown-body:not([style*="display: none"])');
+                if (spacer) {
+                    // Check if any dropdown body is visible
+                    var anyOpen = false;
+                    var ddBodies = formEl.querySelectorAll('.new_f-dropdown-body');
+                    for (var d = 0; d < ddBodies.length; d++) {
+                        if (ddBodies[d].offsetHeight > 0 && ddBodies[d].offsetWidth > 0) {
+                            anyOpen = true;
+                            break;
+                        }
+                    }
+                    spacer.style.height = anyOpen ? '350px' : '20px';
                 }
             }
 
@@ -1109,28 +1075,19 @@
                 for (var i = 0; i < allText.length; i++) {
                     var el = allText[i];
                     var tag = el.tagName;
-                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'IMG' || tag === 'SVG' || tag === 'PATH') continue;
-                    // Skip price badges — they have accent bg with white text
+                    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+                    // Skip price badges — they have accent bg with white text, don't touch them
                     if (el.classList.contains('new_r-item-price') || el.closest('.new_r-item-price')) continue;
-                    // Skip tour code — has accent styling
-                    if (el.classList.contains('new_t-order-code') || el.closest('.new_t-order-code')) continue;
-                    // Skip rating bar/fill — uses borders for the arc
-                    if (el.classList.contains('bar') || el.classList.contains('fill') || el.classList.contains('slice')) continue;
                     var cs = window.getComputedStyle(el);
                     // Fix light backgrounds
                     var bg = cs.backgroundColor;
                     if (bg && isLightBg(bg)) {
-                        // Buttons get accent, everything else transparent
-                        if (tag === 'BUTTON' || el.classList.contains('new_t-order-btn-book') || el.classList.contains('new_t-order-btn')) {
-                            el.style.setProperty('background-color', '#0fa4e6', 'important');
-                        } else {
-                            el.style.setProperty('background-color', 'transparent', 'important');
-                        }
+                        el.style.backgroundColor = 'transparent';
                     }
                     // Fix dark text on dark bg
                     var col = cs.color;
                     if (col && isDarkText(col)) {
-                        el.style.setProperty('color', '#e0e0e0', 'important');
+                        el.style.color = '#e0e0e0';
                     }
                 }
 
@@ -1325,20 +1282,27 @@
                 for (var i = 0; i < tourCodes.length; i++) {
                     var el = tourCodes[i];
                     if (el.dataset.codeStyled) continue;
-                    el.style.fontSize = '26px';
+                    el.style.fontSize = '22px';
                     el.style.fontWeight = '800';
                     el.style.color = '#0fa4e6';
                     el.style.background = 'rgba(15,164,230,0.15)';
                     el.style.border = '2px solid rgba(15,164,230,0.35)';
-                    el.style.borderRadius = '12px';
-                    el.style.padding = '14px 22px';
-                    el.style.display = 'inline-block';
+                    el.style.borderRadius = '10px';
+                    el.style.padding = '10px 14px';
+                    el.style.display = 'block';
                     el.style.letterSpacing = '2px';
-                    el.style.margin = '10px 0';
+                    el.style.margin = '8px 0';
                     el.style.textAlign = 'center';
                     el.style.lineHeight = '1.3';
-                    el.style.whiteSpace = 'nowrap';
+                    el.style.maxWidth = '100%';
+                    el.style.boxSizing = 'border-box';
                     el.dataset.codeStyled = 'true';
+                }
+
+                // Center the order table
+                var orderTables = document.querySelectorAll('.new_t-order-table');
+                for (var i = 0; i < orderTables.length; i++) {
+                    orderTables[i].style.textAlign = 'center';
                 }
 
                 // Also scan for any text containing "Код: XXXXX" pattern
@@ -1349,19 +1313,20 @@
                     var text = (el.textContent || '').trim();
 
                     if (el.children.length <= 1 && /Код\s*[:：]?\s*\d{4,}/.test(text) && text.length < 40) {
-                        el.style.fontSize = '26px';
+                        el.style.fontSize = '22px';
                         el.style.fontWeight = '800';
                         el.style.color = '#0fa4e6';
                         el.style.background = 'rgba(15,164,230,0.15)';
                         el.style.border = '2px solid rgba(15,164,230,0.35)';
-                        el.style.borderRadius = '12px';
-                        el.style.padding = '14px 22px';
-                        el.style.display = 'inline-block';
+                        el.style.borderRadius = '10px';
+                        el.style.padding = '10px 14px';
+                        el.style.display = 'block';
                         el.style.letterSpacing = '2px';
-                        el.style.margin = '10px 0';
+                        el.style.margin = '8px 0';
                         el.style.textAlign = 'center';
                         el.style.lineHeight = '1.3';
-                        el.style.whiteSpace = 'nowrap';
+                        el.style.maxWidth = '100%';
+                        el.style.boxSizing = 'border-box';
                         el.dataset.codeStyled = 'true';
                     }
 
@@ -1370,13 +1335,16 @@
                         if (el.dataset.warnStyled) continue;
                         el.style.color = '#ffb74d';
                         el.style.fontWeight = '700';
-                        el.style.fontSize = '15px';
+                        el.style.fontSize = '13px';
                         el.style.background = 'rgba(255,183,77,0.12)';
                         el.style.border = '1px solid rgba(255,183,77,0.3)';
-                        el.style.padding = '8px 14px';
+                        el.style.padding = '6px 10px';
                         el.style.borderRadius = '8px';
-                        el.style.display = 'inline-block';
+                        el.style.display = 'block';
                         el.style.marginTop = '6px';
+                        el.style.maxWidth = '100%';
+                        el.style.boxSizing = 'border-box';
+                        el.style.wordWrap = 'break-word';
                         el.dataset.warnStyled = 'true';
                     }
                 }
