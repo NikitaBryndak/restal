@@ -54,15 +54,28 @@
 
         /* --- Main form container: kill blue gradient and bg images --- */
         .new_f-container,
-        .new_os,
-        #os-form,
-        #os-form > div {
-            background: rgba(255,255,255,0.05) !important;
+        .new_os {
+            background: transparent !important;
             background-image: none !important;
-            background-color: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
+            background-color: transparent !important;
+            border: none !important;
+            color: #e0e0e0 !important;
+            filter: none !important;
+        }
+        #os-form {
+            background: rgba(255,255,255,0.04) !important;
+            background-image: none !important;
+            background-color: rgba(255,255,255,0.04) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
             border-radius: 16px !important;
             color: #e0e0e0 !important;
+            padding: 0 !important;
+        }
+        #os-form > div {
+            background: transparent !important;
+            background-image: none !important;
+            background-color: transparent !important;
+            border: none !important;
             filter: none !important;
         }
 
@@ -237,17 +250,18 @@
         }
 
         /* Country list dropdown */
-        #cntList {
-            background: #1a1a1a !important;
+        #cntList,
+        #cntList * {
+            background-color: #1a1a1a !important;
         }
         #cntList .ui-menu-item a *,
         #cntList li {
-            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
             color: #e0e0e0 !important;
         }
         #cntList .ui-menu-item.active a,
         #cntList .ui-menu-item.active a * {
-            background: rgba(15,164,230,0.2) !important;
+            background-color: rgba(15,164,230,0.2) !important;
         }
         .new_type-item,
         #new_os-to .type-item {
@@ -256,8 +270,9 @@
         }
 
         /* Resort list */
-        #ctyList {
-            background: #1a1a1a !important;
+        #ctyList,
+        #ctyList * {
+            background-color: #1a1a1a !important;
         }
         #ctyList li {
             background-color: #1a1a1a !important;
@@ -265,11 +280,12 @@
         }
         #ctyList .labelName,
         #ctyList .itemPrice {
-            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
             color: #e0e0e0 !important;
         }
-        .ctyLists-wrapper {
-            background: #1a1a1a !important;
+        .ctyLists-wrapper,
+        .ctyLists-wrapper * {
+            background-color: #1a1a1a !important;
         }
         #ctyList::before {
             background-color: #1a1a1a !important;
@@ -335,11 +351,42 @@
         }
 
         .ui-autocomplete .ui-menu-item a,
+        .ui-autocomplete .ui-menu-item,
+        .ui-autocomplete li,
+        .ui-autocomplete li a,
         .ui-menu .ui-menu-item a,
+        .ui-menu .ui-menu-item,
         #new_os-to .ui-menu .ui-menu-item .label,
         #new_os-to .ui-menu .ui-menu-item .noplace {
             color: #e0e0e0 !important;
-            background: transparent !important;
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+        }
+
+        /* Autocomplete category header (КРАЇНИ / КУРОРТИ) */
+        .ui-autocomplete-category,
+        .ui-autocomplete .ui-autocomplete-category,
+        .ui-menu .ui-autocomplete-category {
+            background-color: #222 !important;
+            color: #888 !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            padding: 8px 12px !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+        }
+
+        /* Selected / hovered items in autocomplete */
+        .ui-autocomplete .ui-menu-item a.ui-state-focus,
+        .ui-autocomplete .ui-menu-item a.ui-state-active,
+        .ui-autocomplete .ui-menu-item.ui-state-focus,
+        .ui-autocomplete .ui-state-focus,
+        .ui-autocomplete .ui-state-active,
+        .ui-autocomplete li:hover,
+        .ui-autocomplete li a:hover,
+        .ui-menu .ui-menu-item a:hover {
+            background: rgba(15,164,230,0.2) !important;
+            background-color: rgba(15,164,230,0.2) !important;
+            color: #ffffff !important;
         }
 
         body:not(.iOS) .new_f-container #new_os-to .ui-menu-item a:hover *,
@@ -350,12 +397,16 @@
             background: rgba(15,164,230,0.15) !important;
         }
 
-        /* Category headers in dropdown */
-        .ui-autocomplete .ui-autocomplete-category {
-            color: #888 !important;
-            font-size: 11px !important;
-            text-transform: uppercase !important;
-            padding: 6px 12px !important;
+        /* All UI-menu children forced dark */
+        .ui-menu *,
+        .ui-autocomplete *,
+        .ui-menu-item *,
+        .ui-menu-item .ui-corner-all,
+        .ui-menu-item .label,
+        .ui-menu-item .noplace {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+            color: #e0e0e0 !important;
         }
 
         /* Datepicker dark theme */
@@ -402,25 +453,27 @@
 
         /* Individual result card */
         .new_r-item {
-            background-color: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
+            background-color: rgba(255,255,255,0.04) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
             border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
-            overflow: visible !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+            overflow: hidden !important;
+            height: auto !important;
         }
 
         .new_r-item:hover {
-            border-color: rgba(15,164,230,0.3) !important;
-            background-color: rgba(255,255,255,0.08) !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+            border-color: rgba(15,164,230,0.25) !important;
+            background-color: rgba(255,255,255,0.06) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
         }
 
         .new_r-item-body {
             background: transparent !important;
             border-color: transparent !important;
+            border: none !important;
         }
         .new_r-item:hover .new_r-item-body {
-            border-color: rgba(15,164,230,0.3) transparent rgba(15,164,230,0.3) transparent !important;
+            border: none !important;
         }
 
         /* Hotel name */
@@ -452,24 +505,38 @@
             background: #0fa4e6 !important;
             border-color: #0fa4e6 !important;
             color: #ffffff !important;
+            border-radius: 20px 0 0 20px !important;
         }
         .new_r-item:hover .new_r-item-price {
-            background: #fff !important;
-            color: #0fa4e6 !important;
+            background: #0d8fca !important;
+            color: #ffffff !important;
+        }
+        .new_r-item:hover .new_r-item-price::after {
+            display: none !important;
+        }
+        .new_r-item-price .new_price-desc {
+            color: rgba(255,255,255,0.7) !important;
         }
 
         /* Rating circle */
         .new_r-item-rating-container {
-            background-color: rgba(255,255,255,0.1) !important;
+            background-color: rgba(255,255,255,0.08) !important;
+            border: none !important;
+            border-radius: 50% !important;
         }
         .new_r-item-rating-container::after {
-            background-color: #1a1a1a !important;
+            background-color: #141414 !important;
         }
         .new_r-item-rating-value {
             color: #e0e0e0 !important;
         }
         .new_r-item-rating-rev {
             color: #0fa4e6 !important;
+        }
+        .new_r-item-rating-container .slice,
+        .new_r-item-rating-container .bar,
+        .new_r-item-rating-container .fill {
+            background: none !important;
         }
 
         /* Show more button */
@@ -960,6 +1027,8 @@
                     var el = allText[i];
                     var tag = el.tagName;
                     if (tag === 'SCRIPT' || tag === 'STYLE') continue;
+                    // Skip price badges — they have accent bg with white text, don't touch them
+                    if (el.classList.contains('new_r-item-price') || el.closest('.new_r-item-price')) continue;
                     var cs = window.getComputedStyle(el);
                     // Fix light backgrounds
                     var bg = cs.backgroundColor;
@@ -1009,22 +1078,21 @@
                 // Form elements dark theme — AGGRESSIVE
                 var formEl = document.getElementById('os-form');
                 if (formEl) {
-                    // Force dark bg on form container
-                    formEl.style.setProperty('background', 'rgba(255,255,255,0.05)', 'important');
-                    formEl.style.setProperty('background-color', 'rgba(255,255,255,0.05)', 'important');
+                    // Force dark bg on form container — only #os-form gets the bg
+                    formEl.style.setProperty('background', 'rgba(255,255,255,0.04)', 'important');
+                    formEl.style.setProperty('background-color', 'rgba(255,255,255,0.04)', 'important');
                     formEl.style.setProperty('background-image', 'none', 'important');
-                    formEl.style.setProperty('border', '1px solid rgba(255,255,255,0.1)', 'important');
+                    formEl.style.setProperty('border', '1px solid rgba(255,255,255,0.08)', 'important');
                     formEl.style.setProperty('border-radius', '16px', 'important');
 
-                    // Target the specific widget container with the blue gradient
+                    // Target the specific widget container — make transparent (no double border)
                     var fContainer = formEl.querySelector('.new_f-container');
                     if (fContainer) {
-                        fContainer.style.setProperty('background', 'rgba(255,255,255,0.05)', 'important');
-                        fContainer.style.setProperty('background-color', 'rgba(255,255,255,0.05)', 'important');
+                        fContainer.style.setProperty('background', 'transparent', 'important');
+                        fContainer.style.setProperty('background-color', 'transparent', 'important');
                         fContainer.style.setProperty('background-image', 'none', 'important');
                         fContainer.style.setProperty('filter', 'none', 'important');
-                        fContainer.style.setProperty('border', '1px solid rgba(255,255,255,0.1)', 'important');
-                        fContainer.style.setProperty('border-radius', '16px', 'important');
+                        fContainer.style.setProperty('border', 'none', 'important');
                     }
 
                     // Hide the decorative compass/airplane background overlay
@@ -1123,19 +1191,38 @@
                     '[class*="dropdown"], [class*="autocomplete"], [class*="popup"], [class*="suggestion"]'
                 );
                 for (var i = 0; i < dropdowns.length; i++) {
-                    dropdowns[i].style.backgroundColor = '#1a1a1a';
-                    dropdowns[i].style.borderColor = 'rgba(255,255,255,0.15)';
-                    dropdowns[i].style.color = '#e0e0e0';
-                    dropdowns[i].style.zIndex = '99999';
+                    dropdowns[i].style.setProperty('background-color', '#1a1a1a', 'important');
+                    dropdowns[i].style.setProperty('border-color', 'rgba(255,255,255,0.15)', 'important');
+                    dropdowns[i].style.setProperty('color', '#e0e0e0', 'important');
+                    dropdowns[i].style.setProperty('z-index', '99999', 'important');
+                    // Force ALL children dark too
+                    var ddChildren = dropdowns[i].querySelectorAll('*');
+                    for (var j = 0; j < ddChildren.length; j++) {
+                        var ddChild = ddChildren[j];
+                        var ddBg = window.getComputedStyle(ddChild).backgroundColor;
+                        if (isLightBg(ddBg)) {
+                            ddChild.style.setProperty('background-color', '#1a1a1a', 'important');
+                        }
+                        if (isDarkText(window.getComputedStyle(ddChild).color)) {
+                            ddChild.style.setProperty('color', '#e0e0e0', 'important');
+                        }
+                    }
                 }
                 var ddItems = document.querySelectorAll(
                     '.ui-menu-item, .ui-menu-item a, .ui-autocomplete li, .ui-autocomplete li a,' +
                     '[class*="autocomplete"] li, [class*="suggestion"] div'
                 );
                 for (var i = 0; i < ddItems.length; i++) {
-                    ddItems[i].style.color = '#e0e0e0';
-                    var dBg = window.getComputedStyle(ddItems[i]).backgroundColor;
-                    if (isLightBg(dBg)) ddItems[i].style.backgroundColor = 'transparent';
+                    ddItems[i].style.setProperty('color', '#e0e0e0', 'important');
+                    ddItems[i].style.setProperty('background-color', '#1a1a1a', 'important');
+                }
+
+                // Price badges — keep accent color, never white
+                var priceBadges = document.querySelectorAll('.new_r-item-price');
+                for (var i = 0; i < priceBadges.length; i++) {
+                    priceBadges[i].style.setProperty('background', '#0fa4e6', 'important');
+                    priceBadges[i].style.setProperty('border-color', '#0fa4e6', 'important');
+                    priceBadges[i].style.setProperty('color', '#ffffff', 'important');
                 }
             }
 
@@ -1280,13 +1367,26 @@
         /* === NUCLEAR: strip the blue gradient from the real widget container === */
         html body .new_f-container,
         html body #os-form .new_f-container {
-            background: rgba(255,255,255,0.05) !important;
-            background-color: rgba(255,255,255,0.05) !important;
+            background: transparent !important;
+            background-color: transparent !important;
             background-image: none !important;
             filter: none !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
+            border: none !important;
+            color: #e0e0e0 !important;
+        }
+        html body #os-form {
+            background: rgba(255,255,255,0.04) !important;
+            background-color: rgba(255,255,255,0.04) !important;
+            background-image: none !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
             border-radius: 16px !important;
             color: #e0e0e0 !important;
+        }
+        html body #os-form > div {
+            background: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            filter: none !important;
         }
 
         /* Kill decorative compass/airplane overlay */
@@ -1409,29 +1509,43 @@
         html body .ui-menu,
         html body .ui-datepicker {
             background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
             border: 1px solid rgba(255,255,255,0.15) !important;
             color: #e0e0e0 !important;
             z-index: 99999 !important;
         }
+        html body .ui-autocomplete *,
+        html body .ui-menu * {
+            background-color: #1a1a1a !important;
+        }
         html body .ui-menu-item,
-        html body .ui-menu-item a {
+        html body .ui-menu-item a,
+        html body .ui-autocomplete li,
+        html body .ui-autocomplete li a {
             color: #e0e0e0 !important;
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+        }
+        html body .ui-autocomplete-category {
+            background-color: #222 !important;
+            color: #888 !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
         }
         html body .ui-state-focus,
         html body .ui-state-active,
-        html body .ui-menu-item:hover a {
+        html body .ui-menu-item:hover,
+        html body .ui-menu-item:hover a,
+        html body .ui-menu-item a:hover {
             background: rgba(15,164,230,0.2) !important;
+            background-color: rgba(15,164,230,0.2) !important;
             color: #ffffff !important;
         }
 
         /* === RESULTS === */
-        html body #os-search-results > div,
-        html body #os-tour-details > div,
-        html body [class*="new_r-"],
-        html body [class*="new_t-"] {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 12px !important;
+        html body .new_r-container {
+            color: #e0e0e0 !important;
+        }
+        html body .new_t-container {
             color: #e0e0e0 !important;
         }
 
@@ -1468,10 +1582,23 @@
             border-radius: 8px !important;
         }
 
-        /* Price styling */
-        html body [class*="price"] {
+        /* Price styling - but NOT the price badge itself (it has white text on blue bg) */
+        html body [class*="price"]:not(.new_r-item-price) {
             color: #0fa4e6 !important;
             font-weight: 700 !important;
+        }
+        /* Price badge: keep white text on accent bg */
+        html body .new_r-item-price {
+            background: #0fa4e6 !important;
+            border-color: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+        html body .new_r-item-price * {
+            color: #ffffff !important;
+        }
+        html body .new_r-item:hover .new_r-item-price {
+            background: #0d8fca !important;
+            color: #ffffff !important;
         }
     </style>
 </body>
