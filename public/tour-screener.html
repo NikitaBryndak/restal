@@ -506,6 +506,20 @@
             border-color: #0fa4e6 !important;
             color: #ffffff !important;
             border-radius: 20px 0 0 20px !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            font-size: 16px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            min-width: 50px !important;
+        }
+        .new_r-item-price * {
+            display: inline !important;
+            color: #ffffff !important;
+            visibility: visible !important;
+        }
+        .new_r-item-price .new_price-desc {
+            display: block !important;
         }
         .new_r-item:hover .new_r-item-price {
             background: #0d8fca !important;
@@ -645,8 +659,15 @@
             color: #0fa4e6 !important;
             margin-bottom: 6px !important;
         }
-        .new_t-order-btn-book {
-            margin-bottom: 8px !important;
+        /* Hide book tour button */
+        .new_t-order-btn-book,
+        .new_t-order-btn {
+            display: none !important;
+        }
+        .new_t-order-content {
+            text-align: center !important;
+            padding: 12px !important;
+            box-sizing: border-box !important;
         }
 
         /* --- Tour Detail Page --- */
@@ -869,24 +890,23 @@
 
         /* --- CRITICAL: Ensure overflow is visible for dropdowns --- */
         #os-form,
-        #os-form > *,
-        #os-form > * > *,
-        #os-form > * > * > *,
-        #os-form > * > * > * > *,
-        #os-form > * > * > * > * > *,
-        .new_f-container,
-        .new_f-wrapper,
-        .new_f-form,
-        .new_f-form > .clearfix,
-        .new_f-form-field,
-        .new_f-dropdown-container,
-        #new_os-to,
-        .new_os {
+        #os-form *:not(#cntList):not(#ctyList):not(.ctyLists-wrapper):not(.new_f-dropdown-list) {
             overflow: visible !important;
             overflow-x: visible !important;
             overflow-y: visible !important;
             clip: auto !important;
             clip-path: none !important;
+        }
+
+        /* Scrollable lists keep their scrolling */
+        #cntList {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            max-height: 300px !important;
+        }
+        #ctyList {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
         }
 
         /* Dropdown body must be visible and above everything */
@@ -895,15 +915,12 @@
             z-index: 9999 !important;
             overflow: visible !important;
         }
-        #cntList {
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-        }
 
         #os-form {
             position: relative !important;
             z-index: 1000 !important;
             margin-bottom: 60px !important;
+            min-height: auto !important;
         }
 
         /* Results must sit below form — prevent covering dropdowns */
@@ -963,6 +980,19 @@
         (function() {
             function postHeight() {
                 var h = document.documentElement.scrollHeight;
+                // Account for absolutely-positioned dropdowns that extend beyond scrollHeight
+                var formEl = document.getElementById('os-form');
+                if (formEl) {
+                    var ddBodies = formEl.querySelectorAll('.new_f-dropdown-body');
+                    for (var d = 0; d < ddBodies.length; d++) {
+                        var dd = ddBodies[d];
+                        if (dd.offsetHeight > 0 && dd.offsetWidth > 0) {
+                            var ddRect = dd.getBoundingClientRect();
+                            var ddBottom = window.scrollY + ddRect.top + ddRect.height;
+                            if (ddBottom > h) h = ddBottom + 40;
+                        }
+                    }
+                }
                 window.parent.postMessage({ type: 'resize', height: h }, '*');
             }
             // Post height on load and periodically (widget dynamically adds content)
@@ -1098,9 +1128,12 @@
                 );
                 for (var i = 0; i < headings.length; i++) headings[i].style.color = '#ffffff';
 
-                // Links accent
+                // Links accent (but NOT the price badge — it's an <a> tag with white text on blue bg)
                 var links = document.querySelectorAll('#os-search-results a, #os-tour-details a');
-                for (var i = 0; i < links.length; i++) links[i].style.color = '#0fa4e6';
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].classList.contains('new_r-item-price') || links[i].closest('.new_r-item-price')) continue;
+                    links[i].style.color = '#0fa4e6';
+                }
 
                 // Tables
                 var cells = document.querySelectorAll(
@@ -1111,10 +1144,9 @@
                     cells[i].style.color = '#e0e0e0';
                 }
 
-                // Buttons
+                // Buttons (but hide book/order buttons)
                 var btns = document.querySelectorAll(
                     '#os-search-results button, #os-search-results input[type="submit"],' +
-                    '#os-search-results [class*="order"], #os-search-results [class*="book"],' +
                     '#os-tour-details button, #os-tour-details input[type="submit"]'
                 );
                 for (var i = 0; i < btns.length; i++) {
@@ -1122,6 +1154,24 @@
                     btns[i].style.color = '#ffffff';
                     btns[i].style.border = 'none';
                     btns[i].style.borderRadius = '8px';
+                }
+                // Hide book tour buttons
+                var bookBtns = document.querySelectorAll('.new_t-order-btn-book, .new_t-order-btn');
+                for (var i = 0; i < bookBtns.length; i++) {
+                    bookBtns[i].style.setProperty('display', 'none', 'important');
+                }
+
+                // Force price badge children to be inline (fix missing price number)
+                var priceBadgeChildren = document.querySelectorAll('.new_r-item-price > *');
+                for (var i = 0; i < priceBadgeChildren.length; i++) {
+                    var pbc = priceBadgeChildren[i];
+                    if (pbc.classList.contains('new_price-desc')) {
+                        pbc.style.setProperty('display', 'block', 'important');
+                    } else {
+                        pbc.style.setProperty('display', 'inline', 'important');
+                    }
+                    pbc.style.setProperty('color', '#ffffff', 'important');
+                    pbc.style.setProperty('visibility', 'visible', 'important');
                 }
 
                 // Form elements dark theme — AGGRESSIVE
@@ -1628,8 +1678,8 @@
             color: #ffffff !important;
         }
 
-        html body #os-search-results a,
-        html body #os-tour-details a {
+        html body #os-search-results a:not(.new_r-item-price),
+        html body #os-tour-details a:not(.new_r-item-price) {
             color: #0fa4e6 !important;
         }
 
@@ -1643,18 +1693,30 @@
         }
 
         /* Price styling - but NOT the price badge itself (it has white text on blue bg) */
-        html body [class*="price"]:not(.new_r-item-price) {
+        html body [class*="price"]:not(.new_r-item-price):not([class*="new_r-item-price"]) {
             color: #0fa4e6 !important;
             font-weight: 700 !important;
         }
-        /* Price badge: keep white text on accent bg */
+        /* Price badge: keep white text on accent bg — force all children inline + white */
         html body .new_r-item-price {
             background: #0fa4e6 !important;
             border-color: #0fa4e6 !important;
             color: #ffffff !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            visibility: visible !important;
         }
         html body .new_r-item-price * {
             color: #ffffff !important;
+            display: inline !important;
+            visibility: visible !important;
+        }
+        html body .new_r-item-price .new_price-desc {
+            display: block !important;
+            white-space: normal !important;
+            font-size: 10px !important;
         }
         html body .new_r-item:hover .new_r-item-price {
             background: #0d8fca !important;
