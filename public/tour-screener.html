@@ -817,8 +817,26 @@
             color: #0fa4e6 !important;
             background: rgba(255,255,255,0.03) !important;
         }
+        .new_t-change-btn:hover {
+            background: rgba(255,255,255,0.08) !important;
+        }
         .new_t-change-btn svg {
             fill: #0fa4e6 !important;
+        }
+
+        /* People dropdown in tour detail */
+        .new_t-change-people .new_f-dropdown-body-wrap {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        .new_t-change-people .new_f-dropdown-btn-cancel {
+            background-color: rgba(255,255,255,0.08) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            color: #e0e0e0 !important;
+        }
+        .new_t-change-people .new_f-dropdown-btn-apply {
+            background-color: #0fa4e6 !important;
+            color: #ffffff !important;
         }
 
         /* Not found message */
@@ -840,10 +858,75 @@
         .new_t-order-book-modal-body {
             background: #1a1a1a !important;
         }
+        .os-order-form-wrap {
+            background: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        .os-order-form-wrap input,
+        .os-order-form-wrap textarea,
+        .os-order-form-wrap select {
+            background-color: rgba(255,255,255,0.08) !important;
+            color: #e0e0e0 !important;
+            border-color: rgba(255,255,255,0.15) !important;
+        }
+        .os-order-select-wrapper {
+            background: rgba(255,255,255,0.08) !important;
+        }
+        .os-order-select-wrapper:after {
+            background: rgba(255,255,255,0.08) !important;
+        }
+        .os-order-form-submit_button {
+            background: #0fa4e6 !important;
+            color: #ffffff !important;
+        }
+
+        /* Credit modal dark theme */
+        .new_credit-modal-body {
+            background-color: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        .new_credit-modal, .new_credit-modal * {
+            color: #e0e0e0 !important;
+        }
+        .new_credit-modal-select::before {
+            background: #1a1a1a !important;
+        }
+        .new_credit-modal-row-count-item {
+            background: rgba(255,255,255,0.05) !important;
+        }
+        .new_credit-modal-row-count-item__btn {
+            background: rgba(255,255,255,0.08) !important;
+            border-color: #0fa4e6 !important;
+            color: #e0e0e0 !important;
+        }
 
         /* Similar/viewed tours */
         .new_t-similar-viewed-wrapper {
             color: #e0e0e0 !important;
+        }
+        .new_t-similar-viewed-wrapper h2,
+        .new_t-similar-viewed-wrapper h3 {
+            color: #ffffff !important;
+        }
+        .new_t-similar-viewed-gallery-item {
+            background: transparent !important;
+        }
+        .new_t-similar-viewed-gallery-item .new_r-item {
+            background-color: rgba(255,255,255,0.04) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+        }
+        /* Owl carousel dots and nav */
+        .new_t-container .owl-dots {
+            background-color: rgba(255,255,255,0.1) !important;
+        }
+        .new_t-container .owl-dot.active {
+            background-color: #0fa4e6 !important;
+        }
+        .new_t-similar-viewed-wrapper .owl-prev,
+        .new_t-similar-viewed-wrapper .owl-next {
+            filter: invert(1) !important;
         }
 
         /* Map */
@@ -1026,19 +1109,28 @@
                 for (var i = 0; i < allText.length; i++) {
                     var el = allText[i];
                     var tag = el.tagName;
-                    if (tag === 'SCRIPT' || tag === 'STYLE') continue;
-                    // Skip price badges — they have accent bg with white text, don't touch them
+                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'IMG' || tag === 'SVG' || tag === 'PATH') continue;
+                    // Skip price badges — they have accent bg with white text
                     if (el.classList.contains('new_r-item-price') || el.closest('.new_r-item-price')) continue;
+                    // Skip tour code — has accent styling
+                    if (el.classList.contains('new_t-order-code') || el.closest('.new_t-order-code')) continue;
+                    // Skip rating bar/fill — uses borders for the arc
+                    if (el.classList.contains('bar') || el.classList.contains('fill') || el.classList.contains('slice')) continue;
                     var cs = window.getComputedStyle(el);
                     // Fix light backgrounds
                     var bg = cs.backgroundColor;
                     if (bg && isLightBg(bg)) {
-                        el.style.backgroundColor = 'transparent';
+                        // Buttons get accent, everything else transparent
+                        if (tag === 'BUTTON' || el.classList.contains('new_t-order-btn-book') || el.classList.contains('new_t-order-btn')) {
+                            el.style.setProperty('background-color', '#0fa4e6', 'important');
+                        } else {
+                            el.style.setProperty('background-color', 'transparent', 'important');
+                        }
                     }
                     // Fix dark text on dark bg
                     var col = cs.color;
                     if (col && isDarkText(col)) {
-                        el.style.color = '#e0e0e0';
+                        el.style.setProperty('color', '#e0e0e0', 'important');
                     }
                 }
 
