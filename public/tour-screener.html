@@ -513,12 +513,20 @@
             opacity: 1 !important;
             min-width: 50px !important;
         }
-        .new_r-item-price * {
-            display: inline !important;
+        /* Use ID selector for max specificity — ensures white text inside price badge */
+        #os-search-results .new_r-item-price,
+        #os-search-results .new_r-item-price *,
+        #os-search-results .new_r-item-price span,
+        #os-search-results .new_r-item-price b,
+        #os-search-results .new_r-item-price strong {
             color: #ffffff !important;
             visibility: visible !important;
+            opacity: 1 !important;
         }
-        .new_r-item-price .new_price-desc {
+        #os-search-results .new_r-item-price * {
+            display: inline !important;
+        }
+        #os-search-results .new_r-item-price .new_price-desc {
             display: block !important;
         }
         .new_r-item:hover .new_r-item-price {
@@ -621,12 +629,12 @@
             color: #ffb0b0 !important;
         }
 
-        /* Links inside results */
-        #os-search-results a,
+        /* Links inside results — exclude price badge */
+        #os-search-results a:not(.new_r-item-price),
         #os-tour-details a {
             color: #0fa4e6 !important;
         }
-        #os-search-results a:hover,
+        #os-search-results a:not(.new_r-item-price):hover,
         #os-tour-details a:hover {
             color: #3dbbf0 !important;
         }
@@ -1204,6 +1212,13 @@
                         extContainer.style.setProperty('background', 'rgba(255,255,255,0.03)', 'important');
                         extContainer.style.setProperty('background-image', 'none', 'important');
                         extContainer.style.setProperty('box-shadow', 'none', 'important');
+                        extContainer.style.setProperty('display', 'block', 'important');
+                        extContainer.style.setProperty('position', 'relative', 'important');
+                    }
+
+                    // Force ext-opened class on container so extended search is visible
+                    if (fContainer && !fContainer.classList.contains('ext-opened')) {
+                        fContainer.classList.add('ext-opened');
                     }
 
                     // Form field boxes
@@ -1319,9 +1334,24 @@
                 // Price badges — keep accent color, never white
                 var priceBadges = document.querySelectorAll('.new_r-item-price');
                 for (var i = 0; i < priceBadges.length; i++) {
-                    priceBadges[i].style.setProperty('background', '#0fa4e6', 'important');
-                    priceBadges[i].style.setProperty('border-color', '#0fa4e6', 'important');
-                    priceBadges[i].style.setProperty('color', '#ffffff', 'important');
+                    var pb = priceBadges[i];
+                    pb.style.setProperty('background', '#0fa4e6', 'important');
+                    pb.style.setProperty('border-color', '#0fa4e6', 'important');
+                    pb.style.setProperty('color', '#ffffff', 'important');
+                    pb.style.setProperty('display', 'inline-block', 'important');
+                    pb.style.setProperty('font-size', '16px', 'important');
+                    pb.style.setProperty('visibility', 'visible', 'important');
+                    // Force ALL descendants white + inline
+                    var pbAll = pb.querySelectorAll('*');
+                    for (var j = 0; j < pbAll.length; j++) {
+                        pbAll[j].style.setProperty('color', '#ffffff', 'important');
+                        pbAll[j].style.setProperty('visibility', 'visible', 'important');
+                        if (pbAll[j].classList.contains('new_price-desc')) {
+                            pbAll[j].style.setProperty('display', 'block', 'important');
+                        } else {
+                            pbAll[j].style.setProperty('display', 'inline', 'important');
+                        }
+                    }
                 }
             }
 
@@ -1522,6 +1552,15 @@
             box-shadow: none !important;
         }
 
+        /* Extended search always visible */
+        .new_f-ext-container {
+            display: block !important;
+            position: relative !important;
+        }
+        .new_f-ext-container::before {
+            display: none !important;
+        }
+
         /* Form field boxes (country, date, etc.) */
         html body .new_f-form-field {
             background-color: rgba(0,0,0,0.5) !important;
@@ -1697,8 +1736,8 @@
             color: #0fa4e6 !important;
             font-weight: 700 !important;
         }
-        /* Price badge: keep white text on accent bg — force all children inline + white */
-        html body .new_r-item-price {
+        /* Price badge: keep white text on accent bg — use ID for max specificity */
+        html body #os-search-results .new_r-item-price {
             background: #0fa4e6 !important;
             border-color: #0fa4e6 !important;
             color: #ffffff !important;
@@ -1708,12 +1747,15 @@
             font-weight: 600 !important;
             visibility: visible !important;
         }
-        html body .new_r-item-price * {
+        html body #os-search-results .new_r-item-price,
+        html body #os-search-results .new_r-item-price * {
             color: #ffffff !important;
-            display: inline !important;
             visibility: visible !important;
         }
-        html body .new_r-item-price .new_price-desc {
+        html body #os-search-results .new_r-item-price * {
+            display: inline !important;
+        }
+        html body #os-search-results .new_r-item-price .new_price-desc {
             display: block !important;
             white-space: normal !important;
             font-size: 10px !important;
