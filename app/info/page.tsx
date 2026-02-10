@@ -87,7 +87,7 @@ export default function InfoPage() {
               placeholder="Шукати статті..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-black/40 border-white/10 focus:border-accent/50 h-10 w-full"
+              className="pl-10 pr-4 bg-black/40 border-white/10 focus:border-accent/50 h-10 w-full"
             />
           </div>
         </div>
