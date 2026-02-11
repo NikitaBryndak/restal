@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 
 @theme {
@@ -47,4 +48,28 @@ body {
   font-weight: 600;
   scroll-behavior: smooth;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hide navbar & footer when AI chat is active */
+body[data-chat-active="true"] nav {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-100%) !important;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+body[data-chat-active="true"] footer,
+body[data-chat-active="true"] > div > .bottom-0 {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(2rem) !important;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Scrollbar-less smooth scroll area */
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

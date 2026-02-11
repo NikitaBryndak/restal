@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { searchTexts } from "@/data";
 
 
-export default function SearchBar({ className, disabled }: { className?: string; disabled?: boolean }) {
+export default function SearchBar({ className }: { className?: string }) {
     const [displayText, setDisplayText] = useState("");
     const [index, setIndex] = useState(0);
     const [subIndex, setSubIndex] = useState(0);
@@ -46,7 +46,6 @@ export default function SearchBar({ className, disabled }: { className?: string;
                 type="text"
                 placeholder={displayText}
                 className={`w-full ${className}`}
-                disabled={disabled}
             />
         </div>
     );
