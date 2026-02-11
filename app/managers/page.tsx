@@ -1,7 +1,7 @@
 "use client";
 
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { Phone, Send, User, MessageCircle, MessageSquareMore, Loader2, CheckCircle2 } from "lucide-react";
+import { Phone, Send, User, MessageCircle, MessageSquareMore, Loader2, CheckCircle2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import AiChatInline from "@/components/search/ai-chat-inline";
@@ -166,7 +166,7 @@ export default function ManagersPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center px-4 py-24 relative overflow-hidden">
+    <main className="min-h-screen w-full flex flex-col items-center px-4 max-sm:px-3 py-24 max-sm:py-16 relative overflow-hidden">
 
       <div className="w-full max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-6">
@@ -179,11 +179,11 @@ export default function ManagersPage() {
 
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
           {managers.map((manager, index) => {
             const isOnline = getOnlineStatus(manager);
             return (
-            <div key={index} className="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-md hover:border-accent/50 transition-all duration-300 flex flex-col gap-5 group hover:shadow-xl hover:shadow-accent/10">
+            <div key={index} className="bg-white/5 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 backdrop-blur-md hover:border-accent/50 transition-all duration-300 flex flex-col gap-4 sm:gap-5 group hover:shadow-xl hover:shadow-accent/10">
               {/* Header with avatar and name */}
               <div className="flex items-start gap-4">
                 <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
@@ -209,11 +209,17 @@ export default function ManagersPage() {
               {/* Primary CTA Button */}
               {!('isVacancy' in manager && manager.isVacancy) && (
               <button
-                onClick={() => handleConsultationClick(manager.name)}
+                onClick={() => {
+                  if ('alwaysOnline' in manager && manager.alwaysOnline) {
+                    setChatOpen(true);
+                  } else {
+                    handleConsultationClick(manager.name);
+                  }
+                }}
                 className="w-full px-5 py-3.5 bg-accent hover:bg-accent/90 text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn font-medium shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:scale-[1.02]"
               >
-                <MessageCircle className="w-5 h-5" />
-                <span>Замовити консультацію</span>
+                {'alwaysOnline' in manager && manager.alwaysOnline ? <Sparkles className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
+                <span>{'alwaysOnline' in manager && manager.alwaysOnline ? 'Запитати ШІ' : 'Замовити консультацію'}</span>
               </button>
               )}
 
@@ -312,6 +318,20 @@ export default function ManagersPage() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {chatOpen && (
+        <div className={`transition-opacity duration-400 ${exitingChat ? "opacity-0" : "opacity-100"}`}>
+          <AiChatInline
+            onClose={() => {
+              setExitingChat(true);
+              setTimeout(() => {
+                setChatOpen(false);
+                setExitingChat(false);
+              }, 400);
+            }}
+          />
         </div>
       )}
     </main>

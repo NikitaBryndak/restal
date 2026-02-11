@@ -2109,6 +2109,24 @@
             html body .new_t-order-table {
                 max-width: 100% !important;
             }
+
+            /* Form fields stacking for tablet */
+            html body .new_f-form-field {
+                float: none !important;
+                width: 100% !important;
+                margin-bottom: 8px !important;
+                display: block !important;
+            }
+            html body .new_f-form .new_f-form-submit {
+                float: none !important;
+                width: 100% !important;
+                display: block !important;
+            }
+            html body .new_f-ext-bl {
+                float: none !important;
+                width: 100% !important;
+                margin-bottom: 12px !important;
+            }
         }
 
         @media (max-width: 478px) {
@@ -2150,6 +2168,31 @@
             /* Form z-index reset */
             html body #os-form {
                 z-index: auto !important;
+            }
+
+            /* Form fields stacking for mobile */
+            html body .new_f-form-field {
+                float: none !important;
+                width: 100% !important;
+                margin-bottom: 8px !important;
+                display: block !important;
+                box-sizing: border-box !important;
+            }
+            html body .new_f-form .new_f-form-submit {
+                float: none !important;
+                width: 100% !important;
+                display: block !important;
+                margin-top: 4px !important;
+            }
+            html body .new_f-ext-bl {
+                float: none !important;
+                width: 100% !important;
+                margin-bottom: 12px !important;
+                box-sizing: border-box !important;
+            }
+            html body .new_f-ext-bl label {
+                display: block !important;
+                margin-bottom: 4px !important;
             }
 
             /* Fullscreen overlays dark bg — high specificity */

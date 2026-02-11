@@ -24,7 +24,7 @@ export default function SmallNavbar() {
             </button>
 
             {isMobileMenuOpen && (
-                <div className="fixed inset-0 z-40 bg-black pt-24 flex flex-col h-screen text-white}">
+                <div className="fixed inset-0 z-40 bg-black pt-20 sm:pt-24 flex flex-col h-screen text-white">
                     <div className="flex-1 overflow-y-auto px-6 pb-4">
                         <div className="flex flex-col space-y-6">
                             {/* Main Navigation */}
