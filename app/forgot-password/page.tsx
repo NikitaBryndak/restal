@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-background border rounded-lg p-8 shadow-sm">
+            <div className="w-full max-w-md bg-background border rounded-lg p-4 sm:p-8 shadow-sm">
                  <Link
                     href="/login"
                     className="text-sm text-muted-foreground hover:text-foreground mb-6 block"

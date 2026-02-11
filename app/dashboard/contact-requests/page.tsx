@@ -153,14 +153,14 @@ export default function ContactRequestsPage() {
     const totalNew = counts.new;
 
     return (
-        <div className="w-full max-w-5xl mx-auto px-4 max-sm:px-2 py-8 max-sm:py-6 space-y-6">
+        <div className="w-full max-w-5xl mx-auto px-4 max-sm:px-2 py-8 max-sm:py-4 space-y-4 sm:space-y-6 overflow-x-hidden">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
-                    <h1 className="text-2xl font-light text-white">
+                    <h1 className="text-xl sm:text-2xl font-light text-white">
                         Запити на зв'язок
                     </h1>
-                    <p className="text-secondary text-sm mt-1">
+                    <p className="text-secondary text-xs sm:text-sm mt-1">
                         {totalNew > 0
                             ? `${totalNew} нових запитів потребують уваги`
                             : 'Немає нових запитів'}
@@ -169,7 +169,7 @@ export default function ContactRequestsPage() {
                 <button
                     onClick={() => fetchRequests()}
                     disabled={loading}
-                    className="px-4 py-2 rounded-xl bg-white/5 text-secondary hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium border border-white/10 disabled:opacity-50"
+                    className="px-3 sm:px-4 py-2 rounded-xl bg-white/5 text-secondary hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium border border-white/10 disabled:opacity-50"
                 >
                     <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     Оновити
@@ -177,7 +177,7 @@ export default function ContactRequestsPage() {
             </div>
 
             {/* Status filter tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 -mx-2 px-2 hide-scrollbar">
                 <Filter className="w-4 h-4 text-secondary shrink-0" />
                 {['all', 'new', 'in_progress', 'completed', 'dismissed'].map((status) => {
                     const count = status === 'all'
@@ -187,14 +187,14 @@ export default function ContactRequestsPage() {
                         <button
                             key={status}
                             onClick={() => handleFilterChange(status)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                                 statusFilter === status
                                     ? 'bg-accent text-white'
                                     : 'bg-white/5 text-secondary hover:bg-white/10'
                             }`}
                         >
                             {STATUS_LABELS[status]}
-                            <span className="ml-1.5 text-xs opacity-70">({count})</span>
+                            <span className="ml-1 sm:ml-1.5 text-[10px] sm:text-xs opacity-70">({count})</span>
                         </button>
                     );
                 })}
@@ -215,104 +215,105 @@ export default function ContactRequestsPage() {
                     {requests.map((req) => (
                         <div
                             key={req._id}
-                            className="bg-white/5 border border-white/10 rounded-2xl p-5 max-sm:p-3 hover:border-white/20 transition-colors"
+                            className="bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-5 hover:border-white/20 transition-colors"
                         >
-                            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                                {/* Icon */}
-                                <div className="p-3 rounded-xl bg-accent/10 text-accent shrink-0 self-start">
-                                    {req.source === 'manager' ? (
-                                        <MessageCircle className="w-5 h-5" />
-                                    ) : (
-                                        <User className="w-5 h-5" />
-                                    )}
-                                </div>
+                            <div className="flex flex-col gap-3 sm:gap-4">
+                                {/* Top row: icon + status + source + date */}
+                                <div className="flex items-start gap-3">
+                                    {/* Icon */}
+                                    <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-accent/10 text-accent shrink-0">
+                                        {req.source === 'manager' ? (
+                                            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        ) : (
+                                            <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        )}
+                                    </div>
 
-                                {/* Content */}
-                                <div className="flex-1 min-w-0 space-y-2">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium border ${STATUS_COLORS[req.status]}`}>
+                                    {/* Content */}
+                                    <div className="flex-1 min-w-0 space-y-2">
+                                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                            <span className={`inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-medium border ${STATUS_COLORS[req.status]}`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT_COLORS[req.status]}`} />
                                                 {STATUS_LABELS[req.status]}
                                             </span>
-                                            <span className="text-xs text-secondary bg-white/5 px-2 py-0.5 rounded-md">
+                                            <span className="text-[10px] sm:text-xs text-secondary bg-white/5 px-1.5 sm:px-2 py-0.5 rounded-md">
                                                 {SOURCE_LABELS[req.source]}
                                             </span>
                                         </div>
-                                        <span className="text-xs text-secondary flex items-center gap-1">
+                                        <span className="text-[10px] sm:text-xs text-secondary flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
                                             {formatDate(req.createdAt)}
                                         </span>
                                     </div>
+                                </div>
 
-                                    {/* Details */}
-                                    <div className="space-y-1">
-                                        {(req.firstName || req.lastName) && (
-                                            <p className="text-white text-sm">
-                                                <span className="text-secondary">Ім'я: </span>
-                                                {[req.firstName, req.lastName].filter(Boolean).join(' ')}
-                                            </p>
-                                        )}
-                                        <p className="text-white text-sm flex items-center gap-1.5">
-                                            <PhoneIcon className="w-3.5 h-3.5 text-accent" />
-                                            <a href={`tel:${req.phone}`} className="hover:text-accent transition-colors">
-                                                {req.phone}
-                                            </a>
+                                {/* Details */}
+                                <div className="space-y-1.5 sm:space-y-1">
+                                    {(req.firstName || req.lastName) && (
+                                        <p className="text-white text-xs sm:text-sm">
+                                            <span className="text-secondary">Ім'я: </span>
+                                            {[req.firstName, req.lastName].filter(Boolean).join(' ')}
                                         </p>
-                                        {req.managerName && (
-                                            <p className="text-white text-sm">
-                                                <span className="text-secondary">Менеджер: </span>
-                                                {req.managerName}
-                                            </p>
-                                        )}
-                                        {req.message && (
-                                            <p className="text-secondary text-sm mt-1 bg-white/5 rounded-lg p-3">
-                                                {req.message}
-                                            </p>
-                                        )}
-                                    </div>
+                                    )}
+                                    <p className="text-white text-xs sm:text-sm flex items-center gap-1.5">
+                                        <PhoneIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-accent shrink-0" />
+                                        <a href={`tel:${req.phone}`} className="hover:text-accent transition-colors break-all">
+                                            {req.phone}
+                                        </a>
+                                    </p>
+                                    {req.managerName && (
+                                        <p className="text-white text-xs sm:text-sm">
+                                            <span className="text-secondary">Менеджер: </span>
+                                            {req.managerName}
+                                        </p>
+                                    )}
+                                    {req.message && (
+                                        <p className="text-secondary text-xs sm:text-sm mt-1 bg-white/5 rounded-lg p-2 sm:p-3 wrap-break-word">
+                                            {req.message}
+                                        </p>
+                                    )}
+                                </div>
 
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-2 pt-2 flex-wrap">
-                                        {req.status !== 'in_progress' && req.status !== 'completed' && (
-                                            <button
-                                                onClick={() => handleStatusChange(req._id, 'in_progress')}
-                                                disabled={updatingId === req._id}
-                                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors disabled:opacity-50"
-                                            >
-                                                В роботу
-                                            </button>
-                                        )}
-                                        {req.status !== 'completed' && (
-                                            <button
-                                                onClick={() => handleStatusChange(req._id, 'completed')}
-                                                disabled={updatingId === req._id}
-                                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                Завершити
-                                            </button>
-                                        )}
-                                        {req.status !== 'dismissed' && req.status !== 'completed' && (
-                                            <button
-                                                onClick={() => handleStatusChange(req._id, 'dismissed')}
-                                                disabled={updatingId === req._id}
-                                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                <XCircle className="w-3 h-3" />
-                                                Відхилити
-                                            </button>
-                                        )}
-                                        {req.status === 'completed' && (
-                                            <button
-                                                onClick={() => handleStatusChange(req._id, 'new')}
-                                                disabled={updatingId === req._id}
-                                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50"
-                                            >
-                                                Повернути
-                                            </button>
-                                        )}
-                                    </div>
+                                {/* Actions */}
+                                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                    {req.status !== 'in_progress' && req.status !== 'completed' && (
+                                        <button
+                                            onClick={() => handleStatusChange(req._id, 'in_progress')}
+                                            disabled={updatingId === req._id}
+                                            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors disabled:opacity-50"
+                                        >
+                                            В роботу
+                                        </button>
+                                    )}
+                                    {req.status !== 'completed' && (
+                                        <button
+                                            onClick={() => handleStatusChange(req._id, 'completed')}
+                                            disabled={updatingId === req._id}
+                                            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            <CheckCircle2 className="w-3 h-3" />
+                                            Завершити
+                                        </button>
+                                    )}
+                                    {req.status !== 'dismissed' && req.status !== 'completed' && (
+                                        <button
+                                            onClick={() => handleStatusChange(req._id, 'dismissed')}
+                                            disabled={updatingId === req._id}
+                                            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            <XCircle className="w-3 h-3" />
+                                            Відхилити
+                                        </button>
+                                    )}
+                                    {req.status === 'completed' && (
+                                        <button
+                                            onClick={() => handleStatusChange(req._id, 'new')}
+                                            disabled={updatingId === req._id}
+                                            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50"
+                                        >
+                                            Повернути
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>

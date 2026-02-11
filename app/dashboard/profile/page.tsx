@@ -59,27 +59,27 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen relative">
-            <div className="relative z-10 p-6 lg:p-8">
+            <div className="relative z-10 p-4 sm:p-6 lg:p-8">
                 <div className="max-w-7xl mx-auto">
 
                     {/* Header */}
-                    <div className="mb-8 text-center lg:text-left">
-                        <h1 className="text-4xl lg:text-5xl font-bold bg-linear-to-r from-white via-blue-200 to-accent bg-clip-text text-transparent mb-4">
+                    <div className="mb-6 sm:mb-8 text-center lg:text-left">
+                        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold bg-linear-to-r from-white via-blue-200 to-accent bg-clip-text text-transparent mb-3 sm:mb-4">
                             Профіль користувача
                         </h1>
-                        <p className="text-lg text-blue-200 font-medium">Керуйте своїм профілем та туристами</p>
+                        <p className="text-sm sm:text-lg text-blue-200 font-medium">Керуйте своїм профілем та туристами</p>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                         {/* Profile Information */}
                         <div className="lg:col-span-1">
-                            <div className="backdrop-blur-sm bg-white/5 rounded-3xl border border-white/10 shadow-xl p-8 hover:bg-white/10 transition-all duration-300">
-                                <div className="flex items-center mb-8">
-                                    <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-accent rounded-2xl flex items-center justify-center mr-5 shadow-lg">
-                                        <User className="w-10 h-10 text-white" />
+                            <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 hover:bg-white/10 transition-all duration-300">
+                                <div className="flex items-center mb-6 sm:mb-8">
+                                    <div className="w-14 h-14 sm:w-20 sm:h-20 bg-linear-to-br from-blue-500 to-accent rounded-xl sm:rounded-2xl flex items-center justify-center mr-3 sm:mr-5 shadow-lg shrink-0">
+                                        <User className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
                                     </div>
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-white mb-1">{userProfile?.userName}</h2>
+                                    <div className="min-w-0">
+                                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 truncate">{userProfile?.userName}</h2>
                                         <p className="text-blue-200 font-medium">Основна інформація</p>
                                     </div>
                                 </div>

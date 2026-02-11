@@ -10,8 +10,8 @@ export default function Footer() {
         pathname !== '/register' &&
         pathname !== '/login' &&
 
-            <div className="bottom-0 left-0 right-0 flex flex-col items-center my-6 gap-4 text-sm text-white/50">
-                <div className="flex justify-center gap-8">
+            <div className="bottom-0 left-0 right-0 flex flex-col items-center my-6 gap-4 text-sm text-white/50 px-4">
+                <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
                     <NavLink href="/contact">Контакти</NavLink>
                     <NavLink href="/">Умови використання</NavLink>
                     <NavLink href="/">Конфіденційність</NavLink>

@@ -44,7 +44,7 @@ export default function InfoPage() {
   });
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center px-4 py-24 relative overflow-hidden">
+    <main className="min-h-screen w-full flex flex-col items-center px-3 sm:px-4 py-12 sm:py-24 relative overflow-hidden">
       <div className="w-full max-w-7xl mx-auto space-y-12">
 
         {/* Header Section */}

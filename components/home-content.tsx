@@ -26,10 +26,10 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
   }, [chatActive]);
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-center px-4">
+    <main className="relative min-h-screen flex flex-col items-center justify-center px-4 max-sm:px-3 overflow-x-hidden">
       <div className="" aria-hidden="true" />
 
-      <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col gap-12">
+      <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col gap-12 max-sm:gap-8 items-center">
 
         {/* Title — slides out when chat is active */}
         <div

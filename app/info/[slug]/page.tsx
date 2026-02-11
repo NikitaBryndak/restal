@@ -87,18 +87,18 @@ export default function ArticlePage({params}: {params: Promise<{slug: string}>})
     }
 
     return (
-    <main className="min-h-screen w-full flex flex-col items-center px-4 py-24 relative overflow-hidden">
+    <main className="min-h-screen w-full flex flex-col items-center px-3 sm:px-4 py-12 sm:py-24 relative overflow-hidden">
        <div className="w-full max-w-4xl mx-auto">
             <Link
                 href="/info"
-                className="inline-flex items-center gap-2 text-secondary hover:text-white transition-colors mb-8 group"
+                className="inline-flex items-center gap-2 text-secondary hover:text-white transition-colors mb-6 sm:mb-8 group"
             >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 Назад до Інфо центру
             </Link>
 
-            <article className="bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md overflow-hidden">
-                <div className="relative h-[400px] w-full">
+            <article className="bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 backdrop-blur-md overflow-hidden">
+                <div className="relative h-[220px] sm:h-[300px] md:h-[400px] w-full">
                     {(article.images || article.image) && (
                         <img
                             src={article.images || article.image}
@@ -107,28 +107,28 @@ export default function ArticlePage({params}: {params: Promise<{slug: string}>})
                         />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
-                        <div className="flex items-center gap-4 mb-4">
-                            <span className="px-3 py-1 rounded-full bg-accent text-white text-sm font-medium">
+                    <div className="absolute bottom-0 left-0 p-4 sm:p-8 md:p-12 w-full">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2 sm:mb-4">
+                            <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-accent text-white text-xs sm:text-sm font-medium">
                                 {article.tag}
                             </span>
-                            <div className="flex items-center gap-2 text-white/80 text-sm">
-                                <Calendar className="w-4 h-4" />
+                            <div className="flex items-center gap-2 text-white/80 text-xs sm:text-sm">
+                                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 <span>Нещодавно опубліковано</span>
                             </div>
                         </div>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+                        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4 leading-tight">
                             {article.title}
                         </h1>
-                        <p className="text-lg text-white/90 max-w-2xl">
+                        <p className="text-sm sm:text-lg text-white/90 max-w-2xl line-clamp-2 sm:line-clamp-none">
                             {article.description}
                         </p>
                     </div>
                 </div>
 
-                <div className="p-8 md:p-12">
+                <div className="p-4 sm:p-8 md:p-12">
                     <div
-                        className="prose prose-invert prose-lg max-w-none
+                        className="prose prose-invert prose-sm sm:prose-lg max-w-none
                         prose-headings:text-white prose-p:text-secondary prose-strong:text-white
                         prose-a:text-accent prose-a:no-underline hover:prose-a:underline
                         prose-li:text-secondary prose-blockquote:border-accent prose-blockquote:bg-white/5 prose-blockquote:p-4 prose-blockquote:rounded-r-lg"

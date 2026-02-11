@@ -36,7 +36,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
     return (
       <div className="min-h-screen flex">
         {/* Left Side - Login Form */}
-        <div className="w-full lg:w-[45%] flex items-center justify-center p-8 relative">
+        <div className="w-full lg:w-[45%] flex items-center justify-center p-4 sm:p-8 relative">
           <div className="w-full max-w-[380px]">
 
             {/* Back */}

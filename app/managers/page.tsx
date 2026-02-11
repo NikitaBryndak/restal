@@ -261,7 +261,7 @@ export default function ManagersPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-black/80 border border-white/10 p-8 rounded-3xl backdrop-blur-md max-w-md w-full space-y-6 relative shadow-2xl">
+          <div className="bg-black/80 border border-white/10 p-4 sm:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-md max-w-md w-full space-y-5 sm:space-y-6 relative shadow-2xl mx-4">
             <div className="space-y-2 text-center">
               <h3 className="text-2xl font-light text-white">
                 Замовити консультацію

@@ -32,7 +32,7 @@ export default function TripCard({ data }: { data: Trip }) {
 
     const outdatedTrip = tripEnd < new Date();
 
-    const rootClass = `w-full h-[900px] md:h-84 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
+    const rootClass = `w-full h-auto md:h-84 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
 
     // Get main documents (non-ticket) count
     const mainDocKeys = ['contract', 'invoice', 'confirmation', 'voucher', 'insurancePolicy', 'tourProgram', 'memo'];
@@ -52,44 +52,47 @@ export default function TripCard({ data }: { data: Trip }) {
                 src={`/countryImages/${getCountryImageName(data.country)}.jpg`}
                 alt={`Trip to ${data.country}`}
                 fill
-                className="object-cover"
+                className="object-cover hidden md:block"
             />
 
-            {/* Glass Effect Overlay */}
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+            {/* Glass Effect Overlay - desktop only (over image) */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm hidden md:block"></div>
+
+            {/* Mobile background gradient */}
+            <div className="absolute inset-0 bg-linear-to-br from-slate-900/95 to-slate-800/95 md:hidden"></div>
 
             {/* Content Container */}
-            <div className="absolute inset-0 flex flex-col md:flex-[0_70%_0] md:flex-row md:items-stretch">
-                {/* Left Side - Photo and Country Name (30%) */}
-                <div className="flex-[0_0_30%] flex flex-col justify-center items-center p-6">
+            <div className="relative md:absolute md:inset-0 flex flex-col md:flex-row md:items-stretch">
+                {/* Left Side - Photo and Country Name */}
+                <div className="shrink-0 md:flex-[0_0_30%] flex flex-col justify-center items-center p-4 sm:p-6">
                     {/* Status Badge */}
                     <div className={cn("px-3 py-1 rounded-full text-xs font-semibold border mb-3", statusColors[status])}>
                         {TOUR_STATUS_LABELS[status]}
                     </div>
-                    <div className="bg-white/20 backdrop-blur-md rounded-lg p-4 text-center">
-                        <h2 className="text-4xl font-bold text-white drop-shadow-lg">
+                    <div className="bg-white/20 backdrop-blur-md rounded-lg p-3 sm:p-4 text-center">
+                        <h2 className="text-2xl sm:text-4xl font-bold text-white drop-shadow-lg">
                             {data.country}
                         </h2>
                     </div>
                     <div className="rounded-lg p-0.5 text-center">
-                        <h2 className="text-xl font-bold text-white drop-shadow-lg">
+                        <h2 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">
                             {data.number}
                         </h2>
                     </div>
                 </div>
 
-                {/* Right Side - All Data Points (70%) */}
-                <div className="flex w-full p-6 gap-5 flex-col md:flex-row">
+                {/* Right Side - All Data Points */}
+                <div className="flex w-full p-3 sm:p-6 gap-3 sm:gap-5 flex-col md:flex-row">
                     {/* Flight & Hotel Info */}
-                    <div className="w-full bg-white/10 backdrop-blur-md rounded-xl p-6 h-full text-white border border-white/10">
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-5 h-full">
+                    <div className="w-full bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-6 text-white border border-white/10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4 sm:gap-y-5">
                             {/* Departure */}
-                            <div className="space-y-2.5">
+                            <div className="space-y-1.5 sm:space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-blue-400/60 rounded-full"></div>
                                     <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Виліт</p>
                                 </div>
-                                <p className="text-base font-semibold pl-3">{data.flightInfo.departure.airportCode} · {data.flightInfo.departure.flightNumber}</p>
+                                <p className="text-sm sm:text-base font-semibold pl-3">{data.flightInfo.departure.airportCode} · {data.flightInfo.departure.flightNumber}</p>
                                 <div className="flex items-center gap-2 text-white/80 pl-3">
                                     <p className="text-xs font-medium">{data.flightInfo.departure.date}</p>
                                     <Clock className='w-3.5 h-3.5 text-white/60'/>
@@ -98,12 +101,12 @@ export default function TripCard({ data }: { data: Trip }) {
                             </div>
 
                             {/* Return */}
-                            <div className="space-y-2.5">
+                            <div className="space-y-1.5 sm:space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-purple-400/60 rounded-full"></div>
                                     <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Повернення</p>
                                 </div>
-                                <p className="text-base font-semibold pl-3">{data.flightInfo.arrival.airportCode} · {data.flightInfo.arrival.flightNumber}</p>
+                                <p className="text-sm sm:text-base font-semibold pl-3">{data.flightInfo.arrival.airportCode} · {data.flightInfo.arrival.flightNumber}</p>
                                 <div className="flex items-center gap-2 text-white/80 pl-3">
                                     <p className="text-xs font-medium">{data.flightInfo.arrival.date}</p>
                                     <Clock className='w-3.5 h-3.5 text-white/60'/>
@@ -112,7 +115,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             </div>
 
                             {/* Stay */}
-                            <div className="space-y-2.5">
+                            <div className="space-y-1.5 sm:space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-amber-400/60 rounded-full"></div>
                                     <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Проживання</p>
@@ -120,7 +123,7 @@ export default function TripCard({ data }: { data: Trip }) {
                                         {data.hotel.nights}
                                     </span>
                                 </div>
-                                <p className="text-sm font-bold leading-tight pl-3">{data.hotel.name}</p>
+                                <p className="text-xs sm:text-sm font-bold leading-tight pl-3">{data.hotel.name}</p>
                                 <div className="space-y-1 text-white/75 text-xs pl-3">
                                     <p className="flex justify-between">
                                         <span className="text-white/60">C-i:</span>
@@ -140,7 +143,7 @@ export default function TripCard({ data }: { data: Trip }) {
                             </div>
 
                             {/* Add-ons */}
-                            <div className="space-y-2.5">
+                            <div className="space-y-1.5 sm:space-y-2.5">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-4 bg-emerald-400/60 rounded-full"></div>
                                     <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">Додатково</p>
@@ -149,14 +152,14 @@ export default function TripCard({ data }: { data: Trip }) {
                                     {addonItems.map((addon) => (
                                         <div
                                             key={addon.label}
-                                            className={`flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm border ${
+                                            className={`flex items-center justify-between gap-2 rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm border ${
                                                 addon.value
                                                     ? 'bg-emerald-500/15 border-emerald-400/40 text-white'
                                                     : 'bg-white/5 border-white/10 text-white/50'
                                             }`}
                                         >
                                             <span className="flex items-center gap-2">
-                                                <span className="text-lg">{addon.icon}</span>
+                                                <span className="text-base sm:text-lg">{addon.icon}</span>
                                                 <span className="font-medium">{addon.label}</span>
                                             </span>
                                         </div>
@@ -166,26 +169,26 @@ export default function TripCard({ data }: { data: Trip }) {
                         </div>
                     </div>
 
-                    <div className="flex flex-[0_0_40%] flex-col gap-3">
-                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-col justify-center">
+                    <div className="flex flex-row md:flex-col md:flex-[0_0_40%] gap-3">
+                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 sm:p-4 flex-1 md:h-full text-white flex flex-col justify-center">
                             <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center mb-2">Оплата</p>
                             <div className="flex flex-col gap-2">
                                 <div className="text-center">
                                     <div className="flex items-center justify-center gap-1">
-                                        <p className="text-2xl font-bold leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalAmount)}₴</p>
+                                        <p className="text-lg sm:text-2xl font-bold leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalAmount)}₴</p>
                                     </div>
-                                    <p className="text-[11px] text-emerald-300 font-medium mt-1">💰 +{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cashback)}₴ cashback</p>
+                                    <p className="text-[10px] sm:text-[11px] text-emerald-300 font-medium mt-1">💰 +{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cashback)}₴ cashback</p>
                                 </div>
 
                                 <div className="w-full h-px bg-white/20 my-0.5"></div>
 
                                 <div className="text-center">
-                                    <p className="text-xl font-bold text-amber-300 leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(toPay)}₴</p>
-                                    <p className="text-[11px] text-white/60 mt-1">{data.payment.deadline}</p>
+                                    <p className="text-base sm:text-xl font-bold text-amber-300 leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(toPay)}₴</p>
+                                    <p className="text-[10px] sm:text-[11px] text-white/60 mt-1">{data.payment.deadline}</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 h-full text-white flex flex-[20%] flex-col gap-2">
+                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 sm:p-4 text-white flex flex-col gap-2">
                             <p className="text-[10px] uppercase tracking-[0.2em] text-white/60 text-center">Документи</p>
                             <div className='flex flex-row justify-around items-center gap-2'>
                                 <div className="flex flex-col items-center">

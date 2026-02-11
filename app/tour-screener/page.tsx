@@ -18,8 +18,8 @@ export default function TourScreenerPage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-1 max-sm:pb-4">
-      <div className="w-full max-w-6xl mx-auto">
+    <main className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-0 max-sm:pb-4 overflow-x-hidden">
+      <div className="w-full max-w-6xl mx-auto max-sm:px-0">
         <iframe
           ref={iframeRef}
           src="/tour-screener.html"

@@ -40,6 +40,7 @@
             background: transparent;
             color: #e0e0e0;
             overflow-x: hidden;
+            max-width: 100%;
         }
         body {
             padding: 0;
@@ -47,6 +48,9 @@
         #os-search-results,
         #os-tour-details {
             padding: 0 8px;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         /* ====== DARK THEME OVERRIDES FOR OTPUSK WIDGET ====== */
@@ -459,6 +463,8 @@
             box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
             overflow: visible !important;
             height: 165px !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
         }
 
         .new_r-item:hover {
@@ -1266,13 +1272,50 @@
             /* Results/tour details padding on mobile */
             #os-search-results,
             #os-tour-details {
-                padding: 0 4px !important;
+                padding: 0 2px !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
+
+            /* Result cards full width on mobile */
+            .new_r-item {
+                height: auto !important;
+                min-height: 120px !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Result list width fix */
+            .new_r-wrapper,
+            .new_r-container {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Tour details full width */
+            .new_t-container,
+            .new_t-content {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+                box-sizing: border-box !important;
             }
 
             /* Show more results button */
             .new_r-show-more-results {
-                margin-left: 6px !important;
-                margin-right: 6px !important;
+                margin-left: 4px !important;
+                margin-right: 4px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Ensure container wrapper doesn't overflow */
+            #os-content-wrapper {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
             }
         }
     </style>
@@ -1877,10 +1920,12 @@
             box-shadow: none !important;
         }
 
-        /* Extended search always visible */
-        .new_f-ext-container {
-            display: block !important;
-            position: relative !important;
+        /* Extended search always visible — desktop only */
+        @media (min-width: 479px) {
+            .new_f-ext-container {
+                display: block !important;
+                position: relative !important;
+            }
         }
         .new_f-ext-container::before {
             display: none !important;
@@ -2160,12 +2205,7 @@
                 display: block !important;
             }
 
-            /* Extended search always visible override disabled */
-            html body .new_f-ext-container::before {
-                display: none !important;
-            }
-
-            /* Form z-index reset */
+                /* Form z-index reset */
             html body #os-form {
                 z-index: auto !important;
             }
