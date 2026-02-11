@@ -26,7 +26,8 @@ export default function TourScreenerPage() {
           className="w-full border-0 rounded-2xl max-sm:rounded-xl"
           style={{ minHeight: "80vh", background: "transparent", overflow: "visible" }}
           title="Пошук турів"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+          loading="lazy"
         />
       </div>
     </main>
