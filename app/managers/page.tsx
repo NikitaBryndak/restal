@@ -4,6 +4,7 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Phone, Send, User, MessageCircle, MessageSquareMore, Loader2, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import AiChatInline from "@/components/search/ai-chat-inline";
 
 // Day names mapping for display
 const dayNames: Record<number, string> = {
@@ -104,6 +105,8 @@ export default function ManagersPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [exitingChat, setExitingChat] = useState(false);
 
   useEffect(() => {
     // Force re-render every minute to update online status
