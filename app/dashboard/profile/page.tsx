@@ -132,7 +132,7 @@ export default function ProfilePage() {
                                         </Label>
                                         <div className="p-4 bg-linear-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/30 backdrop-blur-sm rounded-xl">
                                             <span className="text-xl font-bold text-emerald-300">
-                                                {userProfile?.cashbackAmount || 0} грн
+                                                {(userProfile?.cashbackAmount || 0).toFixed(2)} грн
                                             </span>
                                         </div>
                                     </div>
