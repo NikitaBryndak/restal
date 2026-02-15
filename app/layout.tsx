@@ -5,6 +5,7 @@ import "./globals.css";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://restal.in.ua"), // Update with your actual domain
@@ -84,6 +85,7 @@ export default function RootLayout({
           <Footer />
         </AuthProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
