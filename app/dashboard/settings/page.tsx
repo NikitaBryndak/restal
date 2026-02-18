@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,13 +20,24 @@ import {
     Mail,
     Check,
     Eye,
-    EyeOff
+    EyeOff,
+    AlertCircle
 } from "lucide-react";
 
 export default function SettingsPage() {
-    const { userProfile, loading, error } = useUserProfile();
+    const { userProfile, loading, error, refetch } = useUserProfile();
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+    const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+    const [passwordChangeError, setPasswordChangeError] = useState("");
+    const [passwordChangeSuccess, setPasswordChangeSuccess] = useState("");
+    const [isEditingUsername, setIsEditingUsername] = useState(false);
+    const [newUsername, setNewUsername] = useState(userProfile?.userName || "");
+    const [usernameChangeLoading, setUsernameChangeLoading] = useState(false);
+    const [usernameChangeError, setUsernameChangeError] = useState("");
+    const [usernameChangeSuccess, setUsernameChangeSuccess] = useState("");
     const [notifications, setNotifications] = useState({
         email: true,
         sms: true,
@@ -35,6 +46,137 @@ export default function SettingsPage() {
     });
     const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
     const [language, setLanguage] = useState('uk');
+
+    // Sync newUsername when userProfile updates
+    useEffect(() => {
+        if (userProfile?.userName && !isEditingUsername) {
+            setNewUsername(userProfile.userName);
+        }
+    }, [userProfile?.userName, isEditingUsername]);
+
+    const handleChangePassword = async () => {
+        // Reset previous messages
+        setPasswordChangeError("");
+        setPasswordChangeSuccess("");
+
+        // Validation
+        if (!currentPassword || !newPassword) {
+            setPasswordChangeError("Please fill in all password fields");
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            setPasswordChangeError("New password must be at least 8 characters");
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            setPasswordChangeError("New password must be different from current password");
+            return;
+        }
+
+        setPasswordChangeLoading(true);
+
+        try {
+            const response = await fetch("/api/auth/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setPasswordChangeError(data.message || "Failed to change password");
+                return;
+            }
+
+            setPasswordChangeSuccess("Password changed successfully!");
+            setCurrentPassword("");
+            setNewPassword("");
+            setShowCurrentPassword(false);
+            setShowNewPassword(false);
+
+            // Clear success message after 3 seconds
+            setTimeout(() => {
+                setPasswordChangeSuccess("");
+            }, 3000);
+        } catch (err) {
+            setPasswordChangeError("An error occurred while changing password");
+            console.error(err);
+        } finally {
+            setPasswordChangeLoading(false);
+        }
+    };
+
+    const handleChangeUsername = async () => {
+        // Reset previous messages
+        setUsernameChangeError("");
+        setUsernameChangeSuccess("");
+
+        // Validation
+        if (!newUsername.trim()) {
+            setUsernameChangeError("Username cannot be empty");
+            return;
+        }
+
+        if (newUsername.trim().length < 2) {
+            setUsernameChangeError("Username must be at least 2 characters");
+            return;
+        }
+
+        if (newUsername.trim().length > 100) {
+            setUsernameChangeError("Username must be no more than 100 characters");
+            return;
+        }
+
+        if (newUsername.trim() === userProfile?.userName) {
+            setUsernameChangeError("New username must be different from current username");
+            return;
+        }
+
+        setUsernameChangeLoading(true);
+
+        try {
+            const response = await fetch("/api/auth/change-username", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    newUsername: newUsername.trim(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setUsernameChangeError(data.message || "Failed to change username");
+                return;
+            }
+
+            setUsernameChangeSuccess("Username changed successfully!");
+            setIsEditingUsername(false);
+            
+            // Refetch user profile to update the display immediately
+            await refetch();
+
+            // Clear success message after 3 seconds
+            setTimeout(() => {
+                setUsernameChangeSuccess("");
+            }, 3000);
+        } catch (err) {
+            setUsernameChangeError("An error occurred while changing username");
+            console.error(err);
+        } finally {
+            setUsernameChangeLoading(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -86,26 +228,76 @@ export default function SettingsPage() {
                             </div>
                             <div className="p-4 sm:p-6 space-y-4">
                                 <div className="flex items-center justify-between py-3 border-b border-white/10">
-                                    <div>
+                                    <div className="flex-1">
                                         <p className="font-medium text-white">Ім&apos;я</p>
-                                        <p className="text-sm text-white/60">{userProfile?.userName || 'Не вказано'}</p>
+                                        {!isEditingUsername ? (
+                                            <p className="text-sm text-white/60">{userProfile?.userName || 'Не вказано'}</p>
+                                        ) : (
+                                            <div className="mt-2 space-y-2">
+                                                <Input
+                                                    type="text"
+                                                    value={newUsername}
+                                                    onChange={(e) => setNewUsername(e.target.value)}
+                                                    placeholder="Enter new username"
+                                                    className="bg-white/10 border-white/20 h-10 text-white rounded-lg"
+                                                />
+                                                {usernameChangeError && (
+                                                    <p className="text-xs text-red-400">{usernameChangeError}</p>
+                                                )}
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        onClick={handleChangeUsername}
+                                                        disabled={usernameChangeLoading}
+                                                        size="sm"
+                                                        className="bg-accent hover:bg-accent/90 text-white rounded-lg disabled:opacity-50"
+                                                    >
+                                                        {usernameChangeLoading ? "Збереження..." : "Зберегти"}
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setIsEditingUsername(false);
+                                                            setNewUsername(userProfile?.userName || "");
+                                                            setUsernameChangeError("");
+                                                            setUsernameChangeSuccess("");
+                                                        }}
+                                                        disabled={usernameChangeLoading}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-white/60 hover:text-white disabled:opacity-50"
+                                                    >
+                                                        Скасувати
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    <Button variant="ghost" size="sm" className="text-accent hover:text-accent/80">
-                                        Змінити
-                                    </Button>
+                                    {!isEditingUsername && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setIsEditingUsername(true);
+                                                setNewUsername(userProfile?.userName || "");
+                                                setUsernameChangeError("");
+                                            }}
+                                            className="text-accent hover:text-accent/80"
+                                        >
+                                            Змінити
+                                        </Button>
+                                    )}
                                 </div>
+                                {usernameChangeSuccess && (
+                                    <div className="flex items-center gap-3 p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
+                                        <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+                                        <p className="text-sm text-emerald-200">{usernameChangeSuccess}</p>
+                                    </div>
+                                )}
                                 <div className="flex items-center justify-between py-3 border-b border-white/10">
                                     <div>
                                         <p className="font-medium text-white">Номер телефону</p>
                                         <p className="text-sm text-white/60">{userProfile?.phoneNumber || 'Не вказано'}</p>
                                     </div>
                                     <span className="text-xs text-emerald-400 bg-emerald-500/20 px-2 py-1 rounded-full">Підтверджено</span>
-                                </div>
-                                <div className="flex items-center justify-between py-3">
-                                    <div>
-                                        <p className="font-medium text-white">Рівень привілеїв</p>
-                                        <p className="text-sm text-white/60">Рівень {userProfile?.privilegeLevel || 1}</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -133,6 +325,8 @@ export default function SettingsPage() {
                                             type={showCurrentPassword ? "text" : "password"}
                                             id="currentPassword"
                                             placeholder="Введіть поточний пароль"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
                                             className="bg-white/10 border-white/20 h-12 text-white rounded-xl pr-12"
                                         />
                                         <button
@@ -153,6 +347,8 @@ export default function SettingsPage() {
                                             type={showNewPassword ? "text" : "password"}
                                             id="newPassword"
                                             placeholder="Введіть новий пароль"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
                                             className="bg-white/10 border-white/20 h-12 text-white rounded-xl pr-12"
                                         />
                                         <button
@@ -164,8 +360,24 @@ export default function SettingsPage() {
                                         </button>
                                     </div>
                                 </div>
-                                <Button className="bg-accent hover:bg-accent/90 text-white rounded-xl h-12 w-full sm:w-auto">
-                                    Оновити пароль
+                                {passwordChangeError && (
+                                    <div className="flex items-center gap-3 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
+                                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                                        <p className="text-sm text-red-200">{passwordChangeError}</p>
+                                    </div>
+                                )}
+                                {passwordChangeSuccess && (
+                                    <div className="flex items-center gap-3 p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
+                                        <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+                                        <p className="text-sm text-emerald-200">{passwordChangeSuccess}</p>
+                                    </div>
+                                )}
+                                <Button 
+                                    onClick={handleChangePassword}
+                                    disabled={passwordChangeLoading}
+                                    className="bg-accent hover:bg-accent/90 text-white rounded-xl h-12 w-full sm:w-auto disabled:opacity-50"
+                                >
+                                    {passwordChangeLoading ? "Оновлення..." : "Оновити пароль"}
                                 </Button>
                             </div>
                         </div>
