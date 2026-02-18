@@ -1,10 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+const SCRIPT_URLS = [
+  "https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284",
+  "https://export.otpusk.com/js/onsite/",
+  "https://export.otpusk.com/js/order",
+];
+
+const CSS_URLS = [
+  "https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic",
+  "https://export.otpusk.com/os/onsite/form.css",
+  "https://export.otpusk.com/os/onsite/result.css",
+  "https://export.otpusk.com/os/onsite/tour.css",
+];
 
 export default function TourScreenerPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const initialized = useRef(false);
+
   useEffect(() => {
-    // Set config variables before scripts load
+    // Guard against React Strict Mode double-invocation
+    if (initialized.current) return;
+    initialized.current = true;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Set config variables — must happen before scripts execute
     (window as any).osGeo = "";
     (window as any).osDefaultDeparture = 2025;
     (window as any).osDefaultDuration = "";
@@ -14,8 +37,8 @@ export default function TourScreenerPage() {
     (window as any).osFood = "";
     (window as any).osTransport = "";
     (window as any).osTarget = "";
-    (window as any).osContainer = null;
-    (window as any).osTourContainer = null;
+    (window as any).osContainer = container;
+    (window as any).osTourContainer = container;
     (window as any).osLang = "ua";
     (window as any).osTourTargetBlank = false;
     (window as any).osOrderUrl = null;
@@ -23,14 +46,7 @@ export default function TourScreenerPage() {
     (window as any).osAutoStart = false;
 
     // Inject stylesheets
-    const cssUrls = [
-      "https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic",
-      "https://export.otpusk.com/os/onsite/form.css",
-      "https://export.otpusk.com/os/onsite/result.css",
-      "https://export.otpusk.com/os/onsite/tour.css",
-    ];
-
-    const links = cssUrls.map((href) => {
+    const links = CSS_URLS.map((href) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = href;
@@ -38,21 +54,25 @@ export default function TourScreenerPage() {
       return link;
     });
 
-    // Load scripts sequentially — order matters
-    const scriptUrls = [
-      "https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284",
-      "https://export.otpusk.com/js/onsite/",
-      "https://export.otpusk.com/js/order",
-    ];
-
+    // Load scripts sequentially INSIDE the container div
+    // Many widget scripts render relative to the script tag location
     const scripts: HTMLScriptElement[] = [];
 
     const loadNext = (index: number) => {
-      if (index >= scriptUrls.length) return;
+      if (index >= SCRIPT_URLS.length) {
+        // After all scripts loaded, grab any stray otpusk elements from body
+        setTimeout(() => {
+          document.querySelectorAll("body > [class*='os-'], body > [id*='os-'], body > [class*='otpusk'], body > [id*='otpusk']").forEach((el) => {
+            container.appendChild(el);
+          });
+        }, 500);
+        return;
+      }
       const script = document.createElement("script");
-      script.src = scriptUrls[index];
+      script.src = SCRIPT_URLS[index];
+      script.async = false;
       script.onload = () => loadNext(index + 1);
-      document.head.appendChild(script);
+      container.appendChild(script);
       scripts.push(script);
     };
 
@@ -66,7 +86,9 @@ export default function TourScreenerPage() {
 
   return (
     <main className="min-h-screen w-full pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-4">
-      <div className="w-full max-w-6xl mx-auto" />
+      <div className="w-full max-w-6xl mx-auto">
+        <div ref={containerRef} />
+      </div>
     </main>
   );
 }

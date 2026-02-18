@@ -72,15 +72,15 @@ export default function InfoPage() {
         </div>
 
         {/* Search and Filter Section */}
-        <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row gap-6 items-center justify-between bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-md">
           {/* Categories */}
-          <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+          <div className="flex overflow-x-auto gap-2 w-full lg:w-auto pb-2 lg:pb-0 hide-scrollbar min-w-0">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border",
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border whitespace-nowrap flex-shrink-0",
                   selectedCategory === category
                     ? "bg-accent text-white border-accent"
                     : "bg-transparent text-secondary border-white/10 hover:border-accent/50 hover:text-white"
@@ -92,7 +92,7 @@ export default function InfoPage() {
           </div>
 
           {/* Search Bar */}
-          <div className="relative w-full md:w-72">
+          <div className="relative w-full lg:w-72 shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary" />
             <Input
               placeholder="Шукати статті..."

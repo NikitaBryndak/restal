@@ -134,6 +134,9 @@ export default function ContactPage() {
 
             {/* Right Column: Form */}
             <div className="bg-white/5 p-6 sm:p-8 md:p-10 rounded-3xl border border-white/10 backdrop-blur-md shadow-2xl">
+               <h3 className="text-xl sm:text-2xl font-light text-white mb-6 text-center leading-relaxed">
+                  Готуємо для Вас <br className="hidden sm:block" /> індивідуальний підбір туру
+               </h3>
                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div className="space-y-2">
