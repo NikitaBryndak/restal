@@ -8,7 +8,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { User, Phone, Calendar, Wallet, Shield, Plus, MapPin, Loader } from "lucide-react";
 import type { TouristInfo } from "@/types";
 import { useState, useEffect } from "react";
-import { getCountryImageName } from "@/data";
+
 
 import Link from "next/link";
 
@@ -103,10 +103,10 @@ export default function ProfilePage() {
                         <p className="text-sm sm:text-lg text-blue-200 font-medium">Керуйте своїм профілем та туристами</p>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Profile Information */}
                         <div className="lg:col-span-1">
-                            <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 hover:bg-white/10 transition-all duration-300">
+                            <div className="h-full backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 hover:bg-white/10 transition-all duration-300">
                                 <div className="flex items-center mb-6 sm:mb-8">
                                     <div className="w-14 h-14 sm:w-20 sm:h-20 bg-linear-to-br from-blue-500 to-accent rounded-xl sm:rounded-2xl flex items-center justify-center mr-3 sm:mr-5 shadow-lg shrink-0">
                                         <User className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
@@ -117,7 +117,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <Label htmlFor="name" className="flex items-center gap-3 text-sm font-semibold text-blue-200 mb-3">
                                             <User className="w-5 h-5 text-accent" />
@@ -174,13 +174,13 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Statistics Card */}
-                        <div className="lg:col-span-1 lg:col-start-3">
+                        <div className="lg:col-span-1">
                             {statsLoading ? (
-                                <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 flex items-center justify-center min-h-[300px]">
+                                <div className="h-full backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 flex items-center justify-center min-h-[300px]">
                                     <Loader className="w-8 h-8 text-accent animate-spin" />
                                 </div>
                             ) : (
-                                <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 hover:bg-white/10 transition-all duration-300">
+                                <div className="h-full backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl p-5 sm:p-8 hover:bg-white/10 transition-all duration-300">
                                     <div className="flex items-center mb-6 sm:mb-8">
                                         <div className="w-14 h-14 sm:w-20 sm:h-20 bg-linear-to-br from-purple-500 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center mr-3 sm:mr-5 shadow-lg shrink-0">
                                             <MapPin className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
@@ -194,7 +194,7 @@ export default function ProfilePage() {
                                     {!statistics || statistics.totalTrips === 0 ? (
                                         <div className="text-center py-8">
                                             <p className="text-white/80 font-medium mb-4">
-                                                This section is to be discovered.. Book your trip now!
+                                                У вас ще немає подорожей. Забронюйте свій перший тур!
                                             </p>
                                             <Link href="/contact">
                                                 <Button className="bg-accent hover:bg-accent/90 text-white rounded-xl h-10">
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                                     ) : (
                                         <div className="space-y-6">
                                             <div>
-                                                <p className="text-sm text-blue-200 font-semibold mb-2">Загальна кількість турів</p>
+                                                <p className="text-sm text-blue-200 font-semibold mb-2">Кількість оформлених турів</p>
                                                 <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl">
                                                     <span className="text-3xl font-bold text-accent">
                                                         {statistics.totalTrips}
@@ -213,25 +213,14 @@ export default function ProfilePage() {
                                                 </div>
                                             </div>
 
-                                            <div>
-                                                <p className="text-sm text-blue-200 font-semibold mb-2">Улюблена назва</p>
-                                                <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl">
-                                                    <p className="text-lg font-bold text-white">{statistics.topDestination}</p>
-                                                    <p className="text-xs text-white/60 mt-1">
-                                                        {statistics.topDestinationCount} {statistics.topDestinationCount === 1 ? 'тур' : 'турів'}
-                                                    </p>
-                                                </div>
-                                            </div>
-
                                             {statistics.topDestination && (
                                                 <div>
-                                                    <p className="text-sm text-blue-200 font-semibold mb-2">Фото направлення</p>
-                                                    <div className="relative h-40 rounded-xl overflow-hidden border border-white/20 shadow-lg">
-                                                        <img
-                                                            src={`/countryImages/${getCountryImageName(statistics.topDestination)}.jpg`}
-                                                            alt={statistics.topDestination}
-                                                            className="w-full h-full object-cover"
-                                                        />
+                                                    <p className="text-sm text-blue-200 font-semibold mb-2">Улюблений напрямок</p>
+                                                    <div className="p-4 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl">
+                                                        <p className="text-lg font-bold text-white">{statistics.topDestination}</p>
+                                                        <p className="text-xs text-white/60 mt-1">
+                                                            {statistics.topDestinationCount} {statistics.topDestinationCount === 1 ? 'тур' : 'турів'}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             )}
