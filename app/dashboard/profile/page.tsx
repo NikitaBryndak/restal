@@ -100,7 +100,6 @@ export default function ProfilePage() {
                         <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold bg-linear-to-r from-white via-blue-200 to-accent bg-clip-text text-transparent mb-3 sm:mb-4">
                             Профіль користувача
                         </h1>
-                        <p className="text-sm sm:text-lg text-blue-200 font-medium">Керуйте своїм профілем та туристами</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
