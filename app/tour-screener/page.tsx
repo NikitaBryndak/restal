@@ -1,93 +1,110 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const SCRIPT_URLS = [
-  "https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284",
-  "https://export.otpusk.com/js/onsite/",
-  "https://export.otpusk.com/js/order",
-];
-
-const CSS_URLS = [
-  "https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic",
-  "https://export.otpusk.com/os/onsite/form.css",
-  "https://export.otpusk.com/os/onsite/result.css",
-  "https://export.otpusk.com/os/onsite/tour.css",
-];
+const WIDGET_HTML = `<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    var osGeo = '';
+    var osDefaultDeparture = 2025;
+    var osDefaultDuration = '';
+    var osDateFrom = '';
+    var osDateTo = '';
+    var osHotelCategory = '';
+    var osFood = '';
+    var osTransport = '';
+    var osTarget = '';
+    var osContainer = null;
+    var osTourContainer = null;
+    var osLang = 'ua';
+    var osTourTargetBlank = false;
+    var osOrderUrl = null;
+    var osCurrency = 'converted';
+    var osAutoStart = false;
+  </script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic" rel="stylesheet" />
+  <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/form.css" />
+  <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/result.css" />
+  <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/tour.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'Open Sans', sans-serif;
+      background: transparent;
+      overflow-x: hidden;
+    }
+    body { padding: 0; }
+    .os-form, .os-results, .os-tour {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+    @media (max-width: 640px) {
+      body { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
+  <script src="https://export.otpusk.com/js/onsite/"></script>
+  <script src="https://export.otpusk.com/js/order"></script>
+  <script>
+    (function () {
+      var lastHeight = 0;
+      function postHeight() {
+        var height = document.documentElement.scrollHeight;
+        if (height !== lastHeight) {
+          lastHeight = height;
+          window.parent.postMessage({ type: 'otpusk-resize', height: height }, '*');
+        }
+      }
+      setInterval(postHeight, 300);
+      window.addEventListener('load', postHeight);
+      window.addEventListener('resize', postHeight);
+      if (window.MutationObserver) {
+        new MutationObserver(postHeight).observe(document.body, {
+          childList: true, subtree: true, attributes: true, characterData: true
+        });
+      }
+    })();
+  </script>
+</body>
+</html>`;
 
 export default function TourScreenerPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const initialized = useRef(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeHeight, setIframeHeight] = useState(800);
 
   useEffect(() => {
-    // Guard against React Strict Mode double-invocation
-    if (initialized.current) return;
-    initialized.current = true;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    // Set config variables — must happen before scripts execute
-    (window as any).osGeo = "";
-    (window as any).osDefaultDeparture = 2025;
-    (window as any).osDefaultDuration = "";
-    (window as any).osDateFrom = "";
-    (window as any).osDateTo = "";
-    (window as any).osHotelCategory = "";
-    (window as any).osFood = "";
-    (window as any).osTransport = "";
-    (window as any).osTarget = "";
-    (window as any).osContainer = container;
-    (window as any).osTourContainer = container;
-    (window as any).osLang = "ua";
-    (window as any).osTourTargetBlank = false;
-    (window as any).osOrderUrl = null;
-    (window as any).osCurrency = "converted";
-    (window as any).osAutoStart = false;
-
-    // Inject stylesheets
-    const links = CSS_URLS.map((href) => {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = href;
-      document.head.appendChild(link);
-      return link;
-    });
-
-    // Load scripts sequentially INSIDE the container div
-    // Many widget scripts render relative to the script tag location
-    const scripts: HTMLScriptElement[] = [];
-
-    const loadNext = (index: number) => {
-      if (index >= SCRIPT_URLS.length) {
-        // After all scripts loaded, grab any stray otpusk elements from body
-        setTimeout(() => {
-          document.querySelectorAll("body > [class*='os-'], body > [id*='os-'], body > [class*='otpusk'], body > [id*='otpusk']").forEach((el) => {
-            container.appendChild(el);
-          });
-        }, 500);
-        return;
+    function handleMessage(event: MessageEvent) {
+      if (event.data?.type === "otpusk-resize" && typeof event.data.height === "number") {
+        setIframeHeight(event.data.height);
       }
-      const script = document.createElement("script");
-      script.src = SCRIPT_URLS[index];
-      script.async = false;
-      script.onload = () => loadNext(index + 1);
-      container.appendChild(script);
-      scripts.push(script);
-    };
-
-    loadNext(0);
-
-    return () => {
-      links.forEach((l) => l.remove());
-      scripts.forEach((s) => s.remove());
-    };
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   return (
-    <main className="min-h-screen w-full pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-4">
+    <main className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-4">
       <div className="w-full max-w-6xl mx-auto">
-        <div ref={containerRef} />
+        <iframe
+          ref={iframeRef}
+          srcDoc={WIDGET_HTML}
+          title="Пошук турів"
+          style={{
+            width: "100%",
+            height: `${iframeHeight}px`,
+            border: "none",
+            overflow: "hidden",
+            display: "block",
+          }}
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+          allow="clipboard-write"
+          loading="eager"
+        />
       </div>
     </main>
   );
