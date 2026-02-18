@@ -65,6 +65,13 @@ const TravellerSectionCreate = ({
                     Додати подорожуючого
                 </Button>
             </div>
+            {/* Array-level error (e.g. "at least one traveller required") */}
+            {errors.travellers?.root?.message && (
+                <p className="text-sm text-red-500 font-medium">{errors.travellers.root.message}</p>
+            )}
+            {errors.travellers?.message && (
+                <p className="text-sm text-red-500 font-medium">{errors.travellers.message}</p>
+            )}
             <div className="mt-6 grid gap-6">
                 {fields.map((field, index) => (
                     <div key={field.id} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
@@ -118,6 +125,9 @@ const TravellerSectionCreate = ({
                                     <option value="male">Чоловіча</option>
                                     <option value="other">Інша</option>
                                 </select>
+                                {errors.travellers?.[index]?.sex && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.sex?.message}</p>
+                                )}
                             </div>
                             <div className="space-y-1">
                                 <FormInput
@@ -143,25 +153,40 @@ const TravellerSectionCreate = ({
                                     <p className="text-xs text-red-500">{errors.travellers[index]?.dob?.message}</p>
                                 )}
                             </div>
-                            <FormInput
-                                labelText="Номер паспорта"
-                                placeholder='127485153'
-                                autoComplete="off"
-                                {...register(`travellers.${index}.passportNumber`)}
-                            />
-                            <FormInput
-                                labelText="Серія паспорта"
-                                placeholder='AA123456'
-                                autoComplete="off"
-                                {...register(`travellers.${index}.passportSeries`)}
-                            />
-                            <FormInput
-                                labelText="Дата видачі паспорта"
-                                placeholder='30/01/2021'
-                                autoComplete="off"
-                                formatType="date"
-                                {...register(`travellers.${index}.passportIssueDate`)}
-                            />
+                            <div className="space-y-1">
+                                <FormInput
+                                    labelText="Номер паспорта"
+                                    placeholder='127485153'
+                                    autoComplete="off"
+                                    {...register(`travellers.${index}.passportNumber`)}
+                                />
+                                {errors.travellers?.[index]?.passportNumber && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.passportNumber?.message}</p>
+                                )}
+                            </div>
+                            <div className="space-y-1">
+                                <FormInput
+                                    labelText="Серія паспорта"
+                                    placeholder='AA123456'
+                                    autoComplete="off"
+                                    {...register(`travellers.${index}.passportSeries`)}
+                                />
+                                {errors.travellers?.[index]?.passportSeries && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.passportSeries?.message}</p>
+                                )}
+                            </div>
+                            <div className="space-y-1">
+                                <FormInput
+                                    labelText="Дата видачі паспорта"
+                                    placeholder='30/01/2021'
+                                    autoComplete="off"
+                                    formatType="date"
+                                    {...register(`travellers.${index}.passportIssueDate`)}
+                                />
+                                {errors.travellers?.[index]?.passportIssueDate && (
+                                    <p className="text-xs text-red-500">{errors.travellers[index]?.passportIssueDate?.message}</p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}

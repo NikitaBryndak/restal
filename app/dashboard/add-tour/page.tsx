@@ -8,7 +8,7 @@ import { useAddTourForm } from './hooks/useAddTourForm';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 
 import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, DocumentsSection } from './components';
 
@@ -95,10 +95,25 @@ export default function AddTourPage() {
                                 <PaymentSection />
                             </div>
 
-                            <div className="mt-10 flex justify-end border-t border-border/40 pt-6">
-                                <Button type="submit" size="lg" className="px-8" disabled={isUploading}>
-                                    {isUploading ? 'Завантаження та створення...' : 'Створити тур'}
-                                </Button>
+                            <div className="mt-10 flex flex-col gap-4 border-t border-border/40 pt-6">
+                                {Object.keys(form.formState.errors).length > 0 && (
+                                    <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                                        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+                                                Форма містить помилки
+                                            </p>
+                                            <p className="text-xs text-red-500/80">
+                                                Будь ласка, перевірте всі поля, виділені червоним, і виправте помилки перед створенням туру.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex justify-end">
+                                    <Button type="submit" size="lg" className="px-8" disabled={isUploading}>
+                                        {isUploading ? 'Завантаження та створення...' : 'Створити тур'}
+                                    </Button>
+                                </div>
                             </div>
                         </form>
                     </FormProvider>

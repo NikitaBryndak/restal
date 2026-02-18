@@ -52,72 +52,72 @@ const tripSchema = new Schema({
         departure: {
             airportCode: {
                 type: String,
-                required: true,
+                default: "",
             },
             country: {
                 type: String,
-                required: true,
+                default: "",
             },
             flightNumber: {
                 type: String,
-                required: true,
+                default: "",
             },
             date: {
                 type: String,
-                required: true,
+                default: "",
             },
             time: {
                 type: String,
-                required: true,
+                default: "",
             }
         },
         arrival: {
             airportCode: {
                 type: String,
-                required: true,
+                default: "",
             },
             country: {
                 type: String,
-                required: true,
+                default: "",
             },
             flightNumber: {
                 type: String,
-                required: true,
+                default: "",
             },
             date: {
                 type: String,
-                required: true,
+                default: "",
             },
             time: {
                 type: String,
-                required: true,
+                default: "",
             }
         }
     },
     hotel: {
         name: {
             type: String,
-            required: true,
+            default: "",
         },
         checkIn: {
             type: String,
-            required: true,
+            default: "",
         },
         checkOut: {
             type: String,
-            required: true,
+            default: "",
         },
         food: {
             type: String,
-            required: true,
+            default: "",
         },
         nights: {
             type: Number,
-            required: true,
+            default: 0,
         },
         roomType: {
             type: String,
-            required: true,
+            default: "",
         }
     },
     tourists: [{
@@ -131,27 +131,27 @@ const tripSchema = new Schema({
         },
         sex: {
             type: String,
-            required: true,
+            default: "unspecified",
         },
         passportExpiryDate: {
             type: String,
-            required: true,
+            default: "",
         },
         dob: {
             type: String,
-            required: false,
+            default: "",
         },
         passportNumber: {
             type: String,
-            required: true,
+            default: "",
         },
         passportSeries: {
             type: String,
-            required: true,
+            default: "",
         },
         passportIssueDate: {
             type: String,
-            required: true,
+            default: "",
         }
     }],
     addons: {
@@ -217,7 +217,7 @@ const tripSchema = new Schema({
         },
         deadline : {
             type: String,
-            required: true,
+            default: "",
         }
     },
     ownerPhone: {

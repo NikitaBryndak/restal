@@ -6,28 +6,41 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { CASHBACK_RATE, SUPER_ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL } from '@/config/constants';
 
-// Phone number validation regex
+// Phone number validation regex (after stripping formatting)
 const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
 
 // Validate required trip fields
 function validateTripData(body: any): string | null {
-    if (!body.number || typeof body.number !== 'string') {
-        return "Trip number is required";
+    if (!body.number || typeof body.number !== 'string' || body.number.trim().length === 0) {
+        return "Номер туру є обов'язковим";
     }
     if (!body.country || typeof body.country !== 'string') {
-        return "Country is required";
+        return "Країна є обов'язковою";
     }
     if (!body.tripStartDate || typeof body.tripStartDate !== 'string') {
-        return "Trip start date is required";
+        return "Дата початку туру є обов'язковою";
     }
     if (!body.tripEndDate || typeof body.tripEndDate !== 'string') {
-        return "Trip end date is required";
+        return "Дата закінчення туру є обов'язковою";
     }
     if (!body.ownerPhone || !PHONE_REGEX.test(body.ownerPhone.replace(/[^\d+]/g, ''))) {
-        return "Valid owner phone number is required";
+        return "Потрібен дійсний номер телефону власника";
     }
     if (!body.payment || typeof body.payment.totalAmount !== 'number') {
-        return "Payment total amount is required";
+        return "Загальна сума оплати є обов'язковою";
+    }
+    if (!Array.isArray(body.tourists) || body.tourists.length === 0) {
+        return "Потрібно додати хоча б одного подорожуючого";
+    }
+    // Validate each tourist has at least name and surname
+    for (let i = 0; i < body.tourists.length; i++) {
+        const t = body.tourists[i];
+        if (!t.name || typeof t.name !== 'string' || t.name.trim().length === 0) {
+            return `Ім'я подорожуючого #${i + 1} є обов'язковим`;
+        }
+        if (!t.surname || typeof t.surname !== 'string' || t.surname.trim().length === 0) {
+            return `Прізвище подорожуючого #${i + 1} є обов'язковим`;
+        }
     }
     return null;
 }

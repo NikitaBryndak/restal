@@ -1,24 +1,29 @@
 import { z } from 'zod';
 
 const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-const dateSchema = z.string().regex(dateRegex, "Invalid date format (DD/MM/YYYY)").or(z.literal(''));
+/** Optional date: valid DD/MM/YYYY or empty string */
+const optionalDateSchema = z.string().regex(dateRegex, "Невірний формат дати (ДД/ММ/РРРР)").or(z.literal(''));
+/** Required date: must be a valid DD/MM/YYYY, cannot be empty */
+const requiredDateSchema = z.string().min(1, "Це поле є обов'язковим").regex(dateRegex, "Невірний формат дати (ДД/ММ/РРРР)");
+
+const phoneRegex = /^\+?[1-9]\d{9,14}$/;
 
 export const travellerSchema = z.object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
+    firstName: z.string().min(1, "Ім'я є обов'язковим"),
+    lastName: z.string().min(1, "Прізвище є обов'язковим"),
     sex: z.enum(["male", "female", "other", "unspecified"]).default("unspecified"),
-    passportExpiry: dateSchema,
-    dob: dateSchema,
-    passportNumber: z.string().optional(),
-    passportSeries: z.string().optional(),
-    passportIssueDate: dateSchema,
+    passportExpiry: optionalDateSchema,
+    dob: optionalDateSchema,
+    passportNumber: z.string().optional().default(''),
+    passportSeries: z.string().optional().default(''),
+    passportIssueDate: optionalDateSchema,
 });
 
 export const flightSegmentSchema = z.object({
     country: z.string().optional(),
     airportCode: z.string().optional(),
     flightNumber: z.string().optional(),
-    date: dateSchema,
+    date: optionalDateSchema,
     time: z.string().optional(),
 });
 
@@ -29,50 +34,53 @@ export const documentSchema = z.object({
 
 export const tourSchema = z.object({
     // Basic Details
-    number: z.string().optional().default(''),
-    country: z.string().min(1, "Destination is required"),
+    number: z.string().min(1, "Номер туру є обов'язковим"),
+    country: z.string().min(1, "Країна призначення є обов'язковою"),
     region: z.string().optional(),
-    hotelNights: z.coerce.number().min(0).default(0),
-    tripStartDate: dateSchema,
-    tripEndDate: dateSchema,
+    hotelNights: z.coerce.number().min(0, "Кількість ночей не може бути від'ємною").default(0),
+    tripStartDate: requiredDateSchema,
+    tripEndDate: requiredDateSchema,
     food: z.string().optional(), // Meal plan
-    bookingDate: dateSchema,
+    bookingDate: optionalDateSchema,
 
     // Hotel
     hotelName: z.string().optional(),
-    hotelCheckIn: dateSchema,
-    hotelCheckOut: dateSchema,
+    hotelCheckIn: optionalDateSchema,
+    hotelCheckOut: optionalDateSchema,
     roomType: z.string().optional(),
 
     // Flights
     departureCountry: z.string().optional(),
     departureAirport: z.string().optional(),
     departureFlight: z.string().optional(),
-    departureDate: dateSchema,
+    departureDate: optionalDateSchema,
     departureTime: z.string().optional(),
 
     arrivalCountry: z.string().optional(),
     arrivalAirport: z.string().optional(),
     arrivalFlight: z.string().optional(),
-    arrivalDate: dateSchema,
+    arrivalDate: optionalDateSchema,
     arrivalTime: z.string().optional(),
 
-    // Travellers
-    travellers: z.array(travellerSchema).default([]),
+    // Travellers — at least one required
+    travellers: z.array(travellerSchema).min(1, "Потрібно додати хоча б одного подорожуючого"),
 
     // Addons
     insurance: z.boolean().default(false),
     transfer: z.boolean().default(false),
 
     // Payment
-    paymentTotal: z.coerce.number().min(0).default(0),
-    paymentPaid: z.coerce.number().min(0).default(0),
-    paymentDeadline: dateSchema,
+    paymentTotal: z.coerce.number().min(0, "Сума не може бути від'ємною").default(0),
+    paymentPaid: z.coerce.number().min(0, "Сума не може бути від'ємною").default(0),
+    paymentDeadline: optionalDateSchema,
 
-    // Other
-    ownerPhone: z.string().optional().or(z.literal('')),
+    // Other — phone is required; validated after stripping formatting
+    ownerPhone: z.string().min(1, "Номер телефону є обов'язковим"),
 
     documents: z.record(z.string(), documentSchema).optional(),
-});
+}).refine(
+    (data) => data.paymentPaid <= data.paymentTotal,
+    { message: "Сплачена сума не може перевищувати загальну суму", path: ["paymentPaid"] }
+);
 
 export type TourFormValues = z.infer<typeof tourSchema>;

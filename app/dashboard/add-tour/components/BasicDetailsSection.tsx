@@ -169,6 +169,9 @@ export const BasicDetailsSection = ({
                         <option value="Full Board">Повний пансіон</option>
                         <option value="All Inclusive">Все включено</option>
                     </select>
+                    {!controlled && errors.food && (
+                        <p className="text-xs text-red-500 mt-1">{errors.food.message as string}</p>
+                    )}
                 </div>
             )}
         </section>

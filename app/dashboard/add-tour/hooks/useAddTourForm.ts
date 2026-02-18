@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { tourSchema, TourFormValues } from '../schema';
 import { PreviewState } from '../types';
@@ -46,7 +46,16 @@ export const useAddTourForm = () => {
             arrivalFlight: '',
             arrivalDate: '',
             arrivalTime: '',
-            travellers: [],
+            travellers: [{
+                firstName: '',
+                lastName: '',
+                sex: 'unspecified' as const,
+                passportExpiry: '',
+                dob: '',
+                passportNumber: '',
+                passportSeries: '',
+                passportIssueDate: '',
+            }],
             insurance: false,
             transfer: false,
             paymentTotal: 0,
@@ -254,16 +263,43 @@ export const useAddTourForm = () => {
         }
     };
 
-    const onError = (errors: Record<string, { message?: string }>) => {
-        const errorMessages = Object.values(errors)
-            .map((error) => error.message)
-            .filter(Boolean);
+    const onError = (errors: FieldErrors<TourFormValues>) => {
+        // Recursively collect all error messages from potentially nested FieldErrors
+        const collectMessages = (obj: Record<string, any>, prefix = ''): string[] => {
+            const msgs: string[] = [];
+            for (const key of Object.keys(obj)) {
+                const val = obj[key];
+                if (!val) continue;
+                // If it has a `message` it's a leaf error
+                if (typeof val.message === 'string' && val.message) {
+                    const label = prefix ? `${prefix}.${key}` : key;
+                    msgs.push(`• ${label}: ${val.message}`);
+                } else if (typeof val === 'object') {
+                    // Array (travellers) or nested object
+                    msgs.push(...collectMessages(val as Record<string, any>, prefix ? `${prefix}.${key}` : key));
+                }
+            }
+            return msgs;
+        };
+
+        // Also handle root-level refinement errors (e.g. paymentPaid > paymentTotal)
+        const rootMessage = (errors as any)?.root?.message;
+        const errorMessages = collectMessages(errors as Record<string, any>);
+        if (rootMessage) errorMessages.unshift(`• ${rootMessage}`);
 
         if (errorMessages.length > 0) {
-            alert(`Please fix the following errors:\n${errorMessages.join('\n')}`);
+            alert(`Будь ласка, виправте наступні помилки:\n${errorMessages.join('\n')}`);
         } else {
-            alert('Please check the form for errors.');
+            alert('Будь ласка, перевірте форму на наявність помилок.');
         }
+
+        // Scroll to first error field
+        setTimeout(() => {
+            const firstError = document.querySelector('[aria-invalid="true"], .text-red-500');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
     };
 
     return {
