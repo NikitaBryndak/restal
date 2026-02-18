@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { use } from "react";
-import DOMPurify from "dompurify";
+import ArticleContentPreview from "@/components/article/article-content-preview";
 
 export default function ArticlePage({params}: {params: Promise<{slug: string}>}) {
     const resolvedParams = use(params);
@@ -127,13 +127,7 @@ export default function ArticlePage({params}: {params: Promise<{slug: string}>})
                 </div>
 
                 <div className="p-4 sm:p-8 md:p-12">
-                    <div
-                        className="prose prose-invert prose-sm sm:prose-lg max-w-none
-                        prose-headings:text-white prose-p:text-secondary prose-strong:text-white
-                        prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-                        prose-li:text-secondary prose-blockquote:border-accent prose-blockquote:bg-white/5 prose-blockquote:p-4 prose-blockquote:rounded-r-lg"
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || "<p>No content available.</p>") }}
-                    />
+                    <ArticleContentPreview content={article.content} />
                 </div>
             </article>
        </div>

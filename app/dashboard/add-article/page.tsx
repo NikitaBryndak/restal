@@ -3,7 +3,8 @@
 import ArticleCard from "@/components/article/article-card";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/ui/form-input";
-import { FormProvider } from "react-hook-form";
+import RichTextEditor from "@/components/ui/rich-text-editor";
+import { FormProvider, Controller } from "react-hook-form";
 import { useAddArticleForm } from "./hooks/useAddArticleForm";
 import { usePreviewData } from './hooks/usePreviewData';
 import { useSession } from "next-auth/react";
@@ -97,14 +98,22 @@ export default function AddArticlePage() {
                                             <label className="text-sm font-medium text-foreground/80">
                                                 Content <span className="text-red-500">*</span>
                                             </label>
-                                            <textarea
-                                                className="w-full min-h-[300px] rounded-lg border border-border/60 bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"
-                                                placeholder="Enter article content. You can use HTML tags for formatting:\n• <p>paragraph</p>\n• <strong>bold</strong>\n• <em>italic</em>\n• <h2>heading</h2>\n• <ul><li>list item</li></ul>"
-                                                required
-                                                {...register("content")}
+                                            <Controller
+                                                name="content"
+                                                control={form.control}
+                                                rules={{ required: true }}
+                                                render={({ field }) => (
+                                                    <RichTextEditor
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        placeholder="Start writing your article… Use the toolbar above or paste plain text and click Auto-format."
+                                                        minHeight="350px"
+                                                    />
+                                                )}
                                             />
                                             <p className="text-xs text-foreground/50">
-                                                Supports HTML formatting: &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;h2&gt;, &lt;ul&gt;, &lt;li&gt;, etc.
+                                                Use the toolbar to format text, or write plain text and click &quot;Auto-format&quot; to convert it to HTML.
+                                                Keyboard shortcuts: Ctrl+B bold · Ctrl+I italic · Ctrl+U underline · Ctrl+K link
                                             </p>
                                         </div>
                                         <div className="space-y-1.5">
