@@ -38,6 +38,7 @@ export default function CashbackPage() {
     const [copiedReferral, setCopiedReferral] = useState(false);
     const [userData, setUserData] = useState<UserCashbackData | null>(null);
     const [tripHistory, setTripHistory] = useState<TripCashbackInfo[]>([]);
+    const [allBookingsCount, setAllBookingsCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
     // Promo code generation state
@@ -78,9 +79,11 @@ export default function CashbackPage() {
 
             try {
                 // Fetch user profile data
+                let userPhone = session?.user?.phoneNumber || '';
                 const profileResponse = await fetch('/api/profileFetch');
                 if (profileResponse.ok) {
                     const profileData = await profileResponse.json();
+                    userPhone = profileData.phoneNumber || userPhone;
                     setUserData({
                         cashbackAmount: profileData.cashbackAmount || 0,
                         phoneNumber: profileData.phoneNumber || '',
@@ -88,12 +91,21 @@ export default function CashbackPage() {
                     });
                 }
 
-                // Fetch completed trips for cashback history
-                const tripsResponse = await fetch('/api/trips?status=Completed');
+                // Fetch trips for cashback history
+                const tripsResponse = await fetch('/api/trips');
                 if (tripsResponse.ok) {
                     const tripsData = await tripsResponse.json();
-                    const completedTrips = tripsData.trips?.filter((t: { cashbackProcessed?: boolean }) => t.cashbackProcessed) || [];
-                    setTripHistory(completedTrips.map((trip: { number: string; country: string; payment?: { totalAmount?: number }; cashbackAmount?: number; status: string; updatedAt?: string }) => ({
+                    const allTrips = tripsData.trips || [];
+
+                    // Filter to only user's own trips (exclude trips they manage for others)
+                    const ownedTrips = allTrips.filter((t: { ownerPhone?: string }) => t.ownerPhone === userPhone);
+
+                    // Set total bookings count from ALL owned trips
+                    setAllBookingsCount(ownedTrips.length);
+
+                    // Only trips with processed cashback (for history display)
+                    const processedTrips = ownedTrips.filter((t: { cashbackProcessed?: boolean }) => t.cashbackProcessed);
+                    setTripHistory(processedTrips.map((trip: { number: string; country: string; payment?: { totalAmount?: number }; cashbackAmount?: number; status: string; updatedAt?: string }) => ({
                         tripNumber: trip.number,
                         country: trip.country,
                         totalAmount: trip.payment?.totalAmount || 0,
@@ -116,8 +128,10 @@ export default function CashbackPage() {
     }, [session, sessionStatus, fetchPromoHistory]);
 
     const cashbackBalance = userData?.cashbackAmount || 0;
-    const totalEarned = tripHistory.reduce((sum, trip) => sum + trip.cashbackAmount, 0) + 1000; // +1000 welcome bonus
-    const bookingsCount = tripHistory.length;
+    // Total earned = current balance + all amounts used via promo codes + 1000 welcome bonus
+    const totalPromoSpent = promoHistory.reduce((sum, p) => sum + p.amount, 0);
+    const totalEarned = cashbackBalance + totalPromoSpent + 1000;
+    const bookingsCount = allBookingsCount;
 
     const copyReferralCode = () => {
         navigator.clipboard.writeText(referralCode);
@@ -477,6 +491,43 @@ export default function CashbackPage() {
                                     Поділитися
                                 </Button>
                             </div>
+                        </div>
+
+                        {/* Trip Cashback History */}
+                        <div className="bg-foreground/5 border border-foreground/10 rounded-2xl overflow-hidden">
+                            <div className="p-6 border-b border-foreground/10">
+                                <h3 className="text-xl font-semibold">Історія нарахувань cash-back</h3>
+                            </div>
+                            {tripHistory.length === 0 ? (
+                                <div className="p-6">
+                                    <p className="text-foreground/60 text-sm">Ще немає нарахувань cash-back за завершені тури.</p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="border-b border-foreground/10">
+                                                <th className="text-left p-4 text-sm font-medium text-foreground/60">Тур</th>
+                                                <th className="text-left p-4 text-sm font-medium text-foreground/60">Країна</th>
+                                                <th className="text-left p-4 text-sm font-medium text-foreground/60">Сума туру</th>
+                                                <th className="text-left p-4 text-sm font-medium text-foreground/60">Cash-back</th>
+                                                <th className="text-left p-4 text-sm font-medium text-foreground/60">Дата</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {tripHistory.map((trip) => (
+                                                <tr key={trip.tripNumber} className="border-b border-foreground/10 last:border-b-0 hover:bg-foreground/5">
+                                                    <td className="p-4 font-medium">#{trip.tripNumber}</td>
+                                                    <td className="p-4 text-foreground/70">{trip.country}</td>
+                                                    <td className="p-4 text-foreground/70">{trip.totalAmount.toLocaleString()} грн</td>
+                                                    <td className="p-4 text-accent font-medium">+{trip.cashbackAmount.toLocaleString()} грн</td>
+                                                    <td className="p-4 text-foreground/70">{trip.completedAt ? formatDate(trip.completedAt) : '—'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
 
                         {/* Bonus Summary Table */}

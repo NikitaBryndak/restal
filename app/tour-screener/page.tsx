@@ -34,15 +34,12 @@ const WIDGET_HTML = `<!DOCTYPE html>
     html, body {
       font-family: 'Open Sans', sans-serif;
       background: transparent;
-      overflow-x: hidden;
     }
-    body { padding: 0; }
+    body { padding: 0; overflow: visible; }
     .os-form, .os-results, .os-tour {
       max-width: 100% !important;
       width: 100% !important;
-    }
-    @media (max-width: 640px) {
-      body { padding: 0; }
+      position: relative !important;
     }
   </style>
 </head>
@@ -54,13 +51,18 @@ const WIDGET_HTML = `<!DOCTYPE html>
     (function () {
       var lastHeight = 0;
       function postHeight() {
-        var height = document.documentElement.scrollHeight;
+        var height = Math.max(
+          document.body.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight
+        );
         if (height !== lastHeight) {
           lastHeight = height;
           window.parent.postMessage({ type: 'otpusk-resize', height: height }, '*');
         }
       }
-      setInterval(postHeight, 300);
+      setInterval(postHeight, 150);
       window.addEventListener('load', postHeight);
       window.addEventListener('resize', postHeight);
       if (window.MutationObserver) {
@@ -88,7 +90,7 @@ export default function TourScreenerPage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-4">
+    <main className="min-h-screen w-full pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-4">
       <div className="w-full max-w-6xl mx-auto">
         <iframe
           ref={iframeRef}
@@ -96,12 +98,11 @@ export default function TourScreenerPage() {
           title="Пошук турів"
           style={{
             width: "100%",
-            height: `${iframeHeight}px`,
+            height: `${Math.max(iframeHeight, 600)}px`,
             border: "none",
-            overflow: "hidden",
             display: "block",
           }}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
           allow="clipboard-write"
           loading="eager"
         />
