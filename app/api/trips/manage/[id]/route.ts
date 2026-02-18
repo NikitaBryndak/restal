@@ -5,7 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import Notification from "@/models/notification";
-import { MANAGER_PRIVILEGE_LEVEL, SUPER_ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { MANAGER_PRIVILEGE_LEVEL, SUPER_ADMIN_PRIVILEGE_LEVEL, CASHBACK_RATE } from "@/config/constants";
 import { DOCUMENT_LABELS, TOUR_STATUS_LABELS, TourStatus } from "@/types";
 import mongoose from "mongoose";
 
@@ -146,11 +146,18 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             ...rest
         } = updates ?? {};
 
+        // Recalculate cashback if total amount changes and cashback hasn't been processed
+        let newCashbackAmount = undefined;
+        if (!existingTrip.cashbackProcessed && rest.payment?.totalAmount) {
+            newCashbackAmount = (rest.payment.totalAmount || 0) * CASHBACK_RATE;
+        }
+
         // Get current manager's name
         const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
 
         const payload = {
             ...rest,
+            ...(newCashbackAmount !== undefined && { cashbackAmount: newCashbackAmount }),
             managerPhone: session.user.phoneNumber, // Update to current manager
             managerName: currentManager?.name || '',
         };

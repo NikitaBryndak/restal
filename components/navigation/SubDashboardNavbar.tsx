@@ -67,6 +67,10 @@ export default function SubDashboardNavbar() {
                                 Додати статтю
                             </NavLink>
 
+                            <NavLink href="/dashboard/manage-articles" className={NAV_ITEM_CLASS}>
+                                Керування статтями
+                            </NavLink>
+
                             <NavLink href="/dashboard/promo-codes" className={NAV_ITEM_CLASS}>
                                 Промокоди
                             </NavLink>

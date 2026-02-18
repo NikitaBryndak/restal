@@ -19,7 +19,7 @@ export default function TripCard({ data }: { data: Trip }) {
     const totalAmount = data.payment?.totalAmount ?? 0;
     const paidAmount = data.payment?.paidAmount ?? 0;
     const toPay = totalAmount - paidAmount;
-    const cashback = totalAmount * CASHBACK_RATE;
+    const cashback = (data.cashbackAmount && data.cashbackAmount > 0) ? data.cashbackAmount : totalAmount * CASHBACK_RATE;
 
     const addonItems = [
         { label: "Страхування", value: data.addons.insurance, icon: "🛡️" },

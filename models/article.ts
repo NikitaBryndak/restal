@@ -3,7 +3,8 @@ import mongoose, { Schema } from "mongoose";
 const articleSchema = new Schema({
     articleID: {
         type: Number,
-        required: true
+        required: true,
+        unique: true, // Ensuring unique constraint at schema level too, though index handles it
     },
     tag: {
         type: String,
@@ -35,6 +36,7 @@ articleSchema.index({ articleID: 1 }, { unique: true });
 
 // Prevent Mongoose model recompilation error in development
 if (process.env.NODE_ENV === "development") {
+    // Check if model exists before deleting to handle hot reload correctly
     if (mongoose.models.Article) {
         delete mongoose.models.Article;
     }

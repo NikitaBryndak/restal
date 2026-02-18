@@ -95,7 +95,7 @@ export default async function TripPage({ params }: { params: Promise<{ id: strin
     const totalAmount = trip.payment?.totalAmount ?? 0;
     const paidAmount = trip.payment?.paidAmount ?? 0;
     const toPay = totalAmount - paidAmount;
-    const cashback = totalAmount * CASHBACK_RATE;
+    const cashback = (trip.cashbackAmount && trip.cashbackAmount > 0) ? trip.cashbackAmount : totalAmount * CASHBACK_RATE;
 
     const status = (trip.status || 'In Booking') as TourStatus;
 

@@ -23,7 +23,8 @@ export default function ArticlePage({params}: {params: Promise<{slug: string}>})
                 if (res.ok) {
                     const data = await res.json();
                     console.log('Article data:', data);
-                    setArticle(data);
+                    // Handle wrapped response { article: ... } or direct object
+                    setArticle(data.article || data);
                     setLoading(false);
                     return;
                 } else if (res.status === 400 || res.status === 404) {

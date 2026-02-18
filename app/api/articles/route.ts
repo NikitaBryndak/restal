@@ -17,8 +17,15 @@ export async function GET() {
         await connectToDatabase();
 
         const articles = await Article.find().sort({ createdAt: -1 }).lean();
+        // Ensure _id is string for client consistency
+         const serializedArticles = articles.map((article: any) => ({
+             ...article,
+             _id: article._id.toString(),
+             createdAt: article.createdAt ? new Date(article.createdAt).toISOString() : null,
+             updatedAt: article.updatedAt ? new Date(article.updatedAt).toISOString() : null,
+         }));
 
-        return NextResponse.json({ articles }, { status: 200 });
+        return NextResponse.json({ articles: serializedArticles }, { status: 200 });
     } catch {
         return NextResponse.json({ message: "Error fetching articles" }, { status: 500 });
     }
