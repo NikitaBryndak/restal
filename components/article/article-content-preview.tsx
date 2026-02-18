@@ -3,6 +3,7 @@
 import { useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import { Eye, Code } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 interface ArticleContentPreviewProps {
   content: string;
@@ -19,31 +20,36 @@ export default function ArticleContentPreview({
   className = "",
 }: ArticleContentPreviewProps) {
   const [showSource, setShowSource] = useState(false);
+  const { data: session } = useSession();
 
   const safeHTML = DOMPurify.sanitize(
     content || "<p>No content available.</p>",
   );
 
+  const canViewSource = (session?.user?.privilegeLevel ?? 0) >= 3;
+
   return (
     <div className={className}>
       {/* Toggle button — top-right corner */}
-      <div className="flex justify-end mb-4">
-        <button
-          type="button"
-          onClick={() => setShowSource((s) => !s)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition-colors"
-        >
-          {showSource ? (
-            <>
-              <Eye className="w-3.5 h-3.5" /> Rendered
-            </>
-          ) : (
-            <>
-              <Code className="w-3.5 h-3.5" /> Source
-            </>
-          )}
-        </button>
-      </div>
+      {canViewSource && (
+        <div className="flex justify-end mb-4">
+          <button
+            type="button"
+            onClick={() => setShowSource((s) => !s)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition-colors"
+          >
+            {showSource ? (
+              <>
+                <Eye className="w-3.5 h-3.5" /> Rendered
+              </>
+            ) : (
+              <>
+                <Code className="w-3.5 h-3.5" /> Source
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {showSource ? (
         <pre className="whitespace-pre-wrap wrap-break-word text-xs sm:text-sm font-mono text-secondary bg-white/5 rounded-xl p-4 border border-white/10 overflow-x-auto">

@@ -94,6 +94,22 @@ export default function AddArticlePage() {
                                             required
                                             {...register("images")}
                                         />
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-foreground/80">
+                                                Article Tag
+                                            </label>
+                                            <select
+                                                className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                                {...register("tag")}
+                                            >
+                                                <option value="Популярні країни">Популярні країни</option>
+                                                <option value="Корисно знати">Корисно знати</option>
+                                                <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
+                                                <option value="Інструкції сайта">Інструкції сайта</option>
+                                                <option value="Послуги">Послуги</option>
+                                                <option value="Умови бронювання">Умови бронювання</option>
+                                            </select>
+                                        </div>
                                         <div className="space-y-1.5 md:col-span-2">
                                             <label className="text-sm font-medium text-foreground/80">
                                                 Content <span className="text-red-500">*</span>
@@ -115,22 +131,6 @@ export default function AddArticlePage() {
                                                 Use the toolbar to format text, or write plain text and click &quot;Auto-format&quot; to convert it to HTML.
                                                 Keyboard shortcuts: Ctrl+B bold · Ctrl+I italic · Ctrl+U underline · Ctrl+K link
                                             </p>
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-foreground/80">
-                                                Article Tag
-                                            </label>
-                                            <select
-                                                className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                                {...register("tag")}
-                                            >
-                                                <option value="Популярні країни">Популярні країни</option>
-                                                <option value="Корисно знати">Корисно знати</option>
-                                                <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
-                                                <option value="Інструкції сайта">Інструкції сайта</option>
-                                                <option value="Послуги">Послуги</option>
-                                                <option value="Умови бронювання">Умови бронювання</option>
-                                            </select>
                                         </div>
                                     </div>
                                 </section>

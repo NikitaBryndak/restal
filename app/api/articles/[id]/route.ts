@@ -36,7 +36,7 @@ export async function GET(
             console.log(`ID is not a valid ObjectId: ${resolvedParams.id}`);
         }
 
-        const foundArticle = article || articleById;
+        const foundArticle: any = article || articleById;
         console.log(`Article found: ${!!foundArticle}`);
 
         if (!foundArticle) {

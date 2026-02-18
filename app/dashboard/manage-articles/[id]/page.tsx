@@ -214,6 +214,20 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                             required
                                             {...register("images")}
                                         />
+                                         <div className="space-y-1.5 md:col-span-2">
+                                            <label className="text-sm font-medium text-foreground/80">Tag</label>
+                                            <select
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                {...register("tag")}
+                                            >
+                                                <option value="Популярні країни">Популярні країни</option>
+                                                <option value="Корисно знати">Корисно знати</option>
+                                                <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
+                                                <option value="Інструкції сайта">Інструкції сайта</option>
+                                                <option value="Послуги">Послуги</option>
+                                                <option value="Умови бронювання">Умови бронювання</option>
+                                            </select>
+                                        </div>
                                         <div className="space-y-1.5 md:col-span-2">
                                             <label className="text-sm font-medium text-foreground/80">
                                                 Content <span className="text-red-500">*</span>
@@ -231,20 +245,6 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                                     )}
                                                 />
                                             </div>
-                                        </div>
-                                         <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-foreground/80">Tag</label>
-                                            <select
-                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                {...register("tag")}
-                                            >
-                                                <option value="Популярні країни">Популярні країни</option>
-                                                <option value="Корисно знати">Корисно знати</option>
-                                                <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
-                                                <option value="Інструкції сайта">Інструкції сайта</option>
-                                                <option value="Послуги">Послуги</option>
-                                                <option value="Умови бронювання">Умови бронювання</option>
-                                            </select>
                                         </div>
                                     </div>
                                 </section>

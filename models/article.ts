@@ -32,8 +32,6 @@ const articleSchema = new Schema({
     }
 }, { timestamps: true });
 
-articleSchema.index({ articleID: 1 }, { unique: true });
-
 // Prevent Mongoose model recompilation error in development
 if (process.env.NODE_ENV === "development") {
     // Check if model exists before deleting to handle hot reload correctly
