@@ -20,7 +20,7 @@ const WIDGET_HTML = `<!DOCTYPE html>
     var osContainer = null;
     var osTourContainer = null;
     var osLang = 'ua';
-    var osTourTargetBlank = false;
+    var osTourTargetBlank = true;
     var osOrderUrl = null;
     var osCurrency = 'converted';
     var osAutoStart = false;
@@ -102,7 +102,7 @@ export default function TourScreenerPage() {
             border: "none",
             display: "block",
           }}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
           allow="clipboard-write"
           loading="eager"
         />
