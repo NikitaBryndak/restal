@@ -3,6 +3,6 @@ export type PreviewState= {
     description: string;
     content: string;
     images: string;
-    tag?: "First" | "Second" | "Third" | "Fourth" | "Fifth" | "All";
+    tag?: "Популярні країни" | "Корисно знати" | "Шпаргалки мандрівникам" | "Інструкції сайта" | "Послуги" | "Умови бронювання";
     creatorPhone: string;
 };

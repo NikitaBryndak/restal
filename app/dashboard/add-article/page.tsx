@@ -115,12 +115,12 @@ export default function AddArticlePage() {
                                                 className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                                                 {...register("tag")}
                                             >
-                                                <option value="All">All</option>
-                                                <option value="First">First</option>
-                                                <option value="Second">Second</option>
-                                                <option value="Third">Third</option>
-                                                <option value="Fourth">Fourth</option>
-                                                <option value="Fifth">Fifth</option>
+                                                <option value="Популярні країни">Популярні країни</option>
+                                                <option value="Корисно знати">Корисно знати</option>
+                                                <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
+                                                <option value="Інструкції сайта">Інструкції сайта</option>
+                                                <option value="Послуги">Послуги</option>
+                                                <option value="Умови бронювання">Умови бронювання</option>
                                             </select>
                                         </div>
                                     </div>

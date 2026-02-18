@@ -12,7 +12,7 @@ export const useAddArticleForm = () => {
     const form = useForm<ArticleFormValues>({
         resolver: zodResolver(articleSchema),
         defaultValues: {
-            tag: "All",
+            tag: "Популярні країни",
             images: "",
             title: "",
             description: "",
@@ -32,7 +32,7 @@ export const useAddArticleForm = () => {
         description: (values.description as string) || "No description provided",
         content: (values.content as string) || "Start writing your article...",
         images: (values.images as string) || "",
-        tag: (values.tag as "First" | "Second" | "Third" | "Fourth" | "Fifth" | "All") || "All",
+        tag: (values.tag as "Популярні країни" | "Корисно знати" | "Шпаргалки мандрівникам" | "Інструкції сайта" | "Послуги" | "Умови бронювання") || "Популярні країни",
         creatorPhone: values.creatorPhone || session?.user?.phoneNumber || "",
     });
 

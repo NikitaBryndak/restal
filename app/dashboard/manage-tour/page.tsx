@@ -343,6 +343,7 @@ export default function ManageTourPage() {
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('folder', 'documents');
+                    formData.append('tripNumber', trip.number);
 
                     try {
                         const uploadRes = await fetch('/api/upload', {

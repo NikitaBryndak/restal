@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 
 export const articleSchema = z.object({
-    tag: z.enum(["First", "Second", "Third", "Fourth", "Fifth","All"]),
+    tag: z.enum(["Популярні країни", "Корисно знати", "Шпаргалки мандрівникам", "Інструкції сайта", "Послуги", "Умови бронювання"]),
     images: z.string(),
     title: z.string(),
     description: z.string(),
