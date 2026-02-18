@@ -25,6 +25,10 @@ const WIDGET_HTML = `<!DOCTYPE html>
     var osCurrency = 'converted';
     var osAutoStart = false;
   </script>
+  <script>document.addEventListener('DOMContentLoaded', function() {
+    osContainer = document.getElementById('os-search-results');
+    osTourContainer = document.getElementById('os-tour-details');
+  });</script>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic" rel="stylesheet" />
   <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/form.css" />
   <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/result.css" />
@@ -44,6 +48,12 @@ const WIDGET_HTML = `<!DOCTYPE html>
   </style>
 </head>
 <body>
+  <div id="os-search-results"></div>
+  <div id="os-tour-details"></div>
+  <script>
+    osContainer = document.getElementById('os-search-results');
+    osTourContainer = document.getElementById('os-tour-details');
+  </script>
   <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
   <script src="https://export.otpusk.com/js/onsite/"></script>
   <script src="https://export.otpusk.com/js/order"></script>
