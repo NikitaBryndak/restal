@@ -2,83 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const WIDGET_HTML = `<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>
-    var osGeo = '';
-    var osDefaultDeparture = 2025;
-    var osDefaultDuration = '';
-    var osDateFrom = '';
-    var osDateTo = '';
-    var osHotelCategory = '';
-    var osFood = '';
-    var osTransport = '';
-    var osTarget = '';
-    var osContainer = null;
-    var osTourContainer = null;
-    var osLang = 'ua';
-    var osTourTargetBlank = false;
-    var osOrderUrl = null;
-    var osCurrency = 'converted';
-    var osAutoStart = false;
-  </script>
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic" rel="stylesheet" />
-  <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/form.css" />
-  <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/result.css" />
-  <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/tour.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      font-family: 'Open Sans', sans-serif;
-      background: transparent;
-    }
-    body { padding: 0; overflow: visible; }
-    .os-form, .os-results, .os-tour {
-      max-width: 100% !important;
-      width: 100% !important;
-      position: relative !important;
-    }
-  </style>
-</head>
-<body>
-  <div id="os-tour-details"></div>
-  <script>
-    osTourContainer = document.getElementById('os-tour-details');
-  </script>
-  <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
-  <script src="https://export.otpusk.com/js/onsite/"></script>
-  <script src="https://export.otpusk.com/js/order"></script>
-  <script>
-    (function () {
-      var lastHeight = 0;
-      function postHeight() {
-        var height = Math.max(
-          document.body.scrollHeight,
-          document.body.offsetHeight,
-          document.documentElement.scrollHeight,
-          document.documentElement.offsetHeight
-        );
-        if (height !== lastHeight) {
-          lastHeight = height;
-          window.parent.postMessage({ type: 'otpusk-resize', height: height }, '*');
-        }
-      }
-      setInterval(postHeight, 150);
-      window.addEventListener('load', postHeight);
-      window.addEventListener('resize', postHeight);
-      if (window.MutationObserver) {
-        new MutationObserver(postHeight).observe(document.body, {
-          childList: true, subtree: true, attributes: true, characterData: true
-        });
-      }
-    })();
-  </script>
-</body>
-</html>`;
-
 export default function TourScreenerPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeHeight, setIframeHeight] = useState(800);
@@ -98,7 +21,7 @@ export default function TourScreenerPage() {
       <div className="w-full max-w-6xl mx-auto">
         <iframe
           ref={iframeRef}
-          srcDoc={WIDGET_HTML}
+          src="/otpusk-widget.html"
           title="Пошук турів"
           style={{
             width: "100%",
