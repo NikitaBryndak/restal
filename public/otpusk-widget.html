@@ -530,7 +530,7 @@
     }
 
     /* ============================
-       DARK THEME — RESULTS (result.css)
+       DARK THEME — RESULTS
        ============================ */
 
     /* Result container */
@@ -544,22 +544,10 @@
       box-shadow: 0 0 12px rgba(0, 0, 0, 0.4) !important;
     }
     body .new_r-item-body {
-      border-color: transparent !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
     }
-    @media all and (min-width: 479px) {
-      body .new_r-item:hover {
-        box-shadow: 0 0 16px rgba(15, 164, 230, 0.15) !important;
-      }
-      body .new_r-item:hover .new_r-item-body {
-        border-color: #0fa4e6 rgba(15, 164, 230, 0.4) rgba(15, 164, 230, 0.4) transparent !important;
-      }
-      body .new_r-item:hover .new_r-item-price {
-        background: rgba(255, 255, 255, 0.06) !important;
-        color: #0fa4e6 !important;
-      }
-      body .new_r-item:hover .new_r-item-price::after {
-        background: transparent !important;
-      }
+    body .new_r-item:hover .new_r-item-body {
+      border-color: rgba(15, 164, 230, 0.4) transparent rgba(15, 164, 230, 0.4) transparent !important;
     }
 
     /* Hotel name */
@@ -567,47 +555,30 @@
       color: #ffffff !important;
     }
 
-    /* Geo info */
-    body .new_r-item .new_r-item-geo {
-      color: #0fa4e6 !important;
+    /* Geo, info, food text */
+    body .new_r-item-geo,
+    body .new_r-item-info,
+    body .new_r-item-from,
+    body .new_r-item-date {
+      color: rgba(255, 255, 255, 0.5) !important;
     }
+    body .new_r-item .new_r-item-geo,
     body .new_r-item .new_r-item-geo span {
       color: #0fa4e6 !important;
     }
     body .new_r-item .new_r-item-geo span:only-child {
-      color: rgba(255, 255, 255, 0.6) !important;
-    }
-    body .new_r-item .new_r-item-geo span::after {
-      background: #0fa4e6 !important;
-    }
-    body .new_r-item-geo svg {
-      fill: #0fa4e6 !important;
-    }
-
-    /* Hotel info text (food, room, etc.) */
-    body .new_r-item-info {
       color: rgba(255, 255, 255, 0.5) !important;
     }
 
-    /* From / Date text */
-    body .new_r-item-from,
-    body .new_r-item-date {
-      color: rgba(255, 255, 255, 0.6) !important;
-    }
-
-    /* Transport/date icons */
-    body .new_r-item-icon {
-      fill: #0fa4e6 !important;
-    }
-
-    /* Price badge */
+    /* Price badge (orange → accent) */
     body .new_r-item .new_r-item-price {
       background: #0fa4e6 !important;
       border-color: #0fa4e6 !important;
       color: #fff !important;
     }
-    body .new_r-item .new_r-item-price .currency {
-      color: #fff !important;
+    body .new_r-item:hover .new_r-item-price {
+      background: #fff !important;
+      color: #0fa4e6 !important;
     }
     body .new_r-item-price-discount {
       color: #0fa4e6 !important;
@@ -634,23 +605,21 @@
     body .new_r-currency-switch label input + span {
       background-color: rgba(255, 255, 255, 0.08) !important;
       color: rgba(255, 255, 255, 0.5) !important;
-      box-shadow: none !important;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3) !important;
     }
     body .new_r-currency-switch label input:checked + span {
       background-color: #0fa4e6 !important;
       color: #fff !important;
+      box-shadow: none !important;
     }
 
-    /* Filter bar */
+    /* Filter panel */
     body .new_r-panel {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    body .new_r-filters-title {
       color: rgba(255, 255, 255, 0.7) !important;
     }
     body .new_r-filter {
       background-color: rgba(255, 255, 255, 0.08) !important;
-      box-shadow: none !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
     }
     body .new_r-filter-label {
       color: rgba(255, 255, 255, 0.6) !important;
@@ -660,6 +629,9 @@
     }
     body .new_r-filter-reset {
       color: rgba(255, 255, 255, 0.5) !important;
+    }
+    body .new_r-filters-title {
+      color: rgba(255, 255, 255, 0.7) !important;
     }
     body .new_r-filters-reset {
       color: #0fa4e6 !important;
@@ -671,31 +643,47 @@
       background-color: transparent !important;
       border-color: #0fa4e6 !important;
     }
-    @media all and (min-width: 479px) {
-      body .new_r-show-more-results:hover {
-        background-color: #0fa4e6 !important;
-        color: #fff !important;
-      }
+    body .new_r-show-more-results:hover {
+      background-color: #0fa4e6 !important;
+      color: #fff !important;
     }
 
-    /* Result info / no results */
+    /* No results message */
+    body .new_not-found-message .new_not-found-text {
+      background: rgba(196, 85, 85, 0.2) !important;
+      color: #e0e0e0 !important;
+    }
     body .new_result-info {
       color: rgba(255, 255, 255, 0.7) !important;
     }
     body .new_result-info > .new_result-span {
-      background: rgba(200, 80, 80, 0.15) !important;
+      background: rgba(196, 85, 85, 0.15) !important;
       color: rgba(255, 255, 255, 0.8) !important;
     }
-    body .new_result-info > .new_result-span > a {
-      color: #0fa4e6 !important;
-    }
-    body .new_not-found-message .new_not-found-text {
-      background: rgba(200, 80, 80, 0.15) !important;
-      color: rgba(255, 255, 255, 0.8) !important;
-    }
+    body .new_result-info > .new_result-span > a,
     body .new_not-found-message a {
       color: #0fa4e6 !important;
     }
+
+    /* Progress bar / loader */
+    body .new_progress-container {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body .new_progress-item {
+      background-color: #0fa4e6 !important;
+      background-image: linear-gradient(to top, #0d8ec7, #0fa4e6) !important;
+    }
+    body .new_progressbar-text,
+    body .new_progressbar-text span {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    /* Operator logos dimmed */
+    body .new_loading-logo .new_logo-image-wrap {
+      opacity: 0.4 !important;
+    }
+
+    /* Not-found order form */
     body .new_not-found-message .os-order-input-name input,
     body .new_not-found-message .os-order-input-phone input,
     body .new_not-found-message .os-order-input-email input,
@@ -709,38 +697,16 @@
       color: #fff !important;
     }
 
-    /* Progress bar / loader */
-    body .new_progressbar-text,
-    body .new_progressbar-text span {
-      color: rgba(255, 255, 255, 0.6) !important;
-    }
-    body .new_progress-container {
-      background-color: rgba(255, 255, 255, 0.08) !important;
-    }
-    body .new_progress-item {
-      background-color: #0fa4e6 !important;
-      background-image: linear-gradient(to right, #0fa4e6, #0d8ec7) !important;
-    }
-
-    /* Loader logos */
-    body .new_logo-image-wrap {
-      filter: none !important;
-    }
-    body .new_loading-logo .new_logo-image-wrap {
-      filter: grayscale(100%) invert(1) !important;
-      opacity: 0.3 !important;
-    }
-
     /* ============================
-       DARK THEME — TOUR DETAIL (tour.css)
+       DARK THEME — TOUR DETAIL
        ============================ */
 
-    /* Main container */
+    /* Container text */
     body .new_t-container {
       color: #e0e0e0 !important;
     }
 
-    /* Menu tabs */
+    /* === TABS MENU === */
     body .new_t-menu-wrap::after {
       background: #0fa4e6 !important;
     }
@@ -759,7 +725,7 @@
       color: #0fa4e6 !important;
     }
 
-    /* Header */
+    /* === HOTEL HEADER === */
     body .new_t-header-title {
       color: #ffffff !important;
     }
@@ -782,24 +748,30 @@
       color: #e0e0e0 !important;
     }
 
-    /* Content area (light grey → dark) */
+    /* === MAIN CONTENT AREA (light grey → dark) === */
     body .new_t-content {
-      background-color: #111 !important;
+      background-color: rgba(255, 255, 255, 0.03) !important;
     }
 
-    /* Tour tab rows — left column (grey → dark) */
+    body .new_t-notice-msg {
+      background: rgba(244, 238, 216, 0.1) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* === TOUR TAB ROWS (Туристи, Дата, Тип кімнати, Послуги) === */
+    /* Left column (grey → dark) */
     body .new_t-tour-tab-col-1 {
-      background: rgba(255, 255, 255, 0.04) !important;
+      background: rgba(255, 255, 255, 0.05) !important;
       border-color: rgba(255, 255, 255, 0.08) !important;
     }
     body .new_t-tour-tab-col-1-title {
-      color: rgba(255, 255, 255, 0.7) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
     }
     body .new_t-tour-tab-col-1 svg {
-      fill: rgba(255, 255, 255, 0.35) !important;
+      fill: rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* Tour tab rows — right column (white → dark) */
+    /* Right column (white → dark) */
     body .new_t-tour-tab-col-2 {
       background-color: rgba(255, 255, 255, 0.02) !important;
       border-color: rgba(255, 255, 255, 0.08) !important;
@@ -808,30 +780,12 @@
     body .new_t-tour-tab-col-2 .new_t-important {
       color: #0fa4e6 !important;
     }
+    body .tourist-table .new_t-tour-tab-col-2,
     body .tourist-table .new_t-tour-tab-col-2 span {
-      color: rgba(255, 255, 255, 0.8) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
     }
 
-    /* Change button (expand arrow) */
-    body .new_t-tour-tab-col .new_t-change-btn {
-      border-left-color: rgba(255, 255, 255, 0.08) !important;
-      color: #0fa4e6 !important;
-    }
-    body .new_t-change-btn svg {
-      fill: #0fa4e6 !important;
-    }
-    @media all and (min-width: 479px) {
-      body .new_t-tour-tab-col .new_t-change-btn:hover {
-        background-color: rgba(255, 255, 255, 0.04) !important;
-      }
-    }
-    @media all and (max-width: 478px) {
-      body .new_t-tour-tab-col .new_t-change-btn {
-        background: rgba(255, 255, 255, 0.03) !important;
-      }
-    }
-
-    /* Duration icons / line */
+    /* Duration line & icons */
     body .new_t-duration-icons {
       background-color: rgba(255, 255, 255, 0.2) !important;
     }
@@ -840,18 +794,30 @@
       background-color: #111 !important;
     }
     body .new_t-duration-icon svg {
-      fill: rgba(255, 255, 255, 0.4) !important;
+      fill: rgba(255, 255, 255, 0.35) !important;
     }
     body .new_t-duration-text span {
-      color: rgba(255, 255, 255, 0.5) !important;
+      color: rgba(255, 255, 255, 0.4) !important;
     }
 
-    /* Services (transfer, insurance, visa) */
+    /* "Change" / expand button on rows */
+    body .new_t-tour-tab-col .new_t-change-btn {
+      border-left-color: rgba(255, 255, 255, 0.08) !important;
+      color: #0fa4e6 !important;
+    }
+    body .new_t-change-btn svg {
+      fill: #0fa4e6 !important;
+    }
+    body .new_t-tour-tab-col .new_t-change-btn:hover {
+      background-color: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    /* Services (transfer, insurance, visa) icons */
     body .new_t-service-item {
       color: rgba(255, 255, 255, 0.7) !important;
     }
 
-    /* ORDER panel (right side — blue → dark accent) */
+    /* === ORDER / BOOKING PANEL (right side) === */
     body .new_t-order-table {
       color: rgba(255, 255, 255, 0.5) !important;
     }
@@ -864,21 +830,25 @@
     body .new_t-order-price__getCredit {
       color: #0fa4e6 !important;
     }
+    body .new_t-order-price-descr {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
     body .new_t-order-code {
       color: rgba(255, 255, 255, 0.5) !important;
     }
     body .new_t-operator-name {
       color: rgba(255, 255, 255, 0.5) !important;
     }
+    body .new_request-flight {
+      color: #ff5555 !important;
+    }
 
-    /* Order button (orange → accent blue) */
+    /* Order button (orange → accent) */
     body .new_t-order-btn,
     body .new_t-order-btn-book {
       background-color: #0fa4e6 !important;
-      background: #0fa4e6 !important;
       color: #fff !important;
     }
-    body .new_t-order-btn:hover,
     body .new_t-order-btn-book:hover {
       background-color: #0d8ec7 !important;
     }
@@ -894,7 +864,7 @@
       fill: #0fa4e6 !important;
     }
 
-    /* Book modal */
+    /* === BOOK MODAL === */
     body .new_t-order-book-modal-body {
       background: #1a1a1a !important;
     }
@@ -902,125 +872,10 @@
       background: #0d2137 !important;
     }
 
-    /* Modal windows (dates, food, etc.) */
-    body .new_modal-open .new_t-modal-body {
-      background: #1a1a1a !important;
-    }
-    body .new_t-modal-body-top {
-      background: #0d2137 !important;
-      color: #fff !important;
-    }
+    /* === TAB CONTENT AREAS === */
     body .new_t-tab-content-top {
       background: #0d2137 !important;
-    }
-    body .new_t-tab-content-bottom {
-      background: #0d2137 !important;
-    }
-
-    /* Date modal table */
-    body .new_t-date-modal-table td {
-      border-color: rgba(255, 255, 255, 0.08) !important;
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    body .new_t-date-modal-table td.selected {
-      background-color: rgba(15, 164, 230, 0.1) !important;
-    }
-    body .new_t-date_link {
-      background-color: rgba(255, 255, 255, 0.02) !important;
-      color: #0fa4e6 !important;
-    }
-    body .new_t-date_link,
-    body .new_t-date_link * {
-      color: #0fa4e6 !important;
-    }
-    body .new_t-date_link.new_t-selected {
-      background-color: rgba(15, 164, 230, 0.15) !important;
-    }
-    body .new_t-date_link.selected {
-      background-color: #0fa4e6 !important;
       color: #fff !important;
-    }
-    body .new_t-date_link.selected * {
-      color: #fff !important;
-    }
-    body .new_t-date-modal-table .new_t-date-modal-table-head {
-      border-top-color: rgba(255, 255, 255, 0.08) !important;
-    }
-    body .new_t-date-change {
-      border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    body .new_t-date-change-top,
-    body .new_t-date-change-bottom {
-      background-color: rgba(255, 255, 255, 0.05) !important;
-    }
-    body .new_t-date-change-left,
-    body .new_t-date-change-right {
-      background-color: rgba(255, 255, 255, 0.04) !important;
-    }
-    body .new_t-date-change svg {
-      fill: rgba(255, 255, 255, 0.4) !important;
-    }
-    @media all and (min-width: 479px) {
-      body .new_t-date_link:hover,
-      body .new_t-date_link.new_t-selected {
-        background-color: rgba(15, 164, 230, 0.12) !important;
-      }
-      body .new_t-date-change-top:hover,
-      body .new_t-date-change-bottom:hover {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-      }
-      body .new_t-date-change-left:hover,
-      body .new_t-date-change-right:hover {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-      }
-      body .new_t-date-change:hover svg {
-        fill: rgba(255, 255, 255, 0.7) !important;
-      }
-    }
-
-    /* Food / room modal table */
-    body .food .new_t-modal-table {
-      background-color: #1a1a1a !important;
-    }
-    body .food .new_t-modal-table td {
-      border-color: rgba(255, 255, 255, 0.08) !important;
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    body .food .new_t-modal-table .new_t-room-price {
-      background-color: rgba(255, 255, 255, 0.02) !important;
-    }
-    body .food .new_t-modal-table .new_t-room-price a {
-      color: rgba(255, 255, 255, 0.7) !important;
-      box-shadow: 0 0 1px rgba(255, 255, 255, 0.15) !important;
-    }
-    body .food .new_t-modal-table tr:first-child td:first-child {
-      background-color: #1a1a1a !important;
-    }
-    body .food .new_t-modal-table .new_t-room-price.selected {
-      background-color: #0fa4e6 !important;
-    }
-    body .food .new_t-modal-table .new_t-room-price.selected * {
-      color: #fff !important;
-    }
-    body .new_t-modal-room-title {
-      color: #0fa4e6 !important;
-    }
-    body .new_t-modal-room-desc,
-    body .new_t-modal-room-title span,
-    body .new_t-food-abbr ~ span {
-      color: rgba(255, 255, 255, 0.4) !important;
-    }
-    body .new_t-date-modal-table-head .new_t-head-days {
-      color: rgba(255, 255, 255, 0.4) !important;
-    }
-    body .date .new_t-modal-body-middle {
-      background-color: #1a1a1a !important;
-    }
-
-    /* Notice message */
-    body .new_t-notice-msg {
-      background: rgba(200, 150, 50, 0.15) !important;
-      color: rgba(255, 255, 255, 0.7) !important;
     }
 
     /* Description tab */
@@ -1039,74 +894,149 @@
 
     /* Reviews tab */
     body .new_t-tab-content.reviews .new_t-tab-content-body {
-      background-color: #111 !important;
+      background-color: transparent !important;
+    }
+    body .new_t-rating-tab-container {
+      background-color: rgba(255, 255, 255, 0.03) !important;
     }
     body .new_t-rating-tab-container .big-rating .new_r-item-rating-rev {
       color: #0fa4e6 !important;
     }
-    @media all and (max-width: 478px) {
-      body .new_t-rating-tab-container {
-        background-color: #111 !important;
-      }
+
+    /* Map */
+    body .new_t-map-wrapper {
+      background-color: #1a1a1a !important;
+    }
+    body .new_map-infowindow-price {
+      color: rgba(255, 255, 255, 0.6) !important;
     }
 
-    /* Similar/viewed tours */
-    body .new_t-similar-viewed-wrapper {
-      color: rgba(255, 255, 255, 0.8) !important;
+    /* === MODAL WINDOWS (dates, food, people) === */
+    body .new_t-modal-body,
+    body .new_modal-open .new_t-modal-body {
+      background: #1a1a1a !important;
     }
-    @media (min-width: 479px) {
-      body .new_r-item {
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
-      }
+    body .new_t-modal-body-top {
+      background: #0d2137 !important;
+      color: #fff !important;
     }
-    body .new_t-container .owl-dots {
-      background-color: rgba(255, 255, 255, 0.08) !important;
+
+    /* Date modal */
+    body .new_t-modal-body-item.date .new_t-modal-body-middle {
+      background-color: #111 !important;
     }
-    body .new_t-container .owl-dot.active {
+    body .new_t-date-modal-table td {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    body .new_t-date-modal-table td.selected {
+      background-color: rgba(15, 164, 230, 0.1) !important;
+    }
+    body .new_t-date_link {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+      color: #0fa4e6 !important;
+    }
+    body .new_t-date_link,
+    body .new_t-date_link * {
+      color: #0fa4e6 !important;
+    }
+    body .new_t-date_link.new_t-selected,
+    body .new_t-date_link:hover {
+      background-color: rgba(15, 164, 230, 0.15) !important;
+    }
+    body .new_t-date_link.selected {
+      background-color: #0fa4e6 !important;
+      color: #fff !important;
+    }
+    body .new_t-date_link.selected * {
+      color: #fff !important;
+    }
+
+    /* Date change arrows */
+    body .new_t-date-change {
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    body .new_t-date-change-top,
+    body .new_t-date-change-bottom {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    body .new_t-date-change-left,
+    body .new_t-date-change-right {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+    body .new_t-date-change svg {
+      fill: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    /* Food / room modal */
+    body .food .new_t-modal-table {
+      background-color: #111 !important;
+    }
+    body .food .new_t-modal-table td {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    body .food .new_t-modal-table .new_t-room-price {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+    body .food .new_t-modal-table .new_t-room-price a {
+      color: rgba(255, 255, 255, 0.7) !important;
+      box-shadow: 0 0 1px rgba(255, 255, 255, 0.2) !important;
+    }
+    body .food .new_t-modal-table .new_t-room-price.selected {
       background-color: #0fa4e6 !important;
     }
-    body .new_t-similar-viewed-wrapper .owl-prev,
-    body .new_t-similar-viewed-wrapper .owl-next {
-      filter: grayscale(100%) invert(1) !important;
+    body .food .new_t-modal-table .new_t-room-price.selected * {
+      color: #fff !important;
+    }
+    body .food .new_t-modal-table tr:first-child td:first-child {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+    body .new_t-modal-room-title {
+      color: #0fa4e6 !important;
+    }
+    body .new_t-food-abbr ~ span,
+    body .new_t-modal-room-desc,
+    body .new_t-modal-room-title span {
+      color: rgba(255, 255, 255, 0.4) !important;
     }
 
-    /* People dropdown in tour */
+    /* People change dropdown in tour */
     body .new_t-change-people .new_f-dropdown-body-wrap {
       background: #1a1a1a !important;
-      color: #e0e0e0 !important;
+      color: rgba(255, 255, 255, 0.7) !important;
     }
     body .new_t-change-people .new_f-dropdown-btn-cancel {
-      background-color: rgba(255, 255, 255, 0.06) !important;
+      background-color: #222 !important;
       border-top-color: rgba(255, 255, 255, 0.1) !important;
-      color: rgba(255, 255, 255, 0.7) !important;
+      color: rgba(255, 255, 255, 0.6) !important;
     }
     body .new_t-change-people .new_f-dropdown-btn-apply {
       background-color: #0fa4e6 !important;
       color: #fff !important;
     }
+    body .new_t-change-people .new_f-dropdown-list {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
 
-    /* Order form styling */
+    /* === ORDER FORM (fancybox popup) === */
     body .new_t-order-form-open .os-order-form-wrap {
       background: #1a1a1a !important;
     }
     body .os-order-header-title {
       color: #0fa4e6 !important;
     }
-    body .new_t-order-form-open .os-order-select-wrapper,
-    body .new_t-order-form-open .os-order-select-wrapper:after {
-      background: #1a1a1a !important;
-    }
-    body .new_t-order-form-open .os-order-select-wrapper {
-      border-color: rgba(255, 255, 255, 0.12) !important;
-    }
     body .new_t-order-form-open .os-order-form-wrap select {
       color: #e0e0e0 !important;
+      background: rgba(0, 0, 0, 0.3) !important;
     }
-    body .new_t-order-form-open .os-order-first-title,
-    body .new_t-order-form-open .os-order-and-title,
-    body .new_t-order-form-open .os-order-second-title,
-    body .new_t-order-form-open .os-order-input-dates label {
-      color: rgba(255, 255, 255, 0.6) !important;
+    body .new_t-order-form-open .os-order-select-wrapper {
+      background: rgba(0, 0, 0, 0.3) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    body .new_t-order-form-open .os-order-select-wrapper:after {
+      background: rgba(0, 0, 0, 0.3) !important;
+      color: #0fa4e6 !important;
     }
     body .new_t-order-form-open .os-order-user-contacts input,
     body .new_t-order-form-open .os-order-form-wrap textarea {
@@ -1114,15 +1044,18 @@
       background: rgba(0, 0, 0, 0.3) !important;
       border-color: rgba(255, 255, 255, 0.12) !important;
     }
+    body .new_t-order-form-open .os-order-first-title,
+    body .new_t-order-form-open .os-order-and-title,
+    body .new_t-order-form-open .os-order-second-title,
+    body .new_t-order-form-open .os-order-input-dates label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
     body .new_t-order-form-open .os-order-input-dates .os-order-input-wrapper {
       color: #e0e0e0 !important;
-      background: #1a1a1a !important;
+      background: rgba(0, 0, 0, 0.3) !important;
       border-color: rgba(255, 255, 255, 0.12) !important;
     }
     body .new_t-order-form-open .os-order-input-dates .os-order-input-wrapper:after {
-      color: #0fa4e6 !important;
-    }
-    body .new_t-order-form-open .os-order-form-wrap .os-order-select-wrapper:after {
       color: #0fa4e6 !important;
     }
     body .new_t-order-form-open .os-order-form-submit .os-order-form-submit_button {
@@ -1132,53 +1065,42 @@
       background: #0d8ec7 !important;
     }
 
-    /* Credit modal */
-    body .new_credit-modal,
-    body .new_credit-modal * {
-      color: #e0e0e0 !important;
+    /* Fancybox overlay */
+    body .fancybox-overlay {
+      background: rgba(0, 0, 0, 0.7) !important;
     }
+
+    /* === VIEWED TOURS CAROUSEL === */
+    body .new_t-similar-viewed-wrapper {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* Credit modal */
     body .new_credit-modal-body {
       background-color: #1a1a1a !important;
     }
+    body .new_credit-modal,
+    body .new_credit-modal * {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
     body .new_credit-modal-row-count-item {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+      background: rgba(255, 255, 255, 0.04) !important;
     }
     body .new_credit-modal-row-count-item__btn {
       border-color: #0fa4e6 !important;
-      color: #e0e0e0 !important;
       background: transparent !important;
-    }
-    body .new_credit-modal-select::before {
-      background: #1a1a1a !important;
+      color: #e0e0e0 !important;
     }
     body .new_credit-modal-select {
       border-color: rgba(255, 255, 255, 0.12) !important;
     }
+    body .new_credit-modal-select::before {
+      background: transparent !important;
+    }
     body .new_credit-modal-select select {
       color: #e0e0e0 !important;
       background: transparent !important;
-    }
-    body .new_credit-modal-secondScreen .new_credit-modal-secondWrapper-form-field > :last-child input,
-    body .new_credit-modal__input--price {
-      border-color: rgba(255, 255, 255, 0.12) !important;
-      background: rgba(0, 0, 0, 0.3) !important;
-      color: #e0e0e0 !important;
-    }
-    body .new_credit-modal-secondWrapper-form__btn:last-child {
-      background: #0fa4e6 !important;
-      color: #fff !important;
-    }
-
-    /* Map infowindow */
-    body .new_map-infowindow-price .new_order-button {
-      background: #0fa4e6 !important;
-      border-bottom-color: #0d8ec7 !important;
-    }
-    body .new_map-infowindow-price {
-      color: rgba(255, 255, 255, 0.5) !important;
-    }
-    body .new_map-infowindow-title {
-      color: #fff !important;
     }
 
     /* === SPINNER / LOADING === */
