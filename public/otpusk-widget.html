@@ -70,26 +70,32 @@
   <script>
     // Auto-expand "Розширений пошук" after widget initializes
     (function() {
-      var expanded = false;
-      function expandSearch() {
-        if (expanded) return;
-        // Find any clickable element containing "Розширений пошук"
-        var all = document.querySelectorAll('a, span, div, button, label, p');
-        for (var i = 0; i < all.length; i++) {
-          // Use textContent and check if it starts with "Розширений пошук"
-          var t = (all[i].textContent || '').replace(/\s+/g, ' ').trim();
-          if (t.indexOf('Розширений пошук') === 0 || t.indexOf('розширений пошук') === 0) {
-            all[i].click();
-            expanded = true;
-            return;
+      var done = false;
+      function tryExpand() {
+        if (done) return true;
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+          var txt = walker.currentNode.nodeValue || '';
+          if (txt.indexOf('озширений пошук') !== -1) {
+            // Found the text node — click its parent element
+            var target = walker.currentNode.parentElement;
+            if (target) {
+              target.click();
+              done = true;
+              return true;
+            }
           }
         }
+        return false;
       }
-      // Retry multiple times to catch late rendering
-      setTimeout(expandSearch, 500);
-      setTimeout(expandSearch, 1000);
-      setTimeout(expandSearch, 1500);
-      setTimeout(expandSearch, 2500);
+      // Use MutationObserver to catch it as soon as it renders
+      var obs = new MutationObserver(function() {
+        if (tryExpand()) obs.disconnect();
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      // Fallback timeouts
+      setTimeout(tryExpand, 1000);
+      setTimeout(tryExpand, 3000);
     })();
   </script>
   <script>
