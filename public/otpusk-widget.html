@@ -41,6 +41,29 @@
   </style>
 </head>
 <body>
+  <script>
+    // Intercept "Замовити тур" button clicks (capture phase, runs before widget handlers)
+    document.addEventListener('click', function(e) {
+      var el = e.target;
+      while (el && el !== document.body) {
+        var text = el.textContent ? el.textContent.trim() : '';
+        if (text === 'Замовити тур' && /^(A|BUTTON|DIV|SPAN)$/i.test(el.tagName)) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          var codeMatch = document.body.textContent.match(/Код[:\s]*(\d+)/);
+          var hotelEl = document.querySelector('.tour-name, .os-tour-name, h1, h2');
+          window.parent.postMessage({
+            type: 'otpusk-order',
+            tourCode: codeMatch ? codeMatch[1] : '',
+            hotelName: hotelEl ? hotelEl.textContent.trim() : ''
+          }, '*');
+          return false;
+        }
+        el = el.parentElement;
+      }
+    }, true);
+  </script>
   <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
   <script src="https://export.otpusk.com/js/onsite/"></script>
   <script src="https://export.otpusk.com/js/order"></script>

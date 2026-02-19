@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!["contact", "manager"].includes(source)) {
+        if (!["contact", "manager", "tour"].includes(source)) {
             return NextResponse.json(
                 { message: "Невірне джерело запиту" },
                 { status: 400 }
