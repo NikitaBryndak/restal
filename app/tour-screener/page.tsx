@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import FormInput from "@/components/ui/form-input";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { X, Send, Loader2, CheckCircle2 } from "lucide-react";
 
 export default function TourScreenerPage() {
@@ -99,8 +100,19 @@ export default function TourScreenerPage() {
   }, [resetForm]);
 
   return (
-    <main className="min-h-screen w-full pt-24 pb-12 px-4 sm:pt-16 max-sm:pt-14 max-sm:px-2 max-sm:pb-4">
+    <main className="min-h-screen w-full pt-28 pb-12 px-4 sm:pt-24 max-sm:pt-20 max-sm:px-2 max-sm:pb-4">
       <div className="w-full max-w-6xl mx-auto">
+        <div className="mb-8 sm:mb-10">
+          <TextGenerateEffect
+            words="Підбір туру"
+            className="text-3xl sm:text-4xl md:text-5xl font-light"
+            accentWords={["туру"]}
+            accentClassName="text-accent font-bold"
+          />
+          <p className="text-secondary text-base sm:text-lg mt-3 max-w-2xl leading-relaxed">
+            Знайдіть ідеальний тур для вашої відпустки. Оберіть країну, дати та параметри пошуку.
+          </p>
+        </div>
         <iframe
           ref={iframeRef}
           src="/otpusk-widget.html"

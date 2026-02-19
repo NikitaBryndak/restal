@@ -70,29 +70,26 @@
   <script>
     // Auto-expand "Розширений пошук" after widget initializes
     (function() {
+      var expanded = false;
       function expandSearch() {
-        var toggle = document.querySelector('.os-form-toggle, [class*="toggle"], [class*="advanced"]');
-        if (toggle && !toggle.classList.contains('active')) {
-          toggle.click();
-        }
-        // Also try by text content
-        var links = document.querySelectorAll('a, span, div');
-        for (var i = 0; i < links.length; i++) {
-          var text = links[i].textContent ? links[i].textContent.trim() : '';
-          if (text.indexOf('Розширений пошук') !== -1) {
-            var panel = links[i].nextElementSibling || links[i].parentElement.nextElementSibling;
-            if (panel && panel.style.display === 'none') {
-              links[i].click();
-            } else if (!panel || panel.offsetHeight === 0) {
-              links[i].click();
-            }
-            break;
+        if (expanded) return;
+        // Find any clickable element containing "Розширений пошук"
+        var all = document.querySelectorAll('a, span, div, button, label, p');
+        for (var i = 0; i < all.length; i++) {
+          // Use textContent and check if it starts with "Розширений пошук"
+          var t = (all[i].textContent || '').replace(/\s+/g, ' ').trim();
+          if (t.indexOf('Розширений пошук') === 0 || t.indexOf('розширений пошук') === 0) {
+            all[i].click();
+            expanded = true;
+            return;
           }
         }
       }
-      // Wait for widget to render, then expand
+      // Retry multiple times to catch late rendering
+      setTimeout(expandSearch, 500);
       setTimeout(expandSearch, 1000);
-      setTimeout(expandSearch, 2000);
+      setTimeout(expandSearch, 1500);
+      setTimeout(expandSearch, 2500);
     })();
   </script>
   <script>
