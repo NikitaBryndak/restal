@@ -1147,50 +1147,53 @@
 
     /* ============================
        ADVANCED SEARCH PANEL VISIBILITY
+       Desktop only — on mobile, let the widget's native toggle work
        ============================ */
 
-    /* Force advanced search panel to be visible */
-    .new_f-ext-container,
-    .new_f-ext-body,
-    div[class*="ext-container"],
-    div[class*="ext-body"],
-    .new_f-ext-wrap,
-    .os-form-advanced,
-    .os-form .advanced,
-    .os-form-ext,
-    .os-form-extra,
-    .os-form-more,
-    .os-form-toggle + div,
-    .os-form-toggle + fieldset,
-    .os-form-toggle ~ div[style*="display: none"],
-    .os-form-toggle ~ div[style*="display:none"] {
-      display: block !important;
-      height: auto !important;
-      overflow: visible !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      max-height: none !important;
-    }
+    @media (min-width: 479px) {
+      /* Force advanced search panel to be visible on desktop */
+      .new_f-ext-container,
+      .new_f-ext-body,
+      div[class*="ext-container"],
+      div[class*="ext-body"],
+      .new_f-ext-wrap,
+      .os-form-advanced,
+      .os-form .advanced,
+      .os-form-ext,
+      .os-form-extra,
+      .os-form-more,
+      .os-form-toggle + div,
+      .os-form-toggle + fieldset,
+      .os-form-toggle ~ div[style*="display: none"],
+      .os-form-toggle ~ div[style*="display:none"] {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        max-height: none !important;
+      }
 
-    /* Collapsed state: hide extended search options when search is clicked */
-    body.ext-collapsed .new_f-ext-container,
-    body.ext-collapsed .new_f-ext-body,
-    body.ext-collapsed div[class*="ext-container"],
-    body.ext-collapsed div[class*="ext-body"],
-    body.ext-collapsed .new_f-ext-wrap,
-    body.ext-collapsed .os-form-advanced,
-    body.ext-collapsed .os-form .advanced,
-    body.ext-collapsed .os-form-ext,
-    body.ext-collapsed .os-form-extra,
-    body.ext-collapsed .os-form-more,
-    body.ext-collapsed .os-form-toggle + div,
-    body.ext-collapsed .os-form-toggle + fieldset {
-      display: none !important;
-      height: 0 !important;
-      overflow: hidden !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-      max-height: 0 !important;
+      /* Collapsed state: hide extended search options when search is clicked */
+      body.ext-collapsed .new_f-ext-container,
+      body.ext-collapsed .new_f-ext-body,
+      body.ext-collapsed div[class*="ext-container"],
+      body.ext-collapsed div[class*="ext-body"],
+      body.ext-collapsed .new_f-ext-wrap,
+      body.ext-collapsed .os-form-advanced,
+      body.ext-collapsed .os-form .advanced,
+      body.ext-collapsed .os-form-ext,
+      body.ext-collapsed .os-form-extra,
+      body.ext-collapsed .os-form-more,
+      body.ext-collapsed .os-form-toggle + div,
+      body.ext-collapsed .os-form-toggle + fieldset {
+        display: none !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        max-height: 0 !important;
+      }
     }
   </style>
 </head>
@@ -1222,11 +1225,13 @@
   <script src="https://export.otpusk.com/js/onsite/"></script>
   <script src="https://export.otpusk.com/js/order"></script>
   <script>
-    // Auto-expand "Розширений пошук" after widget initializes
+    // Auto-expand "Розширений пошук" after widget initializes (desktop only)
     (function() {
       var done = false;
       function tryExpand() {
         if (done) return true;
+        // Skip auto-expand on mobile devices
+        if (window.innerWidth <= 478) { done = true; return true; }
 
         // Common text variations for "Extended search"
         var searchTexts = ["Розширений пошук", "Расширенный поиск", "Extended search", "Параметри пошуку"];
