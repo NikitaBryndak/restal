@@ -119,7 +119,7 @@ export default function TourScreenerPage() {
           title="Пошук турів"
           style={{
             width: "100%",
-            height: `${Math.max(iframeHeight, 600)}px`,
+            height: `${Math.max(iframeHeight, 1200)}px`,
             border: "none",
             display: "block",
           }}
