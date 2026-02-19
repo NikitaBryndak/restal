@@ -128,9 +128,10 @@ export default function CashbackPage() {
     }, [session, sessionStatus, fetchPromoHistory]);
 
     const cashbackBalance = userData?.cashbackAmount || 0;
-    // Total earned = current balance + all amounts used via promo codes + 1000 welcome bonus
+    // Total earned = current balance + all amounts used via promo codes
+    // (welcome bonus of 1000 is already included in cashbackAmount)
     const totalPromoSpent = promoHistory.reduce((sum, p) => sum + p.amount, 0);
-    const totalEarned = cashbackBalance + totalPromoSpent + 1000;
+    const totalEarned = cashbackBalance + totalPromoSpent;
     const bookingsCount = allBookingsCount;
 
     const copyReferralCode = () => {
