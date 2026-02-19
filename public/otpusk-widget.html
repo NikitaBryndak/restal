@@ -64,6 +64,27 @@
 
     /* Hide the toggle button if it's expanded by CSS to avoid confusion,
        or keep it. Usually better to keep it but ensure content is shown. */
+
+    /* Collapsed state: hide extended search options when search is clicked */
+    body.ext-collapsed .os-form-advanced,
+    body.ext-collapsed .os-form .advanced,
+    body.ext-collapsed .os-form-ext,
+    body.ext-collapsed .os-form-extra,
+    body.ext-collapsed .os-form-more,
+    body.ext-collapsed .os-form-toggle + div,
+    body.ext-collapsed .os-form-toggle + fieldset,
+    body.ext-collapsed .new_f-ext-container,
+    body.ext-collapsed .new_f-ext-body,
+    body.ext-collapsed div[class*="ext-container"],
+    body.ext-collapsed div[class*="ext-body"],
+    body.ext-collapsed .new_f-ext-wrap {
+      display: none !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      max-height: 0 !important;
+    }
   </style>
 </head>
 <body>
@@ -211,6 +232,49 @@
         setTimeout(tryExpand, t);
       });
 
+    })();
+
+    // Collapse extended search options when the search button is clicked
+    (function() {
+      function attachSearchCollapse() {
+        var searchBtn = document.querySelector(
+          'button[type="submit"], input[type="submit"], .new_f-submit, .new_f-search-btn, ' +
+          '[class*="submit"], [class*="search-btn"], .os-form button, .os-form input[type="submit"]'
+        );
+
+        if (!searchBtn) {
+          // Also try finding by text content
+          var btns = document.querySelectorAll('button, input[type="submit"], a.btn, [role="button"]');
+          for (var i = 0; i < btns.length; i++) {
+            var txt = (btns[i].textContent || btns[i].value || '').trim().toLowerCase();
+            if (txt === 'знайти' || txt === 'пошук' || txt === 'найти' || txt === 'поиск' || txt === 'search') {
+              searchBtn = btns[i];
+              break;
+            }
+          }
+        }
+
+        if (searchBtn && !searchBtn._collapseAttached) {
+          searchBtn._collapseAttached = true;
+          searchBtn.addEventListener('click', function() {
+            document.body.classList.add('ext-collapsed');
+          });
+          return true;
+        }
+        return false;
+      }
+
+      // Observe DOM for widget load, then attach
+      var obs2 = new MutationObserver(function() {
+        if (attachSearchCollapse()) {
+          setTimeout(function() { obs2.disconnect(); }, 2000);
+        }
+      });
+      obs2.observe(document.body, { childList: true, subtree: true });
+
+      [500, 1000, 2000, 4000, 8000].forEach(function(t) {
+        setTimeout(attachSearchCollapse, t);
+      });
     })();
   </script>
   <script>
