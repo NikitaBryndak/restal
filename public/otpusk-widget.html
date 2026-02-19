@@ -68,6 +68,34 @@
   <script src="https://export.otpusk.com/js/onsite/"></script>
   <script src="https://export.otpusk.com/js/order"></script>
   <script>
+    // Auto-expand "Розширений пошук" after widget initializes
+    (function() {
+      function expandSearch() {
+        var toggle = document.querySelector('.os-form-toggle, [class*="toggle"], [class*="advanced"]');
+        if (toggle && !toggle.classList.contains('active')) {
+          toggle.click();
+        }
+        // Also try by text content
+        var links = document.querySelectorAll('a, span, div');
+        for (var i = 0; i < links.length; i++) {
+          var text = links[i].textContent ? links[i].textContent.trim() : '';
+          if (text.indexOf('Розширений пошук') !== -1) {
+            var panel = links[i].nextElementSibling || links[i].parentElement.nextElementSibling;
+            if (panel && panel.style.display === 'none') {
+              links[i].click();
+            } else if (!panel || panel.offsetHeight === 0) {
+              links[i].click();
+            }
+            break;
+          }
+        }
+      }
+      // Wait for widget to render, then expand
+      setTimeout(expandSearch, 1000);
+      setTimeout(expandSearch, 2000);
+    })();
+  </script>
+  <script>
     (function () {
       var lastHeight = 0;
       function postHeight() {

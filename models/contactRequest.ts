@@ -4,7 +4,7 @@ const contactRequestSchema = new Schema({
     // Source: "contact" (contact page) or "manager" (managers page consultation)
     source: {
         type: String,
-        enum: ["contact", "manager"],
+        enum: ["contact", "manager", "tour"],
         required: true,
     },
     // Contact info
