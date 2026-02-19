@@ -38,6 +38,32 @@
       max-width: 100% !important;
       width: 100% !important;
     }
+    /* Force advanced search panel to be visible (Old & New classes) */
+    .os-form-advanced,
+    .os-form .advanced,
+    .os-form-ext,
+    .os-form-extra,
+    .os-form-more,
+    .os-form-toggle + div,
+    .os-form-toggle + fieldset,
+    .os-form-toggle ~ div[style*="display: none"],
+    .os-form-toggle ~ div[style*="display:none"],
+    /* New classes */
+    .new_f-ext-container,
+    .new_f-ext-body,
+    div[class*="ext-container"],
+    div[class*="ext-body"],
+    .new_f-ext-wrap {
+      display: block !important;
+      height: auto !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      max-height: none !important;
+    }
+
+    /* Hide the toggle button if it's expanded by CSS to avoid confusion,
+       or keep it. Usually better to keep it but ensure content is shown. */
   </style>
 </head>
 <body>
@@ -73,29 +99,118 @@
       var done = false;
       function tryExpand() {
         if (done) return true;
-        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        while (walker.nextNode()) {
-          var txt = walker.currentNode.nodeValue || '';
-          if (txt.indexOf('озширений пошук') !== -1) {
-            // Found the text node — click its parent element
-            var target = walker.currentNode.parentElement;
-            if (target) {
-              target.click();
-              done = true;
-              return true;
+
+        // Common text variations for "Extended search"
+        var searchTexts = ["Розширений пошук", "Расширенный поиск", "Extended search", "Параметри пошуку"];
+
+        // Try multiple strategies to find the button
+        var strategies = [
+           function() {
+              // 1. Try generic class names for the button
+              return document.querySelector('.new_f-ext-btn, .new_f-more-btn, [class*="ext-btn"], [class*="more-btn"]');
+           },
+           function() {
+              // 2. Try by text content (recursive)
+              return findToggleByText(searchTexts);
+           },
+           function() {
+              // 3. Fallback: Find ANY element containing the text and click it directly
+              for (var i = 0; i < searchTexts.length; i++) {
+                 var t = searchTexts[i].toLowerCase();
+                 // Create XPath for text content matching (case insensitive using translate hack)
+                 // Note: we need to careful with quotes in XPath
+                 var xpath = "//*[text()[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ', 'abcdefghijklmnopqrstuvwxyzabhgdeezzijklmnoprstufhcchshschyuya'), '" + t + "')]]";
+                 try {
+                     var result = document.evaluate(xpath, document.body, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                     if (result.singleNodeValue) {
+                        return result.singleNodeValue;
+                     }
+                 } catch(e) { console.error("XPath error", e); }
+              }
+              return null;
+           }
+        ];
+
+        function findToggleByText(texts) {
+          // ... (keep logic, but wrapped)
+          for (var t of texts) {
+             var toggle = findToggle(t);
+             if (toggle) return toggle;
+          }
+          return null;
+        }
+
+        // Helper to find valid toggle elements
+        function findToggle(text) {
+          var lowerText = text.toLowerCase();
+          // Use TreeWalker ... (same as before)
+          var treeWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+
+          while(treeWalker.nextNode()) {
+            var node = treeWalker.currentNode;
+            if (node.textContent.toLowerCase().indexOf(lowerText) !== -1) {
+                var element = node.parentElement;
+                var toggle = element.closest('a, button, [class*="toggle"], [class*="more"], [class*="advanced"], [class*="ext-btn"], span[onclick], div[onclick]');
+
+                if (toggle && toggle.offsetParent !== null) {
+                   return toggle;
+                }
             }
           }
+          return null;
         }
+
+        for (var i = 0; i < strategies.length; i++) {
+          var toggle = strategies[i]();
+          if (toggle) {
+             // Dispatch a click event properly
+             // ...
+             // Check if it looks expanded already?
+             // Maybe check if next sibling is visible?
+             // But let's just click it.
+
+             // For jQuery click
+             if (window.jQuery) {
+                window.jQuery(toggle).click();
+                done = true;
+                return true;
+             }
+
+             if (typeof toggle.click === 'function') {
+                 toggle.click();
+             }
+
+             var event = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+             });
+             toggle.dispatchEvent(event);
+
+             done = true;
+             return true;
+          }
+        }
+
         return false;
       }
-      // Use MutationObserver to catch it as soon as it renders
-      var obs = new MutationObserver(function() {
-        if (tryExpand()) obs.disconnect();
+
+      // Observe DOM changes to catch when the widget loads
+      var obs = new MutationObserver(function(mutations) {
+        if (tryExpand()) {
+           // Keep observing for a bit in case it re-renders
+           setTimeout(() => obs.disconnect(), 2000);
+        }
       });
+
       obs.observe(document.body, { childList: true, subtree: true });
-      // Fallback timeouts
-      setTimeout(tryExpand, 1000);
-      setTimeout(tryExpand, 3000);
+
+      // Periodic checks as fallback
+      var intervals = [500, 1000, 2000, 4000, 8000];
+      intervals.forEach(function(t) {
+        setTimeout(tryExpand, t);
+      });
+
     })();
   </script>
   <script>
