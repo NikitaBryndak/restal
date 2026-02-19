@@ -30,15 +30,675 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       font-family: 'Open Sans', sans-serif;
-      background: transparent;
+      background: transparent !important;
       overflow-x: hidden;
+      color: #e0e0e0;
     }
     body { padding: 0; }
-    .os-form, .os-results, .os-tour {
-      max-width: 100% !important;
-      width: 100% !important;
+
+    /* ============================================================
+       DARK THEME OVERRIDES — targeting actual otpusk widget classes
+       ============================================================ */
+
+    /* === MAIN FORM CONTAINER (blue gradient → dark) === */
+    body .new_f-container,
+    body .new_f-container.ext-opened,
+    body .new_os,
+    body .new_f-ext-container .ui-slider-range,
+    body .new_f-ext-container .slider-container .ui-widget-content {
+      background: rgba(255, 255, 255, 0.04) !important;
+      background-image: none !important;
+      filter: none !important;
     }
-    /* Force advanced search panel to be visible (Old & New classes) */
+
+    body .new_f-container {
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Remove compass & plane background images */
+    body .new_f-wrapper-bg-imgs {
+      background: none !important;
+      display: none !important;
+    }
+
+    /* Shadow above extended search */
+    body .new_f-ext-container::before {
+      background: none !important;
+      background-image: none !important;
+      filter: none !important;
+      display: none !important;
+    }
+
+    /* === FORM TITLE "Пошук туру" === */
+    body .new_f-title {
+      color: #ffffff !important;
+    }
+
+    /* === FORM FIELDS (white → dark) === */
+    body .new_f-form-field {
+      background-color: rgba(0, 0, 0, 0.35) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    body .new_f-form-field:hover,
+    body .new_f-form-field:focus-within {
+      border-color: rgba(15, 164, 230, 0.4) !important;
+    }
+
+    body .new_f-form-field::before {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    body .new_f-form-field.to {
+      border-left-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    /* === FORM INPUT TEXT === */
+    body .new_f-autocomplete-input,
+    body .new_f-form .new_f-dropdown-btn,
+    body .new_f-dropdown-btn span,
+    body .new_f-dropdown-btn-text,
+    body .new_input-mask {
+      color: #e0e0e0 !important;
+    }
+
+    body .new_f-autocomplete-input::-webkit-input-placeholder {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body .new_f-autocomplete-input::-moz-placeholder {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body .new_f-autocomplete-input:-ms-input-placeholder {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+
+    /* Dropdown arrows */
+    body .new_f-dropdown-btn::after,
+    body .new_f-dropdown-btn .cnt::after {
+      border-color: #0fa4e6 transparent transparent !important;
+    }
+
+    /* Counter button in "куда" field */
+    body .new_f-dropdown-btn .cnt {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body .new_f-dropdown-btn .cnt:hover {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* === SUBMIT / SEARCH BUTTON === */
+    body .new_f-form .new_f-form-submit,
+    body .new_not-found-message .os-order-form-submit_button,
+    body .new_f-ext-container .new_f-dropdown-btn-apply {
+      background: #0fa4e6 !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 0 12px 12px 0 !important;
+      font-weight: 700 !important;
+      transition: background 0.2s ease !important;
+    }
+
+    body .new_f-form .new_f-form-submit:hover,
+    body .new_not-found-message .os-order-form-submit_button:hover,
+    body .new_f-ext-container .new_f-dropdown-btn-apply:hover {
+      background: #0d8ec7 !important;
+    }
+
+    /* Ripple animation border */
+    body .hvr-ripple-out:before {
+      border-color: #0d8ec7 !important;
+    }
+
+    /* === DATE PICKER FIELDS === */
+    body .new_f-datepicker-wrap button {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #e0e0e0 !important;
+    }
+    body .new_f-datepicker-wrap:hover button {
+      background-color: rgba(255, 255, 255, 0.14) !important;
+    }
+
+    /* Date separator line */
+    body .new_f-datepicker-wrap-2:before {
+      background-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* Calendar icon */
+    body .new_f-search-dates-wrap svg {
+      fill: #0fa4e6 !important;
+    }
+
+    /* Date popup tip */
+    body .new_f-search-dates-popup {
+      background-color: rgba(0, 0, 0, 0.6) !important;
+      color: #e0e0e0 !important;
+    }
+    body .new_f-search-dates-popup:before,
+    body .new_f-search-dates-popup:after {
+      border-color: rgba(0, 0, 0, 0.6) transparent transparent !important;
+    }
+
+    /* === DROPDOWN MENUS === */
+    body .new_f-dropdown-body,
+    body #new_os-to .new_f-dropdown-body,
+    body .new_f-dropdown-body-date,
+    body #new_os-date-check .new_f-dropdown-body {
+      background: #1a1a1a !important;
+      background-color: #1a1a1a !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    /* Dropdown items */
+    body .new_f-dropdown-item {
+      color: #e0e0e0 !important;
+    }
+    body .new_f-dropdown-item.selected {
+      background-color: rgba(15, 164, 230, 0.2) !important;
+      color: #ffffff !important;
+    }
+    body .new_f-dropdown-item:hover {
+      background-color: rgba(15, 164, 230, 0.12) !important;
+    }
+
+    /* Dropdown top bar (blue header) */
+    body .new_f-dropdown-body-top,
+    body .new_t-tab-content-top,
+    body .new_t-modal-body-top {
+      background: #0d2137 !important;
+      background-color: #0d2137 !important;
+      color: #ffffff !important;
+    }
+
+    /* === AUTOCOMPLETE / COUNTRY LIST === */
+    body #new_os-to .ui-autocomplete,
+    body .new_f-container #new_os-to .ui-autocomplete {
+      background: #1a1a1a !important;
+    }
+
+    body #cntList .ui-menu-item a *,
+    body #new_os-to .ui-menu .ui-menu-item .label,
+    body #new_os-to .ui-menu .ui-menu-item .label b,
+    body #new_os-to .ui-menu .ui-menu-item .noplace {
+      background: #1a1a1a !important;
+      color: #e0e0e0 !important;
+    }
+
+    body #new_os-to .type-item {
+      background-color: #111 !important;
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    body #new_os-to .ui-autocomplete .ui-menu-item .price-from {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu-item a:hover *,
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-corner-all:hover,
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-state-focus,
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-corner-all:hover *,
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item .ui-state-focus * {
+      background: rgba(15, 164, 230, 0.12) !important;
+    }
+
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item.active .ui-corner-all,
+    body:not(.iOS) .new_f-container #new_os-to .ui-menu .ui-menu-item.active .ui-corner-all * {
+      background: rgba(15, 164, 230, 0.2) !important;
+    }
+
+    body #cntList .ui-menu-item.active a,
+    body #cntList .ui-menu-item.active a * {
+      background: rgba(15, 164, 230, 0.2) !important;
+    }
+
+    /* Resort list */
+    body #ctyList {
+      background: #222 !important;
+    }
+    body #ctyList li {
+      background-color: #222 !important;
+      color: #e0e0e0 !important;
+    }
+    body #ctyList .labelName,
+    body #ctyList .itemPrice {
+      background: #222 !important;
+      color: #e0e0e0 !important;
+    }
+    body #ctyList .ctyLists-wrapper {
+      background: #222 !important;
+    }
+    body #ctyList .new_f-dropdown-body-bottom {
+      background-color: #1a1a1a !important;
+    }
+    body #ctyList .new_f-dropdown-btn-apply {
+      background-color: #0fa4e6 !important;
+    }
+
+    /* === CALENDAR / DATEPICKER === */
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div {
+      background: #1e1e1e !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div::after {
+      background-color: #111 !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-header {
+      color: #0fa4e6 !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div.ui-datepicker .ui-datepicker-title {
+      color: #0fa4e6 !important;
+    }
+
+    body #new_f-dates-container.new_f-dates-container #ui-datepicker-div th {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td {
+      background: #2a2a2a !important;
+      border-color: #1e1e1e !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td a {
+      color: #0fa4e6 !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td span {
+      color: #0fa4e6 !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled {
+      background-color: #1e1e1e !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-disabled .ui-state-default {
+      color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-other-month {
+      background-color: #1e1e1e !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-state-highlight {
+      background-color: rgba(15, 164, 230, 0.15) !important;
+    }
+
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-today .ui-state-default {
+      background-color: rgba(15, 164, 230, 0.25) !important;
+      color: #0fa4e6 !important;
+    }
+
+    /* Active calendar cell */
+    body .new_f-dates-container#new_f-dates-container .new_first_calendar_open #ui-datepicker-div .ui-datepicker-calendar td.ui-state-active.ui-state-highlight,
+    body .new_f-dates-container#new_f-dates-container .new_second_calendar_open #ui-datepicker-div .ui-datepicker-calendar td.ui-state-active:not(.ui-datepicker-current-day),
+    body .new_f-dates-container#new_f-dates-container .new_second_calendar_open #ui-datepicker-div .ui-datepicker-calendar td.ui-state-active.ui-state-highlight.ui-datepicker-current-day {
+      background-color: #0fa4e6 !important;
+    }
+
+    /* Calendar navigation arrows */
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-prev,
+    body .new_f-dates-container#new_f-dates-container #ui-datepicker-div .ui-datepicker-next {
+      filter: brightness(0) invert(1) !important;
+    }
+
+    /* === EXTENDED SEARCH SECTION === */
+    body .new_f-ext-container {
+      background: #111111 !important;
+      background-color: #111111 !important;
+      background-image: none !important;
+      box-shadow: none !important;
+    }
+
+    body .ext-opened .new_f-ext-container {
+      background: #111111 !important;
+      background-color: #111111 !important;
+      background-image: none !important;
+    }
+
+    /* Extended search toggle button */
+    body .new_f-form .new_f-ext-btn,
+    body .new_f-ext-btn-text {
+      color: #0fa4e6 !important;
+    }
+    body .new_f-ext-btn-text::before {
+      border-color: #0fa4e6 transparent transparent !important;
+    }
+    body .ext-opened .new_f-ext-btn-text::before {
+      border-color: transparent transparent #0fa4e6 !important;
+    }
+
+    /* Extended search section titles */
+    body .new_f-ext-bl-title {
+      color: #0fa4e6 !important;
+    }
+    body .new_f-ext-bl-title span {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    /* Extended search labels */
+    body .new_f-ext-bl label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    body .new_f-label-name {
+      color: #0fa4e6 !important;
+    }
+
+    /* Services / recommendations labels */
+    body .new_f-services-label-wrap .new_f-services-label label,
+    body .new_f-services-label-wrap .new_f-services-label span {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* === CHECKBOXES (white bg → dark) === */
+    body [class*='new_f-'] input[type="checkbox"] + *::before {
+      background-color: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    body .new_f-container label:hover input[type="checkbox"] + *::before {
+      border-color: rgba(15, 164, 230, 0.5) !important;
+    }
+
+    /* === RADIO BUTTONS === */
+    body [class*='new_f-'] input[type="radio"] + ::before,
+    body .new_f-ext-col-recommend input[type="checkbox"] + ::before {
+      background-color: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    body [class*='new_f-'] input[type="radio"]:checked + ::before,
+    body .new_f-ext-col-recommend input[type="checkbox"]:checked + ::before {
+      border-color: #0fa4e6 !important;
+      background: #0fa4e6 !important;
+    }
+
+    /* === SLIDER CONTROLS === */
+    body .new_f-ext-container .ui-slider .ui-slider-handle {
+      background: #1a1a1a !important;
+      border-color: #0fa4e6 !important;
+    }
+
+    body .new_f-ext-container .ui-slider-range {
+      background: linear-gradient(to right, #0fa4e6, #0d8ec7) !important;
+      background-image: none; /* remove any svg fallback */
+      border-radius: 4px !important;
+    }
+
+    body .new_f-ext-container .new_f-ext-bl-rat .ui-slider-range,
+    body .new_f-ext-container .new_f-ext-bl-price .ui-widget-content {
+      background: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    /* Slider scale marks */
+    body .new_f-ext-scale-item::before,
+    body .new_f-ext-bl-cat label::before,
+    body .new_f-ext-bl-food label::before,
+    body .new_f-ext-bl-price .slider-container::before,
+    body .new_f-ext-bl-price .slider-container::after {
+      background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Scale / price input */
+    body .new_f-ext-bl-price .slider-container input {
+      color: rgba(255, 255, 255, 0.7) !important;
+      background: none !important;
+    }
+
+    /* Rating scale items text */
+    body .new_f-ext-scale-item {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    /* === PEOPLE SELECTOR === */
+    body .new_f-people-item {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    body .new_f-people-item:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      color: #e0e0e0 !important;
+    }
+    body .new_f-people-item.active {
+      background-color: #0fa4e6 !important;
+      color: #ffffff !important;
+    }
+
+    /* People title */
+    body .new_f-people-title {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* Children accordion */
+    body .new_f-children-accordion-btn {
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+      background: rgba(255, 255, 255, 0.04) !important;
+    }
+    body .new_f-children-accordion-btn::after {
+      border-color: rgba(255, 255, 255, 0.4) transparent transparent !important;
+    }
+    body .new_f-children-accordion-btn.active::after {
+      border-color: transparent transparent rgba(255, 255, 255, 0.4) !important;
+    }
+    body .new_f-children-accordion-btn.disabled {
+      color: rgba(255, 255, 255, 0.25) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body .new_f-children-accordion-body {
+      background: rgba(255, 255, 255, 0.04) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    body .new_f-children-list-item {
+      background: #0fa4e6 !important;
+      color: #ffffff !important;
+    }
+    body .new_f-children-age-item:hover {
+      background: #0fa4e6 !important;
+      color: #ffffff !important;
+    }
+
+    /* Duration dropdown items */
+    body .duration .new_f-dropdown-item {
+      color: #e0e0e0 !important;
+    }
+    body .duration .new_f-dropdown-item .new_f-duration-days {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    /* === CLEAR FILTERS BUTTON === */
+    body .new_f-ext-clear-btn {
+      color: #0fa4e6 !important;
+    }
+
+    /* === DROPDOWN BOTTOM BUTTONS (mobile) === */
+    body .new_f-dropdown-btn-cancel {
+      background-color: #1a1a1a !important;
+      border-top-color: rgba(255, 255, 255, 0.1) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    body .new_f-dropdown-btn-apply {
+      background-color: #0fa4e6 !important;
+      color: #ffffff !important;
+    }
+
+    /* === GENERAL TEXT & FORM COLORS === */
+    body .new_f-form {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* ============================
+       DARK THEME — RESULTS
+       ============================ */
+
+    body .new_r-container,
+    body [class*="new_r-"] {
+      color: #e0e0e0 !important;
+    }
+
+    /* Result cards */
+    body .new_r-container [class*="result"],
+    body .new_r-container > div {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      border-radius: 12px !important;
+      margin-bottom: 10px !important;
+      overflow: hidden !important;
+    }
+
+    body .new_r-container [class*="result"]:hover,
+    body .new_r-container > div:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(15, 164, 230, 0.2) !important;
+    }
+
+    /* Result text */
+    body .new_r-container * {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    body .new_r-container a {
+      color: #0fa4e6 !important;
+    }
+
+    body .new_r-container [class*="price"] {
+      color: #0fa4e6 !important;
+      font-weight: 700 !important;
+    }
+
+    body .new_r-container [class*="name"],
+    body .new_r-container h2,
+    body .new_r-container h3 {
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+
+    /* Result buttons (order / book) */
+    body .new_r-container button,
+    body .new_r-container [class*="order"],
+    body .new_r-container [class*="book-btn"] {
+      background: #0fa4e6 !important;
+      color: #ffffff !important;
+      border-radius: 8px !important;
+    }
+
+    /* Result filters bar */
+    body .new_r-container [class*="filter"],
+    body .new_r-container [class*="sort"] {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    /* ============================
+       DARK THEME — TOUR DETAIL
+       ============================ */
+
+    body .new_t-container,
+    body [class*="new_t-"] {
+      color: #e0e0e0 !important;
+    }
+
+    body .new_t-container * {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    body .new_t-container h1,
+    body .new_t-container h2,
+    body .new_t-container h3 {
+      color: #ffffff !important;
+    }
+
+    body .new_t-container a {
+      color: #0fa4e6 !important;
+    }
+
+    body .new_t-container [class*="price"] {
+      color: #0fa4e6 !important;
+      font-weight: 700 !important;
+    }
+
+    /* Tour detail panels */
+    body .new_t-container table {
+      border-color: rgba(255, 255, 255, 0.06) !important;
+    }
+    body .new_t-container table th {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: rgba(255, 255, 255, 0.06) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    body .new_t-container table td {
+      border-color: rgba(255, 255, 255, 0.06) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* Tour tabs */
+    body .new_t-tab-content-top {
+      background: #0d2137 !important;
+    }
+
+    /* Tour order button */
+    body .new_t-container button,
+    body .new_t-container [class*="order"],
+    body .new_t-container [class*="book"] {
+      background: #0fa4e6 !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 10px !important;
+    }
+
+    /* === SPINNER / LOADING === */
+    body .new_spinner-wrap {
+      color: #0fa4e6 !important;
+    }
+
+    /* === SCROLLBAR STYLING === */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+
+    /* Otpusk scrollbars */
+    body #new_os-to .new_f-dropdown-body.popup #cntList::-webkit-scrollbar-track,
+    body #ctyList .ctyLists-wrapper::-webkit-scrollbar-track {
+      background-color: #1a1a1a !important;
+    }
+    body #new_os-to .new_f-dropdown-body.popup #cntList::-webkit-scrollbar-thumb,
+    body #ctyList .ctyLists-wrapper::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* === MOBILE OVERRIDES === */
+    @media all and (max-width: 478px) {
+      body .new_f-ext-container,
+      body .new_f-dropdown-container:not(#new_os-date-check) .new_f-dropdown-body,
+      body .new_layer-open .new_t-change-people .new_f-dropdown-body {
+        background: #111111 !important;
+      }
+
+      body .new_f-dropdown-body-date .new_f-dropdown-body-top {
+        background: #0d2137 !important;
+      }
+
+      body .new_f-dates-container#new_f-dates-container .mobile-calendar-days .mobile-calendar-day {
+        color: rgba(255, 255, 255, 0.4) !important;
+      }
+
+      body .new_f-dates-container#new_f-dates-container .calendar-tip {
+        background-color: #0fa4e6 !important;
+      }
+    }
+
+    /* ============================
+       ADVANCED SEARCH PANEL VISIBILITY
+       ============================ */
+
+    /* Force advanced search panel to be visible */
+    .new_f-ext-container,
+    .new_f-ext-body,
+    div[class*="ext-container"],
+    div[class*="ext-body"],
+    .new_f-ext-wrap,
     .os-form-advanced,
     .os-form .advanced,
     .os-form-ext,
@@ -47,13 +707,7 @@
     .os-form-toggle + div,
     .os-form-toggle + fieldset,
     .os-form-toggle ~ div[style*="display: none"],
-    .os-form-toggle ~ div[style*="display:none"],
-    /* New classes */
-    .new_f-ext-container,
-    .new_f-ext-body,
-    div[class*="ext-container"],
-    div[class*="ext-body"],
-    .new_f-ext-wrap {
+    .os-form-toggle ~ div[style*="display:none"] {
       display: block !important;
       height: auto !important;
       overflow: visible !important;
@@ -62,22 +716,19 @@
       max-height: none !important;
     }
 
-    /* Hide the toggle button if it's expanded by CSS to avoid confusion,
-       or keep it. Usually better to keep it but ensure content is shown. */
-
     /* Collapsed state: hide extended search options when search is clicked */
+    body.ext-collapsed .new_f-ext-container,
+    body.ext-collapsed .new_f-ext-body,
+    body.ext-collapsed div[class*="ext-container"],
+    body.ext-collapsed div[class*="ext-body"],
+    body.ext-collapsed .new_f-ext-wrap,
     body.ext-collapsed .os-form-advanced,
     body.ext-collapsed .os-form .advanced,
     body.ext-collapsed .os-form-ext,
     body.ext-collapsed .os-form-extra,
     body.ext-collapsed .os-form-more,
     body.ext-collapsed .os-form-toggle + div,
-    body.ext-collapsed .os-form-toggle + fieldset,
-    body.ext-collapsed .new_f-ext-container,
-    body.ext-collapsed .new_f-ext-body,
-    body.ext-collapsed div[class*="ext-container"],
-    body.ext-collapsed div[class*="ext-body"],
-    body.ext-collapsed .new_f-ext-wrap {
+    body.ext-collapsed .os-form-toggle + fieldset {
       display: none !important;
       height: 0 !important;
       overflow: hidden !important;

@@ -6,7 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import FormInput from "@/components/ui/form-input";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { X, Send, Loader2, CheckCircle2 } from "lucide-react";
+import {
+  X,
+  Send,
+  Loader2,
+  CheckCircle2,
+  Search,
+  Shield,
+  Clock,
+  Headphones,
+} from "lucide-react";
+
+const features = [
+
+];
 
 export default function TourScreenerPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -100,47 +113,53 @@ export default function TourScreenerPage() {
   }, [resetForm]);
 
   return (
-    <main className="min-h-screen w-full pt-28 pb-12 px-4 sm:pt-24 max-sm:pt-20 max-sm:px-2 max-sm:pb-4">
+    <main className="min-h-screen w-full pt-28 pb-16 px-4 sm:pt-24 max-sm:pt-20 max-sm:px-3 max-sm:pb-6">
       <div className="w-full max-w-6xl mx-auto">
-        <div className="mb-8 sm:mb-10">
+        {/* Header Section */}
+        <div className="mb-10 sm:mb-14">
           <TextGenerateEffect
             words="Підбір туру"
-            className="text-3xl sm:text-4xl md:text-5xl font-light"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light"
             accentWords={["туру"]}
             accentClassName="text-accent font-bold"
           />
-          <p className="text-secondary text-base sm:text-lg mt-3 max-w-2xl leading-relaxed">
-            Знайдіть ідеальний тур для вашої відпустки. Оберіть країну, дати та параметри пошуку.
+          <p className="text-secondary text-base sm:text-lg mt-4 max-w-2xl leading-relaxed">
+            Знайдіть ідеальний тур для вашої відпустки. Оберіть країну, дати та
+            параметри пошуку.
           </p>
         </div>
-        <iframe
-          ref={iframeRef}
-          src="/otpusk-widget.html"
-          title="Пошук турів"
-          style={{
-            width: "100%",
-            height: `${Math.max(iframeHeight, 1200)}px`,
-            border: "none",
-            display: "block",
-          }}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-          allow="clipboard-write"
-          loading="eager"
-        />
+
+        {/* Widget container */}
+        <div className="bg-white/2 border border-white/6 rounded-3xl overflow-hidden backdrop-blur-sm">
+          <iframe
+            ref={iframeRef}
+            src="/otpusk-widget.html"
+            title="Пошук турів"
+            style={{
+              width: "100%",
+              height: `${Math.max(iframeHeight, 1200)}px`,
+              border: "none",
+              display: "block",
+            }}
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+            allow="clipboard-write"
+            loading="eager"
+          />
+        </div>
       </div>
 
       {/* Booking Modal */}
       {showBooking && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
         >
-          <div className="relative w-full max-w-lg bg-white/5 p-6 sm:p-8 rounded-3xl border border-white/10 backdrop-blur-md shadow-2xl">
+          <div className="relative w-full max-w-lg bg-white/5 p-6 sm:p-8 rounded-3xl border border-white/10 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -155,7 +174,7 @@ export default function TourScreenerPage() {
                   <p className="text-accent font-medium">{hotelName}</p>
                 )}
                 {tourCode && (
-                  <p className="text-white/60 text-sm">Код туру: {tourCode}</p>
+                  <p className="text-white/50 text-sm">Код туру: {tourCode}</p>
                 )}
               </div>
             )}
@@ -163,7 +182,7 @@ export default function TourScreenerPage() {
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="bookFirstName" className="text-white/80">
+                  <Label htmlFor="bookFirstName" className="text-white/70 text-sm">
                     Ім&apos;я
                   </Label>
                   <Input
@@ -171,11 +190,11 @@ export default function TourScreenerPage() {
                     placeholder="Іван"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
+                    className="bg-black/40 border-white/10 focus:border-accent/50 h-12 rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bookLastName" className="text-white/80">
+                  <Label htmlFor="bookLastName" className="text-white/70 text-sm">
                     Прізвище
                   </Label>
                   <Input
@@ -183,7 +202,7 @@ export default function TourScreenerPage() {
                     placeholder="Петренко"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
+                    className="bg-black/40 border-white/10 focus:border-accent/50 h-12 rounded-xl"
                   />
                 </div>
               </div>
@@ -194,18 +213,18 @@ export default function TourScreenerPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 containerClassName="space-y-2"
-                className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
+                className="bg-black/40 border-white/10 focus:border-accent/50 h-12 rounded-xl"
               />
 
               <div className="space-y-2">
-                <Label htmlFor="bookMessage" className="text-white/80">
+                <Label htmlFor="bookMessage" className="text-white/70 text-sm">
                   Побажання
                 </Label>
                 <textarea
                   id="bookMessage"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="flex min-h-[100px] w-full rounded-md border border-white/10 bg-black/40 px-3 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/50 resize-none"
+                  className="flex min-h-[100px] w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm ring-offset-background placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/50 resize-none"
                   placeholder="Категорія готелю, харчування, побажання..."
                 />
               </div>
