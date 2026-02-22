@@ -112,33 +112,33 @@ export default function PromoCodesManagerPage() {
                 <div className="text-center">
                     <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
                     <h1 className="text-2xl font-semibold mb-2">Доступ заборонено</h1>
-                    <p className="text-foreground/60">Ця сторінка доступна лише для менеджерів.</p>
+                    <p className="text-white/50">Ця сторінка доступна лише для менеджерів.</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen px-4 py-8 md:py-12">
+        <div className="px-4 py-8 md:py-12">
             <div className="max-w-2xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-light mb-2">Перевірка промокоду</h1>
-                    <p className="text-foreground/60">Введіть код клієнта для перевірки його дійсності та застосування знижки</p>
+                    <h1 className="text-3xl md:text-4xl font-light mb-2 text-white">Перевірка промокоду</h1>
+                    <p className="text-white/50">Введіть код клієнта для перевірки його дійсності та застосування знижки</p>
                 </div>
 
                 {/* Validate Code Section */}
-                <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-6 md:p-8">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8">
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
                             <input
                                 type="text"
                                 value={searchCode}
                                 onChange={(e) => { setSearchCode(e.target.value.toUpperCase()); setValidationError(null); setRedeemSuccess(null); }}
                                 onKeyDown={(e) => e.key === 'Enter' && handleValidate()}
                                 placeholder="Введіть код, наприклад CB-XXXX-YYYY"
-                                className="w-full h-12 bg-background border border-foreground/20 rounded-lg pl-10 pr-4 focus:outline-none focus:border-accent transition-colors font-mono tracking-wider uppercase"
+                                className="w-full h-12 bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 text-white focus:outline-none focus:border-accent transition-colors font-mono tracking-wider uppercase placeholder:text-white/25"
                             />
                         </div>
                         <Button
@@ -184,28 +184,28 @@ export default function PromoCodesManagerPage() {
                             </div>
                             <div className="grid sm:grid-cols-2 gap-4 mb-5">
                                 <div>
-                                    <p className="text-xs text-foreground/50 mb-1">Код</p>
-                                    <p className="font-mono tracking-wider text-lg">{validationResult.code}</p>
+                                    <p className="text-xs text-white/40 mb-1">Код</p>
+                                    <p className="font-mono tracking-wider text-lg text-white">{validationResult.code}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-foreground/50 mb-1">Сума знижки</p>
+                                    <p className="text-xs text-white/40 mb-1">Сума знижки</p>
                                     <p className="text-lg font-semibold text-accent">{validationResult.amount.toLocaleString()} грн</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-foreground/50 mb-1">Власник</p>
-                                    <p>{validationResult.ownerName}</p>
+                                    <p className="text-xs text-white/40 mb-1">Власник</p>
+                                    <p className="text-white">{validationResult.ownerName}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-foreground/50 mb-1">Телефон</p>
-                                    <p>{validationResult.ownerPhone}</p>
+                                    <p className="text-xs text-white/40 mb-1">Телефон</p>
+                                    <p className="text-white">{validationResult.ownerPhone}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-foreground/50 mb-1">Створено</p>
-                                    <p>{formatDateTime(validationResult.createdAt)}</p>
+                                    <p className="text-xs text-white/40 mb-1">Створено</p>
+                                    <p className="text-white">{formatDateTime(validationResult.createdAt)}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-foreground/50 mb-1">Дійсний до</p>
-                                    <p>{formatDateTime(validationResult.expiresAt)}</p>
+                                    <p className="text-xs text-white/40 mb-1">Дійсний до</p>
+                                    <p className="text-white">{formatDateTime(validationResult.expiresAt)}</p>
                                 </div>
                             </div>
                             {validationResult.valid && (

@@ -35,26 +35,26 @@ export default function AddArticlePage() {
     }
 
     return (
-        <div className="min-h-screen bg-background py-20">
+        <div className="min-h-screen py-10 sm:py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Articles</p>
-                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Add a new article</h1>
-                    <p className="text-sm text-foreground/60">Register a new article for a client.</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/30">Статті</p>
+                    <h1 className="text-2xl sm:text-3xl font-light text-white">Додати нову <span className="text-accent font-bold">статтю</span></h1>
+                    <p className="text-sm text-white/50">Зареєструйте нову статтю.</p>
                 </header>
 
                 <aside className="space-y-4">
-                    <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
-                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
-                            Live preview
+                    <div className="rounded-2xl border border-white/5 bg-white/3 p-4 backdrop-blur-sm">
+                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/35">
+                            Попередній перегляд
                         </p>
                     </div>
 
                     {previewState.title || previewState.description ? (
                         <ArticleCard data={previewData} />
                     ) : (
-                        <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
-                            Start filling the form to see preview
+                        <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-white/35">
+                            Почніть заповнювати форму, щоб побачити попередній перегляд
                         </div>
                     )}
                 </aside>
@@ -63,52 +63,52 @@ export default function AddArticlePage() {
                     <FormProvider {...form}>
                         <form
                             onSubmit={onSubmit}
-                            className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8"
+                            className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/3 p-6 backdrop-blur-sm sm:p-8"
                         >
                             <div className="space-y-10">
                                 <section>
-                                    <h2 className="text-2xl font-semibold text-foreground mb-6">Article Details</h2>
+                                    <h2 className="text-xl font-semibold text-white mb-6">Деталі статті</h2>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         <FormInput
-                                            labelText="Title"
+                                            labelText="Назва"
                                             type="text"
-                                            placeholder="Enter article title"
+                                            placeholder="Введіть назву статті"
                                             required
                                             {...register("title")}
                                         />
                                         <FormInput
-                                            labelText="Description"
+                                            labelText="Опис"
                                             type="text"
-                                            placeholder="Enter article description"
+                                            placeholder="Введіть опис статті"
                                             required
                                             {...register("description")}
                                         />
                                         <FormInput
-                                            labelText="Image URL"
+                                            labelText="URL зображення"
                                             type="text"
-                                            placeholder="Enter image URL"
+                                            placeholder="Введіть URL зображення"
                                             required
                                             {...register("images")}
                                         />
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-foreground/80">
-                                                Article Tag
+                                            <label className="text-sm font-medium text-white/60">
+                                                Тег статті
                                             </label>
                                             <select
-                                                className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-accent/50"
                                                 {...register("tag")}
                                             >
-                                                <option value="Популярні країни">Популярні країни</option>
-                                                <option value="Корисно знати">Корисно знати</option>
-                                                <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
-                                                <option value="Інструкції сайта">Інструкції сайта</option>
-                                                <option value="Послуги">Послуги</option>
-                                                <option value="Умови бронювання">Умови бронювання</option>
+                                                <option value="Популярні країни" className="bg-black">Популярні країни</option>
+                                                <option value="Корисно знати" className="bg-black">Корисно знати</option>
+                                                <option value="Шпаргалки мандрівникам" className="bg-black">Шпаргалки мандрівникам</option>
+                                                <option value="Інструкції сайта" className="bg-black">Інструкції сайта</option>
+                                                <option value="Послуги" className="bg-black">Послуги</option>
+                                                <option value="Умови бронювання" className="bg-black">Умови бронювання</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-foreground/80">
-                                                Content <span className="text-red-500">*</span>
+                                            <label className="text-sm font-medium text-white/60">
+                                                Контент <span className="text-red-400">*</span>
                                             </label>
                                             <Controller
                                                 name="content"
@@ -118,22 +118,22 @@ export default function AddArticlePage() {
                                                     <RichTextEditor
                                                         value={field.value}
                                                         onChange={field.onChange}
-                                                        placeholder="Start writing your article… Use the toolbar above or paste plain text and click Auto-format."
+                                                        placeholder="Почніть писати статтю… Використовуйте панель інструментів або вставте простий текст та натисніть Авто-формат."
                                                         minHeight="350px"
                                                     />
                                                 )}
                                             />
-                                            <p className="text-xs text-foreground/50">
-                                                Use the toolbar to format text, or write plain text and click &quot;Auto-format&quot; to convert it to HTML.
-                                                Keyboard shortcuts: Ctrl+B bold · Ctrl+I italic · Ctrl+U underline · Ctrl+K link
+                                            <p className="text-xs text-white/35">
+                                                Використовуйте панель інструментів для форматування тексту.
+                                                Ctrl+B жирний · Ctrl+I курсив · Ctrl+U підкреслення · Ctrl+K посилання
                                             </p>
                                         </div>
                                     </div>
                                 </section>
                              </div>
-                            <div className="mt-10 flex justify-end border-t border-border/40 pt-6">
-                                <Button type="submit" size="lg" className="px-8">
-                                    Create Article
+                            <div className="mt-10 flex justify-end border-t border-white/5 pt-6">
+                                <Button type="submit" size="lg" className="px-8 bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all duration-200">
+                                    Створити статтю
                                 </Button>
                             </div>
                         </form>

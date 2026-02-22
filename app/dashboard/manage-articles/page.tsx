@@ -108,83 +108,83 @@ export default function ManageArticlesPage() {
     }
 
     return (
-        <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+        <div className="max-w-5xl mx-auto px-4 max-sm:px-2 py-8 sm:py-10 space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Articles</h1>
-                    <p className="text-muted-foreground">Manage your articles here.</p>
+                    <h1 className="text-xl sm:text-2xl font-light text-white">Керування статтями</h1>
+                    <p className="text-sm text-white/40 mt-1">Редагуйте та видаляйте статті</p>
                 </div>
                 <Link href="/dashboard/add-article">
-                    <Button className="w-full sm:w-auto">
-                        <Plus className="mr-2 h-4 w-4" /> Add Article
+                    <Button className="bg-accent hover:bg-accent/90 text-white rounded-xl h-10 px-5 font-semibold shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all duration-200">
+                        <Plus className="mr-2 h-4 w-4" /> Додати статтю
                     </Button>
                 </Link>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
                     <Input
-                        placeholder="Search by title or author..."
-                        className="pl-8"
+                        placeholder="Пошук за назвою або автором..."
+                        className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-xl h-10 focus:border-accent/50"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 <select
-                    className="flex h-10 w-full sm:w-[200px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-10 w-full sm:w-[200px] rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white/80 outline-none transition focus:border-accent/50"
                     value={filterTag}
                     onChange={(e) => setFilterTag(e.target.value)}
                 >
                     {uniqueTags.map(tag => (
-                        <option key={tag} value={tag}>{tag}</option>
+                        <option key={tag} value={tag} className="bg-black text-white">{tag}</option>
                     ))}
                 </select>
             </div>
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-2xl border border-white/5 overflow-hidden">
                 <div className="relative w-full overflow-auto">
-                    <table className="w-full caption-bottom text-sm">
-                        <thead className="[&_tr]:border-b">
-                            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Title</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Tag</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden sm:table-cell">Author</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden lg:table-cell">Date</th>
-                                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="border-b border-white/5">
+                                <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider">Назва</th>
+                                <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider hidden md:table-cell">Тег</th>
+                                <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider hidden sm:table-cell">Автор</th>
+                                <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider hidden lg:table-cell">Дата</th>
+                                <th className="h-11 px-4 text-right text-xs font-semibold text-white/35 uppercase tracking-wider">Дії</th>
                             </tr>
                         </thead>
-                        <tbody className="[&_tr:last-child]:border-0">
+                        <tbody>
                             {filteredArticles.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="h-24 text-center text-muted-foreground">
-                                        No articles found.
+                                    <td colSpan={5} className="h-24 text-center text-white/40">
+                                        Статей не знайдено.
                                     </td>
                                 </tr>
                             ) : (
                                 filteredArticles.map((article) => (
-                                    <tr key={article._id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <td className="p-4 align-middle font-medium">
-                                            <div className="text-base">{article.title}</div>
-                                            <div className="text-xs text-muted-foreground md:hidden">{article.tag}</div>
+                                    <tr key={article._id} className="border-b border-white/3 last:border-b-0 hover:bg-white/3 transition-colors">
+                                        <td className="p-4">
+                                            <div className="font-medium text-white/90">{article.title}</div>
+                                            <div className="text-xs text-white/35 md:hidden mt-0.5">{article.tag}</div>
                                         </td>
-                                        <td className="p-4 align-middle hidden md:table-cell">
-                                            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                                        <td className="p-4 hidden md:table-cell">
+                                            <span className="inline-flex items-center rounded-full bg-accent/10 border border-accent/20 px-2.5 py-0.5 text-xs font-medium text-accent">
                                                 {article.tag}
                                             </span>
                                         </td>
-                                        <td className="p-4 align-middle hidden sm:table-cell">{article.creatorPhone}</td>
-                                        <td className="p-4 align-middle hidden lg:table-cell">
-                                            {new Date(article.createdAt).toLocaleDateString('en-US', {
+                                        <td className="p-4 hidden sm:table-cell text-white/55">{article.creatorPhone}</td>
+                                        <td className="p-4 hidden lg:table-cell text-white/55">
+                                            {new Date(article.createdAt).toLocaleDateString('uk-UA', {
                                                 year: 'numeric',
                                                 month: 'short',
                                                 day: 'numeric'
                                             })}
                                         </td>
-                                        <td className="p-4 align-middle text-right">
-                                            <div className="flex justify-end gap-2">
+                                        <td className="p-4 text-right">
+                                            <div className="flex justify-end gap-1.5">
                                                 <Link href={`/dashboard/manage-articles/${article._id}`}>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-accent hover:bg-accent/10 rounded-lg">
                                                         <Edit className="h-4 w-4" />
                                                         <span className="sr-only">Edit</span>
                                                     </Button>
@@ -192,7 +192,7 @@ export default function ManageArticlesPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 text-destructive hover:text-destructive/90"
+                                                    className="h-8 w-8 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg"
                                                     onClick={() => setDeleteId(article._id)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -210,16 +210,16 @@ export default function ManageArticlesPage() {
 
             {/* Delete Confirmation Modal */}
             {deleteId && (
-                <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-card border rounded-lg shadow-lg max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-black/90 border border-white/10 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="p-2 bg-destructive/10 rounded-full">
-                                <AlertCircle className="h-6 w-6 text-destructive" />
+                            <div className="p-2.5 bg-red-500/15 border border-red-500/25 rounded-xl">
+                                <AlertCircle className="h-6 w-6 text-red-400" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-semibold">Delete Article</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Are you sure you want to delete this article? This action cannot be undone.
+                                <h3 className="text-lg font-semibold text-white">Видалити статтю</h3>
+                                <p className="text-sm text-white/50">
+                                    Ви впевнені, що хочете видалити цю статтю? Цю дію неможливо скасувати.
                                 </p>
                             </div>
                         </div>
@@ -228,21 +228,22 @@ export default function ManageArticlesPage() {
                                 variant="outline"
                                 onClick={() => setDeleteId(null)}
                                 disabled={isDeleting}
+                                className="border-white/10 text-white/70 hover:bg-white/5 rounded-xl"
                             >
-                                Cancel
+                                Скасувати
                             </Button>
                             <Button
-                                variant="destructive"
                                 onClick={handleDelete}
                                 disabled={isDeleting}
+                                className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-xl"
                             >
                                 {isDeleting ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Deleting...
+                                        Видалення...
                                     </>
                                 ) : (
-                                    'Delete'
+                                    'Видалити'
                                 )}
                             </Button>
                         </div>

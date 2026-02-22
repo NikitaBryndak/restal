@@ -623,15 +623,15 @@ export default function ManageTourPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-background py-12">
+        <div className="py-10 sm:py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Тури</p>
-                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Керування існуючим туром</h1>
-                    <p className="text-sm text-foreground/60">Знайдіть тур за його номером (Тур #123456) або внутрішнім ID, редагуйте деталі та оновлюйте документи.</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/30">Тури</p>
+                    <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Керування існуючим туром</h1>
+                    <p className="text-sm text-white/50">Знайдіть тур за його номером (Тур #123456) або внутрішнім ID, редагуйте деталі та оновлюйте документи.</p>
                 </header>
 
-                <section className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+                <section className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
                     <form onSubmit={handleLookup} className="flex flex-col gap-4 md:flex-row md:items-end">
                         <div className="w-full md:max-w-sm">
                             <Label htmlFor="tour-identifier">Номер туру або ID</Label>
@@ -643,20 +643,20 @@ export default function ManageTourPage() {
                                 autoComplete="off"
                             />
                         </div>
-                        <Button type="submit" size="lg" disabled={isLoading}>
+                        <Button type="submit" size="lg" disabled={isLoading} className="bg-accent hover:bg-accent/80 text-white border-0">
                             {isLoading ? 'Пошук…' : 'Знайти тур'}
                         </Button>
-                        <div className="flex-1 text-sm text-foreground/60">
+                        <div className="flex-1 text-sm text-white/40">
                             Тільки менеджери з підвищеним доступом можуть редагувати існуючі тури.
                         </div>
                     </form>
                     {errorMessage && (
-                        <p className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                        <p className="mt-4 rounded-lg border border-red-400/20 bg-red-500/10 px-4 py-2 text-sm text-red-400">
                             {errorMessage}
                         </p>
                     )}
                     {successMessage && (
-                        <p className="mt-4 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-600">
+                        <p className="mt-4 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
                             {successMessage}
                         </p>
                     )}
@@ -664,13 +664,13 @@ export default function ManageTourPage() {
 
                 {trip ? (
                     <section className="space-y-6">
-                        <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
                             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div>
-                                    <h2 className="text-2xl font-semibold text-foreground">Загальна інформація</h2>
-                                    <p className="text-sm text-foreground/60">Оновіть основні деталі туру та терміни.</p>
+                                    <h2 className="text-2xl font-semibold text-white">Загальна інформація</h2>
+                                    <p className="text-sm text-white/50">Оновіть основні деталі туру та терміни.</p>
                                 </div>
-                                <Button type="button" size="lg" onClick={handleSave} disabled={isSaving}>
+                                <Button type="button" size="lg" onClick={handleSave} disabled={isSaving} className="bg-accent hover:bg-accent/80 text-white border-0">
                                     {isSaving ? 'Збереження…' : 'Зберегти зміни'}
                                 </Button>
                             </div>
@@ -698,7 +698,7 @@ export default function ManageTourPage() {
                                 />
                                 <div>
                                     <Label htmlFor="manager-name">Менеджер туру</Label>
-                                    <Input id="manager-name" value={trip.managerName ?? 'Не вказано'} disabled className="bg-foreground/5" />
+                                    <Input id="manager-name" value={trip.managerName ?? 'Не вказано'} disabled className="bg-white/5" />
                                 </div>
                                 <div>
                                     <Label htmlFor="tour-status">Статус туру</Label>
@@ -708,7 +708,7 @@ export default function ManageTourPage() {
                                         onChange={(event) =>
                                             setTrip((prev) => (prev ? { ...prev, status: event.target.value as TourStatus } : prev))
                                         }
-                                        className="w-full h-10 px-3 py-2 text-sm border border-border/40 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full h-10 px-3 py-2 text-sm border border-white/10 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-accent/30"
                                     >
                                         {TOUR_STATUSES.map((status) => (
                                             <option key={status} value={status}>
@@ -744,7 +744,7 @@ export default function ManageTourPage() {
                             </div>
                         </div>
 
-                        <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
                             <FlightsSection
                                 variant="edit"
                                 values={trip.flightInfo}
@@ -754,7 +754,7 @@ export default function ManageTourPage() {
                             />
                         </div>
 
-                        <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
                             <StaySection
                                 variant="edit"
                                 values={trip.hotel}
@@ -766,7 +766,7 @@ export default function ManageTourPage() {
                             />
                         </div>
 
-                        <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
                             <PaymentSection
                                 variant="edit"
                                 values={trip.payment}
@@ -774,7 +774,7 @@ export default function ManageTourPage() {
                                 title="Огляд оплати"
                                 description="Відстежуйте залишки та терміни оплати."
                             />
-                            <div className="mt-6 border-t border-border/40 pt-6">
+                            <div className="mt-6 border-t border-white/10 pt-6">
                                 <ExtrasSection
                                     variant="edit"
                                     values={trip.addons}
@@ -785,7 +785,7 @@ export default function ManageTourPage() {
                             </div>
                         </div>
 
-                        <div className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
                             <TravellerSection
                                 variant="edit"
                                 tourists={trip.tourists}
@@ -804,13 +804,13 @@ export default function ManageTourPage() {
                         />
 
                         <div className="flex justify-end">
-                            <Button type="button" size="lg" onClick={handleSave} disabled={isSaving}>
+                            <Button type="button" size="lg" onClick={handleSave} disabled={isSaving} className="bg-accent hover:bg-accent/80 text-white border-0">
                                 {isSaving ? 'Збереження…' : 'Зберегти зміни'}
                             </Button>
                         </div>
                     </section>
                 ) : (
-                    <div className="mt-6 rounded-3xl border border-dashed border-border/50 p-8 text-center text-sm text-foreground/60">
+                    <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-white/40">
                         Знайдіть тур, щоб розблокувати інструменти редагування.
                     </div>
                 )}

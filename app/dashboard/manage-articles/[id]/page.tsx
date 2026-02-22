@@ -143,8 +143,8 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
 
     if (loading || status === "loading") {
         return (
-            <div className="min-h-screen bg-background py-20 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="py-10 sm:py-12 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-accent" />
             </div>
         );
     }
@@ -154,22 +154,22 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
     }
 
     return (
-        <div className="min-h-screen bg-background py-20">
+        <div className="py-10 sm:py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-4">
-                    <Link href="/dashboard/manage-articles" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+                    <Link href="/dashboard/manage-articles" className="inline-flex items-center text-sm text-white/40 hover:text-white">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Articles
                     </Link>
                     <div className="space-y-2 text-center">
-                        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Articles</p>
-                        <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Edit Article</h1>
-                        <p className="text-sm text-foreground/60">Update article details and content.</p>
+                        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/30">Articles</p>
+                        <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Edit Article</h1>
+                        <p className="text-sm text-white/50">Update article details and content.</p>
                     </div>
                 </header>
 
                 <aside className="space-y-4">
-                    <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
-                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/40">
                             Live preview
                         </p>
                     </div>
@@ -177,7 +177,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                     {previewData.title || previewData.description ? (
                         <ArticleCard data={previewData} />
                     ) : (
-                        <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
+                        <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-white/40">
                             Start filling the form to see preview
                         </div>
                     )}
@@ -187,11 +187,11 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                     <FormProvider {...form}>
                         <form
                             onSubmit={form.handleSubmit(onSubmit)}
-                            className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8"
+                            className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl sm:p-8"
                         >
                             <div className="space-y-10">
                                 <section>
-                                    <h2 className="text-2xl font-semibold text-foreground mb-6">Article Details</h2>
+                                    <h2 className="text-2xl font-semibold text-white mb-6">Article Details</h2>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         <FormInput
                                             labelText="Title"
@@ -215,9 +215,9 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                             {...register("images")}
                                         />
                                          <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-foreground/80">Tag</label>
+                                            <label className="text-sm font-medium text-white/60">Tag</label>
                                             <select
-                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                className="flex h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50"
                                                 {...register("tag")}
                                             >
                                                 <option value="Популярні країни">Популярні країни</option>
@@ -229,10 +229,10 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                             </select>
                                         </div>
                                         <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-foreground/80">
+                                            <label className="text-sm font-medium text-white/60">
                                                 Content <span className="text-red-500">*</span>
                                             </label>
-                                            <div className="min-h-[400px] overflow-hidden rounded-md border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                                            <div className="min-h-[400px] overflow-hidden rounded-md border border-white/10 focus-within:ring-2 focus-within:ring-accent/30">
                                                 <Controller
                                                     name="content"
                                                     control={control}

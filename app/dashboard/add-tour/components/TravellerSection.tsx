@@ -42,13 +42,13 @@ const TravellerSectionCreate = ({
     return (
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-start gap-4 flex-1 p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 border border-rose-500/20">
+                <div className="flex items-start gap-4 flex-1 p-4 rounded-xl bg-linear-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 border border-rose-500/20">
                     <div className="p-2 rounded-lg bg-rose-500/20">
                         <Users className="w-5 h-5 text-rose-400" />
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-lg font-semibold text-foreground">Подорожуючі</h2>
-                        <p className="text-sm text-foreground/60">Дані основного подорожуючого — мінімум імʼя та термін дії паспорта.</p>
+                        <h2 className="text-lg font-semibold text-white">Подорожуючі</h2>
+                        <p className="text-sm text-white/50">Дані основного подорожуючого — мінімум імʼя та термін дії паспорта.</p>
                     </div>
                 </div>
                 <Button type="button" variant="outline" className="flex items-center gap-2" onClick={() => append({
@@ -74,9 +74,9 @@ const TravellerSectionCreate = ({
             )}
             <div className="mt-6 grid gap-6">
                 {fields.map((field, index) => (
-                    <div key={field.id} className="rounded-2xl border border-border/40 bg-white/60 p-4 dark:bg-white/10">
+                    <div key={field.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-foreground">Подорожуючий #{index + 1}</h3>
+                            <h3 className="text-lg font-semibold text-white">Подорожуючий #{index + 1}</h3>
                             {fields.length > 1 && (
                                 <Button
                                     type="button"
@@ -111,11 +111,11 @@ const TravellerSectionCreate = ({
                                 )}
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-foreground/80">
+                                <label className="text-sm font-medium text-white/60">
                                     Стать
                                 </label>
                                 <select
-                                    className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
                                     {...register(`travellers.${index}.sex`)}
                                 >
                                     <option value="unspecified" disabled>
@@ -204,13 +204,13 @@ const TravellerSectionEdit = ({
     return (
         <section className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-start gap-4 flex-1 p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 border border-rose-500/20">
+                <div className="flex items-start gap-4 flex-1 p-4 rounded-xl bg-linear-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 border border-rose-500/20">
                     <div className="p-2 rounded-lg bg-rose-500/20">
                         <Users className="w-5 h-5 text-rose-400" />
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-lg font-semibold text-foreground">Подорожуючі</h2>
-                        <p className="text-sm text-foreground/60">Редагуйте дані подорожуючих або додайте нових учасників.</p>
+                        <h2 className="text-lg font-semibold text-white">Подорожуючі</h2>
+                        <p className="text-sm text-white/50">Редагуйте дані подорожуючих або додайте нових учасників.</p>
                     </div>
                 </div>
                 {onAdd && (
@@ -222,9 +222,9 @@ const TravellerSectionEdit = ({
             </div>
             <div className="mt-6 grid gap-6">
                 {tourists?.map((tourist, index) => (
-                    <div key={index} className="rounded-2xl border border-border/40 bg-gradient-to-br from-white/70 to-white/50 p-4 dark:from-white/10 dark:to-white/5 shadow-sm">
+                    <div key={index} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-foreground">Подорожуючий #{index + 1}</h3>
+                            <h3 className="text-lg font-semibold text-white">Подорожуючий #{index + 1}</h3>
                             {tourists.length > 1 && onRemove && (
                                 <Button
                                     type="button"
@@ -249,11 +249,11 @@ const TravellerSectionEdit = ({
                                 required
                             />
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-foreground/80">Стать</label>
+                                <label className="text-sm font-medium text-white/60">Стать</label>
                                 <select
                                     value={tourist.sex ?? ''}
                                     onChange={(e) => onChange?.(index, 'sex', e.target.value)}
-                                    className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
                                     required
                                 >
                                     <option value="" disabled>Виберіть опцію</option>

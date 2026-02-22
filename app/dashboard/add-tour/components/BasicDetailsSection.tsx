@@ -91,13 +91,13 @@ export const BasicDetailsSection = ({
 
     return (
         <section className="space-y-6">
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-teal-500/10 border border-blue-500/20">
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-linear-to-r from-blue-500/10 via-cyan-500/10 to-teal-500/10 border border-blue-500/20">
                 <div className="p-2 rounded-lg bg-blue-500/20">
                     <Globe className="w-5 h-5 text-blue-400" />
                 </div>
                 <div className="space-y-1">
-                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                    <p className="text-sm text-foreground/60">{description}</p>
+                    <h2 className="text-lg font-semibold text-white">{title}</h2>
+                    <p className="text-sm text-white/50">{description}</p>
                 </div>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -107,9 +107,9 @@ export const BasicDetailsSection = ({
                         <div key={field}>
                             {isSelect ? (
                                 <>
-                                    <label className="mb-2 block text-sm font-medium text-foreground/80">{label}</label>
+                                    <label className="mb-2 block text-sm font-medium text-white/60">{label}</label>
                                     <select
-                                        className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
                                         {...buildSelectProps(field, name)}
                                     >
                                         <option value="" disabled>
@@ -156,9 +156,9 @@ export const BasicDetailsSection = ({
             </div>
             {showMealPlan && (
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground/80">Харчування</label>
+                    <label className="mb-2 block text-sm font-medium text-white/60">Харчування</label>
                     <select
-                        className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
                         {...mealPlanProps}
                     >
                         <option value="" disabled>

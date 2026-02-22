@@ -64,13 +64,13 @@ export const StaySection = ({
 
     return (
         <section className="space-y-6">
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-linear-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
                 <div className="p-2 rounded-lg bg-amber-500/20">
                     <HotelIcon className="w-5 h-5 text-amber-400" />
                 </div>
                 <div className="space-y-1">
-                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                    <p className="text-sm text-foreground/60">{description}</p>
+                    <h2 className="text-lg font-semibold text-white">{title}</h2>
+                    <p className="text-sm text-white/50">{description}</p>
                 </div>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">

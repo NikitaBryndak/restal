@@ -42,29 +42,29 @@ export const ExtrasSection = ({
 
     return (
         <section className="space-y-4">
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 via-violet-500/10 to-fuchsia-500/10 border border-purple-500/20">
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-linear-to-r from-purple-500/10 via-violet-500/10 to-fuchsia-500/10 border border-purple-500/20">
                 <div className="p-2 rounded-lg bg-purple-500/20">
                     <Sparkles className="w-5 h-5 text-purple-400" />
                 </div>
                 <div className="space-y-1">
-                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                    <p className="text-sm text-foreground/60">{description}</p>
+                    <h2 className="text-lg font-semibold text-white">{title}</h2>
+                    <p className="text-sm text-white/50">{description}</p>
                 </div>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
                 {extrasOptions.map(({ field, label, name }) => (
                     <label
                         key={field}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border/40 bg-white/60 hover:bg-white/80 dark:bg-white/5 dark:hover:bg-white/10 transition-all cursor-pointer"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
                     >
                         <input
                             type="checkbox"
-                            className="size-5 rounded border border-border/60 text-primary focus:ring-primary/30"
+                            className="size-5 rounded border border-white/10 text-accent focus:ring-accent/20"
                             {...buildInputProps(field, name)}
                         />
                         <div className="flex items-center gap-2">
                             {field === 'insurance' ? <Shield className="w-4 h-4 text-purple-400" /> : <Car className="w-4 h-4 text-purple-400" />}
-                            <span className="text-sm font-medium text-foreground/80">{label}</span>
+                            <span className="text-sm font-medium text-white/60">{label}</span>
                         </div>
                     </label>
                 ))}

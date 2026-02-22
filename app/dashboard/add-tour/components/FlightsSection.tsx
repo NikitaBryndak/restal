@@ -66,25 +66,25 @@ export const FlightsSection = ({
 
     return (
         <section className="space-y-6">
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-sky-500/10 via-blue-500/10 to-indigo-500/10 border border-sky-500/20">
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-linear-to-r from-sky-500/10 via-blue-500/10 to-indigo-500/10 border border-sky-500/20">
                 <div className="p-2 rounded-lg bg-sky-500/20">
                     <Plane className="w-5 h-5 text-sky-400" />
                 </div>
                 <div className="space-y-1">
-                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                    <p className="text-sm text-foreground/60">{description}</p>
+                    <h2 className="text-lg font-semibold text-white">{title}</h2>
+                    <p className="text-sm text-white/50">{description}</p>
                 </div>
             </div>
             <div className="grid gap-6">
                 {(['departure', 'arrival'] as const).map((segment) => (
-                    <div key={segment} className="rounded-2xl border border-border/40 bg-gradient-to-br from-white/70 to-white/50 p-5 dark:from-white/10 dark:to-white/5 shadow-sm">
+                    <div key={segment} className="rounded-2xl border border-white/10 bg-white/5 p-5">
                         <div className="flex items-center gap-2 mb-4">
                             {segment === 'departure' ? (
                                 <PlaneTakeoff className="w-4 h-4 text-sky-500" />
                             ) : (
                                 <PlaneLanding className="w-4 h-4 text-indigo-500" />
                             )}
-                            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
+                            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/40">
                                 {segmentCopy[segment].heading}
                             </p>
                         </div>

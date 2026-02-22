@@ -46,24 +46,24 @@ export default function AddTourPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background py-12">
+        <div className="min-h-screen py-10 sm:py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-foreground/40">Тури</p>
-                    <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">Додати новий тур</h1>
-                    <p className="text-sm text-foreground/60">Зареєструйте новий тур для клієнта.</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/30">Тури</p>
+                    <h1 className="text-2xl sm:text-3xl font-light text-white">Додати новий <span className="text-accent font-bold">тур</span></h1>
+                    <p className="text-sm text-white/50">Зареєструйте новий тур для клієнта.</p>
                 </header>
 
                 <aside className="space-y-4">
-                    <div className="rounded-3xl border border-border/40 bg-white/70 p-4 backdrop-blur-xl dark:bg-white/10">
-                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-foreground/50">
+                    <div className="rounded-2xl border border-white/5 bg-white/3 p-4 backdrop-blur-sm">
+                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/35">
                             Попередній перегляд
                         </p>
                     </div>
                     {previewState.country ? (
                         <TripCard data={previewData} />
                     ) : (
-                        <div className="rounded-3xl border border-dashed border-border/50 p-6 text-center text-sm text-foreground/50">
+                        <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-white/35">
                             Додайте напрямок, щоб побачити попередній перегляд.
                         </div>
                     )}
@@ -73,7 +73,7 @@ export default function AddTourPage() {
                     <FormProvider {...form}>
                         <form
                             onSubmit={onSubmit}
-                            className="rounded-3xl border border-border/40 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:p-8"
+                            className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/3 p-6 backdrop-blur-sm sm:p-8"
                         >
                             <div className="space-y-10">
                                 <BasicDetailsSection />
@@ -92,22 +92,22 @@ export default function AddTourPage() {
                                 <PaymentSection />
                             </div>
 
-                            <div className="mt-10 flex flex-col gap-4 border-t border-border/40 pt-6">
+                            <div className="mt-10 flex flex-col gap-4 border-t border-white/5 pt-6">
                                 {Object.keys(form.formState.errors).length > 0 && (
-                                    <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-                                        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                                    <div className="flex items-start gap-3 rounded-xl border border-red-500/25 bg-red-500/10 p-4">
+                                        <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                                         <div className="space-y-1">
-                                            <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+                                            <p className="text-sm font-semibold text-red-400">
                                                 Форма містить помилки
                                             </p>
-                                            <p className="text-xs text-red-500/80">
+                                            <p className="text-xs text-red-400/70">
                                                 Будь ласка, перевірте всі поля, виділені червоним, і виправте помилки перед створенням туру.
                                             </p>
                                         </div>
                                     </div>
                                 )}
                                 <div className="flex justify-end">
-                                    <Button type="submit" size="lg" className="px-8" disabled={isUploading}>
+                                    <Button type="submit" size="lg" className="px-8 bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all duration-200" disabled={isUploading}>
                                         {isUploading ? 'Завантаження та створення...' : 'Створити тур'}
                                     </Button>
                                 </div>
