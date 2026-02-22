@@ -10,7 +10,7 @@ export default function WideNavbar() {
     const { userProfile } = useUserProfile();
 
     return (
-        <ul className="hidden sm:flex items-center gap-8 list-none m-0 p-0">
+        <ul className="hidden lg:flex items-center gap-8 list-none m-0 p-0">
             <li key="tour-screener">
                 <NavLink href="/tour-screener">
                     Підбір туру

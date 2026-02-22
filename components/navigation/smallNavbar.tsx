@@ -17,7 +17,7 @@ export default function SmallNavbar() {
     }
 
     return (
-        <div className="sm:hidden flex items-center gap-2">
+        <div className="lg:hidden flex items-center gap-2">
             {/* Notification bell for mobile - visible outside menu */}
             {session && userProfile && <NotificationBell />}
 
@@ -26,7 +26,7 @@ export default function SmallNavbar() {
             </button>
 
             {isMobileMenuOpen && (
-                <div className="fixed inset-0 z-40 bg-black pt-20 sm:pt-24 flex flex-col h-screen text-white">
+                <div className="fixed inset-0 z-40 bg-black pt-20 lg:pt-24 flex flex-col h-dvh text-white">
                     <div className="flex-1 overflow-y-auto px-6 pb-4">
                         <div className="flex flex-col space-y-6">
                             {/* Main Navigation */}
