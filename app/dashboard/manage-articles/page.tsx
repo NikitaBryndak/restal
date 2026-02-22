@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Plus, Search, Trash2, Edit, AlertCircle } from 'lucide-react';
+import { TableSkeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 
 interface Article {
@@ -99,11 +100,7 @@ export default function ManageArticlesPage() {
     }, [articles]);
 
     if (loading || status === 'loading') {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <TableSkeleton rows={5} />;
     }
 
     if (!session || (session.user?.privilegeLevel ?? 1) < 2) {

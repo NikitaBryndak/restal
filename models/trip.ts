@@ -245,6 +245,9 @@ const tripSchema = new Schema({
 }, { timestamps: true });
 
 tripSchema.index({ number: 1 }, { unique: true });
+// Speed up lookups by owner/manager phone (used by /api/trips and /api/cashback-data)
+tripSchema.index({ ownerPhone: 1, createdAt: -1 });
+tripSchema.index({ managerPhone: 1, createdAt: -1 });
 
 // Prevent Mongoose model recompilation error in development
 if (process.env.NODE_ENV === "development") {

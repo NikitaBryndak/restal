@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoaderOne } from "@/components/ui/loader";
+import { ProfileSkeleton } from "@/components/ui/skeleton";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import {
     User, Phone, Calendar, Wallet, MapPin, Loader,
@@ -77,11 +77,7 @@ export default function ProfilePage() {
     }, []);
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <LoaderOne />
-            </div>
-        );
+        return <ProfileSkeleton />;
     }
 
     if (error) {

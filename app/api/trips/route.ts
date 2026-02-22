@@ -45,7 +45,7 @@ function validateTripData(body: any): string | null {
     return null;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const session = await getServerSession(authOptions);
 
@@ -67,7 +67,30 @@ export async function GET() {
             ]
         };
 
-        const trips = await Trip.find(query).sort({ createdAt: -1 }).lean();
+        // Allow callers to request a subset of fields via ?fields=a,b,c
+        // This avoids transferring large nested objects (tourists, documents) when not needed
+        const url = new URL(request.url);
+        const fieldsParam = url.searchParams.get('fields');
+
+        // Whitelist of safe fields that can be projected
+        const ALLOWED_FIELDS = new Set([
+            'number', 'country', 'status', 'ownerPhone', 'managerPhone',
+            'tripStartDate', 'tripEndDate', 'createdAt', 'updatedAt',
+            'payment', 'payment.totalAmount', 'payment.paidAmount',
+            'cashbackAmount', 'cashbackProcessed', 'cashbackRate',
+            'tourists', 'documents', 'hotelName', 'notes',
+        ]);
+
+        let tripsQuery = Trip.find(query).sort({ createdAt: -1 });
+
+        if (fieldsParam) {
+            const requested = fieldsParam.split(',').map(f => f.trim()).filter(f => ALLOWED_FIELDS.has(f));
+            if (requested.length > 0) {
+                tripsQuery = tripsQuery.select(requested.join(' '));
+            }
+        }
+
+        const trips = await tripsQuery.lean();
 
         return NextResponse.json({ trips }, { status: 200 });
     } catch {

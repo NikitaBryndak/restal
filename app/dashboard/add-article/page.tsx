@@ -10,7 +10,7 @@ import { usePreviewData } from './hooks/usePreviewData';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { DashboardFormSkeleton } from "@/components/ui/skeleton";
 
 export default function AddArticlePage() {
     const { data: session, status } = useSession();
@@ -27,11 +27,7 @@ export default function AddArticlePage() {
     }, [session, status, router]);
 
     if (status === "loading") {
-        return (
-            <div className="min-h-screen bg-background py-20 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <DashboardFormSkeleton />;
     }
 
     if (!session || (session.user?.privilegeLevel ?? 1) < 2) {

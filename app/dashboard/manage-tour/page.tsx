@@ -20,7 +20,7 @@ import {
 import type { BasicDetailsField } from '../add-tour/components';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { DashboardFormSkeleton } from "@/components/ui/skeleton";
 
 type EditableTourist = Tourist & {
     passportNumber?: string;
@@ -270,11 +270,7 @@ export default function ManageTourPage() {
     }, [trip?._id, buildEmptyPendingFiles]);
 
     if (status === "loading") {
-        return (
-            <div className="min-h-screen bg-background py-12 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <DashboardFormSkeleton />;
     }
 
     if (!session || (session.user?.privilegeLevel ?? 1) < 2) {

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoaderOne } from "@/components/ui/loader";
+import { SettingsSkeleton } from "@/components/ui/skeleton";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import {
     Settings,
@@ -179,11 +179,7 @@ export default function SettingsPage() {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <LoaderOne />
-            </div>
-        );
+        return <SettingsSkeleton />;
     }
 
     if (error) {

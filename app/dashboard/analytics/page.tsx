@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { LoaderOne } from '@/components/ui/loader';
+import { AnalyticsSkeleton } from '@/components/ui/skeleton';
 import { TOUR_STATUS_LABELS } from '@/types';
 import type { TourStatus } from '@/types';
 import {
@@ -124,11 +124,7 @@ export default function AnalyticsPage() {
     }, [isAdmin, fetchAnalytics]);
 
     if (profileLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-                <LoaderOne />
-            </div>
-        );
+        return <AnalyticsSkeleton />;
     }
 
     if (!isAdmin) {
@@ -140,11 +136,7 @@ export default function AnalyticsPage() {
     }
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-                <LoaderOne />
-            </div>
-        );
+        return <AnalyticsSkeleton />;
     }
 
     if (error || !data) {

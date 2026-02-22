@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Button } from '@/components/ui/button';
-import { LoaderOne } from '@/components/ui/loader';
+import { PageSkeleton } from '@/components/ui/skeleton';
 import { Search, CheckCircle2, XCircle } from 'lucide-react';
 
 interface ValidatedCode {
@@ -103,11 +103,7 @@ export default function PromoCodesManagerPage() {
     };
 
     if (profileLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <LoaderOne />
-            </div>
-        );
+        return <PageSkeleton />;
     }
 
     if (!isManager) {

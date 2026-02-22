@@ -10,8 +10,8 @@ import {
   BookOpen,
   Compass,
   Newspaper,
-  Loader2,
 } from "lucide-react";
+import { ArticleCardSkeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import ArticleCard from "@/components/article/article-card";
 
@@ -243,9 +243,10 @@ export default function InfoPage() {
           </FadeIn>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <Loader2 className="w-8 h-8 text-accent animate-spin" />
-              <p className="text-white/40 text-sm">Завантаження статей…</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ArticleCardSkeleton key={i} />
+              ))}
             </div>
           ) : filteredArticles.length === 0 ? (
             <FadeIn className="text-center py-24">

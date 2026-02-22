@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { LoaderOne } from '@/components/ui/loader';
+import { TableSkeleton } from '@/components/ui/skeleton';
 import {
     MessageCircle,
     Phone as PhoneIcon,
@@ -135,11 +135,7 @@ export default function ContactRequestsPage() {
     };
 
     if (profileLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <LoaderOne />
-            </div>
-        );
+        return <TableSkeleton rows={5} />;
     }
 
     if (!isManager) {
@@ -203,7 +199,18 @@ export default function ContactRequestsPage() {
             {/* Request list */}
             {loading ? (
                 <div className="flex items-center justify-center py-16">
-                    <LoaderOne />
+                    <div className="w-full space-y-3">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 animate-pulse">
+                                <div className="h-10 w-10 rounded-full bg-white/6 shrink-0" />
+                                <div className="flex-1 space-y-2">
+                                    <div className="h-4 w-1/3 rounded-xl bg-white/6" />
+                                    <div className="h-3 w-1/2 rounded-xl bg-white/6" />
+                                </div>
+                                <div className="h-6 w-20 rounded-full bg-white/6" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             ) : requests.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-secondary space-y-3">

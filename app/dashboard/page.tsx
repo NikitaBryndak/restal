@@ -1,14 +1,25 @@
 "use client"
 
 import { useSession } from "next-auth/react";
+import { CardSkeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
-    const { data: session } = useSession({
+    const { data: session, status } = useSession({
         required: true,
         onUnauthenticated() {
             window.location.href = '/login';
         },
     });
+
+    if (status === "loading") {
+        return (
+            <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] flex-col gap-3 p-4">
+                <div className="w-full max-w-[400px]">
+                    <CardSkeleton />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] flex-col gap-3 p-4">
