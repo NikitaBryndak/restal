@@ -94,6 +94,16 @@ export default function SmallNavbar() {
                                             </NavLink>
                                         </div>
                                     )}
+                                    {userProfile.privilegeLevel > 2 && (
+                                        <div className="flex flex-col space-y-2 pt-2">
+                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                                Super Admin
+                                            </h3>
+                                            <NavLink href="/dashboard/analytics" onClick={toggleMobileMenu} className="text-lg">
+                                                Аналітика
+                                            </NavLink>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
