@@ -11,15 +11,7 @@ import {
   Send,
   Loader2,
   CheckCircle2,
-  Search,
-  Shield,
-  Clock,
-  Headphones,
 } from "lucide-react";
-
-const features = [
-
-];
 
 export default function TourScreenerPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);

@@ -11,7 +11,6 @@ type FormatType = 'date' | 'time' | 'email' | 'phone' | 'none';
 type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     labelText?: string;
     containerClassName?: string;
-    locale?: string;
     formatType?: FormatType;
 };
 
@@ -61,7 +60,7 @@ const formatTimeInput = (value: string): string => {
 };
 
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-    ({ labelText, containerClassName, className, id, name, locale, formatType = 'none', onChange, value, ...rest }, ref) => {
+    ({ labelText, containerClassName, className, id, name, formatType = 'none', onChange, value, ...rest }, ref) => {
         const controlId = id ?? name;
         const [displayValue, setDisplayValue] = React.useState('');
         const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -161,7 +160,6 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             ? {
                 value: displayValue,
                 onChange: handleChange,
-                onInput: handleChange,
                 inputMode: (formatType === 'date' || formatType === 'time') ? 'numeric' as const :
                           formatType === 'email' ? 'email' as const : undefined
               }

@@ -10,6 +10,9 @@ interface UserProfile {
     createdAt: string;
     cashbackAmount: number;
     privilegeLevel: number;
+    referralCode: string | null;
+    referralCount: number;
+    referralBonusEarned: number;
 }
 
 export const useUserProfile = () => {

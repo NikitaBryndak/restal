@@ -23,11 +23,6 @@ export default function SubDashboardNavbar() {
 
                     {/* General Section */}
                     <div className="flex flex-col space-y-2">
-                        {/* Removed the 'Personal Cabinet' header to match minimal style, or keeping it very subtle if needed.
-                            The user complained about "inconsistent", so simpler is better.
-                            However, the request was "make organization ... better".
-                            I will rely on spacing (space-y-6) to separate sections rather than visible headings which might look "new".
-                            Or I can add the header back in a very minimal way. I'll add a subtle text header. */}
                         <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                            Меню
                         </div>

@@ -51,7 +51,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
 
             {/* Logo */}
             <Link href="/" className="inline-block mb-8">
-              <img src="/logo.png" alt="RestAL" className="h-7" />
+              <Image src="/logo.png" alt="RestAL" width={112} height={28} className="h-7 w-auto" />
             </Link>
 
             {/* Header */}

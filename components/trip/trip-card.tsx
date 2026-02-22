@@ -28,7 +28,7 @@ export default function TripCard({ data }: { data: Trip }) {
 
     const [day, month, year] = data.tripEndDate.split('/').map((part: string) => parseInt(part, 10));
 
-    const tripEnd = new Date(`${year}-${month}-${day}`);
+    const tripEnd = new Date(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
 
     const outdatedTrip = tripEnd < new Date();
 
@@ -184,7 +184,7 @@ export default function TripCard({ data }: { data: Trip }) {
 
                                 <div className="text-center">
                                     <p className="text-base sm:text-xl font-bold text-amber-300 leading-none">{new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(toPay)}₴</p>
-                                    <p className="text-[10px] sm:text-[11px] text-white/60 mt-1">{data.payment.deadline}</p>
+                                    <p className="text-[10px] sm:text-[11px] text-white/60 mt-1">{data.payment?.deadline}</p>
                                 </div>
                             </div>
                         </div>

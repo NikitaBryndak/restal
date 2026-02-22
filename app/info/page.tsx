@@ -80,7 +80,7 @@ export default function InfoPage() {
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border whitespace-nowrap flex-shrink-0",
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border whitespace-nowrap shrink-0",
                   selectedCategory === category
                     ? "bg-accent text-white border-accent"
                     : "bg-transparent text-secondary border-white/10 hover:border-accent/50 hover:text-white"

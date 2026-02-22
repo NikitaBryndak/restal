@@ -36,7 +36,7 @@ export default function WideNavbar() {
                         <NavLink href="/cashback" className="bg-accent p-1 rounded-md hover:text-black hover:bg-white">{(userProfile?.cashbackAmount ?? 0).toFixed(2)}₴</NavLink>
                     </>
                 )}
-                <NavLink href="/login" variant="button">
+                <NavLink href={session ? "/dashboard/profile" : "/login"} variant="button">
                     {session ? "Кабінет" : "Стати клієнтом"}
                 </NavLink>
             </li>

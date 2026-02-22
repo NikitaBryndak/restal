@@ -13,34 +13,25 @@ export async function GET(
         const resolvedParams = await params;
         await connectToDatabase();
 
-        console.log(`Fetching article with ID: ${resolvedParams.id}`); // Logging for debugging
-
         let article = null;
         if (!isNaN(Number(resolvedParams.id))) {
             const numericId = Number(resolvedParams.id);
-            console.log(`Searching by articleID: ${numericId}`);
             article = await Article.findOne({ articleID: numericId }).lean();
         }
 
         let articleById = null;
         if (mongoose.Types.ObjectId.isValid(resolvedParams.id)) {
-            console.log(`Searching by _id: ${resolvedParams.id}`);
-            // Use findOne with explicit _id cast just to be absolutely sure
             try {
                 const objectId = new mongoose.Types.ObjectId(resolvedParams.id);
                 articleById = await Article.findOne({ _id: objectId }).lean();
-            } catch (err) {
-                console.error("Error creating ObjectId:", err);
+            } catch {
+                // Invalid ObjectId format, skip
             }
-        } else {
-            console.log(`ID is not a valid ObjectId: ${resolvedParams.id}`);
         }
 
         const foundArticle: any = article || articleById;
-        console.log(`Article found: ${!!foundArticle}`);
 
         if (!foundArticle) {
-            console.log(`Article not found for ID: ${resolvedParams.id}`);
             return NextResponse.json(
                 { message: 'Article not found' },
                 { status: 404 }

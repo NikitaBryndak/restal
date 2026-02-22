@@ -1,1 +1,1 @@
-export const titleTextFadeDuration = 3;
+export { TITLE_FADE_DURATION as titleTextFadeDuration } from './constants';

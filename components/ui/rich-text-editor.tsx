@@ -18,7 +18,6 @@ import {
   Code,
   AlignLeft,
   Pilcrow,
-  Undo2,
   Highlighter,
 } from "lucide-react";
 
@@ -121,8 +120,6 @@ export default function RichTextEditor({
 
     const ta = textareaRef.current;
     if (!ta) return;
-    const selected =
-      ta.value.substring(ta.selectionStart, ta.selectionEnd) || "link text";
     wrapSelection(`<a href="${url}" target="_blank" rel="noopener noreferrer">`, "</a>");
   }, [wrapSelection]);
 

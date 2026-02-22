@@ -246,7 +246,7 @@ export default function CashbackPage() {
 
                     {/* Login Prompt */}
                     <div className="max-w-md mx-auto text-center">
-                        <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-transparent border border-accent/20 rounded-2xl p-8 md:p-12 relative overflow-hidden">
+                        <div className="bg-linear-to-br from-accent/10 via-accent/5 to-transparent border border-accent/20 rounded-2xl p-8 md:p-12 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -mr-32 -mt-32" />
                             <div className="relative z-10">
                                 <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -288,7 +288,7 @@ export default function CashbackPage() {
                 </div>
 
                 {/* Balance Card */}
-                <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-transparent border border-accent/20 rounded-2xl p-8 md:p-12 mb-12 relative overflow-hidden">
+                <div className="bg-linear-to-br from-accent/10 via-accent/5 to-transparent border border-accent/20 rounded-2xl p-8 md:p-12 mb-12 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -mr-32 -mt-32" />
                     <div className="relative z-10">
                         <div className="grid md:grid-cols-3 gap-8">
@@ -357,7 +357,7 @@ export default function CashbackPage() {
                         {/* Bonus Cards Grid */}
                         <div className="grid md:grid-cols-2 gap-6">
                             {/* Bonus 1 - Welcome Bonus */}
-                            <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300">
+                            <div className="bg-linear-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-6">
@@ -386,7 +386,7 @@ export default function CashbackPage() {
                             </div>
 
                             {/* Bonus 2 - Cashback for Booking */}
-                            <div className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent border border-blue-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300">
+                            <div className="bg-linear-to-br from-blue-500/10 via-blue-500/5 to-transparent border border-blue-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-blue-500/20 transition-all" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-6">
@@ -415,7 +415,7 @@ export default function CashbackPage() {
                             </div>
 
                             {/* Bonus 3 - Activity Bonus */}
-                            <div className="bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
+                            <div className="bg-linear-to-br from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-purple-500/20 transition-all" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-6">
@@ -444,7 +444,7 @@ export default function CashbackPage() {
                             </div>
 
                             {/* Bonus 4 - Referral Bonus */}
-                            <div className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
+                            <div className="bg-linear-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl p-8 relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-amber-500/20 transition-all" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-6">
@@ -607,7 +607,7 @@ export default function CashbackPage() {
                             <div className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 md:p-8">
                                 <div className="space-y-6">
                                     <div className="flex gap-4">
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
+                                        <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
                                             <span className="text-accent font-semibold">2%</span>
                                         </div>
                                         <div>
@@ -619,7 +619,7 @@ export default function CashbackPage() {
                                         </div>
                                     </div>
                                     <div className="flex gap-4">
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                                        <div className="shrink-0 w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
                                             <span className="text-purple-400 font-semibold">+1%</span>
                                         </div>
                                         <div>
@@ -631,7 +631,7 @@ export default function CashbackPage() {
                                         </div>
                                     </div>
                                     <div className="flex gap-4">
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
+                                        <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
                                             <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                                             </svg>
@@ -655,7 +655,7 @@ export default function CashbackPage() {
                             <div className="bg-foreground/5 border border-foreground/10 rounded-xl p-6 md:p-8">
                                 <ul className="space-y-4">
                                     <li className="flex gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
@@ -663,7 +663,7 @@ export default function CashbackPage() {
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
@@ -671,7 +671,7 @@ export default function CashbackPage() {
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
@@ -679,7 +679,7 @@ export default function CashbackPage() {
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
@@ -687,7 +687,7 @@ export default function CashbackPage() {
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
@@ -695,7 +695,7 @@ export default function CashbackPage() {
                                         </span>
                                     </li>
                                     <li className="flex gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
                                         <span className="text-foreground/80">
@@ -779,7 +779,7 @@ export default function CashbackPage() {
                             {/* Step-by-step guide */}
                             <div className="space-y-6 mb-8">
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
+                                    <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
                                         1
                                     </div>
                                     <div>
@@ -790,7 +790,7 @@ export default function CashbackPage() {
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
+                                    <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
                                         2
                                     </div>
                                     <div>
@@ -801,7 +801,7 @@ export default function CashbackPage() {
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
+                                    <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
                                         3
                                     </div>
                                     <div>
@@ -812,7 +812,7 @@ export default function CashbackPage() {
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
+                                    <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent flex items-center justify-center text-sm font-semibold">
                                         4
                                     </div>
                                     <div>
@@ -858,7 +858,7 @@ export default function CashbackPage() {
 
                                 <div className="bg-accent/5 border border-accent/20 rounded-lg p-4 mb-6">
                                     <div className="flex items-start gap-3">
-                                        <svg className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-5 h-5 text-accent shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                         </svg>
                                         <p className="text-sm text-foreground/80">
@@ -891,7 +891,7 @@ export default function CashbackPage() {
 
                                 {/* Generated Code Display */}
                                 {generatedCode && (
-                                    <div className="mt-8 p-6 bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/30 rounded-lg">
+                                    <div className="mt-8 p-6 bg-linear-to-br from-accent/10 to-accent/5 border border-accent/30 rounded-lg">
                                         <p className="text-sm text-foreground/70 mb-1 text-center">
                                             Ваш код знижки
                                         </p>

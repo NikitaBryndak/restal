@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type ArticleProps = {
   data: {
@@ -14,6 +15,7 @@ type ArticleProps = {
 };
 
 export default function ArticleCard({ data }: ArticleProps) {
+  const router = useRouter();
   const slug = data._id || data.title
     .toLowerCase()
     .trim()
@@ -22,7 +24,10 @@ export default function ArticleCard({ data }: ArticleProps) {
 
   return (
     <div className="group bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md overflow-hidden hover:border-accent/50 transition-all duration-300 flex flex-col cursor-pointer"
-      onClick={() => window.location.href = `/info/${slug}`}
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/info/${slug}`)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/info/${slug}`); } }}
     >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
@@ -46,8 +51,8 @@ export default function ArticleCard({ data }: ArticleProps) {
       </div>
 
       {/* Content */}
-      <div className="p-6 flex flex-col flex-grow space-y-4">
-        <div className="space-y-2 flex-grow">
+      <div className="p-6 flex flex-col grow space-y-4">
+        <div className="space-y-2 grow">
           <h3 className="text-xl font-semibold text-white group-hover:text-accent transition-colors line-clamp-2">
             {data.title}
           </h3>
