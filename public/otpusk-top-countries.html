@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Популярні напрямки — RestAL</title>
+  <!--
+    Strategy: The widget renders cards with transparent spacer images and
+    country-code classes (e.g., "os-top-countries-item eg"). We inject
+    background-image from local optimized WebP files via a JS lookup map.
+    CSS overrides with !important handle the grid layout.
+  -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: transparent !important;
+      overflow-x: hidden;
+      color: #e0e0e0;
+    }
+    body { padding: 0; }
+
+    /* ============================================================
+       LAYOUT — CSS grid, optimized WebP backgrounds
+       ============================================================ */
+
+    .os-top-countries {
+      padding: 0 !important;
+      background: transparent !important;
+      width: 100% !important;
+      height: auto !important;
+      position: static !important;
+      overflow: visible !important;
+    }
+
+    .os-top-countries > div {
+      width: 100% !important;
+      height: auto !important;
+      position: static !important;
+    }
+
+    .os-top-countries ul {
+      margin: 0 !important;
+      padding: 0 !important;
+      list-style: none !important;
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 14px !important;
+      width: 100% !important;
+      height: auto !important;
+      position: static !important;
+    }
+
+    /* --- Card --- */
+    .os-top-countries-item {
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: auto !important;
+      height: auto !important;
+      aspect-ratio: 4 / 3 !important;
+      float: none !important;
+      overflow: hidden !important;
+      border-radius: 14px !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      background-color: #111827 !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      cursor: pointer !important;
+      transition: transform 0.35s cubic-bezier(0.25, 0.4, 0.25, 1),
+                  box-shadow 0.35s cubic-bezier(0.25, 0.4, 0.25, 1),
+                  border-color 0.35s ease !important;
+      will-change: transform !important;
+    }
+
+    .os-top-countries-item:hover {
+      border-color: rgba(15, 164, 230, 0.25) !important;
+      box-shadow: 0 12px 40px -8px rgba(15, 164, 230, 0.2),
+                  0 4px 12px -2px rgba(0, 0, 0, 0.4) !important;
+      transform: translateY(-4px) scale(1.02) !important;
+    }
+
+    /* Dark overlay for text readability */
+    .os-top-countries-item::after {
+      content: '' !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.15) 0%,
+        rgba(0, 0, 0, 0.05) 40%,
+        rgba(0, 0, 0, 0.35) 70%,
+        rgba(0, 0, 0, 0.7) 100%
+      ) !important;
+      border-radius: 14px !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+      transition: opacity 0.35s ease !important;
+    }
+
+    .os-top-countries-item:hover::after {
+      opacity: 0.85 !important;
+    }
+
+    /* --- Card link --- */
+    .os-top-countries-item > a {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      height: 100% !important;
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      text-decoration: none !important;
+      color: inherit !important;
+      overflow: hidden !important;
+      border-radius: 14px !important;
+      z-index: 2 !important;
+    }
+
+    /* Hide the transparent spacer image */
+    .os-top-countries-item img.os-country-image {
+      display: none !important;
+    }
+
+    /* --- Country name --- */
+    .os-country-name {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      padding: 14px 14px 24px !important;
+      color: #fff !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.01em !important;
+      line-height: 1.2 !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+      z-index: 3 !important;
+    }
+
+    /* --- Price bar --- */
+    .os-country-price {
+      position: absolute !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      background: linear-gradient(
+        to top,
+        rgba(15, 164, 230, 0.92) 0%,
+        rgba(15, 164, 230, 0.75) 60%,
+        transparent 100%
+      ) !important;
+      color: #fff !important;
+      padding: 22px 14px 10px !important;
+      font-size: 12px !important;
+      display: flex !important;
+      align-items: baseline !important;
+      gap: 5px !important;
+      z-index: 3 !important;
+      backdrop-filter: blur(2px) !important;
+    }
+
+    .os-country-price span:nth-child(1) {
+      font-size: 11px !important;
+      opacity: 0.8 !important;
+      font-weight: 500 !important;
+    }
+
+    .os-country-price span:nth-child(2) {
+      font-weight: 800 !important;
+      font-size: 19px !important;
+      letter-spacing: -0.01em !important;
+    }
+
+    .os-country-price span:nth-child(3) {
+      font-size: 11px !important;
+      opacity: 0.8 !important;
+      font-weight: 500 !important;
+    }
+
+    /* --- Responsive --- */
+    @media screen and (max-width: 900px) {
+      .os-top-countries ul {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+      }
+      .os-country-name { font-size: 14px !important; padding: 12px !important; }
+      .os-country-price span:nth-child(2) { font-size: 17px !important; }
+    }
+    @media screen and (max-width: 480px) {
+      .os-top-countries ul {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Otpusk widget script — creates cards; our JS below injects country images -->
+  <script src="https://export.otpusk.com/js/top?k=3f80a-01423-b3ca6-0bbab-1a284&t=image&c=8&u=https://restal.in.ua/&l=ua"></script>
+
+  <script>
+    (function () {
+      var EXPECTED = 8;
+
+      /* Map widget 2-letter country codes → optimized WebP images */
+      var CODE_TO_IMG = {
+        'eg': '/countryImages/optimized/Egypt.webp',
+        'tr': '/countryImages/optimized/Turkey.webp',
+        'ae': '/countryImages/optimized/UAE.webp',
+        'mv': '/countryImages/optimized/Maldives.webp',
+        'do': '/countryImages/optimized/Dominican-Republic.webp',
+        'tz': '/countryImages/optimized/Zanzibar.webp',
+        'th': '/countryImages/optimized/Thailand.webp',
+        'gr': '/countryImages/optimized/Greece.webp',
+        'al': '/countryImages/optimized/Albania.webp',
+        'bg': '/countryImages/optimized/Bulgaria.webp',
+        'hr': '/countryImages/optimized/Croatia.webp',
+        'cy': '/countryImages/optimized/Cyprus.webp',
+        'it': '/countryImages/optimized/Italy.webp',
+        'es': '/countryImages/optimized/Spain.webp',
+        'me': '/countryImages/optimized/Montenegro.webp',
+        'tn': '/countryImages/optimized/Tunisia.webp',
+        'lk': '/countryImages/optimized/SriLanka.webp',
+        'vn': '/countryImages/optimized/Vietnam.webp',
+        'gb': '/countryImages/optimized/UK.webp',
+        'id': '/countryImages/optimized/Bali.webp'
+      };
+
+      /* Preload all images immediately so they're cached before cards render */
+      Object.keys(CODE_TO_IMG).forEach(function (code) {
+        var img = new Image();
+        img.src = CODE_TO_IMG[code];
+      });
+
+      /* Position-related inline styles to strip from widget elements */
+      var STRIP_PROPS = ['position', 'top', 'left', 'right', 'bottom', 'float'];
+
+      /**
+       * Strip position-related inline styles from containers
+       * and inject country background images from local optimized WebP files.
+       */
+      function fixLayout() {
+        var selectors = [
+          '.os-top-countries',
+          '.os-top-countries > div',
+          '.os-top-countries ul',
+          '.os-top-countries-item',
+          '.os-top-countries-item > a'
+        ];
+        for (var s = 0; s < selectors.length; s++) {
+          var els = document.querySelectorAll(selectors[s]);
+          for (var i = 0; i < els.length; i++) {
+            for (var p = 0; p < STRIP_PROPS.length; p++) {
+              els[i].style.removeProperty(STRIP_PROPS[p]);
+            }
+          }
+        }
+
+        // Force the UL to grid
+        var ul = document.querySelector('.os-top-countries ul');
+        if (ul) {
+          ul.style.setProperty('display', 'grid', 'important');
+        }
+
+        // Inject background images based on country code class
+        var items = document.querySelectorAll('.os-top-countries-item');
+        for (var j = 0; j < items.length; j++) {
+          var li = items[j];
+          // Skip if already has a background-image set
+          if (li.style.backgroundImage && li.style.backgroundImage !== 'none') continue;
+
+          // Extract country code from class list (e.g., "os-top-countries-item eg")
+          var classes = li.className.split(/\s+/);
+          for (var k = 0; k < classes.length; k++) {
+            var cls = classes[k].toLowerCase();
+            if (cls.length === 2 && cls !== 'os' && CODE_TO_IMG[cls]) {
+              li.style.setProperty(
+                'background-image',
+                'url(' + CODE_TO_IMG[cls] + ')',
+                'important'
+              );
+              break;
+            }
+          }
+        }
+
+        return items.length;
+      }
+
+      // Poll until all cards exist, fixing layout each time
+      var attempts = 0;
+      var poll = setInterval(function () {
+        var count = fixLayout();
+        attempts++;
+        if (count >= EXPECTED || attempts > 150) {
+          clearInterval(poll);
+          // Keep fixing for 4 more seconds to catch late re-renders
+          var mop = setInterval(fixLayout, 300);
+          setTimeout(function () { clearInterval(mop); }, 4000);
+        }
+      }, 80);
+
+      // MutationObserver — re-apply layout fixes on DOM changes
+      var observer = new MutationObserver(function () {
+        fixLayout();
+      });
+      observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style']
+      });
+
+      // Notify parent frame about height
+      var lastHeight = 0;
+      function reportHeight() {
+        var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+        if (Math.abs(h - lastHeight) > 10) {
+          lastHeight = h;
+          window.parent.postMessage({ type: 'otpusk-top-resize', height: h }, '*');
+        }
+      }
+      setInterval(reportHeight, 500);
+      window.addEventListener('load', function () {
+        setTimeout(reportHeight, 300);
+        setTimeout(reportHeight, 1000);
+        setTimeout(reportHeight, 2000);
+      });
+    })();
+  </script>
+</body>
+</html>

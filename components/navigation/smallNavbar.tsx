@@ -75,16 +75,13 @@ export default function SmallNavbar() {
                                     {userProfile.privilegeLevel > 1 && (
                                         <div className="flex flex-col space-y-2 pt-2">
                                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                Admin
+                                                Manager
                                             </h3>
-                                            <NavLink href="/dashboard/manage-tour" onClick={toggleMobileMenu} className="text-lg">
-                                                Керування турами
-                                            </NavLink>
                                             <NavLink href="/dashboard/add-tour" onClick={toggleMobileMenu} className="text-lg">
                                                 Додати тур
                                             </NavLink>
-                                            <NavLink href="/dashboard/add-article" onClick={toggleMobileMenu} className="text-lg">
-                                                Додати статтю
+                                            <NavLink href="/dashboard/manage-tour" onClick={toggleMobileMenu} className="text-lg">
+                                                Керування турами
                                             </NavLink>
                                             <NavLink href="/dashboard/promo-codes" onClick={toggleMobileMenu} className="text-lg">
                                                 Промокоди
@@ -97,8 +94,14 @@ export default function SmallNavbar() {
                                     {userProfile.privilegeLevel > 2 && (
                                         <div className="flex flex-col space-y-2 pt-2">
                                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                Super Admin
+                                                Admin
                                             </h3>
+                                            <NavLink href="/dashboard/add-article" onClick={toggleMobileMenu} className="text-lg">
+                                                Додати статтю
+                                            </NavLink>
+                                            <NavLink href="/dashboard/manage-articles" onClick={toggleMobileMenu} className="text-lg">
+                                                Керування статтями
+                                            </NavLink>
                                             <NavLink href="/dashboard/analytics" onClick={toggleMobileMenu} className="text-lg">
                                                 Аналітика
                                             </NavLink>

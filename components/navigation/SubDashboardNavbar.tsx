@@ -15,6 +15,7 @@ export default function SubDashboardNavbar() {
 
     // Check if user has admin privileges (level 2 or higher)
     const isAdmin = userProfile && userProfile.privilegeLevel >= 2;
+    const isSuperAdmin = userProfile && userProfile.privilegeLevel >= 3;
 
     return (
         <nav className="hidden sm:flex sm:flex-col sticky top-20 w-44 z-10 h-[calc(100vh-7rem)]">
@@ -47,7 +48,7 @@ export default function SubDashboardNavbar() {
                     {!loading && isAdmin && (
                         <div className="flex flex-col space-y-0.5 pt-4 border-t border-white/5">
                             <div className="px-3 text-[10px] font-semibold text-white/25 uppercase tracking-[0.15em] mb-2">
-                                Admin
+                                Manager
                             </div>
 
                             <NavLink href="/dashboard/manage-tour" className={NAV_ITEM_CLASS}>
@@ -58,20 +59,28 @@ export default function SubDashboardNavbar() {
                                 Додати тур
                             </NavLink>
 
-                            <NavLink href="/dashboard/add-article" className={NAV_ITEM_CLASS}>
-                                Додати статтю
-                            </NavLink>
-
-                            <NavLink href="/dashboard/manage-articles" className={NAV_ITEM_CLASS}>
-                                Керування статтями
-                            </NavLink>
-
                             <NavLink href="/dashboard/promo-codes" className={NAV_ITEM_CLASS}>
                                 Промокоди
                             </NavLink>
 
                             <NavLink href="/dashboard/contact-requests" className={NAV_ITEM_CLASS}>
                                 Запити
+                            </NavLink>
+
+
+                        </div>
+                    )}
+                    {!loading && isSuperAdmin && (
+                        <div className="flex flex-col space-y-0.5 pt-4 border-t border-white/5">
+                            <div className="px-3 text-[10px] font-semibold text-white/25 uppercase tracking-[0.15em] mb-2">
+                                Admin
+                            </div>
+                            <NavLink href="/dashboard/manage-articles" className={NAV_ITEM_CLASS}>
+                                Керування статтями
+                            </NavLink>
+
+                            <NavLink href="/dashboard/add-article" className={NAV_ITEM_CLASS}>
+                                Додати статтю
                             </NavLink>
 
                             <NavLink href="/dashboard/analytics" className={NAV_ITEM_CLASS}>

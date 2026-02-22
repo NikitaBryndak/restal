@@ -48,7 +48,7 @@ export default function ManageArticlesPage() {
 
     useEffect(() => {
         if (status === 'authenticated') {
-            if ((session?.user?.privilegeLevel ?? 1) < 2) {
+            if ((session?.user?.privilegeLevel ?? 1) < 3) {
                 router.replace('/dashboard');
             } else {
                 fetchArticles();

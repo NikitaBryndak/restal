@@ -21,7 +21,7 @@ export default function AddArticlePage() {
 
     useEffect(() => {
         if (status === "loading") return;
-        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        if (!session || (session.user?.privilegeLevel ?? 1) < 3) {
             router.replace("/dashboard");
         }
     }, [session, status, router]);
@@ -30,7 +30,7 @@ export default function AddArticlePage() {
         return <DashboardFormSkeleton />;
     }
 
-    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+    if (!session || (session.user?.privilegeLevel ?? 1) < 3) {
         return null;
     }
 

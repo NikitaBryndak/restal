@@ -71,6 +71,29 @@ export default function InfoPage() {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeHeightRef = useRef(420);
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (!event.data) return;
+      if (
+        event.data.type === "otpusk-top-resize" &&
+        typeof event.data.height === "number"
+      ) {
+        const newHeight = Math.max(event.data.height, 300);
+        if (Math.abs(newHeight - iframeHeightRef.current) > 20) {
+          iframeHeightRef.current = newHeight;
+          if (iframeRef.current) {
+            iframeRef.current.style.height = newHeight + "px";
+          }
+        }
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -262,13 +285,68 @@ export default function InfoPage() {
             </FadeIn>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredArticles.map((article: any, index: number) => (
+              {filteredArticles.slice(0, 6).map((article: any, index: number) => (
                 <FadeIn key={article._id} delay={index * 0.06}>
                   <ArticleCard data={article} />
                 </FadeIn>
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/*  POPULAR DESTINATIONS WIDGET                                  */}
+      {/* ============================================================ */}
+      <section className="relative py-10 md:py-14 px-4 max-sm:px-3">
+        {/* Glow behind widget */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-accent/4 rounded-full blur-[150px] pointer-events-none" />
+
+        <div className="relative z-10 w-full max-w-6xl mx-auto">
+          <FadeIn>
+            {/* Section header */}
+            <div className="text-center mb-8">
+              <span className="text-accent text-xs font-semibold uppercase tracking-[0.2em]">
+                Популярні напрямки
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
+                Гарячі пропозиції
+              </h2>
+              <p className="text-white/40 text-sm mt-2 max-w-lg mx-auto">
+                Найкращі ціни на подорожі до популярних країн
+              </p>
+            </div>
+
+            {/* Widget label */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-white/40 text-sm font-medium tracking-wide uppercase">
+                Актуальні ціни
+              </span>
+            </div>
+
+            <div className="relative bg-white/3 border border-white/10 rounded-3xl shadow-2xl shadow-accent/5" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
+              {/* Decorative top gradient bar */}
+              <div className="h-px w-full bg-linear-to-r from-transparent via-accent/50 to-transparent" />
+
+              <div className="p-4 sm:p-6" style={{ WebkitOverflowScrolling: 'touch', overflow: 'auto' }}>
+                <iframe
+                  ref={iframeRef}
+                  src="/otpusk-top-countries.html"
+                  title="Популярні напрямки"
+                  style={{
+                    width: "100%",
+                    height: "420px",
+                    border: "none",
+                    display: "block",
+                    WebkitTransform: 'translateZ(0)',
+                  }}
+                  allow="clipboard-write"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
     </main>
