@@ -1,3 +1,5 @@
+"use client";
+
 import { Menu, X } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import React from "react";

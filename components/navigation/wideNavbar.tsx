@@ -1,3 +1,5 @@
+"use client";
+
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { NavLink } from "./nav-link";
 import { useSession } from "next-auth/react";
@@ -9,32 +11,32 @@ export default function WideNavbar() {
 
     return (
         <ul className="hidden sm:flex items-center gap-8 list-none m-0 p-0">
-            <li>
+            <li key="tour-screener">
                 <NavLink href="/tour-screener">
                     Підбір туру
                 </NavLink>
             </li>
-            <li>
+            <li key="search">
                 <NavLink href="/search">
                     ШІ Пошук
                 </NavLink>
             </li>
-            <li>
+            <li key="info">
                 <NavLink href="/info">
                     Інфо центр
                 </NavLink>
             </li>
-            <li>
+            <li key="contact">
                 <NavLink href="/contact">
                     Контакти
                 </NavLink>
             </li>
-            <li>
+            <li key="managers">
                 <NavLink href="/managers">
                     Менеджери
                 </NavLink>
             </li>
-            <li className="flex items-center gap-4">
+            <li key="user-actions" className="flex items-center gap-4">
                 {session && userProfile && (
                     <>
                         <NotificationBell />
