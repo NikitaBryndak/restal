@@ -132,24 +132,27 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
   ];
 
   return (
-    <div className={`fixed inset-0 z-[100] w-full h-screen h-[100dvh] bg-black/95 backdrop-blur-xl flex justify-center transition-all duration-700 ${mounted ? "opacity-100" : "opacity-0 translate-y-8"}`}>
-      <div className="w-full max-w-3xl flex flex-col h-full relative">
+    <div className={`fixed inset-0 z-100 w-full h-dvh bg-black flex justify-center transition-all duration-700 ${mounted ? "opacity-100" : "opacity-0 translate-y-8"}`}>
+      {/* Subtle background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-accent/4 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Compact header */}
-      <div className="flex items-center gap-3 py-4 px-1 sticky top-0 z-10 bg-black/50 backdrop-blur-md -mx-4 px-4 sm:mx-0 sm:px-1">
+      <div className="w-full max-w-3xl flex flex-col h-full relative px-4 sm:px-6">
+
+      {/* Header */}
+      <div className="flex items-center gap-3 py-4 sticky top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <button
           onClick={onClose}
-          className="group flex items-center gap-2 text-white/60 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 text-sm font-medium"
+          className="group flex items-center gap-2 text-white/60 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-2 rounded-xl border border-white/8 hover:border-white/15 text-sm font-medium"
         >
             <ArrowLeft className="w-4 h-4" />
             <span>Назад</span>
         </button>
         <div className="flex items-center gap-2.5 flex-1">
           <div className="relative">
-            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-accent/30 to-accent/10 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-accent" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border border-black animate-pulse" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-black animate-pulse" />
           </div>
           <div className="leading-tight">
             <span className="text-white text-sm font-semibold">RestAL AI</span>
@@ -161,65 +164,65 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
       {/* Messages area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-1 space-y-3 relative mask-fade-bottom"
+        className="flex-1 overflow-y-auto space-y-3 relative"
         style={{ scrollbarWidth: "none" }}
       >
         {messages.length === 0 && !isLoading ? (
           <div className={`flex flex-col items-center justify-center h-full gap-8 transition-all duration-500 delay-200 ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
             {/* Glowing orb */}
             <div className="relative">
-              <div className="absolute inset-0 w-20 h-20 rounded-full bg-accent/20 blur-2xl animate-pulse" />
-              <div className="relative w-20 h-20 rounded-full bg-linear-to-br from-accent/20 to-transparent border border-accent/20 flex items-center justify-center backdrop-blur-sm">
+              <div className="absolute inset-0 w-24 h-24 -m-2 rounded-full bg-accent/15 blur-3xl animate-pulse" />
+              <div className="relative w-20 h-20 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center shadow-lg shadow-accent/10">
                 <Sparkles className="w-8 h-8 text-accent" />
               </div>
             </div>
 
-            <div className="text-center space-y-2 max-w-md">
-              <h3 className="text-white text-xl font-semibold">Чим можу допомогти?</h3>
-              <p className="text-white/40 text-sm">
+            <div className="text-center space-y-3 max-w-md">
+              <h3 className="text-white text-2xl font-bold">Чим можу допомогти?</h3>
+              <p className="text-white/40 text-sm leading-relaxed">
                 Запитайте мене про будь-що пов&apos;язане з подорожами — напрямки, погоду, візи, найкращий час для поїздки.
               </p>
             </div>
 
             {/* Quick questions grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full max-w-lg">
               {quickQuestions.map((q, i) => (
                 <button
                   key={q.text}
                   onClick={() => sendMessage(`${q.emoji} ${q.text}`)}
-                  className={`group relative px-4 py-3 text-sm text-white/60 hover:text-white bg-white/3 hover:bg-accent/10 border border-white/6 hover:border-accent/30 rounded-2xl transition-all duration-300 text-left overflow-hidden ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                  className={`group relative px-4 py-3.5 text-sm text-white/60 hover:text-white bg-white/3 hover:bg-accent/10 border border-white/8 hover:border-accent/30 rounded-2xl transition-all duration-300 text-left overflow-hidden hover:shadow-lg hover:shadow-accent/5 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                   style={{ transitionDelay: `${300 + i * 80}ms` }}
                 >
-                  <span className="text-base">{q.emoji}</span>
-                  <span className="block text-xs mt-1 leading-snug">{q.text}</span>
+                  <span className="text-lg">{q.emoji}</span>
+                  <span className="block text-xs mt-1.5 leading-snug font-medium">{q.text}</span>
                   <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
                 </button>
               ))}
             </div>
           </div>
         ) : (
-          <div className="py-4 space-y-4">
+          <div className="py-4 space-y-5">
             {messages.map((msg, i) => (
               <div
                 key={i}
                 className={`flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-xl bg-linear-to-br from-accent/20 to-accent/5 flex items-center justify-center shrink-0 mt-1">
-                    <Bot className="w-3.5 h-3.5 text-accent" />
+                  <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 mt-1">
+                    <Bot className="w-4 h-4 text-accent" />
                   </div>
                 )}
                 <div
                   className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-accent text-white rounded-2xl rounded-br-sm"
-                      : "bg-white/4 text-white/90 rounded-2xl rounded-bl-sm border border-white/6"
+                      ? "bg-accent text-white rounded-2xl rounded-br-md shadow-lg shadow-accent/15"
+                      : "bg-white/4 text-white/90 rounded-2xl rounded-bl-md border border-white/8"
                   }`}
                 >
                   {msg.role === "user" ? (
                     msg.content
                   ) : (
-                    <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-white/10 prose-pre:p-2 prose-pre:rounded-lg">
+                    <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-white/10 prose-pre:p-3 prose-pre:rounded-xl">
                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {msg.content}
                       </ReactMarkdown>
@@ -231,14 +234,14 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
 
             {isLoading && (
               <div className="flex gap-3 justify-start animate-in fade-in duration-300">
-                <div className="w-7 h-7 rounded-xl bg-linear-to-br from-accent/20 to-accent/5 flex items-center justify-center shrink-0">
-                  <Bot className="w-3.5 h-3.5 text-accent" />
+                <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-accent" />
                 </div>
-                <div className="bg-white/4 border border-white/6 rounded-2xl rounded-bl-sm px-5 py-4">
-                  <div className="flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-1.5 h-1.5 bg-accent/50 rounded-full animate-bounce [animation-delay:300ms]" />
+                <div className="bg-white/4 border border-white/8 rounded-2xl rounded-bl-md px-5 py-4">
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 bg-accent/40 rounded-full animate-bounce [animation-delay:0ms]" />
+                    <span className="w-2 h-2 bg-accent/40 rounded-full animate-bounce [animation-delay:150ms]" />
+                    <span className="w-2 h-2 bg-accent/40 rounded-full animate-bounce [animation-delay:300ms]" />
                   </div>
                 </div>
               </div>
@@ -261,9 +264,9 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
       )}
 
       {/* Input area — always at the bottom */}
-      <div className={`py-4 px-1 transition-all duration-500 delay-300 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+      <div className={`py-4 transition-all duration-500 delay-300 border-t border-white/5 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
         <div className="relative">
-          <div className="flex items-center gap-2 bg-white/4 border border-white/8 focus-within:border-accent/40 rounded-2xl px-5 py-1.5 transition-all duration-300 focus-within:bg-white/6 focus-within:shadow-[0_0_30px_rgba(15,164,230,0.08)]">
+          <div className="flex items-center gap-2.5 bg-white/4 border border-white/10 focus-within:border-accent/40 rounded-2xl px-4 py-1 transition-all duration-300 focus-within:bg-white/6 focus-within:shadow-[0_0_40px_rgba(15,164,230,0.08)]">
             <input
               ref={inputRef}
               type="text"
@@ -272,12 +275,12 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
               onKeyDown={handleKeyDown}
               placeholder="Напишіть повідомлення..."
               disabled={isLoading}
-              className="flex-1 bg-transparent text-white text-sm placeholder-white/25 outline-none py-3 disabled:opacity-50"
+              className="flex-1 bg-transparent text-white text-sm placeholder-white/25 outline-none py-3.5 disabled:opacity-50"
             />
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || isLoading}
-              className="w-9 h-9 rounded-xl bg-accent/15 hover:bg-accent text-accent hover:text-white flex items-center justify-center transition-all duration-200 disabled:opacity-20 disabled:hover:bg-accent/15 disabled:hover:text-accent shrink-0"
+              className="w-10 h-10 rounded-xl bg-accent/15 hover:bg-accent text-accent hover:text-white flex items-center justify-center transition-all duration-200 disabled:opacity-20 disabled:hover:bg-accent/15 disabled:hover:text-accent shrink-0"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -287,8 +290,8 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
             </button>
           </div>
         </div>
-        <p className="text-[10px] text-white/15 text-center mt-2.5 tracking-wide">
-          Gemini AI · може помилятися
+        <p className="text-[10px] text-white/20 text-center mt-2.5 tracking-wide">
+          ШІ може помилятися
         </p>
       </div>
       </div>

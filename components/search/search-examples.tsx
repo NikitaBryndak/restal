@@ -15,8 +15,8 @@ export default function SearchExamples({ handleSearch }: SearchExamplesProps) {
                   onClick={() => {
                     handleSearch(suggestion);
                   }}
-                  className="px-3 py-1.5 text-xs sm:text-sm text-white/70 hover:text-white
-                    bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                  className="px-4 py-2 text-xs sm:text-sm text-white/60 hover:text-white
+                    bg-white/4 hover:bg-accent/10 border border-white/6 hover:border-accent/30 rounded-full transition-all duration-300"
                 >
                   {suggestion}
                 </button>

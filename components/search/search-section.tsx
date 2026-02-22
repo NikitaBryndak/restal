@@ -57,32 +57,22 @@ export default function SearchSection({ onChatToggle }: SearchSectionProps) {
   // Normal landing mode
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      <div className="flex justify-center">
-        <button
-          onClick={() => { setInitialQuery(""); setChatOpen(true); }}
-          className="px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium border border-accent/20 hover:bg-accent/20 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-        >
-          <Sparkles className="w-3 h-3" />
-          ШІ помічник
-        </button>
-      </div>
-
       {/* Search Bar */}
       <div className="flex justify-center">
-        <form onSubmit={handleFormSubmit} className="flex justify-center items-center w-full gap-2 p-2.5 rounded-lg bg-input-bg backdrop-blur-sm">
+        <form onSubmit={handleFormSubmit} className="flex justify-center items-center w-full gap-2 p-3 rounded-2xl bg-white/4 border border-white/8 backdrop-blur-sm hover:border-white/12 focus-within:border-accent/30 focus-within:bg-white/6 transition-all duration-300 focus-within:shadow-[0_0_40px_rgba(15,164,230,0.06)]">
           <SearchBar />
           <Button
             type="submit"
             variant="outline"
             size="icon"
-            className="size-10 text-foreground/50 hover:text-foreground hover:border-accent transition-colors"
+            className="size-10 rounded-xl text-foreground/50 hover:text-foreground hover:border-accent transition-colors"
           >
             <Search className="w-4 h-4" />
           </Button>
 
           <Link
             href="/contact"
-            className="hover:bg-accent hover:text-white hover:border-accent hidden p-2 bg-white/90 text-black rounded-md transition-colors sm:flex items-center justify-center gap-2 text-sm"
+            className="hover:bg-accent hover:text-white hover:border-accent hidden p-2 bg-white/90 text-black rounded-xl transition-colors sm:flex items-center justify-center gap-2 text-sm"
           >
             Контакти
             <Send className="w-4 h-4 shrink-0" />
@@ -91,9 +81,9 @@ export default function SearchSection({ onChatToggle }: SearchSectionProps) {
       </div>
 
       {/* Search Suggestions */}
-      <div className="space-y-2">
-        <p className="text-sm text-white/50">
-          Наприклад:
+      <div className="space-y-3">
+        <p className="text-xs text-white/40 uppercase tracking-widest font-medium text-center">
+          Спробуйте запитати
         </p>
         <SearchExamples handleSearch={handleSearch} />
       </div>
