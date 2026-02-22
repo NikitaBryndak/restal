@@ -20,7 +20,7 @@ export async function GET() {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber })
-            .select("name email phoneNumber createdAt cashbackAmount privilegeLevel");
+            .select("name email phoneNumber createdAt cashbackAmount privilegeLevel referralCode referralCount referralBonusEarned");
 
         if (!user) {
             return NextResponse.json({
@@ -38,7 +38,10 @@ export async function GET() {
             phoneNumber: user.phoneNumber,
             createdAt: user.createdAt,
             cashbackAmount: user.cashbackAmount,
-            privilegeLevel: user.privilegeLevel
+            privilegeLevel: user.privilegeLevel,
+            referralCode: user.referralCode || null,
+            referralCount: user.referralCount || 0,
+            referralBonusEarned: user.referralBonusEarned || 0,
         }, {
             status: 200
         });

@@ -23,6 +23,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         phoneNumber: formData.get("phoneNumber") as string,
         password: formData.get("password") as string,
         confirmPassword: formData.get("confirmPassword") as string,
+        referralCode: formData.get("referralCode") as string,
       });
     };
 
@@ -116,6 +117,17 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                   disabled={isLoading}
                   minLength={8}
                   placeholder="••••••••"
+                />
+              )}
+
+              {type === "register" && (
+                <FormField
+                  id="referralCode"
+                  label="Реферальний код (необов'язково)"
+                  type="text"
+                  disabled={isLoading}
+                  placeholder="REF-XXXX-XXXX"
+                  className="uppercase tracking-wider font-mono"
                 />
               )}
 

@@ -1,4 +1,17 @@
 import mongoose, { Schema } from "mongoose";
+import crypto from "crypto";
+
+// Generate a unique referral code: REF-XXXX-XXXX
+function generateReferralCode(): string {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const seg1 = Array.from(crypto.randomBytes(4))
+        .map((b) => chars[b % chars.length])
+        .join("");
+    const seg2 = Array.from(crypto.randomBytes(4))
+        .map((b) => chars[b % chars.length])
+        .join("");
+    return `REF-${seg1}-${seg2}`;
+}
 
 const userSchema = new Schema({
     name: {
@@ -26,6 +39,25 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     },
+    // Referral system fields
+    referralCode: {
+        type: String,
+        unique: true,
+        sparse: true,  // Allow null values without unique conflict
+    },
+    referredBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+    },
+    referralCount: {
+        type: Number,
+        default: 0,  // Number of friends successfully referred
+    },
+    referralBonusEarned: {
+        type: Number,
+        default: 0,  // Total referral bonus earned (in UAH)
+    },
     resetPasswordToken: {
         type: String,
         required: false,
@@ -43,6 +75,22 @@ const userSchema = new Schema({
         required: false,
     },
 }, { timestamps: true });
+
+// Auto-generate referral code before saving if not set
+userSchema.pre("save", async function (next) {
+    if (!this.referralCode) {
+        let code = generateReferralCode();
+        let attempts = 0;
+        const UserModel = mongoose.models.User || mongoose.model("User", userSchema);
+        while (await UserModel.findOne({ referralCode: code })) {
+            code = generateReferralCode();
+            attempts++;
+            if (attempts > 10) break;
+        }
+        this.referralCode = code;
+    }
+    next();
+});
 
 // Prevent Mongoose model recompilation error in development
 // and ensure new schema is applied by deleting existing model if needed

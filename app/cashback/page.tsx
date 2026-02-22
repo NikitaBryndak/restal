@@ -11,6 +11,9 @@ interface UserCashbackData {
     cashbackAmount: number;
     phoneNumber: string;
     userName: string;
+    referralCode: string | null;
+    referralCount: number;
+    referralBonusEarned: number;
 }
 
 interface TripCashbackInfo {
@@ -51,10 +54,10 @@ export default function CashbackPage() {
     // Promo code history
     const [promoHistory, setPromoHistory] = useState<PromoCodeEntry[]>([]);
 
-    // Generate referral code from phone number
-    const referralCode = userData?.phoneNumber
-        ? `RESTAL-${userData.phoneNumber.slice(-6).toUpperCase()}`
-        : "RESTAL-XXXXXX";
+    // Generate referral code from user profile (stored in DB)
+    const referralCode = userData?.referralCode || "REF-XXXX-XXXX";
+    const referralCount = userData?.referralCount || 0;
+    const referralBonusEarned = userData?.referralBonusEarned || 0;
 
     const fetchPromoHistory = useCallback(async () => {
         try {
@@ -87,7 +90,10 @@ export default function CashbackPage() {
                     setUserData({
                         cashbackAmount: profileData.cashbackAmount || 0,
                         phoneNumber: profileData.phoneNumber || '',
-                        userName: profileData.userName || ''
+                        userName: profileData.userName || '',
+                        referralCode: profileData.referralCode || null,
+                        referralCount: profileData.referralCount || 0,
+                        referralBonusEarned: profileData.referralBonusEarned || 0,
                     });
                 }
 
@@ -472,9 +478,9 @@ export default function CashbackPage() {
                             <h3 className="text-xl font-semibold mb-4">Ваш реферальний код</h3>
                             <p className="text-foreground/70 mb-6">
                                 Поділіться цим кодом з друзями. Коли вони зареєструються та здійснять перше бронювання,
-                                ви отримаєте бонус, а вони — знижку 800 грн.
+                                ви отримаєте бонус до 2 000 грн, а вони — додатковий бонус 800 грн при реєстрації.
                             </p>
-                            <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4 mb-6">
                                 <div className="flex-1 bg-background border border-foreground/20 rounded-xl p-4 flex items-center justify-between">
                                     <span className="text-xl font-mono tracking-wider text-accent">{referralCode}</span>
                                     <button
@@ -488,9 +494,23 @@ export default function CashbackPage() {
                                         )}
                                     </button>
                                 </div>
-                                <Button className="bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl px-6">
+                                <Button
+                                    onClick={copyReferralCode}
+                                    className="bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl px-6"
+                                >
                                     Поділитися
                                 </Button>
+                            </div>
+                            {/* Referral Stats */}
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-foreground/10">
+                                <div>
+                                    <p className="text-sm text-foreground/60">Друзів запрошено</p>
+                                    <p className="text-2xl font-light text-amber-400">{referralCount}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-foreground/60">Зароблено з рефералів</p>
+                                    <p className="text-2xl font-light text-amber-400">{referralBonusEarned.toLocaleString()} грн</p>
+                                </div>
                             </div>
                         </div>
 

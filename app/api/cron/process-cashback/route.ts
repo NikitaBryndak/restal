@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
+import { REFERRAL_BONUS_REFERRER } from "@/config/constants";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -70,6 +71,45 @@ export async function POST(request: Request) {
                     });
 
                     processedCount++;
+
+                    // --- Referral bonus processing ---
+                    // If this user was referred and this is their first completed trip,
+                    // award the referrer a bonus
+                    if (updatedUser.referredBy) {
+                        try {
+                            // Check if this is the first cashback-processed trip for this user
+                            const previousProcessedTrips = await Trip.countDocuments({
+                                ownerPhone: trip.ownerPhone,
+                                cashbackProcessed: true,
+                                _id: { $ne: trip._id }, // Exclude current trip
+                            });
+
+                            if (previousProcessedTrips === 0) {
+                                // First completed trip — award referrer
+                                const referralBonus = Math.min(
+                                    REFERRAL_BONUS_REFERRER,
+                                    trip.payment?.totalAmount
+                                        ? Math.round(trip.payment.totalAmount * 0.02)
+                                        : REFERRAL_BONUS_REFERRER
+                                );
+
+                                const bonusToAward = Math.min(referralBonus, REFERRAL_BONUS_REFERRER);
+
+                                await User.findByIdAndUpdate(
+                                    updatedUser.referredBy,
+                                    {
+                                        $inc: {
+                                            cashbackAmount: bonusToAward,
+                                            referralBonusEarned: bonusToAward,
+                                            referralCount: 1,
+                                        },
+                                    }
+                                );
+                            }
+                        } catch (refError) {
+                            errors.push(`Referral bonus error for trip ${trip.number}: ${refError}`);
+                        }
+                    }
                 } else {
                     errors.push(`User not found for trip ${trip.number}: ${trip.ownerPhone}`);
                 }

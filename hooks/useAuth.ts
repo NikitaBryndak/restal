@@ -11,6 +11,7 @@ type AuthFormData = {
   email?: string;
   password: string;
   confirmPassword?: string;
+  referralCode?: string;
 };
 
 export function useAuth({ type }: AuthFormProps) {
@@ -54,7 +55,8 @@ export function useAuth({ type }: AuthFormProps) {
                 name: formData.name,
                 phoneNumber: formData.phoneNumber,
                 email: formData.email,
-                password: formData.password
+                password: formData.password,
+                referralCode: formData.referralCode || undefined,
             }),
             });
 
