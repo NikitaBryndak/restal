@@ -179,9 +179,10 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
             alt="Подорож мрії"
             fill
             priority
+            fetchPriority="high"
             className="object-cover object-center"
             sizes="100vw"
-            quality={90}
+            quality={60}
           />
           {/* Dark overlay gradient */}
           <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/40 to-black" />
