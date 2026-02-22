@@ -58,6 +58,10 @@ const userSchema = new Schema({
         type: Number,
         default: 0,  // Total referral bonus earned (in UAH)
     },
+    referralBonusReceived: {
+        type: Boolean,
+        default: false,  // Whether this user received their referee bonus (awarded on first trip)
+    },
     resetPasswordToken: {
         type: String,
         required: false,

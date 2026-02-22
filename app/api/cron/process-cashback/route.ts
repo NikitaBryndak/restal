@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
-import { REFERRAL_BONUS_REFERRER } from "@/config/constants";
+import { REFERRAL_BONUS_REFERRER, REFERRAL_BONUS_REFEREE } from "@/config/constants";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
                     // --- Referral bonus processing ---
                     // If this user was referred and this is their first completed trip,
-                    // award the referrer a bonus
+                    // award BOTH the referrer and the referee their bonuses
                     if (updatedUser.referredBy) {
                         try {
                             // Check if this is the first cashback-processed trip for this user
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
                             });
 
                             if (previousProcessedTrips === 0) {
-                                // First completed trip — award referrer
+                                // First completed trip — award referrer their bonus
                                 const referralBonus = Math.min(
                                     REFERRAL_BONUS_REFERRER,
                                     trip.payment?.totalAmount
@@ -105,6 +105,17 @@ export async function POST(request: Request) {
                                         },
                                     }
                                 );
+
+                                // First completed trip — award referee (this user) their referral bonus
+                                if (!updatedUser.referralBonusReceived) {
+                                    await User.findByIdAndUpdate(
+                                        updatedUser._id,
+                                        {
+                                            $inc: { cashbackAmount: REFERRAL_BONUS_REFEREE },
+                                            $set: { referralBonusReceived: true },
+                                        }
+                                    );
+                                }
                             }
                         } catch (refError) {
                             errors.push(`Referral bonus error for trip ${trip.number}: ${refError}`);

@@ -460,14 +460,14 @@ export default function CashbackPage() {
                                         <p className="text-4xl font-light text-amber-400 mb-2">до 2 000 грн</p>
                                         <p className="text-foreground/70">
                                             Отримайте до 2 000 грн за кожного друга, якого Ви залучите.
-                                            А ваш друг отримає ваучер на 800 грн для першого бронювання.
+                                            А ваш друг отримає бонус 800 грн після першого бронювання туру.
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-amber-400">
                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
-                                        <span>Необмежена кількість друзів</span>
+                                        <span>Бонус після першого бронювання друга</span>
                                     </div>
                                 </div>
                             </div>
@@ -478,7 +478,7 @@ export default function CashbackPage() {
                             <h3 className="text-xl font-semibold mb-4">Ваш реферальний код</h3>
                             <p className="text-foreground/70 mb-6">
                                 Поділіться цим кодом з друзями. Коли вони зареєструються та здійснять перше бронювання,
-                                ви отримаєте бонус до 2 000 грн, а вони — додатковий бонус 800 грн при реєстрації.
+                                ви отримаєте бонус до 2 000 грн, а вони — додатковий бонус 800 грн.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 mb-6">
                                 <div className="flex-1 bg-background border border-foreground/20 rounded-xl p-4 flex items-center justify-between">
@@ -762,7 +762,7 @@ export default function CashbackPage() {
                                         </svg>
                                     </summary>
                                     <p className="mt-4 text-foreground/70">
-                                        Поділіться своїм реферальним кодом з друзями. Коли ваш друг зареєструється за вашим кодом та здійснить перше бронювання, ви отримаєте до 2 000 грн на свій бонусний рахунок, а ваш друг отримає ваучер на 800 грн для першого бронювання.
+                                        Поділіться своїм реферальним кодом з друзями. Коли ваш друг зареєструється за вашим кодом та здійснить перше бронювання, ви отримаєте до 2 000 грн на свій бонусний рахунок, а ваш друг отримає бонус 800 грн після завершення першого туру.
                                     </p>
                                 </details>
                             </div>

@@ -5,7 +5,7 @@ export const ADMIN_PRIVILEGE_LEVEL = 2;
 export const SUPER_ADMIN_PRIVILEGE_LEVEL = 4; // Top admin - can access and manage any trip
 
 // Referral system constants
-export const REFERRAL_BONUS_REFEREE = 800;   // Bonus for the new user who registers with a referral code (UAH)
+export const REFERRAL_BONUS_REFEREE = 800;   // Bonus for the referred user when they complete their first trip (UAH)
 export const REFERRAL_BONUS_REFERRER = 2000;  // Max bonus for the referrer when friend completes first trip (UAH)
 export const WELCOME_BONUS = 1000;            // Welcome bonus for new users (UAH)
 
