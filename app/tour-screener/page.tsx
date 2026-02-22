@@ -87,7 +87,7 @@ const highlights = [
 
 export default function TourScreenerPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [iframeHeight, setIframeHeight] = useState(800);
+  const iframeHeightRef = useRef(1200);
 
   // Booking modal state
   const [showBooking, setShowBooking] = useState(false);
@@ -162,7 +162,15 @@ export default function TourScreenerPage() {
         event.data.type === "otpusk-resize" &&
         typeof event.data.height === "number"
       ) {
-        setIframeHeight(event.data.height);
+        const newHeight = Math.max(event.data.height, 1200);
+        // Only update if change is significant (avoids oscillation on Safari/iOS)
+        if (Math.abs(newHeight - iframeHeightRef.current) > 30) {
+          iframeHeightRef.current = newHeight;
+          // Directly update DOM — no React re-render, no iframe repaint blink
+          if (iframeRef.current) {
+            iframeRef.current.style.height = newHeight + "px";
+          }
+        }
       }
 
       if (event.data.type === "otpusk-order") {
@@ -312,7 +320,7 @@ export default function TourScreenerPage() {
                   title="Пошук турів"
                   style={{
                     width: "100%",
-                    height: `${Math.max(iframeHeight, 1200)}px`,
+                    height: "1200px",
                     border: "none",
                     display: "block",
                     WebkitTransform: 'translateZ(0)',

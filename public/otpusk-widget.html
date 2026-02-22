@@ -1270,9 +1270,8 @@
         ];
 
         function findToggleByText(texts) {
-          // ... (keep logic, but wrapped)
-          for (var t of texts) {
-             var toggle = findToggle(t);
+          for (var i = 0; i < texts.length; i++) {
+             var toggle = findToggle(texts[i]);
              if (toggle) return toggle;
           }
           return null;
@@ -1397,24 +1396,42 @@
   <script>
     (function () {
       var lastHeight = 0;
-      function postHeight() {
-        var height = Math.max(
-          document.body.scrollHeight,
-          document.body.offsetHeight,
-          document.documentElement.scrollHeight,
-          document.documentElement.offsetHeight
+      var pendingFrame = null;
+      var THRESHOLD = 30; // Only post if height changed by more than 30px
+
+      function getHeight() {
+        return Math.max(
+          document.body.scrollHeight || 0,
+          document.body.offsetHeight || 0,
+          document.documentElement.scrollHeight || 0,
+          document.documentElement.offsetHeight || 0
         );
-        if (height !== lastHeight) {
+      }
+
+      function postHeight() {
+        var height = getHeight();
+        if (Math.abs(height - lastHeight) > THRESHOLD) {
           lastHeight = height;
           window.parent.postMessage({ type: 'otpusk-resize', height: height }, '*');
         }
       }
-      setInterval(postHeight, 150);
+
+      // Debounced version that coalesces rapid mutations
+      function schedulePost() {
+        if (pendingFrame) return;
+        pendingFrame = requestAnimationFrame(function() {
+          pendingFrame = null;
+          postHeight();
+        });
+      }
+
+      // Poll less aggressively
+      setInterval(postHeight, 500);
       window.addEventListener('load', postHeight);
       window.addEventListener('resize', postHeight);
       if (window.MutationObserver) {
-        new MutationObserver(postHeight).observe(document.body, {
-          childList: true, subtree: true, attributes: true, characterData: true
+        new MutationObserver(schedulePost).observe(document.body, {
+          childList: true, subtree: true
         });
       }
     })();
