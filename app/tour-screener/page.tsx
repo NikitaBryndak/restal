@@ -301,24 +301,26 @@ export default function TourScreenerPage() {
               <span className="text-white/40 text-sm font-medium tracking-wide uppercase">Пошук турів</span>
             </div>
 
-            <div className="relative bg-white/3 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-sm shadow-2xl shadow-accent/5">
+            <div className="relative bg-white/3 border border-white/10 rounded-3xl shadow-2xl shadow-accent/5" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
               {/* Decorative top gradient bar */}
               <div className="h-px w-full bg-linear-to-r from-transparent via-accent/50 to-transparent" />
 
-              <iframe
-                ref={iframeRef}
-                src="/otpusk-widget.html"
-                title="Пошук турів"
-                style={{
-                  width: "100%",
-                  height: `${Math.max(iframeHeight, 1200)}px`,
-                  border: "none",
-                  display: "block",
-                }}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-                allow="clipboard-write"
-                loading="eager"
-              />
+              <div style={{ WebkitOverflowScrolling: 'touch', overflow: 'auto' }}>
+                <iframe
+                  ref={iframeRef}
+                  src="/otpusk-widget.html"
+                  title="Пошук турів"
+                  style={{
+                    width: "100%",
+                    height: `${Math.max(iframeHeight, 1200)}px`,
+                    border: "none",
+                    display: "block",
+                    WebkitTransform: 'translateZ(0)',
+                  }}
+                  allow="clipboard-write"
+                  loading="eager"
+                />
+              </div>
             </div>
           </FadeIn>
         </div>
