@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { connectToDatabase } from "@/lib/mongodb";
 import AiRateLimit from "@/models/aiRateLimit";
+import { getServerIp } from "@/lib/rate-limit";
 
 const DAILY_LIMIT = 50;
 
@@ -33,7 +34,7 @@ const SYSTEM_PROMPT = `Ти — дружній ШІ-помічник тураг�
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, visitorId } = await req.json();
+    const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -42,10 +43,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Rate Limiting
-    const forwardedFor = req.headers.get("x-forwarded-for");
-    const ip = forwardedFor ? forwardedFor.split(",")[0] : "unknown";
-    const identifier = visitorId || ip;
+    // SECURITY: Limit message array size to prevent abuse
+    if (messages.length > 50) {
+      return NextResponse.json(
+        { error: "Too many messages in conversation" },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Rate Limiting - use server-derived IP only, never trust client-supplied identifiers
+    const identifier = getServerIp(req);
 
     await connectToDatabase();
 
@@ -105,7 +112,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: response });
   } catch (error) {
-    console.error("Chat API error:", error);
+    // SECURITY: Only log a safe error message, never log the full error object
+    // which may contain API keys in request URLs or stack traces
+    console.error("Chat API error:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json(
       { error: "Failed to generate response" },
       { status: 500 }

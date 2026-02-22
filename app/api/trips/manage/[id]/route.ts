@@ -136,15 +136,22 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             return NextResponse.json({ message: "Forbidden: You don't have access to modify this trip." }, { status: 403 });
         }
 
-        // SECURITY: Remove immutable and sensitive fields to prevent mass assignment
-        const {
-            _id, createdAt, updatedAt, managerName,
-            ownerPhone: _ownerPhone,           // Immutable - set at creation
-            cashbackProcessed: _cbProcessed,    // Only set by cron job
-            cashbackAmount: _cbAmount,           // Only set at creation
-            managerPhone: _mgrPhone,            // Auto-set to current user below
-            ...rest
-        } = updates ?? {};
+        // SECURITY: Use ALLOWLIST pattern instead of blocklist to prevent mass assignment.
+        // Only these fields can be updated by managers — any new fields must be explicitly added here.
+        const ALLOWED_UPDATE_FIELDS = [
+            'status', 'country', 'city', 'hotel', 'roomType',
+            'tripStartDate', 'tripEndDate', 'notes',
+            'payment', 'flightInfo', 'documents',
+            'tourists', 'description', 'boardBasis',
+            'insurance', 'transfer', 'nightsCount',
+        ];
+
+        const rest: Record<string, unknown> = {};
+        for (const key of ALLOWED_UPDATE_FIELDS) {
+            if (key in updates && updates[key] !== undefined) {
+                rest[key] = updates[key];
+            }
+        }
 
         // Recalculate cashback if total amount changes and cashback hasn't been processed
         let newCashbackAmount = undefined;

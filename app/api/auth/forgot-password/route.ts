@@ -1,12 +1,24 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import { sendSMS } from "@/lib/sms";
 import crypto, { randomInt } from "crypto";
 import bcrypt from "bcryptjs";
+import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    // SECURITY: Rate limit forgot-password — max 3 attempts per IP per 15 minutes
+    // Prevents SMS bombing and Twilio billing abuse
+    const ip = getServerIp(req);
+    const { allowed } = checkRateLimit("forgot-password", ip, 3, 15 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { message: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { phoneNumber } = await req.json();
 
     if (!phoneNumber) {

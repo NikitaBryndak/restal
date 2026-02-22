@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/mongodb";
 import Notification from "@/models/notification";
+import mongoose from "mongoose";
 
 // GET - Fetch notifications for current user
 export async function GET() {
@@ -52,9 +53,19 @@ export async function PUT(request: Request) {
                 { read: true }
             );
         } else if (notificationIds && Array.isArray(notificationIds)) {
+            // SECURITY: Validate notificationIds — must be valid ObjectIds and capped at 100
+            if (notificationIds.length > 100) {
+                return NextResponse.json({ message: "Too many notification IDs" }, { status: 400 });
+            }
+            const validIds = notificationIds.filter(
+                (id: unknown) => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id)
+            );
+            if (validIds.length === 0) {
+                return NextResponse.json({ message: "No valid notification IDs" }, { status: 400 });
+            }
             await Notification.updateMany(
                 {
-                    _id: { $in: notificationIds },
+                    _id: { $in: validIds },
                     userPhone: session.user.phoneNumber
                 },
                 { read: true }

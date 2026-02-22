@@ -69,6 +69,14 @@ export async function GET(request: NextRequest) {
                 }
         }
 
+        // SECURITY: Articles require at least manager-level access (privilegeLevel >= 2)
+        if (filePath.startsWith('articles/')) {
+            const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
+            if (userPrivilegeLevel < 2) {
+                return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+            }
+        }
+
         const storage = new Storage({
             projectId: process.env.GCP_PROJECT_ID,
             credentials: {

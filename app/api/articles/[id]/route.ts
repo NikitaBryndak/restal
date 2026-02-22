@@ -88,9 +88,29 @@ export async function PUT(
         const allowedUpdates = ['title', 'description', 'content', 'tag', 'images'];
         const updateData: any = {};
 
+        // SECURITY: Apply the same length limits as the POST handler
+        const MAX_TITLE_LENGTH = 200;
+        const MAX_DESCRIPTION_LENGTH = 500;
+        const MAX_CONTENT_LENGTH = 50000;
+        const MAX_TAG_LENGTH = 50;
+        const MAX_IMAGE_URL_LENGTH = 2000;
+
+        const lengthLimits: Record<string, number> = {
+            title: MAX_TITLE_LENGTH,
+            description: MAX_DESCRIPTION_LENGTH,
+            content: MAX_CONTENT_LENGTH,
+            tag: MAX_TAG_LENGTH,
+            images: MAX_IMAGE_URL_LENGTH,
+        };
+
         Object.keys(body).forEach(key => {
             if (allowedUpdates.includes(key)) {
-                updateData[key] = body[key];
+                let value = body[key];
+                // Apply length limits for string fields
+                if (typeof value === 'string' && lengthLimits[key]) {
+                    value = value.slice(0, lengthLimits[key]);
+                }
+                updateData[key] = value;
             }
         });
 

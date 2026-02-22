@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     }
 
     // Set new password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     userByPhone.password = hashedPassword;
 
     // Clear reset token fields and attempts

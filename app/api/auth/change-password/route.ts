@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../[...nextauth]/route";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -15,6 +16,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 message: "Unauthorized"
             }, { status: 401 });
+        }
+
+        // SECURITY: Rate limit password changes — max 5 attempts per user per 15 minutes
+        // Prevents brute-forcing the current password with a stolen session
+        const { allowed } = checkRateLimit("change-password", session.user.phoneNumber, 5, 15 * 60 * 1000);
+        if (!allowed) {
+            return NextResponse.json({
+                message: "Too many password change attempts. Please try again later."
+            }, { status: 429 });
         }
 
         const body = await request.json();
@@ -60,7 +70,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Hash and update password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
         user.password = hashedPassword;
         await user.save();
 

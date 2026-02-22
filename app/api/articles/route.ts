@@ -16,7 +16,11 @@ export async function GET() {
     try {
         await connectToDatabase();
 
-        const articles = await Article.find().sort({ createdAt: -1 }).lean();
+        // SECURITY: Limit results to prevent loading unbounded data
+        const articles = await Article.find()
+            .sort({ createdAt: -1 })
+            .limit(100)
+            .lean();
         // Ensure _id is string for client consistency
          const serializedArticles = articles.map((article: any) => ({
              ...article,

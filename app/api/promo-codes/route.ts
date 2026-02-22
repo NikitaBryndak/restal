@@ -37,6 +37,23 @@ export async function POST(request: Request) {
             );
         }
 
+        // SECURITY: Cap maximum promo code amount to prevent abuse
+        const MAX_PROMO_AMOUNT = 50000;
+        if (numericAmount > MAX_PROMO_AMOUNT) {
+            return NextResponse.json(
+                { message: `Максимальна сума — ${MAX_PROMO_AMOUNT} грн` },
+                { status: 400 }
+            );
+        }
+
+        // SECURITY: Ensure amount is a whole number
+        if (!Number.isInteger(numericAmount)) {
+            return NextResponse.json(
+                { message: "Сума повинна бути цілим числом" },
+                { status: 400 }
+            );
+        }
+
         await connectToDatabase();
 
         // Generate a unique code (retry on collision)

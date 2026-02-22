@@ -1,16 +1,23 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
-
-// SECURITY NOTE: This endpoint is used during registration to check if a phone number
-// already exists. While this could theoretically be used for user enumeration,
-// the same information is revealed during the registration process anyway.
-// To mitigate abuse, consider adding rate limiting in production.
+import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 
 const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
 
 export async function POST(request: NextRequest) {
     try {
+        // SECURITY: Rate limit user existence checks — max 10 per IP per 15 minutes
+        // Prevents mass phone number enumeration
+        const ip = getServerIp(request);
+        const { allowed } = checkRateLimit("userExists", ip, 10, 15 * 60 * 1000);
+        if (!allowed) {
+            return NextResponse.json({
+                exists: false,
+                message: "Too many requests. Please try again later."
+            }, { status: 429 });
+        }
+
         const { phoneNumber } = await request.json();
 
         // Validate phone number format to prevent NoSQL injection

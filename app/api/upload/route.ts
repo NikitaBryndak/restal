@@ -32,6 +32,15 @@ export async function POST(request: NextRequest) {
     const folder = formData.get("folder") as string || "misc";
     const tripNumber = formData.get("tripNumber") as string || "";
 
+    // SECURITY: Validate folder against an allowlist to prevent path traversal in GCS
+    const ALLOWED_FOLDERS = ['documents', 'articles', 'misc'];
+    if (!ALLOWED_FOLDERS.includes(folder)) {
+      return NextResponse.json(
+        { message: "Invalid upload folder" },
+        { status: 400 }
+      );
+    }
+
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
     }

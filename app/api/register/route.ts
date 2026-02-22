@@ -3,12 +3,25 @@ import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { WELCOME_BONUS } from "@/config/constants";
+import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 
 const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
 const MIN_PASSWORD_LENGTH = 8;
+// SECURITY: Basic email format validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
     try {
+        // SECURITY: Rate limit registration — max 5 attempts per IP per hour
+        const ip = getServerIp(request);
+        const { allowed } = checkRateLimit("register", ip, 5, 60 * 60 * 1000);
+        if (!allowed) {
+            return NextResponse.json(
+                { message: "Too many registration attempts. Please try again later." },
+                { status: 429 }
+            );
+        }
+
         const body = await request.json();
         const { name, phoneNumber, email, password, referralCode } = body;
 
@@ -59,13 +72,22 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // SECURITY: Validate email format if provided
+        if (email && typeof email === 'string' && email.trim().length > 0) {
+            if (!EMAIL_REGEX.test(email.trim())) {
+                return NextResponse.json({
+                    message: "Invalid email format"
+                }, { status: 400 });
+            }
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
 
         // Welcome bonus only at registration — referral bonus is awarded when first trip completes
         await User.create({
             name: sanitizedName,
             phoneNumber: sanitizedPhone,
-            email: email?.trim().toLowerCase(),
+            email: email?.trim().toLowerCase() || undefined,  // Only store if provided
             password: hashedPassword,
             cashbackAmount: WELCOME_BONUS,
             referredBy: referrerId,

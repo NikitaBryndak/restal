@@ -31,9 +31,10 @@ export async function GET() {
             { $set: { status: "expired" } }
         );
 
-        // Fetch all codes sorted by creation date
+        // Fetch codes with pagination limit to prevent unbounded data loading
         const codes = await PromoCode.find()
             .sort({ createdAt: -1 })
+            .limit(500)
             .lean();
 
         // Calculate statistics

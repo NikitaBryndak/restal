@@ -122,10 +122,12 @@ export async function POST(request: Request) {
                         }
                     }
                 } else {
-                    errors.push(`User not found for trip ${trip.number}: ${trip.ownerPhone}`);
+                    // SECURITY: Redact PII — don't include phone numbers in error responses
+                    errors.push(`User not found for trip ${trip.number}`);
                 }
             } catch (error) {
-                errors.push(`Error processing trip ${trip.number}: ${error}`);
+                // SECURITY: Redact internal error details
+                errors.push(`Error processing trip ${trip.number}`);
             }
         }
 
