@@ -15,6 +15,11 @@ export default function WideNavbar() {
                 </NavLink>
             </li>
             <li>
+                <NavLink href="/search">
+                    ШІ Пошук
+                </NavLink>
+            </li>
+            <li>
                 <NavLink href="/info">
                     Інфо центр
                 </NavLink>

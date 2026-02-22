@@ -35,6 +35,9 @@ export default function SmallNavbar() {
                                 <NavLink href="/tour-screener" onClick={toggleMobileMenu} className="text-lg font-medium">
                                     Підбір туру
                                 </NavLink>
+                                <NavLink href="/search" onClick={toggleMobileMenu} className="text-lg font-medium">
+                                    ШІ Пошук
+                                </NavLink>
                                 <NavLink href="/info" onClick={toggleMobileMenu} className="text-lg font-medium">
                                     Інфо центр
                                 </NavLink>

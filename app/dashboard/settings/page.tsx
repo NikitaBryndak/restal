@@ -162,7 +162,7 @@ export default function SettingsPage() {
 
             setUsernameChangeSuccess("Username changed successfully!");
             setIsEditingUsername(false);
-            
+
             // Refetch user profile to update the display immediately
             await refetch();
 
@@ -372,7 +372,7 @@ export default function SettingsPage() {
                                         <p className="text-sm text-emerald-200">{passwordChangeSuccess}</p>
                                     </div>
                                 )}
-                                <Button 
+                                <Button
                                     onClick={handleChangePassword}
                                     disabled={passwordChangeLoading}
                                     className="bg-accent hover:bg-accent/90 text-white rounded-xl h-12 w-full sm:w-auto disabled:opacity-50"
