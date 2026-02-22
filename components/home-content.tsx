@@ -74,14 +74,14 @@ function FadeIn({
 /*  DATA                                                               */
 /* ================================================================== */
 const destinations = [
-  { name: "Туреччина", image: "/countryImages/Turkey.jpg", tag: "Популярне", tagColor: "bg-red-500" },
-  { name: "Єгипет", image: "/countryImages/Egypt.jpg", tag: "Гарячі тури", tagColor: "bg-orange-500" },
-  { name: "Греція", image: "/countryImages/Greece.jpg", tag: "Топ сезону", tagColor: "bg-cyan-500" },
-  { name: "Мальдіви", image: "/countryImages/Maldives.jpg", tag: "Преміум", tagColor: "bg-purple-500" },
-  { name: "Іспанія", image: "/countryImages/Spain.jpg", tag: "Європа", tagColor: "bg-blue-500" },
-  { name: "Таїланд", image: "/countryImages/Thailand.jpg", tag: "Екзотика", tagColor: "bg-emerald-500" },
-  { name: "ОАЕ", image: "/countryImages/UAE.jpg", tag: "Luxury", tagColor: "bg-amber-500" },
-  { name: "Хорватія", image: "/countryImages/Croatia.jpg", tag: "Відкрий нове", tagColor: "bg-teal-500" },
+  { name: "Туреччина", image: "/countryImages/optimized/Turkey-dest.webp", tag: "Популярне", tagColor: "bg-red-500" },
+  { name: "Єгипет", image: "/countryImages/optimized/Egypt-dest.webp", tag: "Гарячі тури", tagColor: "bg-orange-500" },
+  { name: "Греція", image: "/countryImages/optimized/Greece-dest.webp", tag: "Топ сезону", tagColor: "bg-cyan-500" },
+  { name: "Мальдіви", image: "/countryImages/optimized/Maldives-dest.webp", tag: "Преміум", tagColor: "bg-purple-500" },
+  { name: "Іспанія", image: "/countryImages/optimized/Spain-dest.webp", tag: "Європа", tagColor: "bg-blue-500" },
+  { name: "Таїланд", image: "/countryImages/optimized/Thailand-dest.webp", tag: "Екзотика", tagColor: "bg-emerald-500" },
+  { name: "ОАЕ", image: "/countryImages/optimized/UAE-dest.webp", tag: "Luxury", tagColor: "bg-amber-500" },
+  { name: "Хорватія", image: "/countryImages/optimized/Croatia-dest.webp", tag: "Відкрий нове", tagColor: "bg-teal-500" },
 ];
 
 const features = [
@@ -175,14 +175,16 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
         {/* Background image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/countryImages/Greece.jpg"
+            src="/countryImages/optimized/Greece-hero.webp"
             alt="Подорож мрії"
             fill
             priority
             fetchPriority="high"
             className="object-cover object-center"
             sizes="100vw"
-            quality={60}
+            quality={85}
+            placeholder="blur"
+            blurDataURL="data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAABQBQCdASogABUAPzmQuVWvKiWjMBgIAeAnCUAX5wYljSwSLheTFykCNHg4zt18PWpIHgAA/tAvso4ENkzexkPPgqoT616GcEpY1lqDX2zG2Oo7AynhpJ7zLPo48is9+e+s7dkpeULr438lL+9ZEba9+GcCTSMKNMTGzBSfg3KLMpHwfC8AAA=="
           />
           {/* Dark overlay gradient */}
           <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/40 to-black" />
