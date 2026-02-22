@@ -286,12 +286,12 @@ export default function ContactPage() {
 
                {/* Right — Form (3 cols) */}
                <FadeIn delay={0.15} className="lg:col-span-3">
-                  <div className="relative p-6 sm:p-8 rounded-3xl border border-white/6 overflow-hidden backdrop-blur-sm">
+                  <div className="relative p-6 sm:p-8 rounded-3xl border border-white/5 overflow-hidden backdrop-blur-sm">
                      {/* Gradient background fill */}
-                     <div className="absolute inset-0 bg-linear-to-br from-white/4 via-white/2 to-accent/3" />
+                     <div className="absolute inset-0 bg-linear-to-br from-white/3 via-white/1.5 to-accent/2.5" />
 
                      {/* Decorative top gradient bar */}
-                     <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent" />
+                     <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/25 to-transparent" />
 
                      {/* Decorative glows */}
                      <div className="absolute -top-20 -right-20 w-48 h-48 bg-accent/8 rounded-full blur-[80px] pointer-events-none" />
@@ -317,7 +317,7 @@ export default function ContactPage() {
                                     placeholder="Іван"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    className="bg-black/40 border-white/10 focus:border-accent/50 h-11 rounded-xl"
+                                    className="bg-white/5 border-white/8 focus:border-accent/40 h-11 rounded-xl placeholder:text-white/25"
                                  />
                               </div>
                               <div className="space-y-1.5">
@@ -327,7 +327,7 @@ export default function ContactPage() {
                                     placeholder="Петренко"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    className="bg-black/40 border-white/10 focus:border-accent/50 h-11 rounded-xl"
+                                    className="bg-white/5 border-white/8 focus:border-accent/40 h-11 rounded-xl placeholder:text-white/25"
                                  />
                               </div>
                            </div>
@@ -338,7 +338,7 @@ export default function ContactPage() {
                               value={phone}
                               onChange={(e) => setPhone(e.target.value)}
                               containerClassName="space-y-1.5"
-                              className="bg-black/40 border-white/10 focus:border-accent/50 h-11 rounded-xl"
+                              className="bg-white/5 border-white/8 focus:border-accent/40 h-11 rounded-xl placeholder:text-white/25"
                            />
 
                            <div className="space-y-1.5">
@@ -347,7 +347,7 @@ export default function ContactPage() {
                                  id="message"
                                  value={message}
                                  onChange={(e) => setMessage(e.target.value)}
-                                 className="flex min-h-[100px] w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm ring-offset-background placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/50 resize-none"
+                                 className="flex min-h-[100px] w-full rounded-xl border border-white/8 bg-white/5 px-4 py-3 text-sm ring-offset-background placeholder:text-white/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/40 resize-none"
                                  placeholder="Розкажіть про ваші плани подорожі..."
                               />
                            </div>

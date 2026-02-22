@@ -197,8 +197,10 @@ export default function ManagersContent() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [exitingChat, setExitingChat] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const interval = setInterval(() => {
       forceUpdate({});
     }, 60000);
@@ -208,6 +210,7 @@ export default function ManagersContent() {
   const getOnlineStatus = (manager: typeof managers[0]) => {
     if ('alwaysOnline' in manager && manager.alwaysOnline) return true;
     if ('isVacancy' in manager && manager.isVacancy) return false;
+    if (!isMounted) return false;
     return manager.isHuman && 'workingDays' in manager && isWithinWorkingHours(manager.workingDays);
   };
 
