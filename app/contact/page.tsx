@@ -1,14 +1,103 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { motion, useInView } from "motion/react";
+import Link from "next/link";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { Spotlight } from "@/components/ui/spotlight-new";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import FormInput from "@/components/ui/form-input";
-import { Mail, Phone, MapPin, Send, Loader2, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import {
+   Mail,
+   Phone,
+   MapPin,
+   Send,
+   Loader2,
+   CheckCircle2,
+   Headphones,
+   Shield,
+   MessageCircle,
+} from "lucide-react";
 
+/* ------------------------------------------------------------------ */
+/*  Fade-in wrapper                                                    */
+/* ------------------------------------------------------------------ */
+function FadeIn({
+   children,
+   className = "",
+   delay = 0,
+}: {
+   children: React.ReactNode;
+   className?: string;
+   delay?: number;
+}) {
+   const ref = useRef(null);
+   const isInView = useInView(ref, { once: true, margin: "-60px" });
+
+   return (
+      <motion.div
+         ref={ref}
+         initial={{ opacity: 0, y: 32 }}
+         animate={isInView ? { opacity: 1, y: 0 } : {}}
+         transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
+         className={className}
+      >
+         {children}
+      </motion.div>
+   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Data                                                               */
+/* ------------------------------------------------------------------ */
+const contactChannels = [
+   {
+      icon: Mail,
+      label: "Пошта",
+      value: "restal.inform@gmail.com",
+      href: "mailto:restal.inform@gmail.com",
+   },
+   {
+      icon: Phone,
+      label: "Телефон / Viber",
+      value: "+38 (068) 7772550",
+      href: "viber://chat?number=+380687772550",
+   },
+   {
+      icon: Send,
+      label: "Telegram",
+      value: "@RestAL_travel",
+      href: "https://t.me/RestAL_travel",
+      external: true,
+   },
+];
+
+const offices = [
+   {
+      name: "JoinUp Турагенція",
+      address: "ТЦ Монблан, пров. С.Бандери, 2/1а, Хмельницький",
+      color: "text-orange-400",
+      href: "https://maps.app.goo.gl/Vf5dhgpD4z8Xec7y7",
+   },
+   {
+      name: "Anex Турагенція",
+      address: "ТЦ Агора, вул. Ст.Шосе, 2/1А, Хмельницький",
+      color: "text-red-400",
+      href: "https://maps.app.goo.gl/scqauCGqKePULwXTA",
+   },
+];
+
+const trustBadges = [
+   { icon: Shield, text: "Гарантія безпеки" },
+   { icon: Headphones, text: "Підтримка 24/7" },
+   { icon: MessageCircle, text: "Швидка відповідь" },
+];
+
+/* ================================================================== */
+/*  PAGE                                                               */
+/* ================================================================== */
 export default function ContactPage() {
    const [firstName, setFirstName] = useState("");
    const [lastName, setLastName] = useState("");
@@ -57,161 +146,246 @@ export default function ContactPage() {
    };
 
    return (
-      <main className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-16 sm:py-24 relative overflow-hidden">
+      <main className="relative min-h-screen w-full overflow-x-hidden bg-black">
+         {/* ========================================================= */}
+         {/*  HERO + FORM SECTION                                       */}
+         {/* ========================================================= */}
+         <section className="relative pt-28 pb-14 sm:pt-24 max-sm:pt-20 overflow-hidden">
+            {/* Spotlight background */}
+            <Spotlight
+               gradientFirst="radial-gradient(68.54% 68.72% at 55.02% 31.46%, hsla(197, 100%, 50%, 0.12) 0, hsla(197, 100%, 45%, 0.06) 50%, transparent 80%)"
+               gradientSecond="radial-gradient(50% 50% at 50% 50%, hsla(197, 100%, 60%, 0.1) 0, hsla(197, 100%, 45%, 0.04) 80%, transparent 100%)"
+               gradientThird="radial-gradient(50% 50% at 50% 50%, hsla(197, 100%, 50%, 0.06) 0, transparent 80%)"
+               translateY={-200}
+               duration={9}
+            />
 
-         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-24 items-center">
-            {/* Left Column: Info */}
-            <div className="space-y-6 sm:space-y-8">
-               <div>
-                  <TextGenerateEffect
-                     words="Зв'яжіться з нами"
-                     className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6"
-                     accentWords={["нами"]}
-                     accentClassName="text-accent font-bold"
-                  />
-                  <p className="text-secondary text-base sm:text-lg mt-4 sm:mt-6 max-w-md leading-relaxed">
-                     Маєте питання щодо вашої наступної подорожі? Ми тут, щоб допомогти вам спланувати ідеальну відпустку. Звертайтеся будь-коли.
-                  </p>
+            {/* Subtle radial glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="relative z-10 w-full max-w-6xl mx-auto px-4 max-sm:px-3">
+               {/* Badge */}
+               <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="mb-5"
+               >
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium backdrop-blur-sm">
+                     <MessageCircle className="w-4 h-4" />
+                     Ми на зв&apos;язку
+                  </span>
+               </motion.div>
+
+               {/* Title */}
+               <TextGenerateEffect
+                  words="Зв'яжіться з нами"
+                  className="text-4xl sm:text-5xl md:text-6xl font-light"
+                  accentWords={["нами"]}
+                  accentClassName="text-accent font-bold"
+               />
+
+               {/* Subtitle */}
+               <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.5 }}
+                  className="text-white/50 text-base sm:text-lg mt-4 max-w-lg leading-relaxed"
+               >
+                  Маєте питання щодо подорожі? Ми допоможемо спланувати ідеальну відпустку.
+               </motion.p>
+
+               {/* Trust badges */}
+               <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.7 }}
+                  className="flex flex-wrap gap-3 mt-6"
+               >
+                  {trustBadges.map((b) => (
+                     <div
+                        key={b.text}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 border border-white/8 text-white/70 text-sm hover:border-accent/30 hover:text-white/90 transition-colors duration-300"
+                     >
+                        <b.icon className="w-4 h-4 text-accent" />
+                        {b.text}
+                     </div>
+                  ))}
+               </motion.div>
+            </div>
+         </section>
+
+         {/* ========================================================= */}
+         {/*  CONTACT CHANNELS + FORM                                   */}
+         {/* ========================================================= */}
+         <section className="relative py-10 md:py-14">
+            {/* Section glow */}
+            <div className="absolute top-1/3 left-1/4 w-[500px] h-[400px] bg-accent/4 rounded-full blur-[150px] pointer-events-none" />
+
+            <div className="relative z-10 max-w-6xl mx-auto px-4 max-sm:px-3 grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
+
+               {/* Left — Contact info (2 cols) */}
+               <div className="lg:col-span-2 space-y-6">
+                  {/* Contact channels */}
+                  <FadeIn>
+                     <div className="space-y-1">
+                        {contactChannels.map((ch, i) => (
+                           <FadeIn key={ch.label} delay={i * 0.08}>
+                              <Link
+                                 href={ch.href}
+                                 {...(ch.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                                 className="flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all duration-300 group"
+                              >
+                                 <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/15 transition-colors duration-300">
+                                    <ch.icon className="w-5 h-5 text-accent" />
+                                 </div>
+                                 <div className="min-w-0">
+                                    <p className="text-white/35 text-xs uppercase tracking-wider font-medium">{ch.label}</p>
+                                    <p className="text-white/90 text-sm font-medium truncate">{ch.value}</p>
+                                 </div>
+                              </Link>
+                           </FadeIn>
+                        ))}
+                     </div>
+                  </FadeIn>
+
+                  {/* Divider */}
+                  <div className="h-px bg-linear-to-r from-white/6 via-white/10 to-transparent" />
+
+                  {/* Partner offices */}
+                  <FadeIn delay={0.3}>
+                     <div>
+                        <div className="flex items-center gap-2 mb-3 px-4">
+                           <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                           <span className="text-white/35 text-xs font-semibold uppercase tracking-[0.15em]">
+                              Партнери-Офіси
+                           </span>
+                        </div>
+                        <div className="space-y-1">
+                           {offices.map((office) => (
+                              <Link
+                                 key={office.name}
+                                 href={office.href}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/5 transition-all duration-300 group"
+                              >
+                                 <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/15 transition-colors duration-300">
+                                    <MapPin className="w-4 h-4 text-accent" />
+                                 </div>
+                                 <div className="min-w-0">
+                                    <p className={`text-sm font-semibold ${office.color}`}>{office.name}</p>
+                                    <p className="text-white/35 text-xs leading-snug truncate">{office.address}</p>
+                                 </div>
+                              </Link>
+                           ))}
+                        </div>
+                     </div>
+                  </FadeIn>
                </div>
 
-               <div className="space-y-6 sm:space-y-8 mt-6 sm:mt-8">
-                  <div className="flex items-center gap-4 sm:gap-5 group">
-                     <Link href="mailto:restal.inform@gmail.com" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
-                        <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
-                     </Link>
-                     <div className="min-w-0">
-                        <h3 className="font-medium text-base sm:text-lg">Електронна пошта</h3>
-                        <p className="text-secondary text-sm sm:text-base break-all">restal.inform@gmail.com</p>
-                     </div>
-                  </div>
+               {/* Right — Form (3 cols) */}
+               <FadeIn delay={0.15} className="lg:col-span-3">
+                  <div className="relative p-6 sm:p-8 rounded-3xl border border-white/6 overflow-hidden backdrop-blur-sm">
+                     {/* Gradient background fill */}
+                     <div className="absolute inset-0 bg-linear-to-br from-white/4 via-white/2 to-accent/3" />
 
-                  <div className="flex items-center gap-4 sm:gap-5 group">
-                     <Link href="viber://chat?number=+380687772550" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
-                        <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
-                     </Link>
-                     <div className="min-w-0">
-                        <h3 className="font-medium text-base sm:text-lg">Телефон/Viber</h3>
-                        <p className="text-secondary text-sm sm:text-base">+38 (068) 7772550</p>
-                     </div>
-                  </div>
+                     {/* Decorative top gradient bar */}
+                     <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent" />
 
-                  <div className="flex items-center gap-4 sm:gap-5 group">
-                     <Link href="https://t.me/RestAL_travel" target="_blank" rel="noopener noreferrer" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
-                        <Send className="w-5 h-5 sm:w-6 sm:h-6" />
-                     </Link>
-                     <div className="min-w-0">
-                        <h3 className="font-medium text-base sm:text-lg">Telegram</h3>
-                        <p className="text-secondary text-sm sm:text-base">@RestAL_travel</p>
-                     </div>
-                  </div>
+                     {/* Decorative glows */}
+                     <div className="absolute -top-20 -right-20 w-48 h-48 bg-accent/8 rounded-full blur-[80px] pointer-events-none" />
+                     <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-accent/5 rounded-full blur-[60px] pointer-events-none" />
 
-                  <div className="pt-6 sm:pt-8 border-t border-white/10">
-                     <h3 className="text-lg sm:text-xl font-light text-white mb-6 sm:mb-8">Партнери-Офіси</h3>
-                     <div className="space-y-6 sm:space-y-8">
-                        <div className="flex items-start sm:items-center gap-4 sm:gap-5 group">
-                           <Link href="https://maps.app.goo.gl/Vf5dhgpD4z8Xec7y7" target="_blank" rel="noopener noreferrer" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
-                              <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
-                           </Link>
-                           <div className="min-w-0">
-                              <h3 className="font-medium text-lg sm:text-xl text-orange-500/80">JoinUp Турагенція</h3>
-                              <p className="text-secondary text-sm sm:text-base break-words">ТЦ Монблан, пров. С.Бандери, 2/1а, Хмельницький</p>
-                           </div>
+                     <div className="relative z-10">
+                        <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mx-auto mb-4">
+                           <Send className="w-5 h-5 text-accent" />
                         </div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-1 text-center">
+                           Індивідуальний підбір туру
+                        </h3>
+                        <p className="text-white/40 text-sm text-center mb-6">
+                           Залиште заявку — ми зв&apos;яжемося найближчим часом
+                        </p>
 
-                        <div className="flex items-start sm:items-center gap-4 sm:gap-5 group">
-                           <Link href="https://maps.app.goo.gl/scqauCGqKePULwXTA" target="_blank" rel="noopener noreferrer" className="p-3 sm:p-4 rounded-2xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300 shrink-0">
-                              <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
-                           </Link>
-                           <div className="min-w-0">
-                              <h3 className="font-medium text-lg sm:text-xl text-red-500/80">Anex Турагенція</h3>
-                              <p className="text-secondary text-sm sm:text-base break-words">ТЦ Агора, вул. Ст.Шосе, 2/1А, Хмельницький</p>
+                        <form className="space-y-4" onSubmit={handleSubmit}>
+                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div className="space-y-1.5">
+                                 <Label htmlFor="firstName" className="text-white/60 text-sm">Ім&apos;я</Label>
+                                 <Input
+                                    id="firstName"
+                                    placeholder="Іван"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    className="bg-black/40 border-white/10 focus:border-accent/50 h-11 rounded-xl"
+                                 />
+                              </div>
+                              <div className="space-y-1.5">
+                                 <Label htmlFor="lastName" className="text-white/60 text-sm">Прізвище</Label>
+                                 <Input
+                                    id="lastName"
+                                    placeholder="Петренко"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    className="bg-black/40 border-white/10 focus:border-accent/50 h-11 rounded-xl"
+                                 />
+                              </div>
                            </div>
-                        </div>
+
+                           <FormInput
+                              labelText="Телефон"
+                              placeholder="+38 (XXX) XXX-XXXX"
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value)}
+                              containerClassName="space-y-1.5"
+                              className="bg-black/40 border-white/10 focus:border-accent/50 h-11 rounded-xl"
+                           />
+
+                           <div className="space-y-1.5">
+                              <Label htmlFor="message" className="text-white/60 text-sm">Повідомлення</Label>
+                              <textarea
+                                 id="message"
+                                 value={message}
+                                 onChange={(e) => setMessage(e.target.value)}
+                                 className="flex min-h-[100px] w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm ring-offset-background placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/50 resize-none"
+                                 placeholder="Розкажіть про ваші плани подорожі..."
+                              />
+                           </div>
+
+                           {error && (
+                              <p className="text-red-400 text-sm text-center">{error}</p>
+                           )}
+
+                           {success && (
+                              <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
+                                 <CheckCircle2 className="w-4 h-4" />
+                                 <span>Надіслано! Ми зв&apos;яжемося з вами найближчим часом.</span>
+                              </div>
+                           )}
+
+                           <Button
+                              type="submit"
+                              disabled={submitting}
+                              className="w-full bg-accent hover:bg-accent/90 text-white h-11 text-sm font-semibold rounded-xl disabled:opacity-50 shadow-lg shadow-accent/25 hover:shadow-accent/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+                           >
+                              {submitting ? (
+                                 <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Надсилання...
+                                 </>
+                              ) : (
+                                 <>
+                                    Надіслати заявку
+                                    <Send className="w-4 h-4 ml-2" />
+                                 </>
+                              )}
+                           </Button>
+                        </form>
                      </div>
                   </div>
-               </div>
+               </FadeIn>
             </div>
-
-            {/* Right Column: Form */}
-            <div className="bg-white/5 p-6 sm:p-8 md:p-10 rounded-3xl border border-white/10 backdrop-blur-md shadow-2xl">
-               <h3 className="text-xl sm:text-2xl font-light text-white mb-6 text-center leading-relaxed">
-                  Готуємо для Вас <br className="hidden sm:block" /> індивідуальний підбір туру
-               </h3>
-               <form className="space-y-6" onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-white/80">Ім'я</Label>
-                        <Input
-                           id="firstName"
-                           placeholder="Іван"
-                           value={firstName}
-                           onChange={(e) => setFirstName(e.target.value)}
-                           className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
-                        />
-                     </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-white/80">Прізвище</Label>
-                        <Input
-                           id="lastName"
-                           placeholder="Петренко"
-                           value={lastName}
-                           onChange={(e) => setLastName(e.target.value)}
-                           className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
-                        />
-                     </div>
-                  </div>
-
-                  <FormInput
-                     labelText="Телефон"
-                     placeholder="+38 (XXX) XXX-XXXX"
-                     value={phone}
-                     onChange={(e) => setPhone(e.target.value)}
-                     containerClassName="space-y-2"
-                     className="bg-black/40 border-white/10 focus:border-accent/50 h-12"
-                  />
-
-                  <div className="space-y-2">
-                     <Label htmlFor="message" className="text-white/80">Повідомлення</Label>
-                     <textarea
-                        id="message"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className="flex min-h-[150px] w-full rounded-md border border-white/10 bg-black/40 px-3 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/50 resize-none"
-                        placeholder="Розкажіть нам про ваші плани подорожі..."
-                     />
-                  </div>
-
-                  {error && (
-                     <p className="text-red-400 text-sm text-center">{error}</p>
-                  )}
-
-                  {success && (
-                     <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Повідомлення надіслано! Ми зв'яжемося з вами найближчим часом.</span>
-                     </div>
-                  )}
-
-                  <Button
-                     type="submit"
-                     disabled={submitting}
-                     className="w-full bg-accent hover:bg-accent/90 text-white h-12 text-base font-medium rounded-xl mt-2 disabled:opacity-50"
-                  >
-                     {submitting ? (
-                        <>
-                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                           Надсилання...
-                        </>
-                     ) : (
-                        <>
-                           Надіслати повідомлення
-                           <Send className="w-4 h-4 ml-2" />
-                        </>
-                     )}
-                  </Button>
-               </form>
-            </div>
-         </div>
+         </section>
       </main>
    );
 }
