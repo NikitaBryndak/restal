@@ -712,16 +712,31 @@
     }
 
     /* === TABS MENU === */
+    body .new_t-menu-wrap {
+      background: transparent !important;
+    }
     body .new_t-menu-wrap::after {
       background: #0fa4e6 !important;
     }
     body .new_t-menu-item {
       color: #0fa4e6 !important;
       border-bottom-color: #0fa4e6 !important;
+      background: transparent !important;
+      background-color: transparent !important;
     }
     body .new_t-menu-item.selected {
       background: #0fa4e6 !important;
+      background-color: #0fa4e6 !important;
       color: #fff !important;
+    }
+    body .new_t-menu-item:not(.selected) {
+      background: rgba(255, 255, 255, 0.04) !important;
+      background-color: rgba(255, 255, 255, 0.04) !important;
+      color: #0fa4e6 !important;
+    }
+    body .new_t-menu-item:not(.selected):hover {
+      background: rgba(15, 164, 230, 0.12) !important;
+      background-color: rgba(15, 164, 230, 0.12) !important;
     }
     body .new_t-menu-item.selected::after {
       border-color: #0fa4e6 transparent transparent transparent !important;
@@ -764,6 +779,16 @@
     }
 
     /* === TOUR TAB ROWS (Туристи, Дата, Тип кімнати, Послуги) === */
+    /* The entire row */
+    body .new_t-tour-tab-row {
+      background: transparent !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body .new_t-tour-table,
+    body .new_t-tour-table-wrap {
+      background: transparent !important;
+    }
+
     /* Left column (grey → dark) */
     body .new_t-tour-tab-col-1 {
       background: rgba(255, 255, 255, 0.05) !important;
@@ -805,16 +830,46 @@
       color: rgba(255, 255, 255, 0.4) !important;
     }
 
-    /* "Change" / expand button on rows */
-    body .new_t-tour-tab-col .new_t-change-btn {
+    /* "Change" / expand button on rows (the > arrows) */
+    body .new_t-change-btn,
+    body .new_t-tour-tab-col .new_t-change-btn,
+    body .new_t-tour-tab-col-2 .new_t-change-btn,
+    body .new_t-change-btn-wrap,
+    body .new_t-tour-tab-row .new_t-change-btn {
+      background: rgba(255, 255, 255, 0.06) !important;
+      background-color: rgba(255, 255, 255, 0.06) !important;
       border-left-color: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
       color: #0fa4e6 !important;
     }
-    body .new_t-change-btn svg {
+    body .new_t-change-btn svg,
+    body .new_t-tour-tab-col .new_t-change-btn svg,
+    body .new_t-tour-tab-row .new_t-change-btn svg {
       fill: #0fa4e6 !important;
     }
-    body .new_t-tour-tab-col .new_t-change-btn:hover {
-      background-color: rgba(255, 255, 255, 0.04) !important;
+    body .new_t-change-btn:hover,
+    body .new_t-tour-tab-col .new_t-change-btn:hover,
+    body .new_t-tour-tab-row .new_t-change-btn:hover {
+      background: rgba(15, 164, 230, 0.12) !important;
+      background-color: rgba(15, 164, 230, 0.12) !important;
+    }
+    /* "Ще" text on change buttons */
+    body .new_t-change-btn span,
+    body .new_t-change-btn-text,
+    body .new_t-change-btn .new_t-change-text {
+      color: #0fa4e6 !important;
+    }
+
+    /* The entire right-side button/cell area in tour tab rows */
+    body .new_t-tour-tab-col-2 > a,
+    body .new_t-tour-tab-col > a,
+    body .new_t-tour-tab-col-2 > div > a {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: #0fa4e6 !important;
+    }
+    body .new_t-tour-tab-col-2 > a:hover,
+    body .new_t-tour-tab-col > a:hover {
+      background: rgba(15, 164, 230, 0.12) !important;
     }
 
     /* Services (transfer, insurance, visa) icons */
@@ -1595,6 +1650,45 @@
           if (el.closest('.new_t-container, .new_r-container, .new_f-container, .new_os')) {
             el.style.setProperty('background', 'rgba(255, 255, 255, 0.04)', 'important');
             el.style.setProperty('background-color', 'rgba(255, 255, 255, 0.04)', 'important');
+          }
+        });
+
+        // Fix change buttons (>) — widget often sets white background inline
+        var changeBtns = document.querySelectorAll(
+          '.new_t-change-btn, [class*="change-btn"], ' +
+          '.new_t-tour-tab-col-2 a, .new_t-tour-tab-row a'
+        );
+        changeBtns.forEach(function(el) {
+          var bg = window.getComputedStyle(el).backgroundColor;
+          // Check if it has a light/white background
+          if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+            var match = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+            if (match) {
+              var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+              // If it's a light color (luminance > 180), darken it
+              if (r > 180 && g > 180 && b > 180) {
+                el.style.setProperty('background', 'rgba(255, 255, 255, 0.06)', 'important');
+                el.style.setProperty('background-color', 'rgba(255, 255, 255, 0.06)', 'important');
+              }
+            }
+          }
+        });
+
+        // Fix any remaining elements in tour detail with computed light backgrounds
+        var tourCols = document.querySelectorAll(
+          '.new_t-tour-tab-col, .new_t-tour-tab-col-1, .new_t-tour-tab-col-2, ' +
+          '.new_t-tour-tab-row, .new_t-tour-table'
+        );
+        tourCols.forEach(function(el) {
+          var bg = window.getComputedStyle(el).backgroundColor;
+          if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+            var match = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+            if (match) {
+              var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+              if (r > 180 && g > 180 && b > 180) {
+                el.style.setProperty('background-color', 'rgba(255, 255, 255, 0.04)', 'important');
+              }
+            }
           }
         });
       }
