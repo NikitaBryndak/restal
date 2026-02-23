@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://restal.in.ua"; // Update with your actual domain
 
-  // Static pages
+  // Static page
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
