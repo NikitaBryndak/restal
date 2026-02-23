@@ -317,6 +317,16 @@
         attributeFilter: ['style']
       });
 
+      // Override all card links to navigate the parent page to "/"
+      document.addEventListener('click', function (e) {
+        var link = e.target.closest('.os-top-countries-item a');
+        if (link) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.top.location.href = '/';
+        }
+      }, true);
+
       // Notify parent frame about height
       var lastHeight = 0;
       function reportHeight() {
