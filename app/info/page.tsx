@@ -126,7 +126,7 @@ export default function InfoPage() {
   });
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden bg-black">
+    <main className="relative min-h-screen w-full bg-black">
       {/* ============================================================ */}
       {/*  HERO SECTION                                                 */}
       {/* ============================================================ */}
