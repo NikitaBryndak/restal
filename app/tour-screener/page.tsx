@@ -252,6 +252,23 @@ export default function TourScreenerPage() {
               </div>
             ))}
           </motion.div>
+
+          {/* CTA — scroll to widget */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="mt-10"
+          >
+            <button
+              onClick={() => document.getElementById("tour-widget")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl shadow-lg shadow-accent/25 hover:scale-105 active:scale-95 transition-all duration-200 text-base"
+            >
+              <Search className="w-5 h-5" />
+              Знайти тур
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </motion.div>
         </div>
       </section>
 
@@ -297,7 +314,7 @@ export default function TourScreenerPage() {
       {/* ============================================================ */}
       {/*  WIDGET SECTION                                               */}
       {/* ============================================================ */}
-      <section className="relative py-10 md:py-14 px-4 max-sm:px-3">
+      <section id="tour-widget" className="relative py-10 md:py-14 px-4 max-sm:px-3 scroll-mt-4">
         {/* Glow behind widget */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-accent/4 rounded-full blur-[150px] pointer-events-none" />
 

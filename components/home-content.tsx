@@ -150,16 +150,14 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
         {/* Background image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/countryImages/optimized/Maldives-dest.webp"
-            alt="Подорож мрії"
+            src="/countryImages/optimized/Maldives-hero.webp"
+            alt="Подорож мрії — Мальдіви"
             fill
             priority
             fetchPriority="high"
             className="object-cover object-center"
             sizes="100vw"
             quality={85}
-            placeholder="blur"
-            blurDataURL="data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAABQBQCdASogABUAPzmQuVWvKiWjMBgIAeAnCUAX5wYljSwSLheTFykCNHg4zt18PWpIHgAA/tAvso4ENkzexkPPgqoT616GcEpY1lqDX2zG2Oo7AynhpJ7zLPo48is9+e+s7dkpeULr438lL+9ZEba9+GcCTSMKNMTGzBSfg3KLMpHwfC8AAA=="
           />
           {/* Dark overlay gradient */}
           <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/40 to-black" />
