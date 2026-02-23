@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Storage } from "@google-cloud/storage";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 // SECURITY: Allowed file types for upload
 const ALLOWED_MIME_TYPES = [

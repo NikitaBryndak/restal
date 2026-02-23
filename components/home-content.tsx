@@ -18,6 +18,8 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { motion, useInView, useSpring, useTransform } from "motion/react";
+import FadeIn from "@/components/ui/fade-in";
+import { TRIP_COUNT_OFFSET } from "@/config/constants";
 
 /* ------------------------------------------------------------------ */
 /*  Animated counter                                                   */
@@ -39,34 +41,6 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
       </motion.span>
       {suffix && <span className="text-accent text-xl font-light">{suffix}</span>}
     </span>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Fade-in wrapper                                                    */
-/* ------------------------------------------------------------------ */
-function FadeIn({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
   );
 }
 
@@ -163,6 +137,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
       {/* Floating contact button */}
       <Link
         href="/managers"
+        aria-label="Зв'язатися з менеджером"
         className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 bg-accent hover:bg-accent/90 text-white font-semibold rounded-full shadow-xl shadow-accent/30 transition-all hover:scale-105 active:scale-95 group"
       >
         <MessageCircle className="w-5 h-5" />
@@ -175,7 +150,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
         {/* Background image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/countryImages/optimized/Greece-hero.webp"
+            src="/countryImages/optimized/Maldives-dest.webp"
             alt="Подорож мрії"
             fill
             priority
@@ -279,6 +254,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.8 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+          aria-hidden="true"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
@@ -297,7 +273,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center">
             {[
-              { value: tripCount + 7860, suffix: "+", label: "ПОДОРОЖЕЙ ОРГАНІЗОВАНО" },
+              { value: tripCount + TRIP_COUNT_OFFSET, suffix: "+", label: "ПОДОРОЖЕЙ ОРГАНІЗОВАНО" },
               { value: 24, suffix: "+", label: "КРАЇНИ" },
               { value: 4.9, suffix: "", label: "РЕЙТИНГ", isDecimal: true },
               { value: 24, suffix: "/7", label: "ПІДТРИМКА", isStatic: true },

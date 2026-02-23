@@ -2,10 +2,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../[...nextauth]/route";
-
-const MIN_USERNAME_LENGTH = 2;
-const MAX_USERNAME_LENGTH = 100;
+import { authOptions } from "@/lib/auth";
+import { MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
 
 export async function POST(request: NextRequest) {
     try {

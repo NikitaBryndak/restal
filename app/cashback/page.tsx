@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import { motion, useInView, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 import { Spotlight } from '@/components/ui/spotlight-new';
+import FadeIn from '@/components/ui/fade-in';
 import {
    Gift,
    Percent,
@@ -24,36 +25,9 @@ import {
    FileText,
    Clock,
 } from 'lucide-react';
+import { MIN_PROMO_AMOUNT } from '@/config/constants';
 import { CashbackSkeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
-
-/* ------------------------------------------------------------------ */
-/*  Fade-in wrapper                                                    */
-/* ------------------------------------------------------------------ */
-function FadeIn({
-   children,
-   className = '',
-   delay = 0,
-}: {
-   children: React.ReactNode;
-   className?: string;
-   delay?: number;
-}) {
-   const ref = useRef(null);
-   const isInView = useInView(ref, { once: true, margin: '-60px' });
-
-   return (
-      <motion.div
-         ref={ref}
-         initial={{ opacity: 0, y: 32 }}
-         animate={isInView ? { opacity: 1, y: 0 } : {}}
-         transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
-         className={className}
-      >
-         {children}
-      </motion.div>
-   );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Hero section (shared by auth / unauth views)                       */
@@ -381,8 +355,8 @@ export default function CashbackPage() {
 
    const handleGenerateCode = async () => {
       const numAmount = Number(claimAmount);
-      if (!numAmount || numAmount < 100) {
-         setGenerateError('Мінімальна сума — 100 грн');
+      if (!numAmount || numAmount < MIN_PROMO_AMOUNT) {
+         setGenerateError(`Мінімальна сума — ${MIN_PROMO_AMOUNT} грн`);
          return;
       }
       if (numAmount > cashbackBalance) {

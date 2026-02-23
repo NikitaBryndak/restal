@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, DocumentsSection } from './components';
 
@@ -19,7 +20,7 @@ export default function AddTourPage() {
 
     useEffect(() => {
         if (status === "loading") return;
-        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             router.replace("/dashboard");
         }
     }, [session, status, router]);
@@ -41,7 +42,7 @@ export default function AddTourPage() {
         return <DashboardFormSkeleton />;
     }
 
-    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
         return null;
     }
 

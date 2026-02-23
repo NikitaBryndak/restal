@@ -6,6 +6,7 @@ import React from "react";
 import { NavLink } from "./nav-link";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import NotificationBell from "./NotificationBell";
+import { MANAGER_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 export default function SmallNavbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -21,7 +22,12 @@ export default function SmallNavbar() {
             {/* Notification bell for mobile - visible outside menu */}
             {session && userProfile && <NotificationBell />}
 
-            <button onClick={toggleMobileMenu} className="z-50 text-white">
+            <button
+                onClick={toggleMobileMenu}
+                className="z-50 text-white"
+                aria-label={isMobileMenuOpen ? "Закрити меню" : "Відкрити меню"}
+                aria-expanded={isMobileMenuOpen}
+            >
                 {isMobileMenuOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
             </button>
 
@@ -72,7 +78,7 @@ export default function SmallNavbar() {
                                         </NavLink>
                                     </div>
 
-                                    {userProfile.privilegeLevel > 1 && (
+                                    {userProfile.privilegeLevel >= MANAGER_PRIVILEGE_LEVEL && (
                                         <div className="flex flex-col space-y-2 pt-2">
                                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                                 Manager
@@ -91,7 +97,7 @@ export default function SmallNavbar() {
                                             </NavLink>
                                         </div>
                                     )}
-                                    {userProfile.privilegeLevel > 2 && (
+                                    {userProfile.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL && (
                                         <div className="flex flex-col space-y-2 pt-2">
                                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                                 Admin

@@ -2,15 +2,9 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Article from "@/models/article";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import Counter from "@/models/counter";
-
-// SECURITY: Maximum allowed lengths for article fields
-const MAX_TITLE_LENGTH = 200;
-const MAX_DESCRIPTION_LENGTH = 500;
-const MAX_CONTENT_LENGTH = 50000;
-const MAX_TAG_LENGTH = 50;
-const MAX_IMAGE_URL_LENGTH = 2000;
+import { MANAGER_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
 
 export async function GET() {
     try {
@@ -43,8 +37,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be tier 2 or above
-        if ((session.user.privilegeLevel ?? 1) < 2) {
+        // Check privilege level - must be manager or above
+        if ((session.user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 
@@ -82,11 +76,11 @@ export async function POST(request: Request) {
         const toCreate = {
             articleID,
             creatorPhone,
-            title: body.title.trim().slice(0, MAX_TITLE_LENGTH),
-            description: body.description.trim().slice(0, MAX_DESCRIPTION_LENGTH),
-            content: body.content.slice(0, MAX_CONTENT_LENGTH),
-            tag: body.tag.trim().slice(0, MAX_TAG_LENGTH),
-            images: body.images.trim().slice(0, MAX_IMAGE_URL_LENGTH),
+            title: body.title.trim().slice(0, ARTICLE_MAX_TITLE_LENGTH),
+            description: body.description.trim().slice(0, ARTICLE_MAX_DESCRIPTION_LENGTH),
+            content: body.content.slice(0, ARTICLE_MAX_CONTENT_LENGTH),
+            tag: body.tag.trim().slice(0, ARTICLE_MAX_TAG_LENGTH),
+            images: body.images.trim().slice(0, ARTICLE_MAX_IMAGE_URL_LENGTH),
         };
 
         const created = await Article.create(toCreate);

@@ -1,15 +1,6 @@
 
 import mongoose, { Schema } from "mongoose";
-
-// Tour status types
-export const TOUR_STATUSES = [
-    "In Booking",
-    "Booked",
-    "Paid",
-    "In Progress",
-    "Completed",
-    "Archived"
-] as const;
+import { TOUR_STATUSES } from "@/types";
 
 // Ticket file schema for individual ticket uploads
 const ticketFileSchema = new Schema({

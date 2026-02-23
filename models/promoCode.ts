@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { MIN_PROMO_AMOUNT } from "@/config/constants";
 
 export const PROMO_CODE_STATUSES = ["active", "used", "expired"] as const;
 export type PromoCodeStatus = typeof PROMO_CODE_STATUSES[number];
@@ -13,7 +14,7 @@ const promoCodeSchema = new Schema({
     amount: {
         type: Number,
         required: true,
-        min: 100,
+        min: MIN_PROMO_AMOUNT,
     },
     // The user who generated the code
     userId: {

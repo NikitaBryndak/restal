@@ -3,9 +3,7 @@ import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+import { MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
 
 export async function POST(req: Request) {
   try {
@@ -15,13 +13,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Phone Number, Code, and Password are required" }, { status: 400 });
     }
 
-    if (password.length < 8) {
+    if (password.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json({ message: "Password must be at least 8 characters" }, { status: 400 });
     }
 
     // Sanitize inputs
     const sanitizedPhone = phoneNumber.replace(/[^\d+]/g, '');
-    const sanitizedOtp = otp.replace(/\D/g, '').slice(0, 6);  // Only digits, max 6
+    const sanitizedOtp = otp.replace(/\D/g, '').slice(0, OTP_LENGTH);  // Only digits, max 6
 
     await connectToDatabase();
 
@@ -56,7 +54,7 @@ export async function POST(req: Request) {
       // Increment failed attempts
       userByPhone.resetPasswordAttempts = (userByPhone.resetPasswordAttempts || 0) + 1;
 
-      if (userByPhone.resetPasswordAttempts >= MAX_ATTEMPTS) {
+      if (userByPhone.resetPasswordAttempts >= OTP_MAX_ATTEMPTS) {
         userByPhone.resetPasswordLockUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
         userByPhone.resetPasswordAttempts = 0;
         userByPhone.resetPasswordToken = undefined;
@@ -68,7 +66,7 @@ export async function POST(req: Request) {
     }
 
     // Set new password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     userByPhone.password = hashedPassword;
 
     // Clear reset token fields and attempts

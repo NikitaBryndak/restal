@@ -2,11 +2,11 @@ import { Clock, Calendar, MapPin, User, FileText, CreditCard, Plane, Hotel, Shie
 import Image from 'next/image';
 import { Trip, TOUR_STATUS_LABELS, TourStatus, DOCUMENT_LABELS, Documents } from '@/types';
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
-import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL, SUPER_ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
+import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 import { getCountryImageName } from '@/data';
 
 // Status color mapping
@@ -48,11 +48,10 @@ async function getTripData(id: string): Promise<EnrichedTrip | null> {
 
         const isOwner = trip.ownerPhone === userPhone;
         const isManager = trip.managerPhone === userPhone;
-        const hasAdminAccess = userPrivilegeLevel > ADMIN_PRIVILEGE_LEVEL;
-        const isSuperAdmin = userPrivilegeLevel >= SUPER_ADMIN_PRIVILEGE_LEVEL;
+        const hasAdminAccess = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
 
-        // Super admins (level 4+) can access any trip
-        if (!isOwner && !isManager && !hasAdminAccess && !isSuperAdmin) {
+        // Admins can access any trip
+        if (!isOwner && !isManager && !hasAdminAccess) {
             return null;
         }
 

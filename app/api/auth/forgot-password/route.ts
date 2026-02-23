@@ -5,6 +5,7 @@ import { sendSMS } from "@/lib/sms";
 import crypto, { randomInt } from "crypto";
 import bcrypt from "bcryptjs";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
+import { OTP_EXPIRY_MS } from "@/config/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
       .digest("hex");
 
     // Expires in 10 minutes
-    const otpExpires = Date.now() + 10 * 60 * 1000;
+    const otpExpires = Date.now() + OTP_EXPIRY_MS;
 
     user.resetPasswordToken = otpHash;
     user.resetPasswordExpires = otpExpires;

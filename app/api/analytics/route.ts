@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import ContactRequest from "@/models/contactRequest";
+import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 // In-memory rate limiter: max 30 requests per admin per 5 minutes
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
@@ -51,7 +52,7 @@ export async function GET() {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < 3) {
+        if (!user || (user.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
             return NextResponse.json(
                 { message: "Недостатньо прав" },
                 { status: 403, headers: SECURITY_HEADERS }

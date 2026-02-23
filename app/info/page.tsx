@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "motion/react";
+import { motion } from "motion/react";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { Input } from "@/components/ui/input";
@@ -14,34 +14,8 @@ import {
 import { ArticleCardSkeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import ArticleCard from "@/components/article/article-card";
-
-/* ------------------------------------------------------------------ */
-/*  Fade-in wrapper                                                    */
-/* ------------------------------------------------------------------ */
-function FadeIn({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
+import FadeIn from "@/components/ui/fade-in";
+import { TRUSTED_ORIGINS } from "@/config/constants";
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -77,6 +51,7 @@ export default function InfoPage() {
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       if (!event.data) return;
+      if (!TRUSTED_ORIGINS.includes(event.origin)) return;
       if (
         event.data.type === "otpusk-top-resize" &&
         typeof event.data.height === "number"

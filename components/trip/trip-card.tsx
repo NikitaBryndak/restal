@@ -49,9 +49,10 @@ export default function TripCard({ data }: { data: Trip }) {
     <div className={rootClass}>
             {/* Background Image */}
             <Image
-                src={`/countryImages/${getCountryImageName(data.country)}.jpg`}
+                src={`/countryImages/${getCountryImageName(data.country)}.webp`}
                 alt={`Trip to ${data.country}`}
                 fill
+                sizes="(max-width: 768px) 0px, 100vw"
                 className="object-cover hidden md:block"
             />
 

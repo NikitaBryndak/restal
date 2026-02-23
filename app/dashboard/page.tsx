@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 function getGreeting(): string {
     const hour = new Date().getHours();
@@ -41,7 +42,7 @@ export default function DashboardPage() {
     }
 
     const greeting = getGreeting();
-    const isManager = (session?.user?.privilegeLevel ?? 1) >= 2;
+    const isManager = (session?.user?.privilegeLevel ?? 1) >= MANAGER_PRIVILEGE_LEVEL;
 
     const quickLinks = [
         { href: "/dashboard/profile", icon: User, label: "Профіль", desc: "Переглянути інформацію", color: "text-blue-400", bg: "bg-blue-500/20" },

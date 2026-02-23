@@ -19,8 +19,8 @@ export const getCurrentDate = (): string => {
 };
 
 const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
-                     'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTH_NAMES = ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень',
+                     'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'];
 
 const isLeapYear = (year: number): boolean =>
     year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
@@ -34,21 +34,21 @@ const getMaxDays = (month: number, year: number): number =>
  */
 export const validateDate = (dateStr: string): string | null => {
     if (!dateStr) return null;
-    if (dateStr.length !== 10) return 'Date must be in DD/MM/YYYY format.';
+    if (dateStr.length !== 10) return 'Дата має бути у форматі ДД/ММ/РРРР.';
 
     const parts = dateStr.split('/');
-    if (parts.length !== 3) return 'Invalid date format.';
+    if (parts.length !== 3) return 'Невірний формат дати.';
 
     const [day, month, year] = parts.map(p => parseInt(p, 10));
 
-    if (isNaN(day) || isNaN(month) || isNaN(year)) return 'Invalid date format.';
-    if (month < 1 || month > 12) return 'Month must be between 01 and 12.';
-    if (day < 1 || day > 31) return 'Day must be between 01 and 31.';
-    if (year < 1940 || year > 2050) return 'Year must be between 1940 and 2050.';
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return 'Невірний формат дати.';
+    if (month < 1 || month > 12) return 'Місяць має бути від 01 до 12.';
+    if (day < 1 || day > 31) return 'День має бути від 01 до 31.';
+    if (year < 1940 || year > 2050) return 'Рік має бути від 1940 до 2050.';
 
     const maxDays = getMaxDays(month, year);
     if (day > maxDays) {
-        return `${MONTH_NAMES[month - 1]} ${year} only has ${maxDays} days.`;
+        return `${MONTH_NAMES[month - 1]} ${year} має лише ${maxDays} днів.`;
     }
 
     return null;

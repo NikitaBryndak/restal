@@ -9,6 +9,7 @@ import { chooseRandomItem } from "@/lib/utils";
 import { quotes } from "@/data";
 import { FormField } from "./form-field";
 import { useAuth } from "@/hooks/useAuth";
+import { MIN_PASSWORD_LENGTH } from "@/config/constants";
 
 
 export function AuthForm({ type }: { type: "login" | "register" }) {
@@ -104,7 +105,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                 type="password"
                 required
                 disabled={isLoading}
-                minLength={8}
+                minLength={MIN_PASSWORD_LENGTH}
                 placeholder="••••••••"
               />
 
@@ -115,7 +116,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                   type="password"
                   required
                   disabled={isLoading}
-                  minLength={8}
+                  minLength={MIN_PASSWORD_LENGTH}
                   placeholder="••••••••"
                 />
               )}

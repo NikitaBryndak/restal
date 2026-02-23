@@ -1,10 +1,11 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import FadeIn from "@/components/ui/fade-in";
 import {
   Phone,
   Send,
@@ -26,35 +27,6 @@ import {
   Zap,
 } from "lucide-react";
 import AiChatInline from "@/components/search/ai-chat-inline";
-
-/* ------------------------------------------------------------------ */
-/*  Fade-in wrapper                                                    */
-/* ------------------------------------------------------------------ */
-// Animation wrapper component
-function FadeIn({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -573,6 +545,7 @@ export default function ManagersContent() {
       {/* ============================================================ */}
       {/*  CONSULTATION MODAL                                           */}
       {/* ============================================================ */}
+      <AnimatePresence>
       {isModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
@@ -592,6 +565,7 @@ export default function ManagersContent() {
 
             <button
               onClick={() => setIsModalOpen(false)}
+              aria-label="Закрити"
               className="absolute top-4 right-4 p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               <X className="w-5 h-5" />
@@ -660,6 +634,7 @@ export default function ManagersContent() {
           </motion.div>
         </div>
       )}
+      </AnimatePresence>
 
       {/* ============================================================ */}
       {/*  AI CHAT                                                      */}

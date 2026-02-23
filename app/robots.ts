@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BASE_URL } from "@/config/constants";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/dashboard/"],
     },
-    sitemap: "https://restal.in.ua/sitemap.xml", // Update with your actual domain
+    sitemap: `${BASE_URL}/sitemap.xml`,
   };
 }

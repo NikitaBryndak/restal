@@ -1,7 +1,7 @@
 import TripCard from "@/components/trip/trip-card"
 import Link from "next/link"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 import { connectToDatabase } from "@/lib/mongodb"
 import Trip from "@/models/trip"
 

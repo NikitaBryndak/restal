@@ -16,6 +16,7 @@ import {
     Filter,
     RefreshCw,
 } from 'lucide-react';
+import { MANAGER_PRIVILEGE_LEVEL } from '@/config/constants';
 
 interface ContactRequestItem {
     _id: string;
@@ -75,7 +76,7 @@ export default function ContactRequestsPage() {
     const [counts, setCounts] = useState<StatusCounts>({ new: 0, in_progress: 0, completed: 0, dismissed: 0 });
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-    const isManager = userProfile && userProfile.privilegeLevel >= 2;
+    const isManager = userProfile && userProfile.privilegeLevel >= MANAGER_PRIVILEGE_LEVEL;
 
     const fetchRequests = useCallback(async () => {
         setLoading(true);

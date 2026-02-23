@@ -10,6 +10,7 @@ import {
     TrendingUp, MessageCircle, RefreshCw,
     Plane, Award, CreditCard, Clock,
 } from 'lucide-react';
+import { ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell,
@@ -102,7 +103,7 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const isAdmin = userProfile && userProfile.privilegeLevel >= 3;
+    const isAdmin = userProfile && userProfile.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
 
     const fetchAnalytics = useCallback(async () => {
         try {

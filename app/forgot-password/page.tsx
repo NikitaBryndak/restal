@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MIN_PASSWORD_LENGTH, OTP_LENGTH } from "@/config/constants";
 
 export default function ForgotPasswordPage() {
     const router = useRouter();
@@ -146,7 +147,7 @@ export default function ForgotPasswordPage() {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
-                                maxLength={6}
+                                maxLength={OTP_LENGTH}
                             />
                         </div>
 
@@ -158,7 +159,7 @@ export default function ForgotPasswordPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                minLength={8}
+                                minLength={MIN_PASSWORD_LENGTH}
                             />
                         </div>
 
@@ -170,7 +171,7 @@ export default function ForgotPasswordPage() {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
-                                minLength={8}
+                                minLength={MIN_PASSWORD_LENGTH}
                             />
                         </div>
 

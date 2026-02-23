@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { motion, useSpring, useTransform } from "motion/react";
+import { TRIP_COUNT_OFFSET } from "@/config/constants";
 
 export const ToursSoldCounter = ({ count = 0 }: { count?: number }) => {
   const target = count;
@@ -9,7 +10,7 @@ export const ToursSoldCounter = ({ count = 0 }: { count?: number }) => {
   const display = useTransform(spring, (current) => Math.round(current).toLocaleString());
 
   useEffect(() => {
-    spring.set(target+7860);
+    spring.set(target+TRIP_COUNT_OFFSET);
   }, [spring, target]);
 
   return (

@@ -2,11 +2,9 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { WELCOME_BONUS } from "@/config/constants";
+import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 
-const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
-const MIN_PASSWORD_LENGTH = 8;
 // SECURITY: Basic email format validation
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -81,7 +79,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
         // Welcome bonus only at registration — referral bonus is awarded when first trip completes
         await User.create({

@@ -1,9 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 import crypto from "crypto";
+import { UNAMBIGUOUS_CHARS, MAX_CODE_GEN_RETRIES, WELCOME_BONUS } from "@/config/constants";
 
 // Generate a unique referral code: REF-XXXX-XXXX
 function generateReferralCode(): string {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const chars = UNAMBIGUOUS_CHARS;
     const seg1 = Array.from(crypto.randomBytes(4))
         .map((b) => chars[b % chars.length])
         .join("");
@@ -32,7 +33,7 @@ const userSchema = new Schema({
     },
     cashbackAmount: {
         type: Number,
-        default: 1000  // Welcome bonus for new users (in UAH)
+        default: WELCOME_BONUS  // Welcome bonus for new users (in UAH)
     },
     phoneNumber: {
         type: String,
@@ -89,7 +90,7 @@ userSchema.pre("save", async function (next) {
         while (await UserModel.findOne({ referralCode: code })) {
             code = generateReferralCode();
             attempts++;
-            if (attempts > 10) break;
+            if (attempts > MAX_CODE_GEN_RETRIES) break;
         }
         this.referralCode = code;
     }

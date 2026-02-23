@@ -4,6 +4,7 @@ import { useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import { Eye, Code } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 interface ArticleContentPreviewProps {
   content: string;
@@ -26,7 +27,7 @@ export default function ArticleContentPreview({
     content || "<p>No content available.</p>",
   );
 
-  const canViewSource = (session?.user?.privilegeLevel ?? 0) >= 3;
+  const canViewSource = (session?.user?.privilegeLevel ?? 0) >= ADMIN_PRIVILEGE_LEVEL;
 
   return (
     <div className={className}>

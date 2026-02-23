@@ -21,6 +21,7 @@ import type { BasicDetailsField } from '../add-tour/components';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 type EditableTourist = Tourist & {
     passportNumber?: string;
@@ -260,7 +261,7 @@ export default function ManageTourPage() {
 
     useEffect(() => {
         if (status === "loading") return;
-        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             router.replace("/dashboard");
         }
     }, [session, status, router]);
@@ -273,7 +274,7 @@ export default function ManageTourPage() {
         return <DashboardFormSkeleton />;
     }
 
-    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
         return null;
     }
 

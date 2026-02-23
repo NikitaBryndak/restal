@@ -40,11 +40,13 @@ export default function SearchBar({ className }: { className?: string }) {
 
     return (
         <div className="relative w-full max-w-md">
+            <label htmlFor="search-query" className="sr-only">Пошук турів</label>
             <Input
                 name="search-query"
                 id="search-query"
                 type="text"
                 placeholder={displayText}
+                aria-label="Пошук турів"
                 className={`w-full ${className}`}
             />
         </div>

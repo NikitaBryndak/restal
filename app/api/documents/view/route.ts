@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Storage } from "@google-cloud/storage";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
-import { SUPER_ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 export const dynamic = 'force-dynamic';
 
@@ -60,19 +60,19 @@ export async function GET(request: NextRequest) {
 
                 const userPhone = session.user.phoneNumber;
                 const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-                const isSuperAdmin = userPrivilegeLevel >= SUPER_ADMIN_PRIVILEGE_LEVEL;
+                const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
                 const isOwnerOrManager = trip.ownerPhone === userPhone || trip.managerPhone === userPhone;
 
-                // Only allow access if user is owner, manager, or super admin
-                if (!isSuperAdmin && !isOwnerOrManager) {
+                // Only allow access if user is owner, manager, or admin
+                if (!isAdmin && !isOwnerOrManager) {
                     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
                 }
         }
 
-        // SECURITY: Articles require at least manager-level access (privilegeLevel >= 2)
+        // SECURITY: Articles require at least manager-level access
         if (filePath.startsWith('articles/')) {
             const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-            if (userPrivilegeLevel < 2) {
+            if (userPrivilegeLevel < MANAGER_PRIVILEGE_LEVEL) {
                 return NextResponse.json({ message: "Forbidden" }, { status: 403 });
             }
         }

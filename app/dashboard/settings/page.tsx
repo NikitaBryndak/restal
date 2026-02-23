@@ -23,6 +23,7 @@ import {
     EyeOff,
     AlertCircle
 } from "lucide-react";
+import { MIN_PASSWORD_LENGTH, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
 
 export default function SettingsPage() {
     const { userProfile, loading, error, refetch } = useUserProfile();
@@ -65,7 +66,7 @@ export default function SettingsPage() {
             return;
         }
 
-        if (newPassword.length < 8) {
+        if (newPassword.length < MIN_PASSWORD_LENGTH) {
             setPasswordChangeError("New password must be at least 8 characters");
             return;
         }
@@ -125,12 +126,12 @@ export default function SettingsPage() {
             return;
         }
 
-        if (newUsername.trim().length < 2) {
+        if (newUsername.trim().length < MIN_USERNAME_LENGTH) {
             setUsernameChangeError("Username must be at least 2 characters");
             return;
         }
 
-        if (newUsername.trim().length > 100) {
+        if (newUsername.trim().length > MAX_USERNAME_LENGTH) {
             setUsernameChangeError("Username must be no more than 100 characters");
             return;
         }

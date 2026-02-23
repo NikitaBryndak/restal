@@ -3,7 +3,8 @@ import { connectToDatabase } from '@/lib/mongodb';
 import Article from '@/models/article';
 import mongoose from 'mongoose';
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
+import { MANAGER_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
 
 export async function GET(
     request: NextRequest,
@@ -68,8 +69,8 @@ export async function PUT(
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be tier 2 or above
-        if ((session.user.privilegeLevel ?? 1) < 2) {
+        // Check privilege level - must be manager or above
+        if ((session.user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 
@@ -89,18 +90,12 @@ export async function PUT(
         const updateData: any = {};
 
         // SECURITY: Apply the same length limits as the POST handler
-        const MAX_TITLE_LENGTH = 200;
-        const MAX_DESCRIPTION_LENGTH = 500;
-        const MAX_CONTENT_LENGTH = 50000;
-        const MAX_TAG_LENGTH = 50;
-        const MAX_IMAGE_URL_LENGTH = 2000;
-
         const lengthLimits: Record<string, number> = {
-            title: MAX_TITLE_LENGTH,
-            description: MAX_DESCRIPTION_LENGTH,
-            content: MAX_CONTENT_LENGTH,
-            tag: MAX_TAG_LENGTH,
-            images: MAX_IMAGE_URL_LENGTH,
+            title: ARTICLE_MAX_TITLE_LENGTH,
+            description: ARTICLE_MAX_DESCRIPTION_LENGTH,
+            content: ARTICLE_MAX_CONTENT_LENGTH,
+            tag: ARTICLE_MAX_TAG_LENGTH,
+            images: ARTICLE_MAX_IMAGE_URL_LENGTH,
         };
 
         Object.keys(body).forEach(key => {
@@ -142,8 +137,8 @@ export async function DELETE(
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be tier 2 or above
-        if ((session.user.privilegeLevel ?? 1) < 2) {
+        // Check privilege level - must be manager or above
+        if ((session.user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 

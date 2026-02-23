@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useInView } from "motion/react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import FormInput from "@/components/ui/form-input";
+import FadeIn from "@/components/ui/fade-in";
 import {
    Mail,
    Phone,
@@ -20,34 +21,6 @@ import {
    Shield,
    MessageCircle,
 } from "lucide-react";
-
-/* ------------------------------------------------------------------ */
-/*  Fade-in wrapper                                                    */
-/* ------------------------------------------------------------------ */
-function FadeIn({
-   children,
-   className = "",
-   delay = 0,
-}: {
-   children: React.ReactNode;
-   className?: string;
-   delay?: number;
-}) {
-   const ref = useRef(null);
-   const isInView = useInView(ref, { once: true, margin: "-60px" });
-
-   return (
-      <motion.div
-         ref={ref}
-         initial={{ opacity: 0, y: 32 }}
-         animate={isInView ? { opacity: 1, y: 0 } : {}}
-         transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
-         className={className}
-      >
-         {children}
-      </motion.div>
-   );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */

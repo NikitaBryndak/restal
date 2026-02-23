@@ -6,8 +6,6 @@ const optionalDateSchema = z.string().regex(dateRegex, "Невірний фор�
 /** Required date: must be a valid DD/MM/YYYY, cannot be empty */
 const requiredDateSchema = z.string().min(1, "Це поле є обов'язковим").regex(dateRegex, "Невірний формат дати (ДД/ММ/РРРР)");
 
-const phoneRegex = /^\+?[1-9]\d{9,14}$/;
-
 export const travellerSchema = z.object({
     firstName: z.string().min(1, "Ім'я є обов'язковим"),
     lastName: z.string().min(1, "Прізвище є обов'язковим"),

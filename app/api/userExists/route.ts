@@ -2,8 +2,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
-
-const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
+import { PHONE_REGEX } from "@/config/constants";
 
 export async function POST(request: NextRequest) {
     try {

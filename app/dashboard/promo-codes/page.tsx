@@ -5,6 +5,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { Button } from '@/components/ui/button';
 import { PageSkeleton } from '@/components/ui/skeleton';
 import { Search, CheckCircle2, XCircle } from 'lucide-react';
+import { MANAGER_PRIVILEGE_LEVEL } from '@/config/constants';
 
 interface ValidatedCode {
     valid: boolean;
@@ -31,7 +32,7 @@ export default function PromoCodesManagerPage() {
     const [redeeming, setRedeeming] = useState(false);
     const [redeemSuccess, setRedeemSuccess] = useState<string | null>(null);
 
-    const isManager = userProfile && userProfile.privilegeLevel >= 2;
+    const isManager = userProfile && userProfile.privilegeLevel >= MANAGER_PRIVILEGE_LEVEL;
 
     const handleValidate = async () => {
         if (!searchCode.trim()) return;

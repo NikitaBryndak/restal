@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import ContactRequest from "@/models/contactRequest";
 import User from "@/models/user";
 import mongoose from "mongoose";
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 // Rate limit: max 5 requests per IP per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
 
         // Check admin privileges
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < 2) {
+        if (!user || (user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Недостатньо прав" }, { status: 403 });
         }
 
@@ -163,7 +164,7 @@ export async function PUT(request: NextRequest) {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < 2) {
+        if (!user || (user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Недостатньо прав" }, { status: 403 });
         }
 

@@ -3,6 +3,7 @@
 import { NavLink } from "./nav-link";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { signOut } from "next-auth/react";
+import { MANAGER_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 const NAV_ITEM_CLASS = "block text-sm text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200 py-2 px-3 rounded-lg";
 
@@ -13,9 +14,9 @@ export default function SubDashboardNavbar() {
         signOut({ callbackUrl: "/" });
     };
 
-    // Check if user has admin privileges (level 2 or higher)
-    const isAdmin = userProfile && userProfile.privilegeLevel >= 2;
-    const isSuperAdmin = userProfile && userProfile.privilegeLevel >= 3;
+    // Check if user has admin privileges
+    const isManager = userProfile && userProfile.privilegeLevel >= MANAGER_PRIVILEGE_LEVEL;
+    const isAdmin = userProfile && userProfile.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
 
     return (
         <nav className="hidden sm:flex sm:flex-col sticky top-20 w-44 z-10 h-[calc(100vh-7rem)]">
@@ -44,8 +45,8 @@ export default function SubDashboardNavbar() {
                         </NavLink>
                     </div>
 
-                    {/* Admin Section */}
-                    {!loading && isAdmin && (
+                    {/* Manager Section */}
+                    {!loading && isManager && (
                         <div className="flex flex-col space-y-0.5 pt-4 border-t border-white/5">
                             <div className="px-3 text-[10px] font-semibold text-white/25 uppercase tracking-[0.15em] mb-2">
                                 Manager
@@ -70,7 +71,7 @@ export default function SubDashboardNavbar() {
 
                         </div>
                     )}
-                    {!loading && isSuperAdmin && (
+                    {!loading && isAdmin && (
                         <div className="flex flex-col space-y-0.5 pt-4 border-t border-white/5">
                             <div className="px-3 text-[10px] font-semibold text-white/25 uppercase tracking-[0.15em] mb-2">
                                 Admin

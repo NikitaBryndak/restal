@@ -3,11 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { CASHBACK_RATE, SUPER_ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL } from '@/config/constants';
-
-// Phone number validation regex (after stripping formatting)
-const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
+import { authOptions } from "@/lib/auth";
+import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL, PHONE_REGEX } from '@/config/constants';
 
 // Validate required trip fields
 function validateTripData(body: any): string | null {
@@ -57,10 +54,10 @@ export async function GET(request: Request) {
 
         const userPhone = session.user.phoneNumber;
         const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-        const isSuperAdmin = userPrivilegeLevel >= SUPER_ADMIN_PRIVILEGE_LEVEL;
+        const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
 
-        // Super admins (level 4+) can see all trips
-        const query = isSuperAdmin ? {} : {
+        // Admins can see all trips
+        const query = isAdmin ? {} : {
             $or: [
                 { ownerPhone: userPhone },
                 { managerPhone: userPhone }

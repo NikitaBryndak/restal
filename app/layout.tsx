@@ -6,9 +6,10 @@ import { Spotlight } from "@/components/ui/spotlight-new";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { BASE_URL } from "@/config/constants";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://restal.in.ua"), // Update with your actual domain
+  metadataBase: new URL(BASE_URL),
   title: {
     default: "RestAL",
     template: "%s | RestAL",
@@ -16,14 +17,16 @@ export const metadata: Metadata = {
   description:
     "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
   keywords: [
-    "Надійність", "безпека", "експертність"
+    "тури", "подорожі", "відпочинок", "бронювання турів", "турагенція",
+    "гарячі тури", "тури з України", "відпустка", "тур онлайн",
+    "Туреччина", "Єгипет", "Мальдіви", "RestAL"
   ],
   authors: [{ name: "RestAL" }],
   creator: "RestAL",
   openGraph: {
     type: "website",
     locale: "uk_UA",
-    url: "https://restal.in.ua",
+    url: BASE_URL,
     siteName: "RestAL",
     title: "Турагенція RestAL — Експертне планування вашого відпочинку",
     description:
@@ -55,10 +58,10 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // icons: {
-  //   icon: "/logo.png",
-  //   apple: "/logo.png",
-  // },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
   verification: {
     // Add your verification codes here after setting up Google Search Console
     // google: "your-google-verification-code",

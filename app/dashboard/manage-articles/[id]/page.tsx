@@ -13,6 +13,7 @@ import FormInput from "@/components/ui/form-input";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import ArticleCard from "@/components/article/article-card";
 import Link from 'next/link';
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 // Schema Definition (duplicated from add-article/schema.ts for safety)
 const articleSchema = z.object({
@@ -93,7 +94,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
     // Auth Check
     useEffect(() => {
         if (status === "loading") return;
-        if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
             router.replace("/dashboard");
         }
     }, [session, status, router]);
@@ -149,7 +150,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
         );
     }
 
-    if (!session || (session.user?.privilegeLevel ?? 1) < 2) {
+    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
         return null;
     }
 

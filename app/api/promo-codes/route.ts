@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import PromoCode from "@/models/promoCode";
 import User from "@/models/user";
 import crypto from "crypto";
+import { UNAMBIGUOUS_CHARS, MAX_CODE_GEN_RETRIES, MIN_PROMO_AMOUNT, MAX_PROMO_AMOUNT, PROMO_CODE_EXPIRY_DAYS } from "@/config/constants";
 
 // Generate a unique promo code string
 function generateCode(): string {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars
+    const chars = UNAMBIGUOUS_CHARS;
     const seg1 = Array.from(crypto.randomBytes(4))
         .map((b) => chars[b % chars.length])
         .join("");
@@ -30,15 +31,14 @@ export async function POST(request: Request) {
         const { amount } = await request.json();
         const numericAmount = Number(amount);
 
-        if (!numericAmount || numericAmount < 100) {
+        if (!numericAmount || numericAmount < MIN_PROMO_AMOUNT) {
             return NextResponse.json(
-                { message: "Мінімальна сума — 100 грн" },
+                { message: `Мінімальна сума — ${MIN_PROMO_AMOUNT} грн` },
                 { status: 400 }
             );
         }
 
         // SECURITY: Cap maximum promo code amount to prevent abuse
-        const MAX_PROMO_AMOUNT = 50000;
         if (numericAmount > MAX_PROMO_AMOUNT) {
             return NextResponse.json(
                 { message: `Максимальна сума — ${MAX_PROMO_AMOUNT} грн` },
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         while (await PromoCode.findOne({ code })) {
             code = generateCode();
             attempts++;
-            if (attempts > 10) {
+            if (attempts > MAX_CODE_GEN_RETRIES) {
                 return NextResponse.json(
                     { message: "Не вдалося згенерувати унікальний код. Спробуйте пізніше." },
                     { status: 500 }
@@ -93,9 +93,9 @@ export async function POST(request: Request) {
             );
         }
 
-        // Set expiry to 30 days from now
+        // Set expiry
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 30);
+        expiresAt.setDate(expiresAt.getDate() + PROMO_CODE_EXPIRY_DAYS);
 
         const promoCode = await PromoCode.create({
             code,

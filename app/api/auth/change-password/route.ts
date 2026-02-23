@@ -3,10 +3,9 @@ import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const MIN_PASSWORD_LENGTH = 8;
+import { MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
 
 export async function POST(request: NextRequest) {
     try {
@@ -70,7 +69,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Hash and update password
-        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
         user.password = hashedPassword;
         await user.save();
 
