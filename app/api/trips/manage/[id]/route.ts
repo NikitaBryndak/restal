@@ -155,14 +155,15 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
         // Recalculate cashback if total amount changes and cashback hasn't been processed
         let newCashbackAmount = undefined;
-        if (!existingTrip.cashbackProcessed && rest.payment?.totalAmount) {
-            newCashbackAmount = (rest.payment.totalAmount || 0) * CASHBACK_RATE;
+        const payment = rest.payment as { totalAmount?: number } | undefined;
+        if (!existingTrip.cashbackProcessed && payment?.totalAmount) {
+            newCashbackAmount = (payment.totalAmount || 0) * CASHBACK_RATE;
         }
 
         // Get current manager's name
         const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
 
-        const payload = {
+        const payload: Record<string, any> = {
             ...rest,
             ...(newCashbackAmount !== undefined && { cashbackAmount: newCashbackAmount }),
             managerPhone: session.user.phoneNumber, // Update to current manager
