@@ -281,11 +281,8 @@ export default function InfoPage() {
           <FadeIn>
             {/* Section header */}
             <div className="text-center mb-8">
-              <span className="text-accent text-xs font-semibold uppercase tracking-[0.2em]">
-                Популярні напрямки
-              </span>
               <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
-                Гарячі пропозиції
+                Популярні напрямки
               </h2>
               <p className="text-white/40 text-sm mt-2 max-w-lg mx-auto">
                 Найкращі ціни на подорожі до популярних країн

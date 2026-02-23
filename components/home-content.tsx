@@ -215,18 +215,6 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
 
         {/* Hero content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center gap-6 pt-20">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 border border-accent/30 text-accent text-sm font-medium backdrop-blur-sm">
-              <Star className="w-4 h-4 fill-accent" />
-              Турагенція №1 в Україні
-            </span>
-          </motion.div>
-
           {/* Heading */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -259,7 +247,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
             className="flex flex-wrap justify-center gap-4 mt-2"
           >
             <Link
-              href="/tour-screener"
+              href="/tour-screener#tour-widget"
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/25"
             >
               Підібрати тур
@@ -368,7 +356,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
             {destinations.map((dest, i) => (
               <FadeIn key={dest.name} delay={i * 0.07}>
                 <Link
-                  href="/tour-screener"
+                  href="/tour-screener#tour-widget"
                   className="group relative aspect-3/4 rounded-2xl overflow-hidden block cursor-pointer"
                 >
                   <Image
@@ -404,7 +392,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
 
           <FadeIn className="flex justify-center mt-10">
             <Link
-              href="/tour-screener"
+              href="/tour-screener#tour-widget"
               className="inline-flex items-center gap-2 px-6 py-3 border border-accent/40 text-accent rounded-xl hover:bg-accent/10 transition-all hover:scale-105 active:scale-95 font-medium"
             >
               Переглянути всі напрямки
@@ -602,7 +590,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
                 Залишити заявку
               </Link>
               <Link
-                href="/tour-screener"
+                href="/tour-screener#tour-widget"
                 className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl backdrop-blur-sm border border-white/20 transition-all hover:scale-105 active:scale-95"
               >
                 Підібрати тур самостійно
