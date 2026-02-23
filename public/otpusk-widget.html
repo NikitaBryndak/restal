@@ -1129,6 +1129,171 @@
       background-color: rgba(255, 255, 255, 0.2) !important;
     }
 
+    /* ============================
+       PEOPLE/TOURISTS MODAL — compact layout & visible apply button
+       ============================ */
+
+    /* Flex layout so bottom buttons sit right after content */
+    body .new_t-change-people .new_f-dropdown-body,
+    body .new_layer-open .new_t-change-people .new_f-dropdown-body {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    body .new_t-change-people .new_f-dropdown-body-wrap {
+      flex: 0 1 auto !important;
+      overflow-y: auto !important;
+    }
+
+    /* Bottom button bar — always visible, no scroll needed */
+    body .new_t-change-people .new_f-dropdown-body-bottom {
+      flex-shrink: 0 !important;
+      margin-top: auto !important;
+      background: #1a1a1a !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Ensure apply / cancel buttons are always visible */
+    body .new_t-change-people .new_f-dropdown-btn-cancel,
+    body .new_t-change-people .new_f-dropdown-btn-apply {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    /* Also fix all form dropdowns — same issue with people selector in search form  */
+    body .new_f-dropdown-container .new_f-dropdown-body {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    body .new_f-dropdown-container .new_f-dropdown-body-wrap {
+      flex: 0 1 auto !important;
+      overflow-y: auto !important;
+    }
+    body .new_f-dropdown-container .new_f-dropdown-body-bottom {
+      flex-shrink: 0 !important;
+      margin-top: auto !important;
+    }
+
+    /* ============================
+       ADDITIONAL DARK THEME — post-apply state & missing elements
+       ============================ */
+
+    /* Tour detail row containers — prevent white flash on reload */
+    body .new_t-tour-tab-row {
+      background: transparent !important;
+    }
+    body .new_t-content-wrap,
+    body .new_t-tab-content-body {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+
+    /* Loading overlay during tour detail refresh */
+    body .new_t-loading,
+    body .new_t-overlay,
+    body .new_t-modal-overlay,
+    body .new_t-reloading,
+    body .new_t-tour-reloading {
+      background: rgba(0, 0, 0, 0.6) !important;
+    }
+
+    /* Sorting controls in results */
+    body .new_r-sorting {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    body .new_r-sorting-item {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+    body .new_r-sorting-item.active,
+    body .new_r-sorting-item:hover {
+      color: #0fa4e6 !important;
+    }
+
+    /* Result item expanded info */
+    body .new_r-item-toggle,
+    body .new_r-item-toggle-wrap {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body .new_r-item-toggle-btn {
+      color: #0fa4e6 !important;
+    }
+
+    /* Tour detail — section headers on change */
+    body .new_t-tour-tab-col {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body .new_t-tour-table {
+      background: transparent !important;
+    }
+
+    /* Tooltip / popover elements */
+    body .new_t-tooltip,
+    body .new_t-popover,
+    body .new_tooltip {
+      background: #1a1a1a !important;
+      color: #e0e0e0 !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    /* All generic white backgrounds in the widget */
+    body .new_t-wrapper,
+    body .new_t-container-wrap {
+      background: transparent !important;
+    }
+
+    /* Fix for any modal backdrop */
+    body .new_modal-bg,
+    body .modal-backdrop,
+    body .new_layer-bg {
+      background: rgba(0, 0, 0, 0.7) !important;
+    }
+
+    /* Flight details text */
+    body .new_t-flight-text,
+    body .new_t-flight-info {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    body .new_t-flight-code,
+    body .new_t-flight-time {
+      color: #0fa4e6 !important;
+    }
+
+    /* Service items (transfer, insurance) */
+    body .new_t-service-included {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    /* Info / warning messages in tour detail */
+    body .new_t-info-msg,
+    body .new_t-warning-msg {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Catch-all for any remaining white text containers in tour detail */
+    body .new_t-container *[style*="background: #fff"],
+    body .new_t-container *[style*="background:#fff"],
+    body .new_t-container *[style*="background: white"],
+    body .new_t-container *[style*="background-color: #fff"],
+    body .new_t-container *[style*="background-color:#fff"],
+    body .new_t-container *[style*="background-color: white"] {
+      background: rgba(255, 255, 255, 0.04) !important;
+      color: #e0e0e0 !important;
+    }
+
+    /* Catch-all for result containers too */
+    body .new_r-container *[style*="background: #fff"],
+    body .new_r-container *[style*="background:#fff"],
+    body .new_r-container *[style*="background: white"],
+    body .new_r-container *[style*="background-color: #fff"],
+    body .new_r-container *[style*="background-color:#fff"],
+    body .new_r-container *[style*="background-color: white"] {
+      background: rgba(255, 255, 255, 0.04) !important;
+      color: #e0e0e0 !important;
+    }
+
     /* === MOBILE OVERRIDES === */
     @media all and (max-width: 478px) {
       body .new_f-ext-container,
@@ -1147,6 +1312,46 @@
 
       body .new_f-dates-container#new_f-dates-container .calendar-tip {
         background-color: #0fa4e6 !important;
+      }
+
+      /* People modal — compact height, not stretched to fullscreen */
+      body .new_layer-open .new_t-change-people .new_f-dropdown-body {
+        height: auto !important;
+        min-height: unset !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      /* Bottom buttons bar — sticky at bottom, always visible */
+      body .new_t-change-people .new_f-dropdown-body-bottom {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 10 !important;
+        padding: 10px 16px !important;
+        background: #111111 !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+
+      /* Also fix ALL form dropdowns on mobile — sticky bottom buttons */
+      body .new_f-dropdown-container .new_f-dropdown-body {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      body .new_f-dropdown-container .new_f-dropdown-body-bottom {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 10 !important;
+        background: #111111 !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        padding: 10px 16px !important;
+      }
+
+      /* Ensure people modal content doesn't take unnecessary space */
+      body .new_t-change-people .new_f-dropdown-body-wrap {
+        flex: 0 1 auto !important;
+        padding-bottom: 12px !important;
       }
     }
 
@@ -1391,6 +1596,100 @@
       [500, 1000, 2000, 4000, 8000].forEach(function(t) {
         setTimeout(attachSearchCollapse, t);
       });
+    })();
+  </script>
+  <script>
+    // Fix inline styles on modals/dropdowns and override white backgrounds
+    (function() {
+      function fixStyles() {
+        // Fix people modal: force flex layout and auto-height on mobile
+        var peopleBodies = document.querySelectorAll('.new_t-change-people .new_f-dropdown-body');
+        peopleBodies.forEach(function(el) {
+          el.style.setProperty('display', 'flex', 'important');
+          el.style.setProperty('flex-direction', 'column', 'important');
+          if (window.innerWidth <= 478) {
+            el.style.setProperty('height', 'auto', 'important');
+            el.style.setProperty('min-height', 'unset', 'important');
+            el.style.setProperty('max-height', '100dvh', 'important');
+          }
+        });
+
+        // Fix all dropdown bottoms to be sticky on mobile
+        if (window.innerWidth <= 478) {
+          var bottoms = document.querySelectorAll(
+            '.new_t-change-people .new_f-dropdown-body-bottom, ' +
+            '.new_f-dropdown-container .new_f-dropdown-body-bottom'
+          );
+          bottoms.forEach(function(el) {
+            el.style.setProperty('position', 'sticky', 'important');
+            el.style.setProperty('bottom', '0', 'important');
+            el.style.setProperty('z-index', '10', 'important');
+          });
+        }
+
+        // Fix any elements with inline white backgrounds
+        var whiteEls = document.querySelectorAll(
+          '[style*="background: #fff"], [style*="background:#fff"], ' +
+          '[style*="background: white"], [style*="background-color: #fff"], ' +
+          '[style*="background-color:#fff"], [style*="background-color: white"], ' +
+          '[style*="background: rgb(255"], [style*="background-color: rgb(255"]'
+        );
+        whiteEls.forEach(function(el) {
+          // Only override if inside the widget containers
+          if (el.closest('.new_t-container, .new_r-container, .new_f-container, .new_os')) {
+            el.style.setProperty('background', 'rgba(255, 255, 255, 0.04)', 'important');
+            el.style.setProperty('background-color', 'rgba(255, 255, 255, 0.04)', 'important');
+            // Also fix text color if it's dark
+            var color = window.getComputedStyle(el).color;
+            if (color && (color === 'rgb(0, 0, 0)' || color === 'rgb(51, 51, 51)' || color === 'rgb(34, 34, 34)' || color === 'rgb(85, 85, 85)')) {
+              el.style.setProperty('color', '#e0e0e0', 'important');
+            }
+          }
+        });
+
+        // Fix dark text elements inside tour container
+        var darkTexts = document.querySelectorAll(
+          '[style*="color: #333"], [style*="color:#333"], ' +
+          '[style*="color: #000"], [style*="color:#000"], ' +
+          '[style*="color: black"], [style*="color: rgb(0, 0, 0)"], ' +
+          '[style*="color: rgb(51"], [style*="color: rgb(34"]'
+        );
+        darkTexts.forEach(function(el) {
+          if (el.closest('.new_t-container, .new_r-container, .new_f-container, .new_os')) {
+            el.style.setProperty('color', '#e0e0e0', 'important');
+          }
+        });
+
+        // Fix gray/light backgrounds
+        var grayEls = document.querySelectorAll(
+          '[style*="background: #f"], [style*="background:#f"], ' +
+          '[style*="background: #e"], [style*="background:#e"], ' +
+          '[style*="background: #d"], [style*="background:#d"], ' +
+          '[style*="background-color: #f"], [style*="background-color:#f"], ' +
+          '[style*="background-color: #e"], [style*="background-color:#e"], ' +
+          '[style*="background-color: #d"], [style*="background-color:#d"]'
+        );
+        grayEls.forEach(function(el) {
+          if (el.closest('.new_t-container, .new_r-container, .new_f-container, .new_os')) {
+            el.style.setProperty('background', 'rgba(255, 255, 255, 0.04)', 'important');
+            el.style.setProperty('background-color', 'rgba(255, 255, 255, 0.04)', 'important');
+          }
+        });
+      }
+
+      // Run on DOM mutations (widget changes)
+      if (window.MutationObserver) {
+        var fixObs = new MutationObserver(function() {
+          requestAnimationFrame(fixStyles);
+        });
+        fixObs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+      }
+
+      // Also run periodically for good measure
+      [300, 600, 1200, 2500, 5000].forEach(function(t) {
+        setTimeout(fixStyles, t);
+      });
+      setInterval(fixStyles, 3000);
     })();
   </script>
   <script>
