@@ -1133,22 +1133,8 @@
        PEOPLE/TOURISTS MODAL — compact layout & visible apply button
        ============================ */
 
-    /* Flex layout so bottom buttons sit right after content */
-    body .new_t-change-people .new_f-dropdown-body,
-    body .new_layer-open .new_t-change-people .new_f-dropdown-body {
-      display: flex !important;
-      flex-direction: column !important;
-    }
-
-    body .new_t-change-people .new_f-dropdown-body-wrap {
-      flex: 0 1 auto !important;
-      overflow-y: auto !important;
-    }
-
-    /* Bottom button bar — always visible, no scroll needed */
+    /* Bottom button bar in people modal — always visible, no scroll needed */
     body .new_t-change-people .new_f-dropdown-body-bottom {
-      flex-shrink: 0 !important;
-      margin-top: auto !important;
       background: #1a1a1a !important;
       border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
@@ -1156,23 +1142,13 @@
     /* Ensure apply / cancel buttons are always visible */
     body .new_t-change-people .new_f-dropdown-btn-cancel,
     body .new_t-change-people .new_f-dropdown-btn-apply {
-      display: block !important;
       visibility: visible !important;
       opacity: 1 !important;
     }
 
-    /* Also fix all form dropdowns — same issue with people selector in search form  */
-    body .new_f-dropdown-container .new_f-dropdown-body {
-      display: flex !important;
-      flex-direction: column !important;
-    }
-    body .new_f-dropdown-container .new_f-dropdown-body-wrap {
-      flex: 0 1 auto !important;
-      overflow-y: auto !important;
-    }
-    body .new_f-dropdown-container .new_f-dropdown-body-bottom {
-      flex-shrink: 0 !important;
-      margin-top: auto !important;
+    /* Bottom buttons in all form dropdowns — dark theme */
+    body .new_f-dropdown-body-bottom {
+      background: #1a1a1a !important;
     }
 
     /* ============================
@@ -1314,44 +1290,15 @@
         background-color: #0fa4e6 !important;
       }
 
-      /* People modal — compact height, not stretched to fullscreen */
-      body .new_layer-open .new_t-change-people .new_f-dropdown-body {
-        height: auto !important;
-        min-height: unset !important;
-        max-height: 100vh !important;
-        max-height: 100dvh !important;
-        display: flex !important;
-        flex-direction: column !important;
-      }
-
       /* Bottom buttons bar — sticky at bottom, always visible */
-      body .new_t-change-people .new_f-dropdown-body-bottom {
+      body .new_t-change-people .new_f-dropdown-body-bottom,
+      body .new_f-dropdown-body-bottom {
         position: sticky !important;
         bottom: 0 !important;
         z-index: 10 !important;
         padding: 10px 16px !important;
         background: #111111 !important;
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-      }
-
-      /* Also fix ALL form dropdowns on mobile — sticky bottom buttons */
-      body .new_f-dropdown-container .new_f-dropdown-body {
-        display: flex !important;
-        flex-direction: column !important;
-      }
-      body .new_f-dropdown-container .new_f-dropdown-body-bottom {
-        position: sticky !important;
-        bottom: 0 !important;
-        z-index: 10 !important;
-        background: #111111 !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-        padding: 10px 16px !important;
-      }
-
-      /* Ensure people modal content doesn't take unnecessary space */
-      body .new_t-change-people .new_f-dropdown-body-wrap {
-        flex: 0 1 auto !important;
-        padding-bottom: 12px !important;
       }
     }
 
@@ -1599,34 +1546,9 @@
     })();
   </script>
   <script>
-    // Fix inline styles on modals/dropdowns and override white backgrounds
+    // Fix inline styles: override white backgrounds & dark text for dark theme
     (function() {
       function fixStyles() {
-        // Fix people modal: force flex layout and auto-height on mobile
-        var peopleBodies = document.querySelectorAll('.new_t-change-people .new_f-dropdown-body');
-        peopleBodies.forEach(function(el) {
-          el.style.setProperty('display', 'flex', 'important');
-          el.style.setProperty('flex-direction', 'column', 'important');
-          if (window.innerWidth <= 478) {
-            el.style.setProperty('height', 'auto', 'important');
-            el.style.setProperty('min-height', 'unset', 'important');
-            el.style.setProperty('max-height', '100dvh', 'important');
-          }
-        });
-
-        // Fix all dropdown bottoms to be sticky on mobile
-        if (window.innerWidth <= 478) {
-          var bottoms = document.querySelectorAll(
-            '.new_t-change-people .new_f-dropdown-body-bottom, ' +
-            '.new_f-dropdown-container .new_f-dropdown-body-bottom'
-          );
-          bottoms.forEach(function(el) {
-            el.style.setProperty('position', 'sticky', 'important');
-            el.style.setProperty('bottom', '0', 'important');
-            el.style.setProperty('z-index', '10', 'important');
-          });
-        }
-
         // Fix any elements with inline white backgrounds
         var whiteEls = document.querySelectorAll(
           '[style*="background: #fff"], [style*="background:#fff"], ' +
