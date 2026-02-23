@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // PERFORMANCE: Prefer WebP for optimized images, set default quality
+  images: {
+    formats: ["image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+  },
+
   // SECURITY: Add security headers to all responses
   async headers() {
     return [
