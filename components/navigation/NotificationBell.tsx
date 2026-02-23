@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 
 type NotificationItem = {
@@ -13,17 +13,18 @@ type NotificationItem = {
 };
 
 export default function NotificationBell() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Fetch notifications
-    const fetchNotifications = async () => {
-        if (!session?.user) return;
+    // Stable user indicator — avoids re-running effects when session object ref changes
+    const isAuthenticated = status === 'authenticated' && !!session?.user;
 
+    // Fetch notifications
+    const fetchNotifications = useCallback(async () => {
         try {
             const response = await fetch('/api/notifications');
             if (response.ok) {
@@ -34,16 +35,16 @@ export default function NotificationBell() {
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
         }
-    };
+    }, []);
 
     // Fetch on mount and periodically
     useEffect(() => {
-        if (session?.user) {
-            fetchNotifications();
-            const interval = setInterval(fetchNotifications, 60000); // Refresh every 60 seconds
-            return () => clearInterval(interval);
-        }
-    }, [session]);
+        if (!isAuthenticated) return;
+
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 60000); // Refresh every 60 seconds
+        return () => clearInterval(interval);
+    }, [isAuthenticated, fetchNotifications]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -62,7 +63,7 @@ export default function NotificationBell() {
         if (isOpen && unreadCount > 0) {
             markAllAsRead();
         }
-    }, [isOpen]);
+    }, [isOpen, unreadCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Mark all as read
     const markAllAsRead = async () => {

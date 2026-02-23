@@ -16,6 +16,11 @@ import {
   CheckCircle,
   MapPin,
   MessageCircle,
+  Users,
+  Heart,
+  Percent,
+  X,
+  Check,
 } from "lucide-react";
 import { motion, useInView, useSpring, useTransform } from "motion/react";
 import FadeIn from "@/components/ui/fade-in";
@@ -76,8 +81,8 @@ const features = [
   },
   {
     icon: Sparkles,
-    title: "ШІ рекомендації",
-    desc: "Розумний підбір туру за вашими побажаннями завдяки технологіям ШІ",
+    title: "ШІ помічник",
+    desc: "Задайте будь-яке питання про подорожі та отримайте миттєву відповідь від нашого ШІ-асистента",
   },
 ];
 
@@ -96,6 +101,51 @@ const steps = [
     icon: Plane,
     title: "Вирушайте у подорож",
     desc: "Ми оформимо всі документи — вам залишиться лише зібрати валізу",
+  },
+];
+
+const whyRestalPoints = [
+  {
+    icon: Users,
+    title: "Персональний менеджер",
+    desc: "У вас є живий експерт, який знає вас особисто — на відміну від безликих платформ, де ви самі шукаєте серед тисяч варіантів.",
+    booking: "Самостійний пошук без підтримки",
+    restal: "Менеджер підбирає тур під ваші побажання",
+  },
+  {
+    icon: Sparkles,
+    title: "ШІ-асистент для питань",
+    desc: "Маєте питання про візи, клімат чи курорти? Наш ШІ-помічник дасть миттєву відповідь, а менеджер допоможе з усім іншим.",
+    booking: "Шукайте відповіді самостійно",
+    restal: "ШІ-помічник + живий менеджер",
+  },
+  {
+    icon: Shield,
+    title: "Повна організація подорожі",
+    desc: "Авіаквитки, трансфер, страхування, документи — ми організовуємо ВСЕ. На Booking ви самі вирішуєте кожну деталь.",
+    booking: "Тільки бронювання готелю",
+    restal: "Переліт, готель, трансфер, страховка, документи",
+  },
+  {
+    icon: Percent,
+    title: "Кешбек 2% на кожну подорож",
+    desc: "Кожна поїздка повертає вам гроші. У великих агрегаторів програми лояльності або відсутні, або вимагають десятки бронювань.",
+    booking: "Бали лише після багатьох бронювань",
+    restal: "2% кешбек з першої подорожі",
+  },
+  {
+    icon: Heart,
+    title: "Підтримка до, під час і після",
+    desc: "Ми на зв\u2019язку 24/7 — навіть коли ви вже на курорті. Якщо щось піде не так, ми вирішимо це замість вас.",
+    booking: "Підтримка лише з питань бронювання",
+    restal: "Повний супровід цілодобово",
+  },
+  {
+    icon: Globe,
+    title: "Перевірені готелі та маршрути",
+    desc: "Наші експерти особисто інспектують готелі. Ви не побачите \u2018сюрпризів\u2019 — тільки те, що відповідає опису.",
+    booking: "Відгуки користувачів без гарантій",
+    restal: "Особисто перевірена якість",
   },
 ];
 
@@ -419,6 +469,57 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
                   <p className="text-white/50 text-sm leading-relaxed max-w-xs">
                     {step.desc}
                   </p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/*  WHY RESTAL (vs Booking & others)                             */}
+      {/* ============================================================ */}
+      <section className="py-20 md:py-28 bg-white/2">
+        <div className="max-w-6xl mx-auto px-4">
+          <FadeIn className="text-center mb-12 md:mb-16">
+            <span className="text-accent text-sm font-semibold uppercase tracking-widest">
+              Чому саме Restal
+            </span>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mt-3">
+              Restal vs. Booking та інші
+            </h2>
+            <p className="text-white/50 mt-4 max-w-2xl mx-auto text-base md:text-lg">
+              Великі платформи дають вам пошук — ми даємо результат.
+              Ось чим Restal відрізняється від звичайних сайтів бронювання.
+            </p>
+          </FadeIn>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {whyRestalPoints.map((point, i) => (
+              <FadeIn key={point.title} delay={i * 0.08}>
+                <div className="p-6 rounded-2xl bg-white/4 border border-white/6 hover:border-accent/30 transition-all hover:bg-white/6 group h-full flex flex-col">
+                  {/* Icon + Title */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors">
+                      <point.icon className="w-5 h-5 text-accent" />
+                    </div>
+                    <h3 className="text-white font-bold text-lg leading-tight">{point.title}</h3>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-white/50 text-sm leading-relaxed mb-5 flex-1">{point.desc}</p>
+
+                  {/* Comparison rows */}
+                  <div className="space-y-2 pt-4 border-t border-white/6">
+                    <div className="flex items-start gap-2 text-sm">
+                      <X className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+                      <span className="text-white/40">{point.booking}</span>
+                    </div>
+                    <div className="flex items-start gap-2 text-sm">
+                      <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <span className="text-white/80 font-medium">{point.restal}</span>
+                    </div>
+                  </div>
                 </div>
               </FadeIn>
             ))}
