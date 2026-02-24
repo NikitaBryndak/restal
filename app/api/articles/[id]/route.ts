@@ -41,8 +41,10 @@ export async function GET(
 
         // Must serialize ObjectId to string explicitly if it wasn't done by lean() (though lean usually does)
         // Or if it's returning Number type for articleID but string for _id
+        // SECURITY: Exclude creatorPhone from public response to prevent PII leakage
+        const { creatorPhone: _phone, ...articleWithoutPhone } = foundArticle;
         const sanitizedArticle = {
-            ...foundArticle,
+            ...articleWithoutPhone,
             _id: foundArticle._id.toString(),
             createdAt: foundArticle.createdAt ? new Date(foundArticle.createdAt).toISOString() : null,
             updatedAt: foundArticle.updatedAt ? new Date(foundArticle.updatedAt).toISOString() : null,

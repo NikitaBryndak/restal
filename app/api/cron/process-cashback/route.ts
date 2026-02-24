@@ -57,7 +57,20 @@ export async function POST(request: Request) {
                     continue; // Not yet time to process this trip
                 }
 
-                // Find the user and add cashback atomically
+                // SECURITY: Atomically claim the trip first to prevent double-crediting.
+                // If the process crashes after this but before crediting the user,
+                // the worst case is a missed credit (which can be manually corrected),
+                // rather than a double credit (financial loss).
+                const claimed = await Trip.findOneAndUpdate(
+                    { _id: trip._id, cashbackProcessed: { $ne: true } },
+                    { $set: { cashbackProcessed: true } },
+                    { new: true }
+                );
+
+                // If another process already claimed this trip, skip it
+                if (!claimed) continue;
+
+                // Now safely credit the user
                 const updatedUser = await User.findOneAndUpdate(
                     { phoneNumber: trip.ownerPhone },
                     { $inc: { cashbackAmount: (trip.cashbackAmount || 0) } },
@@ -65,11 +78,6 @@ export async function POST(request: Request) {
                 );
 
                 if (updatedUser) {
-                    // Mark trip as processed atomically
-                    await Trip.findByIdAndUpdate(trip._id, {
-                        cashbackProcessed: true,
-                    });
-
                     processedCount++;
 
                     // --- Referral bonus processing ---

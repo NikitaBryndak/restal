@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
 
 export async function POST(request: NextRequest) {
     try {
@@ -39,6 +39,13 @@ export async function POST(request: NextRequest) {
         if (newPassword.length < MIN_PASSWORD_LENGTH) {
             return NextResponse.json({
                 message: `Новий пароль повинен містити щонайменше ${MIN_PASSWORD_LENGTH} символів`
+            }, { status: 400 });
+        }
+
+        // SECURITY: Prevent DoS via expensive bcrypt hashing and silent truncation at 72 bytes
+        if (newPassword.length > MAX_PASSWORD_LENGTH) {
+            return NextResponse.json({
+                message: `Пароль не може перевищувати ${MAX_PASSWORD_LENGTH} символів`
             }, { status: 400 });
         }
 

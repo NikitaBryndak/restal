@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import FormInput from "@/components/ui/form-input";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import { TRUSTED_ORIGINS } from "@/config/constants";
 import {
   X,
   Send,
@@ -157,6 +158,11 @@ export default function TourScreenerPage() {
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       if (!event.data) return;
+
+      // SECURITY: Validate origin for postMessage events to prevent spoofing
+      const isSelfOrigin = event.origin === window.location.origin;
+      const isTrustedOrigin = TRUSTED_ORIGINS.includes(event.origin);
+      if (!isSelfOrigin && !isTrustedOrigin) return;
 
       if (
         event.data.type === "otpusk-resize" &&

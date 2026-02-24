@@ -16,12 +16,16 @@ export async function GET() {
             .limit(100)
             .lean();
         // Ensure _id is string for client consistency
-         const serializedArticles = articles.map((article: any) => ({
-             ...article,
-             _id: article._id.toString(),
-             createdAt: article.createdAt ? new Date(article.createdAt).toISOString() : null,
-             updatedAt: article.updatedAt ? new Date(article.updatedAt).toISOString() : null,
-         }));
+         // SECURITY: Exclude creatorPhone from public response to prevent PII leakage
+         const serializedArticles = articles.map((article: any) => {
+             const { creatorPhone: _phone, ...rest } = article;
+             return {
+                 ...rest,
+                 _id: article._id.toString(),
+                 createdAt: article.createdAt ? new Date(article.createdAt).toISOString() : null,
+                 updatedAt: article.updatedAt ? new Date(article.updatedAt).toISOString() : null,
+             };
+         });
 
         return NextResponse.json({ articles: serializedArticles }, { status: 200 });
     } catch {

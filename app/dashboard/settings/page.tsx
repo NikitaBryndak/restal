@@ -39,14 +39,13 @@ export default function SettingsPage() {
     const [usernameChangeLoading, setUsernameChangeLoading] = useState(false);
     const [usernameChangeError, setUsernameChangeError] = useState("");
     const [usernameChangeSuccess, setUsernameChangeSuccess] = useState("");
-    const [notifications, setNotifications] = useState({
+    const notifications = {
         email: true,
         sms: true,
         push: false,
         marketing: false
-    });
-    const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
-    const [language, setLanguage] = useState('uk');
+    };
+    const theme = 'dark' as const;
 
     // Sync newUsername when userProfile updates
     useEffect(() => {
@@ -379,20 +378,21 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        {/* Notifications Section */}
-                        <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                        {/* Notifications Section (coming soon) */}
+                        <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden opacity-60">
                             <div className="p-4 sm:p-6 border-b border-white/10">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center shrink-0">
                                         <Bell className="w-5 h-5 text-amber-400" />
                                     </div>
-                                    <div className="min-w-0">
+                                    <div className="min-w-0 flex-1">
                                         <h2 className="text-lg sm:text-xl font-bold text-white">Сповіщення</h2>
                                         <p className="text-xs sm:text-sm text-white/60">Налаштуйте способи отримання сповіщень</p>
                                     </div>
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full shrink-0">Незабаром</span>
                                 </div>
                             </div>
-                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="p-4 sm:p-6 space-y-4 pointer-events-none">
                                 <div className="flex items-center justify-between py-3 border-b border-white/10">
                                     <div className="flex items-center gap-3">
                                         <Mail className="w-5 h-5 text-white/60" />
@@ -401,16 +401,11 @@ export default function SettingsPage() {
                                             <p className="text-sm text-white/60">Отримувати сповіщення на email</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setNotifications(prev => ({ ...prev, email: !prev.email }))}
-                                        className={`w-12 h-6 rounded-full transition-colors ${
-                                            notifications.email ? 'bg-accent' : 'bg-white/20'
-                                        }`}
+                                    <div
+                                        className={`w-12 h-6 rounded-full ${notifications.email ? 'bg-accent' : 'bg-white/20'}`}
                                     >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform transition-transform ${
-                                            notifications.email ? 'translate-x-6' : 'translate-x-0.5'
-                                        }`} />
-                                    </button>
+                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.email ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                    </div>
                                 </div>
                                 <div className="flex items-center justify-between py-3 border-b border-white/10">
                                     <div className="flex items-center gap-3">
@@ -420,16 +415,11 @@ export default function SettingsPage() {
                                             <p className="text-sm text-white/60">Отримувати SMS про важливі оновлення</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setNotifications(prev => ({ ...prev, sms: !prev.sms }))}
-                                        className={`w-12 h-6 rounded-full transition-colors ${
-                                            notifications.sms ? 'bg-accent' : 'bg-white/20'
-                                        }`}
+                                    <div
+                                        className={`w-12 h-6 rounded-full ${notifications.sms ? 'bg-accent' : 'bg-white/20'}`}
                                     >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform transition-transform ${
-                                            notifications.sms ? 'translate-x-6' : 'translate-x-0.5'
-                                        }`} />
-                                    </button>
+                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.sms ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                    </div>
                                 </div>
                                 <div className="flex items-center justify-between py-3">
                                     <div className="flex items-center gap-3">
@@ -439,34 +429,30 @@ export default function SettingsPage() {
                                             <p className="text-sm text-white/60">Сповіщення в браузері</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setNotifications(prev => ({ ...prev, push: !prev.push }))}
-                                        className={`w-12 h-6 rounded-full transition-colors ${
-                                            notifications.push ? 'bg-accent' : 'bg-white/20'
-                                        }`}
+                                    <div
+                                        className={`w-12 h-6 rounded-full ${notifications.push ? 'bg-accent' : 'bg-white/20'}`}
                                     >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform transition-transform ${
-                                            notifications.push ? 'translate-x-6' : 'translate-x-0.5'
-                                        }`} />
-                                    </button>
+                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.push ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Appearance Section */}
-                        <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                        {/* Appearance Section (coming soon) */}
+                        <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden opacity-60">
                             <div className="p-4 sm:p-6 border-b border-white/10">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center shrink-0">
                                         <Palette className="w-5 h-5 text-purple-400" />
                                     </div>
-                                    <div className="min-w-0">
+                                    <div className="min-w-0 flex-1">
                                         <h2 className="text-lg sm:text-xl font-bold text-white">Зовнішній вигляд</h2>
                                         <p className="text-xs sm:text-sm text-white/60">Налаштуйте тему та мову інтерфейсу</p>
                                     </div>
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider bg-purple-500/20 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full shrink-0">Незабаром</span>
                                 </div>
                             </div>
-                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="p-4 sm:p-6 space-y-4 pointer-events-none">
                                 <div>
                                     <p className="font-medium text-white mb-3">Тема</p>
                                     <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -475,19 +461,18 @@ export default function SettingsPage() {
                                             { value: 'dark', label: 'Темна', icon: Moon },
                                             { value: 'system', label: 'Системна', icon: Settings }
                                         ].map(({ value, label, icon: Icon }) => (
-                                            <button
+                                            <div
                                                 key={value}
-                                                onClick={() => setTheme(value as 'light' | 'dark' | 'system')}
-                                                className={`p-3 sm:p-4 rounded-xl border transition-all flex flex-col items-center gap-1.5 sm:gap-2 ${
+                                                className={`p-3 sm:p-4 rounded-xl border flex flex-col items-center gap-1.5 sm:gap-2 ${
                                                     theme === value
                                                         ? 'bg-accent/20 border-accent'
-                                                        : 'bg-white/5 border-white/10 hover:border-white/30'
+                                                        : 'bg-white/5 border-white/10'
                                                 }`}
                                             >
                                                 <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${theme === value ? 'text-accent' : 'text-white/60'}`} />
                                                 <span className={`text-xs sm:text-sm ${theme === value ? 'text-accent' : 'text-white/80'}`}>{label}</span>
                                                 {theme === value && <Check className="w-4 h-4 text-accent" />}
-                                            </button>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
@@ -506,12 +491,7 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        {/* Save Button */}
-                        <div className="flex justify-end pt-4">
-                            <Button className="bg-accent hover:bg-accent/90 text-white rounded-xl h-12 w-full sm:w-auto px-8">
-                                Зберегти налаштування
-                            </Button>
-                        </div>
+
                     </div>
                 </div>
             </div>

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { Storage } from "@google-cloud/storage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import User from "@/models/user";
+import { connectToDatabase } from "@/lib/mongodb";
+import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 // SECURITY: Allowed file types for upload
 const ALLOWED_MIME_TYPES = [
@@ -39,6 +42,18 @@ export async function POST(request: NextRequest) {
         { message: "Invalid upload folder" },
         { status: 400 }
       );
+    }
+
+    // SECURITY: documents and articles folders require manager privileges
+    if (folder === 'documents' || folder === 'articles') {
+      await connectToDatabase();
+      const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
+      if (!user || (user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        return NextResponse.json(
+          { message: "Insufficient privileges to upload to this folder" },
+          { status: 403 }
+        );
+      }
     }
 
     if (!file) {

@@ -6,23 +6,7 @@ import Trip from "@/models/trip";
 import User from "@/models/user";
 import ContactRequest from "@/models/contactRequest";
 import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
-
-// In-memory rate limiter: max 30 requests per admin per 5 minutes
-const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-const RATE_LIMIT_MAX = 30;
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(identifier: string): boolean {
-    const now = Date.now();
-    const entry = rateLimitMap.get(identifier);
-    if (!entry || now > entry.resetAt) {
-        rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-        return true;
-    }
-    if (entry.count >= RATE_LIMIT_MAX) return false;
-    entry.count++;
-    return true;
-}
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // Security headers for sensitive data
 const SECURITY_HEADERS = {
@@ -81,11 +65,12 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Rate limit by phone number
-        if (!checkRateLimit(session.user.phoneNumber)) {
+        // Rate limit by phone number (max 30 per 5 min)
+        const rl = checkRateLimit("analytics", session.user.phoneNumber, 30, 5 * 60 * 1000);
+        if (!rl.allowed) {
             return NextResponse.json(
                 { message: "Забагато запитів. Спробуйте пізніше." },
-                { status: 429, headers: SECURITY_HEADERS }
+                { status: 429, headers: { ...SECURITY_HEADERS, "Retry-After": String(Math.ceil((rl.retryAfterMs ?? 0) / 1000)) } }
             );
         }
 

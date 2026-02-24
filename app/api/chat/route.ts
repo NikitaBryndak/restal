@@ -51,6 +51,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SECURITY: Validate individual message content length to prevent cost abuse
+    const MAX_MESSAGE_LENGTH = 5000;
+    for (const msg of messages) {
+      if (typeof msg.content !== 'string' || msg.content.length > MAX_MESSAGE_LENGTH) {
+        return NextResponse.json(
+          { error: `Each message must be a string of at most ${MAX_MESSAGE_LENGTH} characters` },
+          { status: 400 }
+        );
+      }
+    }
+
     // SECURITY: Rate Limiting - use server-derived IP only, never trust client-supplied identifiers
     const identifier = getServerIp(req);
 

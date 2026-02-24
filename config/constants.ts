@@ -25,6 +25,7 @@ export const PROMO_CODE_EXPIRY_DAYS = 30;    // Days until promo code expires
 /** Phone number regex — digits only, 10-15 chars, optional leading + */
 export const PHONE_REGEX = /^\+?[1-9]\d{9,14}$/;
 export const MIN_PASSWORD_LENGTH = 8;
+export const MAX_PASSWORD_LENGTH = 128;  // Bcrypt truncates at 72 bytes; also prevents DoS via expensive hashing
 export const MIN_USERNAME_LENGTH = 2;
 export const MAX_USERNAME_LENGTH = 100;
 

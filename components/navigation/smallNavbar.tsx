@@ -4,14 +4,19 @@ import { Menu, X } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import React from "react";
 import { NavLink } from "./nav-link";
-import { useUserProfile } from "@/hooks/useUserProfile";
 import NotificationBell from "./NotificationBell";
 import { MANAGER_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
-export default function SmallNavbar() {
+interface UserProfile {
+    userName: string;
+    cashbackAmount: number;
+    privilegeLevel: number;
+    [key: string]: unknown;
+}
+
+export default function SmallNavbar({ userProfile }: { userProfile: UserProfile | null }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
     const { data: session } = useSession();
-    const { userProfile } = useUserProfile();
 
     function toggleMobileMenu() {
         setIsMobileMenuOpen((prev) => !prev);

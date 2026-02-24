@@ -53,6 +53,26 @@ export const authOptions: AuthOptions = {
                 token.privilegeLevel = user.privilegeLevel;
                 token.phoneNumber = user.phoneNumber;
             }
+
+            // SECURITY: Re-fetch privilegeLevel from DB on every token refresh
+            // to ensure demoted users lose access promptly, not after 24h JWT expiry
+            if (token.phoneNumber) {
+                try {
+                    await connectToDatabase();
+                    const dbUser = await User.findOne(
+                        { phoneNumber: token.phoneNumber },
+                        { privilegeLevel: 1 }
+                    ).lean() as { privilegeLevel?: number } | null;
+
+                    if (dbUser) {
+                        token.privilegeLevel = dbUser.privilegeLevel ?? 1;
+                    }
+                } catch {
+                    // If DB lookup fails, keep the existing token value
+                    // to avoid locking users out on transient errors
+                }
+            }
+
             return token;
         },
         async session({ session, token }) {

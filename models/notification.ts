@@ -43,6 +43,11 @@ const notificationSchema = new Schema({
 // Index for efficient queries
 notificationSchema.index({ userPhone: 1, read: 1, createdAt: -1 });
 
+// DEVELOPMENT: Delete cached model on hot-reload to prevent "Cannot overwrite model" errors
+if (process.env.NODE_ENV === "development") {
+    if (mongoose.models.Notification) delete mongoose.models.Notification;
+}
+
 const Notification = mongoose.models.Notification || mongoose.model("Notification", notificationSchema);
 
 export default Notification;

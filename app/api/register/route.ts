@@ -3,7 +3,7 @@ import User from "@/models/user";
 import PhoneVerification from "@/models/phoneVerification";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
+import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 
 // SECURITY: Basic email format validation
@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
         if (password.length < MIN_PASSWORD_LENGTH) {
             return NextResponse.json({
                 message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`
+            }, { status: 400 });
+        }
+
+        // SECURITY: Prevent DoS via expensive bcrypt hashing and silent truncation at 72 bytes
+        if (password.length > MAX_PASSWORD_LENGTH) {
+            return NextResponse.json({
+                message: `Password must be at most ${MAX_PASSWORD_LENGTH} characters`
             }, { status: 400 });
         }
 

@@ -69,6 +69,15 @@ export async function GET(request: Request) {
         const url = new URL(request.url);
         const fieldsParam = url.searchParams.get('fields');
 
+        // SECURITY: Pagination to prevent memory exhaustion on large datasets
+        const DEFAULT_LIMIT = 50;
+        const MAX_LIMIT = 200;
+        const pageParam = parseInt(url.searchParams.get('page') || '1', 10);
+        const limitParam = parseInt(url.searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
+        const page = Math.max(1, isNaN(pageParam) ? 1 : pageParam);
+        const limit = Math.min(MAX_LIMIT, Math.max(1, isNaN(limitParam) ? DEFAULT_LIMIT : limitParam));
+        const skip = (page - 1) * limit;
+
         // Whitelist of safe fields that can be projected
         const ALLOWED_FIELDS = new Set([
             'number', 'country', 'status', 'ownerPhone', 'managerPhone',
@@ -78,7 +87,7 @@ export async function GET(request: Request) {
             'tourists', 'documents', 'hotelName', 'notes',
         ]);
 
-        let tripsQuery = Trip.find(query).sort({ createdAt: -1 });
+        let tripsQuery = Trip.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
         if (fieldsParam) {
             const requested = fieldsParam.split(',').map(f => f.trim()).filter(f => ALLOWED_FIELDS.has(f));
@@ -88,8 +97,17 @@ export async function GET(request: Request) {
         }
 
         const trips = await tripsQuery.lean();
+        const totalCount = await Trip.countDocuments(query);
 
-        return NextResponse.json({ trips }, { status: 200 });
+        return NextResponse.json({
+            trips,
+            pagination: {
+                page,
+                limit,
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+            },
+        }, { status: 200 });
     } catch {
         return NextResponse.json({ message: "Error fetching trips" }, { status: 500 });
     }

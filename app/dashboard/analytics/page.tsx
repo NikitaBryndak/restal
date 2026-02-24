@@ -20,7 +20,7 @@ import {
 } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Types ──────────────────────────────────────────────────────────
 
 type Period = '7d' | '30d' | '90d' | '12m' | 'all';
 
@@ -64,7 +64,7 @@ interface AnalyticsData {
     conversionFunnel: { status: string; count: number; revenue: number }[];
 }
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Constants ──────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
     "In Booking": "#f59e0b",
@@ -78,26 +78,26 @@ const STATUS_COLORS: Record<string, string> = {
 const PIE_COLORS = ['#0fa4e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#14b8a6', '#6366f1'];
 
 const PERIOD_OPTIONS: { value: Period; label: string }[] = [
-    { value: '7d', label: '7 Ð´Ð½Ñ–Ð²' },
-    { value: '30d', label: '30 Ð´Ð½Ñ–Ð²' },
-    { value: '90d', label: '90 Ð´Ð½Ñ–Ð²' },
-    { value: '12m', label: '12 Ð¼Ñ–ÑÑÑ†Ñ–Ð²' },
-    { value: 'all', label: 'Ð’ÐµÑÑŒ Ñ‡Ð°Ñ' },
+    { value: '7d', label: '7 днів' },
+    { value: '30d', label: '30 днів' },
+    { value: '90d', label: '90 днів' },
+    { value: '12m', label: '12 місяців' },
+    { value: 'all', label: 'Весь час' },
 ];
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Helpers ────────────────────────────────────────────────────────
 
 function formatCurrency(value: number): string {
-    return new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 0 }).format(value) + ' â‚´';
+    return new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 0 }).format(value) + ' ₴';
 }
 
 function formatCompact(value: number): string {
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M â‚´`;
-    if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k â‚´`;
-    return `${value} â‚´`;
+    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M ₴`;
+    if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k ₴`;
+    return `${value} ₴`;
 }
 
-// â”€â”€â”€ Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Components ─────────────────────────────────────────────────────
 
 function ChangeIndicator({ value }: { value: number | null | undefined }) {
     if (value === null || value === undefined) return null;
@@ -194,7 +194,7 @@ function CustomTooltip({ active, payload, label }: any) {
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                     <span className="text-secondary">{entry.name}:</span>
                     <span className="font-medium" style={{ color: entry.color }}>
-                        {typeof entry.value === 'number' && (entry.name.toLowerCase().includes('Ð´Ð¾Ñ…Ñ–Ð´') || entry.name.toLowerCase().includes('Ð¾Ð¿Ð»Ð°Ñ‡ÐµÐ½Ð¾'))
+                        {typeof entry.value === 'number' && (entry.name.toLowerCase().includes('дохід') || entry.name.toLowerCase().includes('оплачено'))
                             ? formatCurrency(entry.value)
                             : entry.value}
                     </span>
@@ -228,7 +228,7 @@ function ChartCard({ title, icon: Icon, children, className = '' }: {
 
 function ConversionFunnel({ data }: { data: AnalyticsData['conversionFunnel'] }) {
     const total = data.reduce((sum, d) => sum + d.count, 0);
-    if (total === 0) return <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>;
+    if (total === 0) return <p className="text-secondary text-sm text-center py-8">Немає даних</p>;
 
     return (
         <div className="space-y-2.5">
@@ -275,39 +275,39 @@ function ExportCSV({ data }: { data: AnalyticsData }) {
         const rows: string[][] = [];
 
         // Overview
-        rows.push(['--- ÐžÐ³Ð»ÑÐ´ ---']);
-        rows.push(['ÐœÐµÑ‚Ñ€Ð¸ÐºÐ°', 'Ð—Ð½Ð°Ñ‡ÐµÐ½Ð½Ñ']);
-        rows.push(['Ð’ÑÑŒÐ¾Ð³Ð¾ Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹', String(data.overview.totalTrips)]);
-        rows.push(['ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–', String(data.overview.totalUsers)]);
-        rows.push(['Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´', String(data.overview.totalRevenue)]);
-        rows.push(['ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾', String(data.overview.totalPaid)]);
-        rows.push(['Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº', String(data.overview.avgTripValue)]);
-        rows.push(['ÐšÐµÑˆÐ±ÐµÐº Ð²Ð¸Ð´Ð°Ð½Ð¾', String(data.overview.totalCashback)]);
-        rows.push(['Ð—Ð°Ð¿Ð¸Ñ‚Ð¸', String(data.overview.totalContactRequests)]);
-        rows.push(['Ð—Ð°Ð±Ð¾Ñ€Ð³Ð¾Ð²Ð°Ð½Ñ–ÑÑ‚ÑŒ', String(data.overview.outstandingPayments)]);
+        rows.push(['--- Огляд ---']);
+        rows.push(['Метрика', 'Значення']);
+        rows.push(['Всього подорожей', String(data.overview.totalTrips)]);
+        rows.push(['Користувачі', String(data.overview.totalUsers)]);
+        rows.push(['Загальний дохід', String(data.overview.totalRevenue)]);
+        rows.push(['Оплачено', String(data.overview.totalPaid)]);
+        rows.push(['Середній чек', String(data.overview.avgTripValue)]);
+        rows.push(['Кешбек видано', String(data.overview.totalCashback)]);
+        rows.push(['Запити', String(data.overview.totalContactRequests)]);
+        rows.push(['Заборгованість', String(data.overview.outstandingPayments)]);
         rows.push([]);
 
         // Trips over time
-        rows.push(['--- ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ– Ð·Ð° Ð¼Ñ–ÑÑÑ†ÑÐ¼Ð¸ ---']);
-        rows.push(['ÐœÑ–ÑÑÑ†ÑŒ', 'ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ', 'Ð”Ð¾Ñ…Ñ–Ð´', 'ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾']);
+        rows.push(['--- Подорожі за місяцями ---']);
+        rows.push(['Місяць', 'Кількість', 'Дохід', 'Оплачено']);
         data.tripsOverTime.forEach((t) => rows.push([t.month, String(t.count), String(t.revenue), String(t.paid)]));
         rows.push([]);
 
         // By country
-        rows.push(['--- Ð¢Ð¾Ð¿ Ð½Ð°Ð¿Ñ€ÑÐ¼ÐºÐ¸ ---']);
-        rows.push(['ÐšÑ€Ð°Ñ—Ð½Ð°', 'ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ']);
-        data.tripsByCountry.forEach((c) => rows.push([c._id || 'ÐÐµÐ²Ñ–Ð´Ð¾Ð¼Ð¾', String(c.count)]));
+        rows.push(['--- Топ напрямки ---']);
+        rows.push(['Країна', 'Кількість']);
+        data.tripsByCountry.forEach((c) => rows.push([c._id || 'Невідомо', String(c.count)]));
         rows.push([]);
 
         // Top managers
-        rows.push(['--- Ð¢Ð¾Ð¿ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¸ ---']);
-        rows.push(['ÐœÐµÐ½ÐµÐ´Ð¶ÐµÑ€', 'ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹', 'Ð”Ð¾Ñ…Ñ–Ð´']);
-        data.topManagers.forEach((m) => rows.push([m._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–', String(m.tripCount), String(m.totalRevenue)]));
+        rows.push(['--- Топ менеджери ---']);
+        rows.push(['Менеджер', 'Подорожей', 'Дохід']);
+        data.topManagers.forEach((m) => rows.push([m._id || 'Без імені', String(m.tripCount), String(m.totalRevenue)]));
         rows.push([]);
 
         // Recent trips
-        rows.push(['--- ÐžÑÑ‚Ð°Ð½Ð½Ñ– Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ– ---']);
-        rows.push(['ÐÐ¾Ð¼ÐµÑ€', 'ÐšÑ€Ð°Ñ—Ð½Ð°', 'Ð¡Ñ‚Ð°Ñ‚ÑƒÑ', 'Ð¡ÑƒÐ¼Ð°', 'ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾', 'ÐœÐµÐ½ÐµÐ´Ð¶ÐµÑ€', 'Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾']);
+        rows.push(['--- Останні подорожі ---']);
+        rows.push(['Номер', 'Країна', 'Статус', 'Сума', 'Оплачено', 'Менеджер', 'Створено']);
         data.recentTrips.forEach((t) => rows.push([
             t.number, t.country, t.status,
             String(t.payment.totalAmount), String(t.payment.paidAmount),
@@ -328,15 +328,15 @@ function ExportCSV({ data }: { data: AnalyticsData }) {
         <button
             onClick={handleExport}
             className="flex items-center gap-2 text-xs bg-white/3 border border-white/8 rounded-xl px-3 py-2 text-secondary hover:text-white hover:bg-white/6 transition-all duration-200"
-            title="Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚ÑƒÐ²Ð°Ñ‚Ð¸ CSV"
+            title="Експортувати CSV"
         >
             <Download size={13} />
-            <span className="hidden sm:inline">Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚</span>
+            <span className="hidden sm:inline">Експорт</span>
         </button>
     );
 }
 
-// â”€â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Main Page ──────────────────────────────────────────────────────
 
 export default function AnalyticsPage() {
     const { userProfile, loading: profileLoading } = useUserProfile();
@@ -353,11 +353,11 @@ export default function AnalyticsPage() {
             setLoading(true);
             setError('');
             const res = await fetch(`/api/analytics?period=${p}`);
-            if (!res.ok) throw new Error('ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ');
+            if (!res.ok) throw new Error('Помилка завантаження');
             const json = await res.json();
             setData(json);
         } catch {
-            setError('ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ Ð°Ð½Ð°Ð»Ñ–Ñ‚Ð¸ÐºÑƒ');
+            setError('Не вдалося завантажити аналітику');
         } finally {
             setLoading(false);
         }
@@ -379,7 +379,7 @@ export default function AnalyticsPage() {
     if (!isAdmin) {
         return (
             <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-                <p className="text-secondary">ÐÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð½ÑŒÐ¾ Ð¿Ñ€Ð°Ð² Ð´Ð»Ñ Ð¿ÐµÑ€ÐµÐ³Ð»ÑÐ´Ñƒ Ð°Ð½Ð°Ð»Ñ–Ñ‚Ð¸ÐºÐ¸</p>
+                <p className="text-secondary">Недостатньо прав для перегляду аналітики</p>
             </div>
         );
     }
@@ -391,12 +391,12 @@ export default function AnalyticsPage() {
     if (error && !data) {
         return (
             <div className="flex flex-col justify-center items-center min-h-[calc(100vh-5rem)] gap-4">
-                <p className="text-red-400">{error || 'ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…'}</p>
+                <p className="text-red-400">{error || 'Немає даних'}</p>
                 <button
                     onClick={() => fetchAnalytics()}
                     className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors"
                 >
-                    <RefreshCw size={14} /> Ð¡Ð¿Ñ€Ð¾Ð±ÑƒÐ²Ð°Ñ‚Ð¸ Ð·Ð½Ð¾Ð²Ñƒ
+                    <RefreshCw size={14} /> Спробувати знову
                 </button>
             </div>
         );
@@ -413,7 +413,7 @@ export default function AnalyticsPage() {
     }));
 
     const countryChartData = tripsByCountry.map((c) => ({
-        name: c._id || 'ÐÐµÐ²Ñ–Ð´Ð¾Ð¼Ð¾',
+        name: c._id || 'Невідомо',
         count: c.count,
     }));
 
@@ -440,10 +440,10 @@ export default function AnalyticsPage() {
                             <BarChart3 size={22} className="text-accent" />
                         </div>
                         <div>
-                            <h1 className="text-xl sm:text-2xl font-light text-white">ÐÐ½Ð°Ð»Ñ–Ñ‚Ð¸ÐºÐ°</h1>
+                            <h1 className="text-xl sm:text-2xl font-light text-white">Аналітика</h1>
                             <p className="text-xs text-secondary mt-0.5">
-                                {period === 'all' ? 'Ð£ÑÑ– Ð´Ð°Ð½Ñ–' : `ÐžÑÑ‚Ð°Ð½Ð½Ñ– ${PERIOD_OPTIONS.find(o => o.value === period)?.label}`}
-                                {loading && <span className="ml-2 text-accent">Ð¾Ð½Ð¾Ð²Ð»ÑŽÑ”Ñ‚ÑŒÑÑâ€¦</span>}
+                                {period === 'all' ? 'Усі дані' : `Останні ${PERIOD_OPTIONS.find(o => o.value === period)?.label}`}
+                                {loading && <span className="ml-2 text-accent">оновлюється…</span>}
                             </p>
                         </div>
                     </div>
@@ -455,7 +455,7 @@ export default function AnalyticsPage() {
                             className="flex items-center gap-2 text-xs bg-white/3 border border-white/8 rounded-xl px-3 py-2 text-secondary hover:text-white hover:bg-white/6 transition-all duration-200"
                         >
                             <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-                            <span className="hidden sm:inline">ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸</span>
+                            <span className="hidden sm:inline">Оновити</span>
                         </button>
                     </div>
                 </div>
@@ -464,7 +464,7 @@ export default function AnalyticsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     <div className="flex items-center gap-2 text-xs text-secondary">
                         <Filter size={12} />
-                        ÐŸÐµÑ€Ñ–Ð¾Ð´:
+                        Період:
                     </div>
                     <PeriodSelector value={period} onChange={handlePeriodChange} />
                 </div>
@@ -473,9 +473,9 @@ export default function AnalyticsPage() {
             {/* Tabs */}
             <div className="flex items-center gap-1 bg-white/3 border border-white/8 rounded-xl p-1 w-fit">
                 {([
-                    { id: 'overview' as const, label: 'ÐžÐ³Ð»ÑÐ´', icon: BarChart3 },
-                    { id: 'revenue' as const, label: 'Ð¤Ñ–Ð½Ð°Ð½ÑÐ¸', icon: DollarSign },
-                    { id: 'users' as const, label: 'ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–', icon: Users },
+                    { id: 'overview' as const, label: 'Огляд', icon: BarChart3 },
+                    { id: 'revenue' as const, label: 'Фінанси', icon: DollarSign },
+                    { id: 'users' as const, label: 'Користувачі', icon: Users },
                 ]).map((tab) => (
                     <button
                         key={tab.id}
@@ -503,77 +503,77 @@ export default function AnalyticsPage() {
                     >
                         {/* Overview Stats Grid */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                            <StatCard icon={Plane} label="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" value={overview.totalTrips} change={comparison?.trips} delay={0} />
-                            <StatCard icon={Users} label="ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–" value={overview.totalUsers} change={comparison?.users} delay={0.05} />
+                            <StatCard icon={Plane} label="Подорожей" value={overview.totalTrips} change={comparison?.trips} delay={0} />
+                            <StatCard icon={Users} label="Користувачі" value={overview.totalUsers} change={comparison?.users} delay={0.05} />
                             <StatCard
-                                icon={DollarSign} label="Ð”Ð¾Ñ…Ñ–Ð´"
+                                icon={DollarSign} label="Дохід"
                                 value={formatCurrency(overview.totalRevenue)}
                                 color="text-green-400" change={comparison?.revenue} delay={0.1}
                             />
                             <StatCard
-                                icon={CreditCard} label="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾"
+                                icon={CreditCard} label="Оплачено"
                                 value={formatCurrency(overview.totalPaid)}
-                                subValue={overview.outstandingPayments > 0 ? `Ð‘Ð¾Ñ€Ð³: ${formatCurrency(overview.outstandingPayments)}` : undefined}
+                                subValue={overview.outstandingPayments > 0 ? `Борг: ${formatCurrency(overview.outstandingPayments)}` : undefined}
                                 color="text-emerald-400" change={comparison?.paid} delay={0.15}
                             />
                             <StatCard
-                                icon={TrendingUp} label="Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº"
+                                icon={TrendingUp} label="Середній чек"
                                 value={formatCurrency(overview.avgTripValue)}
                                 color="text-blue-400" change={comparison?.avgTripValue} delay={0.2}
                             />
                             <StatCard
-                                icon={Award} label="ÐšÐµÑˆÐ±ÐµÐº"
+                                icon={Award} label="Кешбек"
                                 value={formatCurrency(overview.totalCashback)}
                                 color="text-purple-400" delay={0.25}
                             />
                             <StatCard
-                                icon={MessageCircle} label="Ð—Ð°Ð¿Ð¸Ñ‚Ð¸"
+                                icon={MessageCircle} label="Запити"
                                 value={overview.totalContactRequests}
-                                subValue={`ÐÐ¾Ð²Ð¸Ñ… Ð·Ð° 7Ð´: ${overview.newContactRequests}`}
+                                subValue={`Нових за 7д: ${overview.newContactRequests}`}
                                 color="text-yellow-400" change={comparison?.contactRequests} delay={0.3}
                             />
                             <StatCard
-                                icon={Percent} label="Ð—Ð±Ñ–Ñ€ Ð¾Ð¿Ð»Ð°Ñ‚"
+                                icon={Percent} label="Збір оплат"
                                 value={`${overview.collectionRate}%`}
-                                subValue={overview.collectionRate < 80 ? 'ÐŸÐ¾Ñ‚Ñ€ÐµÐ±ÑƒÑ” ÑƒÐ²Ð°Ð³Ð¸' : 'Ð”Ð¾Ð±Ñ€Ðµ'}
+                                subValue={overview.collectionRate < 80 ? 'Потребує уваги' : 'Добре'}
                                 color={overview.collectionRate >= 80 ? 'text-emerald-400' : 'text-amber-400'} delay={0.35}
                             />
                         </div>
 
                         {/* Collection Rate + Conversion Funnel */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <ChartCard title="Ð—Ð±Ñ–Ñ€ Ð¾Ð¿Ð»Ð°Ñ‚" icon={CreditCard}>
+                            <ChartCard title="Збір оплат" icon={CreditCard}>
                                 <div className="space-y-6">
                                     <ProgressBar
                                         value={overview.collectionRate}
-                                        label="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾ Ð²Ñ–Ð´ Ð·Ð°Ð³Ð°Ð»ÑŒÐ½Ð¾Ñ— ÑÑƒÐ¼Ð¸"
+                                        label="Оплачено від загальної суми"
                                         color={overview.collectionRate >= 80 ? '#10b981' : overview.collectionRate >= 50 ? '#f59e0b' : '#ef4444'}
                                     />
                                     <div className="grid grid-cols-3 gap-3">
                                         <div className="text-center p-3 bg-white/3 rounded-lg">
                                             <div className="text-lg font-semibold text-white">{formatCompact(overview.totalRevenue)}</div>
-                                            <div className="text-[10px] text-secondary mt-1">Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´</div>
+                                            <div className="text-[10px] text-secondary mt-1">Загальний дохід</div>
                                         </div>
                                         <div className="text-center p-3 bg-white/3 rounded-lg">
                                             <div className="text-lg font-semibold text-emerald-400">{formatCompact(overview.totalPaid)}</div>
-                                            <div className="text-[10px] text-secondary mt-1">ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾</div>
+                                            <div className="text-[10px] text-secondary mt-1">Оплачено</div>
                                         </div>
                                         <div className="text-center p-3 bg-white/3 rounded-lg">
                                             <div className="text-lg font-semibold text-red-400">{formatCompact(overview.outstandingPayments)}</div>
-                                            <div className="text-[10px] text-secondary mt-1">Ð—Ð°Ð±Ð¾Ñ€Ð³Ð¾Ð²Ð°Ð½Ñ–ÑÑ‚ÑŒ</div>
+                                            <div className="text-[10px] text-secondary mt-1">Заборгованість</div>
                                         </div>
                                     </div>
                                 </div>
                             </ChartCard>
 
-                            <ChartCard title="Ð’Ð¾Ñ€Ð¾Ð½ÐºÐ° ÑÑ‚Ð°Ñ‚ÑƒÑÑ–Ð²" icon={Filter}>
+                            <ChartCard title="Воронка статусів" icon={Filter}>
                                 <ConversionFunnel data={conversionFunnel} />
                             </ChartCard>
                         </div>
 
                         {/* Charts Row 1 - Trips */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <ChartCard title="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ– Ð·Ð° Ð¼Ñ–ÑÑÑ†ÑÐ¼Ð¸" icon={Plane}>
+                            <ChartCard title="Подорожі за місяцями" icon={Plane}>
                                 {tripsOverTime.length > 0 ? (
                                     <ResponsiveContainer width="100%" height={280}>
                                         <AreaChart data={tripsOverTime}>
@@ -588,7 +588,7 @@ export default function AnalyticsPage() {
                                             <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
                                             <Tooltip content={<CustomTooltip />} />
                                             <Area
-                                                type="monotone" dataKey="count" name="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹"
+                                                type="monotone" dataKey="count" name="Подорожей"
                                                 stroke="#0fa4e6" fill="url(#tripsGradient)" strokeWidth={2}
                                                 dot={{ r: 3, fill: '#0fa4e6', strokeWidth: 0 }}
                                                 activeDot={{ r: 5, fill: '#0fa4e6', stroke: '#fff', strokeWidth: 2 }}
@@ -596,12 +596,12 @@ export default function AnalyticsPage() {
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                    <p className="text-secondary text-sm text-center py-8">Немає даних</p>
                                 )}
                             </ChartCard>
 
                             {/* Trip Status Distribution */}
-                            <ChartCard title="Ð¡Ñ‚Ð°Ñ‚ÑƒÑÐ¸ Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" icon={CheckCircle2}>
+                            <ChartCard title="Статуси подорожей" icon={CheckCircle2}>
                                 {statusChartData.length > 0 ? (
                                     <div className="flex flex-col sm:flex-row items-center gap-4">
                                         <ResponsiveContainer width="100%" height={220}>
@@ -637,13 +637,13 @@ export default function AnalyticsPage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                    <p className="text-secondary text-sm text-center py-8">Немає даних</p>
                                 )}
                             </ChartCard>
                         </div>
 
                         {/* Top Countries */}
-                        <ChartCard title="Ð¢Ð¾Ð¿ Ð½Ð°Ð¿Ñ€ÑÐ¼ÐºÐ¸" icon={Map}>
+                        <ChartCard title="Топ напрямки" icon={Map}>
                             {countryChartData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={Math.max(280, countryChartData.length * 35)}>
                                     <BarChart data={countryChartData} layout="vertical">
@@ -651,7 +651,7 @@ export default function AnalyticsPage() {
                                         <XAxis type="number" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} />
                                         <YAxis dataKey="name" type="category" tick={{ fill: '#999', fontSize: 11 }} width={110} axisLine={false} />
                                         <Tooltip content={<CustomTooltip />} />
-                                        <Bar dataKey="count" name="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" radius={[0, 6, 6, 0]} animationDuration={600}>
+                                        <Bar dataKey="count" name="Подорожей" radius={[0, 6, 6, 0]} animationDuration={600}>
                                             {countryChartData.map((_, index) => (
                                                 <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                                             ))}
@@ -659,13 +659,13 @@ export default function AnalyticsPage() {
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                <p className="text-secondary text-sm text-center py-8">Немає даних</p>
                             )}
                         </ChartCard>
 
                         {/* Bottom Row: Recent Trips + Top Managers */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <ChartCard title="ÐžÑÑ‚Ð°Ð½Ð½Ñ– Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ–" icon={Map}>
+                            <ChartCard title="Останні подорожі" icon={Map}>
                                 <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
                                     {recentTrips.length > 0 ? recentTrips.map((trip, i) => (
                                         <motion.div
@@ -690,7 +690,7 @@ export default function AnalyticsPage() {
                                                     </span>
                                                 </div>
                                                 <span className="text-xs text-secondary truncate">
-                                                    {trip.country}{trip.managerName ? ` Â· ${trip.managerName}` : ''}
+                                                    {trip.country}{trip.managerName ? ` · ${trip.managerName}` : ''}
                                                 </span>
                                             </div>
                                             <div className="text-right shrink-0 ml-3">
@@ -701,12 +701,12 @@ export default function AnalyticsPage() {
                                             </div>
                                         </motion.div>
                                     )) : (
-                                        <p className="text-secondary text-sm text-center py-4">ÐÐµÐ¼Ð°Ñ” Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹</p>
+                                        <p className="text-secondary text-sm text-center py-4">Немає подорожей</p>
                                     )}
                                 </div>
                             </ChartCard>
 
-                            <ChartCard title="Ð¢Ð¾Ð¿ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¸" icon={Award}>
+                            <ChartCard title="Топ менеджери" icon={Award}>
                                 <div className="space-y-2">
                                     {topManagers.length > 0 ? topManagers.map((mgr, index) => {
                                         const mgrCollectionRate = mgr.totalRevenue > 0 ? Math.round((mgr.totalPaid / mgr.totalRevenue) * 100) : 0;
@@ -727,15 +727,15 @@ export default function AnalyticsPage() {
                                                         {index + 1}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm text-white">{mgr._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–'}</span>
-                                                        <span className="text-xs text-secondary">{mgr.tripCount} Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹ Â· Ð·Ð±Ñ–Ñ€ {mgrCollectionRate}%</span>
+                                                        <span className="text-sm text-white">{mgr._id || 'Без імені'}</span>
+                                                        <span className="text-xs text-secondary">{mgr.tripCount} подорожей · збір {mgrCollectionRate}%</span>
                                                     </div>
                                                 </div>
                                                 <span className="text-sm text-green-400 font-medium">{formatCurrency(mgr.totalRevenue)}</span>
                                             </motion.div>
                                         );
                                     }) : (
-                                        <p className="text-secondary text-sm text-center py-4">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                        <p className="text-secondary text-sm text-center py-4">Немає даних</p>
                                     )}
                                 </div>
                             </ChartCard>
@@ -754,14 +754,14 @@ export default function AnalyticsPage() {
                     >
                         {/* Revenue KPIs */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                            <StatCard icon={DollarSign} label="Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´" value={formatCurrency(overview.totalRevenue)} color="text-green-400" change={comparison?.revenue} />
-                            <StatCard icon={CreditCard} label="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾" value={formatCurrency(overview.totalPaid)} color="text-emerald-400" change={comparison?.paid} delay={0.05} />
-                            <StatCard icon={TrendingUp} label="Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº" value={formatCurrency(overview.avgTripValue)} color="text-blue-400" change={comparison?.avgTripValue} delay={0.1} />
-                            <StatCard icon={Clock} label="Ð—Ð°Ð±Ð¾Ñ€Ð³Ð¾Ð²Ð°Ð½Ñ–ÑÑ‚ÑŒ" value={formatCurrency(overview.outstandingPayments)} color="text-red-400" delay={0.15} />
+                            <StatCard icon={DollarSign} label="Загальний дохід" value={formatCurrency(overview.totalRevenue)} color="text-green-400" change={comparison?.revenue} />
+                            <StatCard icon={CreditCard} label="Оплачено" value={formatCurrency(overview.totalPaid)} color="text-emerald-400" change={comparison?.paid} delay={0.05} />
+                            <StatCard icon={TrendingUp} label="Середній чек" value={formatCurrency(overview.avgTripValue)} color="text-blue-400" change={comparison?.avgTripValue} delay={0.1} />
+                            <StatCard icon={Clock} label="Заборгованість" value={formatCurrency(overview.outstandingPayments)} color="text-red-400" delay={0.15} />
                         </div>
 
                         {/* Revenue Over Time */}
-                        <ChartCard title="Ð”Ð¾Ñ…Ñ–Ð´ Ñ‚Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ð¸ Ð·Ð° Ð¼Ñ–ÑÑÑ†ÑÐ¼Ð¸">
+                        <ChartCard title="Дохід та оплати за місяцями">
                             {tripsOverTime.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={320}>
                                     <BarChart data={tripsOverTime}>
@@ -780,17 +780,17 @@ export default function AnalyticsPage() {
                                         <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                                         <Tooltip content={<CustomTooltip />} />
                                         <Legend wrapperStyle={{ fontSize: 12, color: '#666' }} />
-                                        <Bar dataKey="revenue" name="Ð”Ð¾Ñ…Ñ–Ð´" fill="url(#revenueGrad)" radius={[4, 4, 0, 0]} />
-                                        <Bar dataKey="paid" name="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾" fill="url(#paidGrad)" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="revenue" name="Дохід" fill="url(#revenueGrad)" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="paid" name="Оплачено" fill="url(#paidGrad)" radius={[4, 4, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                <p className="text-secondary text-sm text-center py-8">Немає даних</p>
                             )}
                         </ChartCard>
 
                         {/* Cumulative Revenue */}
-                        <ChartCard title="ÐšÑƒÐ¼ÑƒÐ»ÑÑ‚Ð¸Ð²Ð½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´">
+                        <ChartCard title="Кумулятивний дохід">
                             {cumulativeData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={300}>
                                     <LineChart data={cumulativeData}>
@@ -805,40 +805,40 @@ export default function AnalyticsPage() {
                                         <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                                         <Tooltip content={<CustomTooltip />} />
                                         <Legend wrapperStyle={{ fontSize: 12, color: '#666' }} />
-                                        <Line type="monotone" dataKey="cumRevenue" name="ÐšÑƒÐ¼ÑƒÐ»ÑÑ‚Ð¸Ð²Ð½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´" stroke="#0fa4e6" strokeWidth={2.5} dot={false} />
-                                        <Line type="monotone" dataKey="cumPaid" name="ÐšÑƒÐ¼ÑƒÐ»ÑÑ‚Ð¸Ð²Ð½Ð¾ Ð¾Ð¿Ð»Ð°Ñ‡ÐµÐ½Ð¾" stroke="#10b981" strokeWidth={2.5} dot={false} strokeDasharray="5 3" />
+                                        <Line type="monotone" dataKey="cumRevenue" name="Кумулятивний дохід" stroke="#0fa4e6" strokeWidth={2.5} dot={false} />
+                                        <Line type="monotone" dataKey="cumPaid" name="Кумулятивно оплачено" stroke="#10b981" strokeWidth={2.5} dot={false} strokeDasharray="5 3" />
                                     </LineChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                <p className="text-secondary text-sm text-center py-8">Немає даних</p>
                             )}
                         </ChartCard>
 
                         {/* Payment Collection Rate */}
-                        <ChartCard title="ÐÐ½Ð°Ð»Ñ–Ð· Ð¾Ð¿Ð»Ð°Ñ‚" icon={CreditCard}>
+                        <ChartCard title="Аналіз оплат" icon={CreditCard}>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-4">
                                     <ProgressBar
                                         value={overview.collectionRate}
-                                        label="Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð·Ð±Ñ–Ñ€"
+                                        label="Загальний збір"
                                         color={overview.collectionRate >= 80 ? '#10b981' : overview.collectionRate >= 50 ? '#f59e0b' : '#ef4444'}
                                     />
                                     {topManagers.filter(m => m.totalRevenue > 0).slice(0, 3).map((mgr) => (
                                         <ProgressBar
                                             key={mgr._id}
                                             value={Math.round((mgr.totalPaid / mgr.totalRevenue) * 100)}
-                                            label={mgr._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–'}
+                                            label={mgr._id || 'Без імені'}
                                             color="#8b5cf6"
                                         />
                                     ))}
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <div className="p-4 bg-white/3 rounded-xl">
-                                        <div className="text-xs text-secondary mb-1">ÐšÐµÑˆÐ±ÐµÐº Ð²Ð¸Ð´Ð°Ð½Ð¾</div>
+                                        <div className="text-xs text-secondary mb-1">Кешбек видано</div>
                                         <div className="text-xl font-semibold text-purple-400">{formatCurrency(overview.totalCashback)}</div>
                                     </div>
                                     <div className="p-4 bg-white/3 rounded-xl">
-                                        <div className="text-xs text-secondary mb-1">Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº</div>
+                                        <div className="text-xs text-secondary mb-1">Середній чек</div>
                                         <div className="text-xl font-semibold text-blue-400">{formatCurrency(overview.avgTripValue)}</div>
                                     </div>
                                 </div>
@@ -858,18 +858,18 @@ export default function AnalyticsPage() {
                     >
                         {/* User KPIs */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                            <StatCard icon={Users} label="ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–" value={overview.totalUsers} change={comparison?.users} />
-                            <StatCard icon={MessageCircle} label="Ð—Ð°Ð¿Ð¸Ñ‚Ð¸" value={overview.totalContactRequests} color="text-yellow-400" change={comparison?.contactRequests} delay={0.05} />
-                            <StatCard icon={Plane} label="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" value={overview.totalTrips} change={comparison?.trips} delay={0.1} />
+                            <StatCard icon={Users} label="Користувачі" value={overview.totalUsers} change={comparison?.users} />
+                            <StatCard icon={MessageCircle} label="Запити" value={overview.totalContactRequests} color="text-yellow-400" change={comparison?.contactRequests} delay={0.05} />
+                            <StatCard icon={Plane} label="Подорожей" value={overview.totalTrips} change={comparison?.trips} delay={0.1} />
                             <StatCard
-                                icon={TrendingUp} label="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹/ÐºÐ¾Ñ€Ð¸ÑÑ‚."
+                                icon={TrendingUp} label="Подорожей/корист."
                                 value={overview.totalUsers > 0 ? (overview.totalTrips / overview.totalUsers).toFixed(1) : '0'}
                                 color="text-cyan-400" delay={0.15}
                             />
                         </div>
 
                         {/* User Growth */}
-                        <ChartCard title="Ð ÐµÑ”ÑÑ‚Ñ€Ð°Ñ†Ñ–Ñ— ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð²" icon={Users}>
+                        <ChartCard title="Реєстрації користувачів" icon={Users}>
                             {userGrowth.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={300}>
                                     <AreaChart data={userGrowth}>
@@ -884,7 +884,7 @@ export default function AnalyticsPage() {
                                         <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
                                         <Tooltip content={<CustomTooltip />} />
                                         <Area
-                                            type="monotone" dataKey="count" name="ÐÐ¾Ð²Ð¸Ñ… ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð²"
+                                            type="monotone" dataKey="count" name="Нових користувачів"
                                             stroke="#8b5cf6" fill="url(#userGrowthGrad)" strokeWidth={2}
                                             dot={{ r: 3, fill: '#8b5cf6', strokeWidth: 0 }}
                                             activeDot={{ r: 5, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
@@ -892,33 +892,33 @@ export default function AnalyticsPage() {
                                     </AreaChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                <p className="text-secondary text-sm text-center py-8">Немає даних</p>
                             )}
                         </ChartCard>
 
                         {/* Contact Requests Breakdown */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <ChartCard title="Ð—Ð°Ð¿Ð¸Ñ‚Ð¸ Ð²Ñ–Ð´ ÐºÐ»Ñ–Ñ”Ð½Ñ‚Ñ–Ð²" icon={MessageCircle}>
+                            <ChartCard title="Запити від клієнтів" icon={MessageCircle}>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-4 bg-white/3 rounded-xl text-center">
                                         <div className="text-2xl font-semibold text-white">{overview.totalContactRequests}</div>
-                                        <div className="text-xs text-secondary mt-1">Ð’ÑÑŒÐ¾Ð³Ð¾ Ð·Ð°Ð¿Ð¸Ñ‚Ñ–Ð²</div>
+                                        <div className="text-xs text-secondary mt-1">Всього запитів</div>
                                     </div>
                                     <div className="p-4 bg-white/3 rounded-xl text-center">
                                         <div className="text-2xl font-semibold text-accent">{overview.newContactRequests}</div>
-                                        <div className="text-xs text-secondary mt-1">ÐÐ¾Ð²Ð¸Ñ… Ð·Ð° 7 Ð´Ð½Ñ–Ð²</div>
+                                        <div className="text-xs text-secondary mt-1">Нових за 7 днів</div>
                                     </div>
                                 </div>
                                 <div className="mt-4">
                                     <ProgressBar
                                         value={overview.totalContactRequests > 0 ? Math.round((overview.newContactRequests / overview.totalContactRequests) * 100) : 0}
-                                        label="Ð§Ð°ÑÑ‚ÐºÐ° Ð½Ð¾Ð²Ð¸Ñ… Ð·Ð°Ð¿Ð¸Ñ‚Ñ–Ð²"
+                                        label="Частка нових запитів"
                                         color="#0fa4e6"
                                     />
                                 </div>
                             </ChartCard>
 
-                            <ChartCard title="ÐÐºÑ‚Ð¸Ð²Ð½Ñ–ÑÑ‚ÑŒ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ñ–Ð²" icon={Award}>
+                            <ChartCard title="Активність менеджерів" icon={Award}>
                                 <div className="space-y-3">
                                     {topManagers.length > 0 ? topManagers.map((mgr, index) => (
                                         <div key={mgr._id} className="flex items-center gap-3">
@@ -931,8 +931,8 @@ export default function AnalyticsPage() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between mb-1">
-                                                    <span className="text-sm text-white truncate">{mgr._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–'}</span>
-                                                    <span className="text-xs text-secondary ml-2">{mgr.tripCount} Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹</span>
+                                                    <span className="text-sm text-white truncate">{mgr._id || 'Без імені'}</span>
+                                                    <span className="text-xs text-secondary ml-2">{mgr.tripCount} подорожей</span>
                                                 </div>
                                                 <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                                                     <div
@@ -946,7 +946,7 @@ export default function AnalyticsPage() {
                                             </div>
                                         </div>
                                     )) : (
-                                        <p className="text-secondary text-sm text-center py-4">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                        <p className="text-secondary text-sm text-center py-4">Немає даних</p>
                                     )}
                                 </div>
                             </ChartCard>

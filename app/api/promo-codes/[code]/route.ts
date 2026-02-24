@@ -99,35 +99,48 @@ export async function POST(
             { $set: { status: "expired" } }
         );
 
-        const promoCode = await PromoCode.findOne({ code: upperCode });
+        // SECURITY: Atomic redemption — prevents double-spend race condition.
+        // findOneAndUpdate with status: "active" ensures only one concurrent
+        // request can redeem the code.
+        const promoCode = await PromoCode.findOneAndUpdate(
+            { code: upperCode, status: "active", expiresAt: { $gte: new Date() } },
+            {
+                $set: {
+                    status: "used",
+                    usedAt: new Date(),
+                    usedByManagerId: manager._id,
+                    usedByManagerPhone: manager.phoneNumber,
+                },
+            },
+            { new: true }
+        );
 
         if (!promoCode) {
+            // Check why it failed — code doesn't exist, already used, or expired
+            const existing = await PromoCode.findOne({ code: upperCode }).lean() as Record<string, unknown> | null;
+            if (!existing) {
+                return NextResponse.json(
+                    { message: "Код не знайдено" },
+                    { status: 404 }
+                );
+            }
+            if (existing.status === "used") {
+                return NextResponse.json(
+                    { message: "Цей код вже було використано" },
+                    { status: 400 }
+                );
+            }
+            if (existing.status === "expired" || (existing.expiresAt && new Date(existing.expiresAt as string) < new Date())) {
+                return NextResponse.json(
+                    { message: "Термін дії коду закінчився" },
+                    { status: 400 }
+                );
+            }
             return NextResponse.json(
-                { message: "Код не знайдено" },
-                { status: 404 }
-            );
-        }
-
-        if (promoCode.status === "used") {
-            return NextResponse.json(
-                { message: "Цей код вже було використано" },
+                { message: "Не вдалося використати код" },
                 { status: 400 }
             );
         }
-
-        if (promoCode.status === "expired") {
-            return NextResponse.json(
-                { message: "Термін дії коду закінчився" },
-                { status: 400 }
-            );
-        }
-
-        // Mark as used
-        promoCode.status = "used";
-        promoCode.usedAt = new Date();
-        promoCode.usedByManagerId = manager._id;
-        promoCode.usedByManagerPhone = manager.phoneNumber;
-        await promoCode.save();
 
         return NextResponse.json({
             message: "Код успішно використано",

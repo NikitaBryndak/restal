@@ -3,7 +3,7 @@ import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +15,11 @@ export async function POST(req: Request) {
 
     if (password.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json({ message: `Пароль повинен містити щонайменше ${MIN_PASSWORD_LENGTH} символів` }, { status: 400 });
+    }
+
+    // SECURITY: Prevent DoS via expensive bcrypt hashing and silent truncation at 72 bytes
+    if (password.length > MAX_PASSWORD_LENGTH) {
+      return NextResponse.json({ message: `Пароль не може перевищувати ${MAX_PASSWORD_LENGTH} символів` }, { status: 400 });
     }
 
     // Sanitize inputs

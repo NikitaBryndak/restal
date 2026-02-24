@@ -1,13 +1,18 @@
 "use client";
 
-import { useUserProfile } from "@/hooks/useUserProfile";
 import { NavLink } from "./nav-link";
 import { useSession } from "next-auth/react";
 import NotificationBell from "./NotificationBell";
 
-export default function WideNavbar() {
+interface UserProfile {
+    userName: string;
+    cashbackAmount: number;
+    privilegeLevel: number;
+    [key: string]: unknown;
+}
+
+export default function WideNavbar({ userProfile }: { userProfile: UserProfile | null }) {
     const { data: session } = useSession();
-    const { userProfile } = useUserProfile();
 
     return (
         <ul className="hidden lg:flex items-center gap-8 list-none m-0 p-0">
