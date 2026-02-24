@@ -86,7 +86,6 @@ const managers = [
     color: "bg-cyan-600",
     hoverGlow: "group-hover:shadow-cyan-500/15",
     initials: "ОБ",
-    featured: true,
     specialties: ["VIP", "Преміум", "Лідер"],
   },
   {
