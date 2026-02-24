@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,40 @@ import { chooseRandomItem } from "@/lib/utils";
 import { quotes } from "@/data";
 import { FormField } from "./form-field";
 import { useAuth } from "@/hooks/useAuth";
-import { MIN_PASSWORD_LENGTH } from "@/config/constants";
+import { MIN_PASSWORD_LENGTH, OTP_LENGTH } from "@/config/constants";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 
 export function AuthForm({ type }: { type: "login" | "register" }) {
-    const { isLoading, error, handleAuth } = useAuth({ type });
+    const {
+      isLoading,
+      error,
+      handleAuth,
+      registrationStep,
+      handleVerifyOtp,
+      handleResendOtp,
+      handleBackToForm,
+      pendingPhoneNumber,
+    } = useAuth({ type });
+
+    const [otpValue, setOtpValue] = useState("");
+    const [resendCooldown, setResendCooldown] = useState(0);
+
+    // Cooldown timer for resend button
+    useEffect(() => {
+      if (resendCooldown <= 0) return;
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }, [resendCooldown]);
+
+    // Start cooldown when OTP step is shown
+    useEffect(() => {
+      if (registrationStep === "otp") {
+        setResendCooldown(60);
+        setOtpValue("");
+      }
+    }, [registrationStep]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -26,6 +55,16 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         confirmPassword: formData.get("confirmPassword") as string,
         referralCode: formData.get("referralCode") as string,
       });
+    };
+
+    const handleOtpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      await handleVerifyOtp(otpValue);
+    };
+
+    const handleResend = async () => {
+      await handleResendOtp();
+      setResendCooldown(60);
     };
 
     // Fetch Quote
@@ -58,10 +97,18 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
             {/* Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-light mb-1.5">
-                {type === "login" ? "Вітаємо знову" : "Створити акаунт"}
+                {type === "login"
+                  ? "Вітаємо знову"
+                  : registrationStep === "otp"
+                    ? "Підтвердження номера"
+                    : "Створити акаунт"}
               </h1>
               <p className="text-foreground/60 text-sm">
-                {type === "login" ? "Ввійдіть, щоб продовжити" : "Розпочніть свою подорож"}
+                {type === "login"
+                  ? "Ввійдіть, щоб продовжити"
+                  : registrationStep === "otp"
+                    ? `Ми надіслали SMS-код на ${pendingPhoneNumber}`
+                    : "Розпочніть свою подорож"}
               </p>
             </div>
 
@@ -70,7 +117,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
               <div className="h-px flex-1 border"></div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={type === "register" && registrationStep === "otp" ? handleOtpSubmit : handleSubmit} className="space-y-4">
               {/* Error Message */}
               {error && (
                 <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
@@ -78,7 +125,62 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                 </div>
               )}
 
-              {/* Form Fields */}
+              {/* OTP Step (Registration) */}
+              {type === "register" && registrationStep === "otp" ? (
+                <>
+                  <div>
+                    <Label htmlFor="otp" className="text-sm text-foreground/60 mb-1.5 block">
+                      Код підтвердження
+                    </Label>
+                    <Input
+                      id="otp"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      placeholder="123456"
+                      value={otpValue}
+                      onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH))}
+                      required
+                      maxLength={OTP_LENGTH}
+                      disabled={isLoading}
+                      className="h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30 text-center tracking-[0.5em] text-lg font-mono"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isLoading || otpValue.length !== OTP_LENGTH}
+                    variant="default"
+                    className="w-full h-10 mt-2 text-black bg-white hover:bg-white/70 transition-colors text-sm"
+                  >
+                    {isLoading ? "Перевірка..." : "Підтвердити код"}
+                  </Button>
+
+                  <div className="flex items-center justify-between mt-2">
+                    <button
+                      type="button"
+                      onClick={handleBackToForm}
+                      disabled={isLoading}
+                      className="text-sm text-foreground/60 hover:text-foreground/80 underline underline-offset-4 transition-colors"
+                    >
+                      ← Змінити номер
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={isLoading || resendCooldown > 0}
+                      className="text-sm text-foreground/60 hover:text-foreground/80 underline underline-offset-4 transition-colors disabled:opacity-50 disabled:no-underline"
+                    >
+                      {resendCooldown > 0
+                        ? `Надіслати знову (${resendCooldown}с)`
+                        : "Надіслати знову"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Form Fields */}
               {type === "register" && (
                 <FormField
                   id="name"
@@ -139,7 +241,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                 variant="default"
                 className="w-full h-10 mt-2 text-black bg-white hover:bg-white/70 transition-colors text-sm"
               >
-                {isLoading ? "Завантаження..." : type === "login" ? "Увійти" : "Зареєструватися"}
+                {isLoading ? "Завантаження..." : type === "login" ? "Увійти" : "Далі →"}
               </Button>
 
               {/* Forgot Password Link */}
@@ -152,6 +254,8 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                     Забули пароль?
                   </Link>
                 </div>
+              )}
+                </>
               )}
             </form>
 

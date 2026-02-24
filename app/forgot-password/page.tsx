@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,14 @@ export default function ForgotPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [resendCooldown, setResendCooldown] = useState(0);
+
+    // Cooldown timer for resend button
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+        const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+        return () => clearTimeout(timer);
+    }, [resendCooldown]);
 
     const handleRequestOTP = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,21 +38,56 @@ export default function ForgotPasswordPage() {
         setError("");
 
         try {
-            const res = await fetch("/api/auth/forgot-password", {
+            const res = await fetch("/api/auth/send-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phoneNumber }),
+                body: JSON.stringify({ phoneNumber, purpose: "forgot-password" }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.message || "Something went wrong");
+                throw new Error(data.message || "Щось пішло не так");
             }
+
+            // Also call forgot-password endpoint to store OTP hash on user record
+            await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber }),
+            });
 
             // Move to next step
             setStep("verify");
-            setMessage(data.message);
+            setMessage("Код підтвердження надіслано на ваш номер телефону.");
+            setResendCooldown(60);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        setIsLoading(true);
+        setMessage("");
+        setError("");
+
+        try {
+            await fetch("/api/auth/send-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber, purpose: "forgot-password" }),
+            });
+
+            await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber }),
+            });
+
+            setMessage("Код підтвердження надіслано повторно.");
+            setResendCooldown(60);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -56,7 +99,7 @@ export default function ForgotPasswordPage() {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
+            setError("Паролі не співпадають");
             return;
         }
 
@@ -78,10 +121,10 @@ export default function ForgotPasswordPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.message || "Something went wrong");
+                throw new Error(data.message || "Щось пішло не так");
             }
 
-            setMessage("Password reset successful! Redirecting...");
+            setMessage("Пароль успішно змінено! Переспрямовуємо...");
 
             // Redirect to login after a few seconds
             setTimeout(() => {
@@ -143,11 +186,14 @@ export default function ForgotPasswordPage() {
                             <Input
                                 id="otp"
                                 type="text"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
                                 placeholder="123456"
                                 value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
+                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH))}
                                 required
                                 maxLength={OTP_LENGTH}
+                                className="text-center tracking-[0.5em] text-lg font-mono"
                             />
                         </div>
 
@@ -182,13 +228,33 @@ export default function ForgotPasswordPage() {
                             {isLoading ? "Збереження..." : "Встановити новий пароль"}
                         </Button>
 
-                        <button
-                            type="button"
-                            onClick={() => setStep("request")}
-                            className="text-sm text-muted-foreground underline w-full text-center mt-2 hover:text-foreground"
-                        >
-                            Змінити номер телефону
-                        </button>
+                        <div className="flex items-center justify-between mt-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setStep("request");
+                                    setOtp("");
+                                    setPassword("");
+                                    setConfirmPassword("");
+                                    setError("");
+                                    setMessage("");
+                                }}
+                                className="text-sm text-muted-foreground underline hover:text-foreground"
+                            >
+                                ← Змінити номер
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleResendOTP}
+                                disabled={isLoading || resendCooldown > 0}
+                                className="text-sm text-muted-foreground underline hover:text-foreground disabled:opacity-50"
+                            >
+                                {resendCooldown > 0
+                                    ? `Надіслати знову (${resendCooldown}с)`
+                                    : "Надіслати знову"}
+                            </button>
+                        </div>
                     </form>
                 )}
             </div>

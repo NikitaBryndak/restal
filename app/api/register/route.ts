@@ -1,5 +1,6 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
+import PhoneVerification from "@/models/phoneVerification";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
@@ -50,6 +51,18 @@ export async function POST(request: NextRequest) {
 
         await connectToDatabase();
 
+        // SECURITY: Verify that the phone number was verified via OTP
+        const verification = await PhoneVerification.findOne({
+            phoneNumber: sanitizedPhone,
+            verified: true,
+        }).sort({ createdAt: -1 });
+
+        if (!verification) {
+            return NextResponse.json({
+                message: "Phone number has not been verified. Please verify your phone number first."
+            }, { status: 403 });
+        }
+
         // Check for existing user
         const existingUser = await User.findOne({ phoneNumber: sanitizedPhone }).select("_id");
         if (existingUser) {
@@ -90,6 +103,9 @@ export async function POST(request: NextRequest) {
             cashbackAmount: WELCOME_BONUS,
             referredBy: referrerId,
         });
+
+        // Clean up verification record after successful registration
+        await PhoneVerification.deleteMany({ phoneNumber: sanitizedPhone });
 
         return NextResponse.json({
             message: "User registered successfully",
