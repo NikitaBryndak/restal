@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -9,15 +9,23 @@ import {
     BarChart3, Users, Map, DollarSign,
     TrendingUp, MessageCircle, RefreshCw,
     Plane, Award, CreditCard, Clock,
+    Download, ArrowUpRight, ArrowDownRight,
+    Filter, CheckCircle2, Percent,
 } from 'lucide-react';
 import { ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell,
-    AreaChart, Area, Legend,
+    AreaChart, Area, Legend, LineChart, Line,
 } from 'recharts';
+import { motion, AnimatePresence } from 'motion/react';
+
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+type Period = '7d' | '30d' | '90d' | '12m' | 'all';
 
 interface AnalyticsData {
+    period: Period;
     overview: {
         totalTrips: number;
         totalUsers: number;
@@ -28,7 +36,16 @@ interface AnalyticsData {
         totalCashback: number;
         avgTripValue: number;
         outstandingPayments: number;
+        collectionRate: number;
     };
+    comparison: {
+        trips: number | null;
+        users: number | null;
+        contactRequests: number | null;
+        revenue: number | null;
+        paid: number | null;
+        avgTripValue: number | null;
+    } | null;
     tripsByStatus: { _id: string; count: number }[];
     tripsByCountry: { _id: string; count: number }[];
     tripsOverTime: { month: string; count: number; revenue: number; paid: number }[];
@@ -43,8 +60,11 @@ interface AnalyticsData {
         managerName?: string;
         createdAt: string;
     }[];
-    topManagers: { _id: string; tripCount: number; totalRevenue: number }[];
+    topManagers: { _id: string; tripCount: number; totalRevenue: number; totalPaid: number }[];
+    conversionFunnel: { status: string; count: number; revenue: number }[];
 }
+
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const STATUS_COLORS: Record<string, string> = {
     "In Booking": "#f59e0b",
@@ -57,25 +77,108 @@ const STATUS_COLORS: Record<string, string> = {
 
 const PIE_COLORS = ['#0fa4e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#14b8a6', '#6366f1'];
 
+const PERIOD_OPTIONS: { value: Period; label: string }[] = [
+    { value: '7d', label: '7 Ð´Ð½Ñ–Ð²' },
+    { value: '30d', label: '30 Ð´Ð½Ñ–Ð²' },
+    { value: '90d', label: '90 Ð´Ð½Ñ–Ð²' },
+    { value: '12m', label: '12 Ð¼Ñ–ÑÑÑ†Ñ–Ð²' },
+    { value: 'all', label: 'Ð’ÐµÑÑŒ Ñ‡Ð°Ñ' },
+];
+
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 function formatCurrency(value: number): string {
-    return new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 0 }).format(value) + ' ₴';
+    return new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 0 }).format(value) + ' â‚´';
 }
 
-function StatCard({ icon: Icon, label, value, subValue, color }: {
+function formatCompact(value: number): string {
+    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M â‚´`;
+    if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k â‚´`;
+    return `${value} â‚´`;
+}
+
+// â”€â”€â”€ Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function ChangeIndicator({ value }: { value: number | null | undefined }) {
+    if (value === null || value === undefined) return null;
+    const isPositive = value >= 0;
+    return (
+        <span className={`inline-flex items-center gap-0.5 text-[11px] font-medium px-1.5 py-0.5 rounded-full ${isPositive
+            ? 'text-emerald-400 bg-emerald-400/10'
+            : 'text-red-400 bg-red-400/10'
+            }`}>
+            {isPositive ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
+            {Math.abs(value)}%
+        </span>
+    );
+}
+
+function StatCard({ icon: Icon, label, value, subValue, color, change, delay = 0 }: {
     icon: React.ElementType;
     label: string;
     value: string | number;
     subValue?: string;
     color?: string;
+    change?: number | null;
+    delay?: number;
 }) {
     return (
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-secondary text-sm">
-                <Icon size={16} className={color || 'text-accent'} />
-                {label}
+        <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay }}
+            className="group bg-white/3 hover:bg-white/6 border border-white/8 hover:border-white/15 rounded-xl p-4 sm:p-5 flex flex-col gap-2 transition-all duration-300"
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-secondary text-sm">
+                    <div className={`p-1.5 rounded-lg bg-white/5 ${color ? '' : 'text-accent'}`}>
+                        <Icon size={14} className={color || 'text-accent'} />
+                    </div>
+                    {label}
+                </div>
+                <ChangeIndicator value={change} />
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-white">{value}</div>
+            <div className="text-xl sm:text-2xl font-semibold text-white tracking-tight">{value}</div>
             {subValue && <div className="text-xs text-secondary">{subValue}</div>}
+        </motion.div>
+    );
+}
+
+function ProgressBar({ value, label, color = '#0fa4e6' }: { value: number; label: string; color?: string }) {
+    return (
+        <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+                <span className="text-secondary">{label}</span>
+                <span className="text-white font-medium">{value}%</span>
+            </div>
+            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(value, 100)}%` }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: color }}
+                />
+            </div>
+        </div>
+    );
+}
+
+function PeriodSelector({ value, onChange }: { value: Period; onChange: (p: Period) => void }) {
+    return (
+        <div className="flex items-center gap-1 bg-white/3 border border-white/8 rounded-xl p-1">
+            {PERIOD_OPTIONS.map((opt) => (
+                <button
+                    key={opt.value}
+                    onClick={() => onChange(opt.value)}
+                    className={`text-xs px-3 py-1.5 rounded-lg transition-all duration-200 ${value === opt.value
+                        ? 'bg-accent text-white shadow-sm shadow-accent/20'
+                        : 'text-secondary hover:text-white hover:bg-white/5'
+                        }`}
+                >
+                    {opt.label}
+                </button>
+            ))}
         </div>
     );
 }
@@ -84,41 +187,186 @@ function StatCard({ icon: Icon, label, value, subValue, color }: {
 function CustomTooltip({ active, payload, label }: any) {
     if (!active || !payload?.length) return null;
     return (
-        <div className="bg-black/90 border border-white/20 rounded-lg px-3 py-2 text-sm">
-            <p className="text-white font-medium mb-1">{label}</p>
+        <div className="bg-[#111]/95 backdrop-blur-sm border border-white/15 rounded-xl px-4 py-3 text-sm shadow-xl">
+            <p className="text-white font-medium mb-1.5">{label}</p>
             {payload.map((entry: { name: string; value: number; color: string }, i: number) => (
-                <p key={i} style={{ color: entry.color }} className="text-xs">
-                    {entry.name}: {typeof entry.value === 'number' && entry.name.toLowerCase().includes('дохід')
-                        ? formatCurrency(entry.value)
-                        : entry.value}
+                <p key={i} style={{ color: entry.color }} className="text-xs flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                    <span className="text-secondary">{entry.name}:</span>
+                    <span className="font-medium" style={{ color: entry.color }}>
+                        {typeof entry.value === 'number' && (entry.name.toLowerCase().includes('Ð´Ð¾Ñ…Ñ–Ð´') || entry.name.toLowerCase().includes('Ð¾Ð¿Ð»Ð°Ñ‡ÐµÐ½Ð¾'))
+                            ? formatCurrency(entry.value)
+                            : entry.value}
+                    </span>
                 </p>
             ))}
         </div>
     );
 }
 
+function ChartCard({ title, icon: Icon, children, className = '' }: {
+    title: string;
+    icon?: React.ElementType;
+    children: React.ReactNode;
+    className?: string;
+}) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className={`bg-white/3 border border-white/8 rounded-xl p-4 sm:p-6 ${className}`}
+        >
+            <h2 className="text-sm font-medium text-secondary mb-4 flex items-center gap-2">
+                {Icon && <Icon size={14} className="text-accent" />}
+                {title}
+            </h2>
+            {children}
+        </motion.div>
+    );
+}
+
+function ConversionFunnel({ data }: { data: AnalyticsData['conversionFunnel'] }) {
+    const total = data.reduce((sum, d) => sum + d.count, 0);
+    if (total === 0) return <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>;
+
+    return (
+        <div className="space-y-2.5">
+            {data.filter(d => d.count > 0).map((item, i) => {
+                const percentage = Math.round((item.count / total) * 100);
+                const statusLabel = TOUR_STATUS_LABELS[item.status as TourStatus] || item.status;
+                const color = STATUS_COLORS[item.status] || '#6b7280';
+                return (
+                    <motion.div
+                        key={item.status}
+                        initial={{ opacity: 0, x: -16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className="group"
+                    >
+                        <div className="flex items-center justify-between text-xs mb-1">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+                                <span className="text-secondary group-hover:text-white transition-colors">{statusLabel}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="text-white font-medium">{item.count}</span>
+                                <span className="text-secondary text-[10px] w-8 text-right">{percentage}%</span>
+                            </div>
+                        </div>
+                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${percentage}%` }}
+                                transition={{ duration: 0.6, delay: i * 0.08, ease: 'easeOut' }}
+                                className="h-full rounded-full"
+                                style={{ backgroundColor: color }}
+                            />
+                        </div>
+                    </motion.div>
+                );
+            })}
+        </div>
+    );
+}
+
+function ExportCSV({ data }: { data: AnalyticsData }) {
+    const handleExport = useCallback(() => {
+        const rows: string[][] = [];
+
+        // Overview
+        rows.push(['--- ÐžÐ³Ð»ÑÐ´ ---']);
+        rows.push(['ÐœÐµÑ‚Ñ€Ð¸ÐºÐ°', 'Ð—Ð½Ð°Ñ‡ÐµÐ½Ð½Ñ']);
+        rows.push(['Ð’ÑÑŒÐ¾Ð³Ð¾ Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹', String(data.overview.totalTrips)]);
+        rows.push(['ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–', String(data.overview.totalUsers)]);
+        rows.push(['Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´', String(data.overview.totalRevenue)]);
+        rows.push(['ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾', String(data.overview.totalPaid)]);
+        rows.push(['Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº', String(data.overview.avgTripValue)]);
+        rows.push(['ÐšÐµÑˆÐ±ÐµÐº Ð²Ð¸Ð´Ð°Ð½Ð¾', String(data.overview.totalCashback)]);
+        rows.push(['Ð—Ð°Ð¿Ð¸Ñ‚Ð¸', String(data.overview.totalContactRequests)]);
+        rows.push(['Ð—Ð°Ð±Ð¾Ñ€Ð³Ð¾Ð²Ð°Ð½Ñ–ÑÑ‚ÑŒ', String(data.overview.outstandingPayments)]);
+        rows.push([]);
+
+        // Trips over time
+        rows.push(['--- ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ– Ð·Ð° Ð¼Ñ–ÑÑÑ†ÑÐ¼Ð¸ ---']);
+        rows.push(['ÐœÑ–ÑÑÑ†ÑŒ', 'ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ', 'Ð”Ð¾Ñ…Ñ–Ð´', 'ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾']);
+        data.tripsOverTime.forEach((t) => rows.push([t.month, String(t.count), String(t.revenue), String(t.paid)]));
+        rows.push([]);
+
+        // By country
+        rows.push(['--- Ð¢Ð¾Ð¿ Ð½Ð°Ð¿Ñ€ÑÐ¼ÐºÐ¸ ---']);
+        rows.push(['ÐšÑ€Ð°Ñ—Ð½Ð°', 'ÐšÑ–Ð»ÑŒÐºÑ–ÑÑ‚ÑŒ']);
+        data.tripsByCountry.forEach((c) => rows.push([c._id || 'ÐÐµÐ²Ñ–Ð´Ð¾Ð¼Ð¾', String(c.count)]));
+        rows.push([]);
+
+        // Top managers
+        rows.push(['--- Ð¢Ð¾Ð¿ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¸ ---']);
+        rows.push(['ÐœÐµÐ½ÐµÐ´Ð¶ÐµÑ€', 'ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹', 'Ð”Ð¾Ñ…Ñ–Ð´']);
+        data.topManagers.forEach((m) => rows.push([m._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–', String(m.tripCount), String(m.totalRevenue)]));
+        rows.push([]);
+
+        // Recent trips
+        rows.push(['--- ÐžÑÑ‚Ð°Ð½Ð½Ñ– Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ– ---']);
+        rows.push(['ÐÐ¾Ð¼ÐµÑ€', 'ÐšÑ€Ð°Ñ—Ð½Ð°', 'Ð¡Ñ‚Ð°Ñ‚ÑƒÑ', 'Ð¡ÑƒÐ¼Ð°', 'ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾', 'ÐœÐµÐ½ÐµÐ´Ð¶ÐµÑ€', 'Ð¡Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¾']);
+        data.recentTrips.forEach((t) => rows.push([
+            t.number, t.country, t.status,
+            String(t.payment.totalAmount), String(t.payment.paidAmount),
+            t.managerName || '', new Date(t.createdAt).toLocaleDateString('uk-UA'),
+        ]));
+
+        const csvContent = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `analytics-${data.period}-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }, [data]);
+
+    return (
+        <button
+            onClick={handleExport}
+            className="flex items-center gap-2 text-xs bg-white/3 border border-white/8 rounded-xl px-3 py-2 text-secondary hover:text-white hover:bg-white/6 transition-all duration-200"
+            title="Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚ÑƒÐ²Ð°Ñ‚Ð¸ CSV"
+        >
+            <Download size={13} />
+            <span className="hidden sm:inline">Ð•ÐºÑÐ¿Ð¾Ñ€Ñ‚</span>
+        </button>
+    );
+}
+
+// â”€â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 export default function AnalyticsPage() {
     const { userProfile, loading: profileLoading } = useUserProfile();
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [period, setPeriod] = useState<Period>('all');
+    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users'>('overview');
 
     const isAdmin = userProfile && userProfile.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
 
-    const fetchAnalytics = useCallback(async () => {
+    const fetchAnalytics = useCallback(async (p: Period = period) => {
         try {
             setLoading(true);
             setError('');
-            const res = await fetch('/api/analytics');
-            if (!res.ok) throw new Error('Помилка завантаження');
+            const res = await fetch(`/api/analytics?period=${p}`);
+            if (!res.ok) throw new Error('ÐŸÐ¾Ð¼Ð¸Ð»ÐºÐ° Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶ÐµÐ½Ð½Ñ');
             const json = await res.json();
             setData(json);
         } catch {
-            setError('Не вдалося завантажити аналітику');
+            setError('ÐÐµ Ð²Ð´Ð°Ð»Ð¾ÑÑ Ð·Ð°Ð²Ð°Ð½Ñ‚Ð°Ð¶Ð¸Ñ‚Ð¸ Ð°Ð½Ð°Ð»Ñ–Ñ‚Ð¸ÐºÑƒ');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [period]);
+
+    const handlePeriodChange = useCallback((p: Period) => {
+        setPeriod(p);
+        fetchAnalytics(p);
+    }, [fetchAnalytics]);
 
     useEffect(() => {
         if (isAdmin) fetchAnalytics();
@@ -131,30 +379,32 @@ export default function AnalyticsPage() {
     if (!isAdmin) {
         return (
             <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-                <p className="text-secondary">Недостатньо прав для перегляду аналітики</p>
+                <p className="text-secondary">ÐÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð½ÑŒÐ¾ Ð¿Ñ€Ð°Ð² Ð´Ð»Ñ Ð¿ÐµÑ€ÐµÐ³Ð»ÑÐ´Ñƒ Ð°Ð½Ð°Ð»Ñ–Ñ‚Ð¸ÐºÐ¸</p>
             </div>
         );
     }
 
-    if (loading) {
+    if (loading && !data) {
         return <AnalyticsSkeleton />;
     }
 
-    if (error || !data) {
+    if (error && !data) {
         return (
             <div className="flex flex-col justify-center items-center min-h-[calc(100vh-5rem)] gap-4">
-                <p className="text-red-400">{error || 'Немає даних'}</p>
+                <p className="text-red-400">{error || 'ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…'}</p>
                 <button
-                    onClick={fetchAnalytics}
+                    onClick={() => fetchAnalytics()}
                     className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors"
                 >
-                    <RefreshCw size={14} /> Спробувати знову
+                    <RefreshCw size={14} /> Ð¡Ð¿Ñ€Ð¾Ð±ÑƒÐ²Ð°Ñ‚Ð¸ Ð·Ð½Ð¾Ð²Ñƒ
                 </button>
             </div>
         );
     }
 
-    const { overview, tripsByStatus, tripsByCountry, tripsOverTime, userGrowth, recentTrips, topManagers } = data;
+    if (!data) return null;
+
+    const { overview, comparison, tripsByStatus, tripsByCountry, tripsOverTime, userGrowth, recentTrips, topManagers, conversionFunnel } = data;
 
     const statusChartData = tripsByStatus.map((s) => ({
         name: TOUR_STATUS_LABELS[s._id as TourStatus] || s._id,
@@ -163,301 +413,547 @@ export default function AnalyticsPage() {
     }));
 
     const countryChartData = tripsByCountry.map((c) => ({
-        name: c._id || 'Невідомо',
+        name: c._id || 'ÐÐµÐ²Ñ–Ð´Ð¾Ð¼Ð¾',
         count: c.count,
     }));
 
+    // Cumulative revenue data
+    const cumulativeData = tripsOverTime.reduce<{ month: string; revenue: number; paid: number; cumRevenue: number; cumPaid: number }[]>((acc, item) => {
+        const prev = acc.length > 0 ? acc[acc.length - 1] : { cumRevenue: 0, cumPaid: 0 };
+        acc.push({
+            month: item.month,
+            revenue: item.revenue,
+            paid: item.paid,
+            cumRevenue: prev.cumRevenue + item.revenue,
+            cumPaid: prev.cumPaid + item.paid,
+        });
+        return acc;
+    }, []);
+
     return (
-        <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                    <BarChart3 size={24} className="text-accent" />
-                    <h1 className="text-xl sm:text-2xl font-light text-white">Аналітика</h1>
-                </div>
-                <button
-                    onClick={fetchAnalytics}
-                    disabled={loading}
-                    className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors self-start sm:self-auto"
-                >
-                    <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                    Оновити
-                </button>
-            </div>
-
-            {/* Overview Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <StatCard icon={Plane} label="Всього подорожей" value={overview.totalTrips} />
-                <StatCard icon={Users} label="Користувачі" value={overview.totalUsers} />
-                <StatCard
-                    icon={DollarSign}
-                    label="Загальний дохід"
-                    value={formatCurrency(overview.totalRevenue)}
-                    color="text-green-400"
-                />
-                <StatCard
-                    icon={CreditCard}
-                    label="Оплачено"
-                    value={formatCurrency(overview.totalPaid)}
-                    subValue={overview.outstandingPayments > 0 ? `Заборгованість: ${formatCurrency(overview.outstandingPayments)}` : undefined}
-                    color="text-emerald-400"
-                />
-                <StatCard
-                    icon={TrendingUp}
-                    label="Середній чек"
-                    value={formatCurrency(overview.avgTripValue)}
-                    color="text-blue-400"
-                />
-                <StatCard
-                    icon={Award}
-                    label="Кешбек видано"
-                    value={formatCurrency(overview.totalCashback)}
-                    color="text-purple-400"
-                />
-                <StatCard
-                    icon={MessageCircle}
-                    label="Запити (всього)"
-                    value={overview.totalContactRequests}
-                    subValue={`Нових за 7 днів: ${overview.newContactRequests}`}
-                    color="text-yellow-400"
-                />
-                <StatCard
-                    icon={Clock}
-                    label="Заборгованість"
-                    value={formatCurrency(overview.outstandingPayments)}
-                    color="text-red-400"
-                />
-            </div>
-
-            {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Trips Over Time */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4">Подорожі за місяцями</h2>
-                    {tripsOverTime.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={280}>
-                            <AreaChart data={tripsOverTime}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 11 }} />
-                                <YAxis tick={{ fill: '#666', fontSize: 11 }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Area
-                                    type="monotone"
-                                    dataKey="count"
-                                    name="Подорожей"
-                                    stroke="#0fa4e6"
-                                    fill="rgba(15, 164, 230, 0.15)"
-                                    strokeWidth={2}
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <p className="text-secondary text-sm text-center py-8">Немає даних</p>
-                    )}
-                </div>
-
-                {/* Revenue Over Time */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4">Дохід за місяцями</h2>
-                    {tripsOverTime.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={280}>
-                            <BarChart data={tripsOverTime}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 11 }} />
-                                <YAxis tick={{ fill: '#666', fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: 12, color: '#666' }} />
-                                <Bar dataKey="revenue" name="Дохід" fill="#0fa4e6" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="paid" name="Оплачено" fill="#10b981" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <p className="text-secondary text-sm text-center py-8">Немає даних</p>
-                    )}
-                </div>
-            </div>
-
-            {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Trip Status Distribution */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4">Статуси подорожей</h2>
-                    {statusChartData.length > 0 ? (
-                        <div className="flex flex-col sm:flex-row items-center gap-4">
-                            <ResponsiveContainer width="100%" height={220}>
-                                <PieChart>
-                                    <Pie
-                                        data={statusChartData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={85}
-                                        paddingAngle={3}
-                                        dataKey="value"
-                                    >
-                                        {statusChartData.map((entry, index) => (
-                                            <Cell key={index} fill={entry.fill} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: 'rgba(0,0,0,0.9)',
-                                            border: '1px solid rgba(255,255,255,0.2)',
-                                            borderRadius: 8,
-                                            fontSize: 12,
-                                        }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="flex flex-wrap sm:flex-col gap-2 text-xs">
-                                {statusChartData.map((s, i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                        <span
-                                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                                            style={{ backgroundColor: s.fill }}
-                                        />
-                                        <span className="text-secondary whitespace-nowrap">{s.name}</span>
-                                        <span className="text-white font-medium">{s.value}</span>
-                                    </div>
-                                ))}
-                            </div>
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-accent/10">
+                            <BarChart3 size={22} className="text-accent" />
                         </div>
-                    ) : (
-                        <p className="text-secondary text-sm text-center py-8">Немає даних</p>
-                    )}
+                        <div>
+                            <h1 className="text-xl sm:text-2xl font-light text-white">ÐÐ½Ð°Ð»Ñ–Ñ‚Ð¸ÐºÐ°</h1>
+                            <p className="text-xs text-secondary mt-0.5">
+                                {period === 'all' ? 'Ð£ÑÑ– Ð´Ð°Ð½Ñ–' : `ÐžÑÑ‚Ð°Ð½Ð½Ñ– ${PERIOD_OPTIONS.find(o => o.value === period)?.label}`}
+                                {loading && <span className="ml-2 text-accent">Ð¾Ð½Ð¾Ð²Ð»ÑŽÑ”Ñ‚ÑŒÑÑâ€¦</span>}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <ExportCSV data={data} />
+                        <button
+                            onClick={() => fetchAnalytics()}
+                            disabled={loading}
+                            className="flex items-center gap-2 text-xs bg-white/3 border border-white/8 rounded-xl px-3 py-2 text-secondary hover:text-white hover:bg-white/6 transition-all duration-200"
+                        >
+                            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+                            <span className="hidden sm:inline">ÐžÐ½Ð¾Ð²Ð¸Ñ‚Ð¸</span>
+                        </button>
+                    </div>
                 </div>
 
-                {/* Top Countries */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4">Топ напрямки</h2>
-                    {countryChartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={280}>
-                            <BarChart data={countryChartData} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis type="number" tick={{ fill: '#666', fontSize: 11 }} />
-                                <YAxis
-                                    dataKey="name"
-                                    type="category"
-                                    tick={{ fill: '#999', fontSize: 11 }}
-                                    width={100}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="count" name="Подорожей" radius={[0, 4, 4, 0]}>
-                                    {countryChartData.map((_, index) => (
-                                        <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <p className="text-secondary text-sm text-center py-8">Немає даних</p>
-                    )}
+                {/* Period Selector */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-2 text-xs text-secondary">
+                        <Filter size={12} />
+                        ÐŸÐµÑ€Ñ–Ð¾Ð´:
+                    </div>
+                    <PeriodSelector value={period} onChange={handlePeriodChange} />
                 </div>
             </div>
 
-            {/* User Growth */}
-            {userGrowth.length > 0 && (
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4">Реєстрації користувачів</h2>
-                    <ResponsiveContainer width="100%" height={250}>
-                        <AreaChart data={userGrowth}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                            <XAxis dataKey="month" tick={{ fill: '#666', fontSize: 11 }} />
-                            <YAxis tick={{ fill: '#666', fontSize: 11 }} allowDecimals={false} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Area
-                                type="monotone"
-                                dataKey="count"
-                                name="Нових користувачів"
-                                stroke="#8b5cf6"
-                                fill="rgba(139, 92, 246, 0.15)"
-                                strokeWidth={2}
+            {/* Tabs */}
+            <div className="flex items-center gap-1 bg-white/3 border border-white/8 rounded-xl p-1 w-fit">
+                {([
+                    { id: 'overview' as const, label: 'ÐžÐ³Ð»ÑÐ´', icon: BarChart3 },
+                    { id: 'revenue' as const, label: 'Ð¤Ñ–Ð½Ð°Ð½ÑÐ¸', icon: DollarSign },
+                    { id: 'users' as const, label: 'ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–', icon: Users },
+                ]).map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all duration-200 ${activeTab === tab.id
+                            ? 'bg-white/8 text-white'
+                            : 'text-secondary hover:text-white hover:bg-white/3'
+                            }`}
+                    >
+                        <tab.icon size={13} />
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            <AnimatePresence mode="wait">
+                {activeTab === 'overview' && (
+                    <motion.div
+                        key="overview"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 sm:space-y-8"
+                    >
+                        {/* Overview Stats Grid */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                            <StatCard icon={Plane} label="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" value={overview.totalTrips} change={comparison?.trips} delay={0} />
+                            <StatCard icon={Users} label="ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–" value={overview.totalUsers} change={comparison?.users} delay={0.05} />
+                            <StatCard
+                                icon={DollarSign} label="Ð”Ð¾Ñ…Ñ–Ð´"
+                                value={formatCurrency(overview.totalRevenue)}
+                                color="text-green-400" change={comparison?.revenue} delay={0.1}
                             />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
-            )}
+                            <StatCard
+                                icon={CreditCard} label="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾"
+                                value={formatCurrency(overview.totalPaid)}
+                                subValue={overview.outstandingPayments > 0 ? `Ð‘Ð¾Ñ€Ð³: ${formatCurrency(overview.outstandingPayments)}` : undefined}
+                                color="text-emerald-400" change={comparison?.paid} delay={0.15}
+                            />
+                            <StatCard
+                                icon={TrendingUp} label="Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº"
+                                value={formatCurrency(overview.avgTripValue)}
+                                color="text-blue-400" change={comparison?.avgTripValue} delay={0.2}
+                            />
+                            <StatCard
+                                icon={Award} label="ÐšÐµÑˆÐ±ÐµÐº"
+                                value={formatCurrency(overview.totalCashback)}
+                                color="text-purple-400" delay={0.25}
+                            />
+                            <StatCard
+                                icon={MessageCircle} label="Ð—Ð°Ð¿Ð¸Ñ‚Ð¸"
+                                value={overview.totalContactRequests}
+                                subValue={`ÐÐ¾Ð²Ð¸Ñ… Ð·Ð° 7Ð´: ${overview.newContactRequests}`}
+                                color="text-yellow-400" change={comparison?.contactRequests} delay={0.3}
+                            />
+                            <StatCard
+                                icon={Percent} label="Ð—Ð±Ñ–Ñ€ Ð¾Ð¿Ð»Ð°Ñ‚"
+                                value={`${overview.collectionRate}%`}
+                                subValue={overview.collectionRate < 80 ? 'ÐŸÐ¾Ñ‚Ñ€ÐµÐ±ÑƒÑ” ÑƒÐ²Ð°Ð³Ð¸' : 'Ð”Ð¾Ð±Ñ€Ðµ'}
+                                color={overview.collectionRate >= 80 ? 'text-emerald-400' : 'text-amber-400'} delay={0.35}
+                            />
+                        </div>
 
-            {/* Bottom Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Recent Trips */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4 flex items-center gap-2">
-                        <Map size={14} className="text-accent" />
-                        Останні подорожі
-                    </h2>
-                    <div className="space-y-3">
-                        {recentTrips.length > 0 ? recentTrips.map((trip) => (
-                            <div
-                                key={trip._id}
-                                className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
-                            >
-                                <div className="flex flex-col gap-0.5 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-white font-medium truncate">
-                                            #{trip.number}
-                                        </span>
-                                        <span
-                                            className="text-[10px] px-1.5 py-0.5 rounded-full border shrink-0"
-                                            style={{
-                                                color: STATUS_COLORS[trip.status] || '#6b7280',
-                                                borderColor: `${STATUS_COLORS[trip.status] || '#6b7280'}50`,
-                                                backgroundColor: `${STATUS_COLORS[trip.status] || '#6b7280'}15`,
-                                            }}
+                        {/* Collection Rate + Conversion Funnel */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                            <ChartCard title="Ð—Ð±Ñ–Ñ€ Ð¾Ð¿Ð»Ð°Ñ‚" icon={CreditCard}>
+                                <div className="space-y-6">
+                                    <ProgressBar
+                                        value={overview.collectionRate}
+                                        label="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾ Ð²Ñ–Ð´ Ð·Ð°Ð³Ð°Ð»ÑŒÐ½Ð¾Ñ— ÑÑƒÐ¼Ð¸"
+                                        color={overview.collectionRate >= 80 ? '#10b981' : overview.collectionRate >= 50 ? '#f59e0b' : '#ef4444'}
+                                    />
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="text-center p-3 bg-white/3 rounded-lg">
+                                            <div className="text-lg font-semibold text-white">{formatCompact(overview.totalRevenue)}</div>
+                                            <div className="text-[10px] text-secondary mt-1">Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-white/3 rounded-lg">
+                                            <div className="text-lg font-semibold text-emerald-400">{formatCompact(overview.totalPaid)}</div>
+                                            <div className="text-[10px] text-secondary mt-1">ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-white/3 rounded-lg">
+                                            <div className="text-lg font-semibold text-red-400">{formatCompact(overview.outstandingPayments)}</div>
+                                            <div className="text-[10px] text-secondary mt-1">Ð—Ð°Ð±Ð¾Ñ€Ð³Ð¾Ð²Ð°Ð½Ñ–ÑÑ‚ÑŒ</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ChartCard>
+
+                            <ChartCard title="Ð’Ð¾Ñ€Ð¾Ð½ÐºÐ° ÑÑ‚Ð°Ñ‚ÑƒÑÑ–Ð²" icon={Filter}>
+                                <ConversionFunnel data={conversionFunnel} />
+                            </ChartCard>
+                        </div>
+
+                        {/* Charts Row 1 - Trips */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                            <ChartCard title="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ– Ð·Ð° Ð¼Ñ–ÑÑÑ†ÑÐ¼Ð¸" icon={Plane}>
+                                {tripsOverTime.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={280}>
+                                        <AreaChart data={tripsOverTime}>
+                                            <defs>
+                                                <linearGradient id="tripsGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#0fa4e6" stopOpacity={0.25} />
+                                                    <stop offset="95%" stopColor="#0fa4e6" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                            <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                            <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                            <Tooltip content={<CustomTooltip />} />
+                                            <Area
+                                                type="monotone" dataKey="count" name="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹"
+                                                stroke="#0fa4e6" fill="url(#tripsGradient)" strokeWidth={2}
+                                                dot={{ r: 3, fill: '#0fa4e6', strokeWidth: 0 }}
+                                                activeDot={{ r: 5, fill: '#0fa4e6', stroke: '#fff', strokeWidth: 2 }}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                )}
+                            </ChartCard>
+
+                            {/* Trip Status Distribution */}
+                            <ChartCard title="Ð¡Ñ‚Ð°Ñ‚ÑƒÑÐ¸ Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" icon={CheckCircle2}>
+                                {statusChartData.length > 0 ? (
+                                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                                        <ResponsiveContainer width="100%" height={220}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={statusChartData}
+                                                    cx="50%" cy="50%"
+                                                    innerRadius={55} outerRadius={90}
+                                                    paddingAngle={3} dataKey="value"
+                                                    animationBegin={0} animationDuration={800}
+                                                >
+                                                    {statusChartData.map((entry, index) => (
+                                                        <Cell key={index} fill={entry.fill} stroke="transparent" />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor: 'rgba(17,17,17,0.95)',
+                                                        border: '1px solid rgba(255,255,255,0.15)',
+                                                        borderRadius: 12, fontSize: 12, backdropFilter: 'blur(8px)',
+                                                    }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        <div className="flex flex-wrap sm:flex-col gap-2 text-xs">
+                                            {statusChartData.map((s, i) => (
+                                                <div key={i} className="flex items-center gap-2">
+                                                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.fill }} />
+                                                    <span className="text-secondary whitespace-nowrap">{s.name}</span>
+                                                    <span className="text-white font-medium">{s.value}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                )}
+                            </ChartCard>
+                        </div>
+
+                        {/* Top Countries */}
+                        <ChartCard title="Ð¢Ð¾Ð¿ Ð½Ð°Ð¿Ñ€ÑÐ¼ÐºÐ¸" icon={Map}>
+                            {countryChartData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={Math.max(280, countryChartData.length * 35)}>
+                                    <BarChart data={countryChartData} layout="vertical">
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                        <XAxis type="number" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} />
+                                        <YAxis dataKey="name" type="category" tick={{ fill: '#999', fontSize: 11 }} width={110} axisLine={false} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Bar dataKey="count" name="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" radius={[0, 6, 6, 0]} animationDuration={600}>
+                                            {countryChartData.map((_, index) => (
+                                                <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                            )}
+                        </ChartCard>
+
+                        {/* Bottom Row: Recent Trips + Top Managers */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                            <ChartCard title="ÐžÑÑ‚Ð°Ð½Ð½Ñ– Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶Ñ–" icon={Map}>
+                                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                                    {recentTrips.length > 0 ? recentTrips.map((trip, i) => (
+                                        <motion.div
+                                            key={trip._id}
+                                            initial={{ opacity: 0, x: -8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: i * 0.04 }}
+                                            className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-white/3 border-b border-white/4 last:border-0 transition-colors"
                                         >
-                                            {TOUR_STATUS_LABELS[trip.status as TourStatus] || trip.status}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-secondary truncate">
-                                        {trip.country}{trip.managerName ? ` • ${trip.managerName}` : ''}
-                                    </span>
+                                            <div className="flex flex-col gap-0.5 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-white font-medium truncate">#{trip.number}</span>
+                                                    <span
+                                                        className="text-[10px] px-1.5 py-0.5 rounded-full border shrink-0"
+                                                        style={{
+                                                            color: STATUS_COLORS[trip.status] || '#6b7280',
+                                                            borderColor: `${STATUS_COLORS[trip.status] || '#6b7280'}40`,
+                                                            backgroundColor: `${STATUS_COLORS[trip.status] || '#6b7280'}10`,
+                                                        }}
+                                                    >
+                                                        {TOUR_STATUS_LABELS[trip.status as TourStatus] || trip.status}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs text-secondary truncate">
+                                                    {trip.country}{trip.managerName ? ` Â· ${trip.managerName}` : ''}
+                                                </span>
+                                            </div>
+                                            <div className="text-right shrink-0 ml-3">
+                                                <div className="text-sm text-white font-medium">{formatCurrency(trip.payment.totalAmount)}</div>
+                                                <div className="text-[10px] text-secondary">
+                                                    {new Date(trip.createdAt).toLocaleDateString('uk-UA')}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )) : (
+                                        <p className="text-secondary text-sm text-center py-4">ÐÐµÐ¼Ð°Ñ” Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹</p>
+                                    )}
                                 </div>
-                                <div className="text-right shrink-0 ml-2">
-                                    <div className="text-sm text-white">
-                                        {formatCurrency(trip.payment.totalAmount)}
-                                    </div>
-                                    <div className="text-[10px] text-secondary">
-                                        {new Date(trip.createdAt).toLocaleDateString('uk-UA')}
-                                    </div>
-                                </div>
-                            </div>
-                        )) : (
-                            <p className="text-secondary text-sm text-center py-4">Немає подорожей</p>
-                        )}
-                    </div>
-                </div>
+                            </ChartCard>
 
-                {/* Top Managers */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                    <h2 className="text-sm font-medium text-secondary mb-4 flex items-center gap-2">
-                        <Award size={14} className="text-accent" />
-                        Топ менеджери
-                    </h2>
-                    <div className="space-y-3">
-                        {topManagers.length > 0 ? topManagers.map((mgr, index) => (
-                            <div
-                                key={mgr._id}
-                                className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className="text-lg font-light text-secondary w-6 text-center">
-                                        {index + 1}
-                                    </span>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm text-white">{mgr._id || 'Без імені'}</span>
-                                        <span className="text-xs text-secondary">{mgr.tripCount} подорожей</span>
+                            <ChartCard title="Ð¢Ð¾Ð¿ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¸" icon={Award}>
+                                <div className="space-y-2">
+                                    {topManagers.length > 0 ? topManagers.map((mgr, index) => {
+                                        const mgrCollectionRate = mgr.totalRevenue > 0 ? Math.round((mgr.totalPaid / mgr.totalRevenue) * 100) : 0;
+                                        return (
+                                            <motion.div
+                                                key={mgr._id}
+                                                initial={{ opacity: 0, x: -8 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: index * 0.06 }}
+                                                className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-white/3 border-b border-white/4 last:border-0 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${index === 0 ? 'bg-amber-500/20 text-amber-400' :
+                                                        index === 1 ? 'bg-gray-400/20 text-gray-300' :
+                                                            index === 2 ? 'bg-orange-500/20 text-orange-400' :
+                                                                'bg-white/5 text-secondary'
+                                                        }`}>
+                                                        {index + 1}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm text-white">{mgr._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–'}</span>
+                                                        <span className="text-xs text-secondary">{mgr.tripCount} Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹ Â· Ð·Ð±Ñ–Ñ€ {mgrCollectionRate}%</span>
+                                                    </div>
+                                                </div>
+                                                <span className="text-sm text-green-400 font-medium">{formatCurrency(mgr.totalRevenue)}</span>
+                                            </motion.div>
+                                        );
+                                    }) : (
+                                        <p className="text-secondary text-sm text-center py-4">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                    )}
+                                </div>
+                            </ChartCard>
+                        </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'revenue' && (
+                    <motion.div
+                        key="revenue"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 sm:space-y-8"
+                    >
+                        {/* Revenue KPIs */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                            <StatCard icon={DollarSign} label="Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´" value={formatCurrency(overview.totalRevenue)} color="text-green-400" change={comparison?.revenue} />
+                            <StatCard icon={CreditCard} label="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾" value={formatCurrency(overview.totalPaid)} color="text-emerald-400" change={comparison?.paid} delay={0.05} />
+                            <StatCard icon={TrendingUp} label="Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº" value={formatCurrency(overview.avgTripValue)} color="text-blue-400" change={comparison?.avgTripValue} delay={0.1} />
+                            <StatCard icon={Clock} label="Ð—Ð°Ð±Ð¾Ñ€Ð³Ð¾Ð²Ð°Ð½Ñ–ÑÑ‚ÑŒ" value={formatCurrency(overview.outstandingPayments)} color="text-red-400" delay={0.15} />
+                        </div>
+
+                        {/* Revenue Over Time */}
+                        <ChartCard title="Ð”Ð¾Ñ…Ñ–Ð´ Ñ‚Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ð¸ Ð·Ð° Ð¼Ñ–ÑÑÑ†ÑÐ¼Ð¸">
+                            {tripsOverTime.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={320}>
+                                    <BarChart data={tripsOverTime}>
+                                        <defs>
+                                            <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#0fa4e6" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#0fa4e6" stopOpacity={0.4} />
+                                            </linearGradient>
+                                            <linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
+                                                <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                        <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                        <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Legend wrapperStyle={{ fontSize: 12, color: '#666' }} />
+                                        <Bar dataKey="revenue" name="Ð”Ð¾Ñ…Ñ–Ð´" fill="url(#revenueGrad)" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="paid" name="ÐžÐ¿Ð»Ð°Ñ‡ÐµÐ½Ð¾" fill="url(#paidGrad)" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                            )}
+                        </ChartCard>
+
+                        {/* Cumulative Revenue */}
+                        <ChartCard title="ÐšÑƒÐ¼ÑƒÐ»ÑÑ‚Ð¸Ð²Ð½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´">
+                            {cumulativeData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <LineChart data={cumulativeData}>
+                                        <defs>
+                                            <linearGradient id="cumRevGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#0fa4e6" stopOpacity={0.15} />
+                                                <stop offset="95%" stopColor="#0fa4e6" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                        <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                        <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Legend wrapperStyle={{ fontSize: 12, color: '#666' }} />
+                                        <Line type="monotone" dataKey="cumRevenue" name="ÐšÑƒÐ¼ÑƒÐ»ÑÑ‚Ð¸Ð²Ð½Ð¸Ð¹ Ð´Ð¾Ñ…Ñ–Ð´" stroke="#0fa4e6" strokeWidth={2.5} dot={false} />
+                                        <Line type="monotone" dataKey="cumPaid" name="ÐšÑƒÐ¼ÑƒÐ»ÑÑ‚Ð¸Ð²Ð½Ð¾ Ð¾Ð¿Ð»Ð°Ñ‡ÐµÐ½Ð¾" stroke="#10b981" strokeWidth={2.5} dot={false} strokeDasharray="5 3" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                            )}
+                        </ChartCard>
+
+                        {/* Payment Collection Rate */}
+                        <ChartCard title="ÐÐ½Ð°Ð»Ñ–Ð· Ð¾Ð¿Ð»Ð°Ñ‚" icon={CreditCard}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <ProgressBar
+                                        value={overview.collectionRate}
+                                        label="Ð—Ð°Ð³Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð·Ð±Ñ–Ñ€"
+                                        color={overview.collectionRate >= 80 ? '#10b981' : overview.collectionRate >= 50 ? '#f59e0b' : '#ef4444'}
+                                    />
+                                    {topManagers.filter(m => m.totalRevenue > 0).slice(0, 3).map((mgr) => (
+                                        <ProgressBar
+                                            key={mgr._id}
+                                            value={Math.round((mgr.totalPaid / mgr.totalRevenue) * 100)}
+                                            label={mgr._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–'}
+                                            color="#8b5cf6"
+                                        />
+                                    ))}
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <div className="p-4 bg-white/3 rounded-xl">
+                                        <div className="text-xs text-secondary mb-1">ÐšÐµÑˆÐ±ÐµÐº Ð²Ð¸Ð´Ð°Ð½Ð¾</div>
+                                        <div className="text-xl font-semibold text-purple-400">{formatCurrency(overview.totalCashback)}</div>
+                                    </div>
+                                    <div className="p-4 bg-white/3 rounded-xl">
+                                        <div className="text-xs text-secondary mb-1">Ð¡ÐµÑ€ÐµÐ´Ð½Ñ–Ð¹ Ñ‡ÐµÐº</div>
+                                        <div className="text-xl font-semibold text-blue-400">{formatCurrency(overview.avgTripValue)}</div>
                                     </div>
                                 </div>
-                                <span className="text-sm text-green-400">
-                                    {formatCurrency(mgr.totalRevenue)}
-                                </span>
                             </div>
-                        )) : (
-                            <p className="text-secondary text-sm text-center py-4">Немає даних</p>
-                        )}
-                    </div>
-                </div>
-            </div>
+                        </ChartCard>
+                    </motion.div>
+                )}
+
+                {activeTab === 'users' && (
+                    <motion.div
+                        key="users"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 sm:space-y-8"
+                    >
+                        {/* User KPIs */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                            <StatCard icon={Users} label="ÐšÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–" value={overview.totalUsers} change={comparison?.users} />
+                            <StatCard icon={MessageCircle} label="Ð—Ð°Ð¿Ð¸Ñ‚Ð¸" value={overview.totalContactRequests} color="text-yellow-400" change={comparison?.contactRequests} delay={0.05} />
+                            <StatCard icon={Plane} label="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹" value={overview.totalTrips} change={comparison?.trips} delay={0.1} />
+                            <StatCard
+                                icon={TrendingUp} label="ÐŸÐ¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹/ÐºÐ¾Ñ€Ð¸ÑÑ‚."
+                                value={overview.totalUsers > 0 ? (overview.totalTrips / overview.totalUsers).toFixed(1) : '0'}
+                                color="text-cyan-400" delay={0.15}
+                            />
+                        </div>
+
+                        {/* User Growth */}
+                        <ChartCard title="Ð ÐµÑ”ÑÑ‚Ñ€Ð°Ñ†Ñ–Ñ— ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð²" icon={Users}>
+                            {userGrowth.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <AreaChart data={userGrowth}>
+                                        <defs>
+                                            <linearGradient id="userGrowthGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.25} />
+                                                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                        <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                        <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Area
+                                            type="monotone" dataKey="count" name="ÐÐ¾Ð²Ð¸Ñ… ÐºÐ¾Ñ€Ð¸ÑÑ‚ÑƒÐ²Ð°Ñ‡Ñ–Ð²"
+                                            stroke="#8b5cf6" fill="url(#userGrowthGrad)" strokeWidth={2}
+                                            dot={{ r: 3, fill: '#8b5cf6', strokeWidth: 0 }}
+                                            activeDot={{ r: 5, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-secondary text-sm text-center py-8">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                            )}
+                        </ChartCard>
+
+                        {/* Contact Requests Breakdown */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                            <ChartCard title="Ð—Ð°Ð¿Ð¸Ñ‚Ð¸ Ð²Ñ–Ð´ ÐºÐ»Ñ–Ñ”Ð½Ñ‚Ñ–Ð²" icon={MessageCircle}>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 bg-white/3 rounded-xl text-center">
+                                        <div className="text-2xl font-semibold text-white">{overview.totalContactRequests}</div>
+                                        <div className="text-xs text-secondary mt-1">Ð’ÑÑŒÐ¾Ð³Ð¾ Ð·Ð°Ð¿Ð¸Ñ‚Ñ–Ð²</div>
+                                    </div>
+                                    <div className="p-4 bg-white/3 rounded-xl text-center">
+                                        <div className="text-2xl font-semibold text-accent">{overview.newContactRequests}</div>
+                                        <div className="text-xs text-secondary mt-1">ÐÐ¾Ð²Ð¸Ñ… Ð·Ð° 7 Ð´Ð½Ñ–Ð²</div>
+                                    </div>
+                                </div>
+                                <div className="mt-4">
+                                    <ProgressBar
+                                        value={overview.totalContactRequests > 0 ? Math.round((overview.newContactRequests / overview.totalContactRequests) * 100) : 0}
+                                        label="Ð§Ð°ÑÑ‚ÐºÐ° Ð½Ð¾Ð²Ð¸Ñ… Ð·Ð°Ð¿Ð¸Ñ‚Ñ–Ð²"
+                                        color="#0fa4e6"
+                                    />
+                                </div>
+                            </ChartCard>
+
+                            <ChartCard title="ÐÐºÑ‚Ð¸Ð²Ð½Ñ–ÑÑ‚ÑŒ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ñ–Ð²" icon={Award}>
+                                <div className="space-y-3">
+                                    {topManagers.length > 0 ? topManagers.map((mgr, index) => (
+                                        <div key={mgr._id} className="flex items-center gap-3">
+                                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${index === 0 ? 'bg-amber-500/20 text-amber-400' :
+                                                index === 1 ? 'bg-gray-400/20 text-gray-300' :
+                                                    index === 2 ? 'bg-orange-500/20 text-orange-400' :
+                                                        'bg-white/5 text-secondary'
+                                                }`}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="text-sm text-white truncate">{mgr._id || 'Ð‘ÐµÐ· Ñ–Ð¼ÐµÐ½Ñ–'}</span>
+                                                    <span className="text-xs text-secondary ml-2">{mgr.tripCount} Ð¿Ð¾Ð´Ð¾Ñ€Ð¾Ð¶ÐµÐ¹</span>
+                                                </div>
+                                                <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full transition-all duration-500"
+                                                        style={{
+                                                            width: `${(mgr.tripCount / (topManagers[0]?.tripCount || 1)) * 100}%`,
+                                                            backgroundColor: PIE_COLORS[index % PIE_COLORS.length],
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <p className="text-secondary text-sm text-center py-4">ÐÐµÐ¼Ð°Ñ” Ð´Ð°Ð½Ð¸Ñ…</p>
+                                    )}
+                                </div>
+                            </ChartCard>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
