@@ -199,6 +199,14 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ message: "Немає даних для оновлення" }, { status: 400 });
         }
 
+        // If status is changing away from "new", record the response time
+        if (updateData.status && updateData.status !== "new") {
+            const existing = await ContactRequest.findById(id).lean() as { status?: string; respondedAt?: Date } | null;
+            if (existing && existing.status === "new" && !existing.respondedAt) {
+                updateData.respondedAt = new Date();
+            }
+        }
+
         const updated = await ContactRequest.findByIdAndUpdate(id, updateData, { new: true }).lean();
 
         if (!updated) {

@@ -41,6 +41,8 @@ interface AnalyticsData {
         avgTripValue: number;
         outstandingPayments: number;
         collectionRate: number;
+        avgResponseTimeMinutes: number | null;
+        respondedCount: number;
     };
     comparison: {
         trips: number | null;
@@ -518,10 +520,23 @@ export default function AnalyticsPage() {
                                 color="text-yellow-400" change={comparison?.contactRequests} delay={0.3}
                             />
                             <StatCard
+                                icon={Clock} label="Час відповіді"
+                                value={overview.avgResponseTimeMinutes !== null
+                                    ? overview.avgResponseTimeMinutes < 60
+                                        ? `${overview.avgResponseTimeMinutes} хв`
+                                        : overview.avgResponseTimeMinutes < 1440
+                                            ? `${Math.round(overview.avgResponseTimeMinutes / 60)} год`
+                                            : `${Math.round(overview.avgResponseTimeMinutes / 1440)} д`
+                                    : 'Н/Д'}
+                                subValue={overview.respondedCount > 0 ? `На основі ${overview.respondedCount} запитів` : 'Ще немає даних'}
+                                color={overview.avgResponseTimeMinutes !== null && overview.avgResponseTimeMinutes <= 60 ? 'text-emerald-400' : 'text-orange-400'}
+                                delay={0.35}
+                            />
+                            <StatCard
                                 icon={Percent} label="Збір оплат"
                                 value={`${overview.collectionRate}%`}
                                 subValue={overview.collectionRate < 80 ? 'Потребує уваги' : 'Добре'}
-                                color={overview.collectionRate >= 80 ? 'text-emerald-400' : 'text-amber-400'} delay={0.35}
+                                color={overview.collectionRate >= 80 ? 'text-emerald-400' : 'text-amber-400'} delay={0.4}
                             />
                         </div>
 

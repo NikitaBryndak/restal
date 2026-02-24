@@ -118,6 +118,8 @@ export async function GET(request: NextRequest) {
             prevRevenueData,
             // Conversion funnel data
             conversionFunnel,
+            // Avg response time
+            avgResponseTimeData,
         ] = await Promise.all([
             // Total counts (filtered by period)
             Trip.countDocuments(dateFilter),
@@ -255,6 +257,28 @@ export async function GET(request: NextRequest) {
                     },
                 },
             ]),
+
+            // Average response time for contact requests (ms between createdAt and respondedAt)
+            ContactRequest.aggregate([
+                {
+                    $match: {
+                        respondedAt: { $ne: null },
+                        ...(periodStart ? { createdAt: { $gte: periodStart } } : {}),
+                    },
+                },
+                {
+                    $project: {
+                        responseTimeMs: { $subtract: ["$respondedAt", "$createdAt"] },
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        avgResponseTimeMs: { $avg: "$responseTimeMs" },
+                        count: { $sum: 1 },
+                    },
+                },
+            ]),
         ]);
 
         const monthNames = [
@@ -308,6 +332,13 @@ export async function GET(request: NextRequest) {
             ? Math.round((revenue.totalPaid / revenue.totalRevenue) * 100)
             : 0;
 
+        // Average response time in minutes
+        const avgResponseRaw = (avgResponseTimeData as { avgResponseTimeMs: number; count: number }[])[0];
+        const avgResponseTimeMinutes = avgResponseRaw
+            ? Math.round(avgResponseRaw.avgResponseTimeMs / 60000)
+            : null;
+        const respondedCount = avgResponseRaw?.count || 0;
+
         return NextResponse.json(
             {
                 period,
@@ -322,6 +353,8 @@ export async function GET(request: NextRequest) {
                     avgTripValue: Math.round(revenue.avgTripValue || 0),
                     outstandingPayments: revenue.totalRevenue - revenue.totalPaid,
                     collectionRate,
+                    avgResponseTimeMinutes,
+                    respondedCount,
                 },
                 comparison: previousPeriodStart ? {
                     trips: calcChange(totalTrips, prevTrips as number),

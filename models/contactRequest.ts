@@ -45,6 +45,11 @@ const contactRequestSchema = new Schema({
         type: String,
         default: "",
     },
+    // Timestamp when the request was first responded to (status changed from "new")
+    respondedAt: {
+        type: Date,
+        default: null,
+    },
     // IP for rate limiting
     ip: {
         type: String,
