@@ -13,4 +13,11 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 
+// Fix circular reference in react plugin (next.js flat-config compat issue)
+for (const config of eslintConfig) {
+  if (config.plugins?.react) {
+    config.plugins.react = { rules: config.plugins.react.rules };
+  }
+}
+
 export default eslintConfig;

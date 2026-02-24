@@ -81,10 +81,12 @@ export async function POST(request: NextRequest) {
             ip,
         });
 
-        // Send email notification (non-blocking — don't fail the request if email fails)
-        sendContactRequestNotification(sanitizedData).catch((err) =>
-            console.error("Failed to send contact request email:", err)
-        );
+        // Send email notification (await so Vercel doesn't kill the function early)
+        try {
+            await sendContactRequestNotification(sanitizedData);
+        } catch (err) {
+            console.error("Failed to send contact request email:", err);
+        }
 
         return NextResponse.json(
             { message: "Запит успішно надіслано", id: contactRequest._id },
