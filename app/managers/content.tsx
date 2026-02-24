@@ -326,7 +326,7 @@ export default function ManagersContent() {
       {/* ============================================================ */}
       {/*  TEAM GRID                                                    */}
       {/* ============================================================ */}
-      <section className="py-14 md:py-20">
+      <section id="managers" className="py-14 md:py-20">
         <div className="max-w-6xl mx-auto px-4 max-sm:px-3">
           <FadeIn className="text-center mb-10 md:mb-14">
             <span className="text-accent text-xs font-semibold uppercase tracking-[0.2em]">

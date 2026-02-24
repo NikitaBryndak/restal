@@ -254,11 +254,11 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/search"
+              href="/managers#managers"
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl backdrop-blur-sm border border-white/20 transition-all hover:scale-105 active:scale-95"
             >
-              <Sparkles className="w-5 h-5" />
-              ШІ помічник
+              <MessageCircle className="w-5 h-5" />
+              Зв'язатися з менеджером
             </Link>
           </motion.div>
 
