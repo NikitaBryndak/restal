@@ -73,9 +73,18 @@ export async function POST(req: NextRequest) {
 
     try {
       await sendSMS(sanitizedPhone, messageText);
-    } catch (smsError) {
+    } catch (smsError: any) {
       console.error("Error sending SMS:", smsError);
-      // Don't fail the request — in dev, we log it anyway
+
+      // In production, we should let the user know if SMS failed
+      // especially if it's a configuration error like Geo Permissions
+      if (process.env.NODE_ENV === 'production') {
+         return NextResponse.json(
+           { message: "Не вдалося надіслати SMS. Перевірте правильність номера або спробуйте пізніше." },
+           { status: 500 }
+         );
+      }
+      // In development, we log it and continue
     }
 
     // Log OTP in development for testing

@@ -51,15 +51,17 @@ export async function POST(request: NextRequest) {
 
         await connectToDatabase();
 
-        // SECURITY: Verify that the phone number was verified via OTP
+        // SECURITY: Verify that the phone number was verified via OTP RECENTLY (e.g. within last 10 minutes)
+        const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
         const verification = await PhoneVerification.findOne({
             phoneNumber: sanitizedPhone,
             verified: true,
+            updatedAt: { $gte: tenMinutesAgo }
         }).sort({ createdAt: -1 });
 
         if (!verification) {
             return NextResponse.json({
-                message: "Phone number has not been verified. Please verify your phone number first."
+                message: "Phone number has not been verified or verification expired. Please verify again."
             }, { status: 403 });
         }
 
