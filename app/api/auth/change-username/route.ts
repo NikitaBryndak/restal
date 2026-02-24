@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
         if (!session || !session.user?.phoneNumber) {
             return NextResponse.json({
-                message: "Unauthorized"
+                message: "Неавторизовано"
             }, { status: 401 });
         }
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         // Input validation
         if (!newUsername) {
             return NextResponse.json({
-                message: "New username is required"
+                message: "Нове ім'я користувача обов'язкове"
             }, { status: 400 });
         }
 
@@ -29,13 +29,13 @@ export async function POST(request: NextRequest) {
 
         if (sanitizedUsername.length < MIN_USERNAME_LENGTH) {
             return NextResponse.json({
-                message: `Username must be at least ${MIN_USERNAME_LENGTH} characters`
+                message: `Ім'я користувача повинно містити щонайменше ${MIN_USERNAME_LENGTH} символи`
             }, { status: 400 });
         }
 
         if (sanitizedUsername.length > MAX_USERNAME_LENGTH) {
             return NextResponse.json({
-                message: `Username must be no more than ${MAX_USERNAME_LENGTH} characters`
+                message: `Ім'я користувача не може перевищувати ${MAX_USERNAME_LENGTH} символів`
             }, { status: 400 });
         }
 
@@ -50,18 +50,18 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json({
-                message: "User not found"
+                message: "Користувача не знайдено"
             }, { status: 404 });
         }
 
         return NextResponse.json({
-            message: "Username changed successfully",
+            message: "Ім'я користувача успішно змінено",
             userName: user.name
         }, { status: 200 });
     } catch (error) {
         console.error("Change username error:", error);
         return NextResponse.json({
-            message: "Internal server error"
+            message: "Внутрішня помилка сервера"
         }, { status: 500 });
     }
 }

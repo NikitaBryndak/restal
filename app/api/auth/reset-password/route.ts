@@ -10,11 +10,11 @@ export async function POST(req: Request) {
     const { phoneNumber, otp, password } = await req.json();
 
     if (!phoneNumber || !otp || !password) {
-      return NextResponse.json({ message: "Phone Number, Code, and Password are required" }, { status: 400 });
+      return NextResponse.json({ message: "Номер телефону, код та пароль обов'язкові" }, { status: 400 });
     }
 
     if (password.length < MIN_PASSWORD_LENGTH) {
-      return NextResponse.json({ message: "Password must be at least 8 characters" }, { status: 400 });
+      return NextResponse.json({ message: `Пароль повинен містити щонайменше ${MIN_PASSWORD_LENGTH} символів` }, { status: 400 });
     }
 
     // Sanitize inputs
@@ -28,14 +28,14 @@ export async function POST(req: Request) {
 
     if (!userByPhone) {
       // Don't reveal if user exists
-      return NextResponse.json({ message: "Invalid or expired verification code" }, { status: 400 });
+      return NextResponse.json({ message: "Невірний або прострочений код підтвердження" }, { status: 400 });
     }
 
     // Check if account is locked
     if (userByPhone.resetPasswordLockUntil && userByPhone.resetPasswordLockUntil > new Date()) {
       const remainingMinutes = Math.ceil((userByPhone.resetPasswordLockUntil.getTime() - Date.now()) / 60000);
       return NextResponse.json({
-        message: `Too many failed attempts. Try again in ${remainingMinutes} minutes.`
+        message: `Забагато невдалих спроб. Спробуйте через ${remainingMinutes} хв.`
       }, { status: 429 });
     }
 
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       }
 
       await userByPhone.save();
-      return NextResponse.json({ message: "Invalid or expired verification code" }, { status: 400 });
+      return NextResponse.json({ message: "Невірний або прострочений код підтвердження" }, { status: 400 });
     }
 
     // Set new password
@@ -77,9 +77,9 @@ export async function POST(req: Request) {
 
     await userByPhone.save();
 
-    return NextResponse.json({ message: "Password reset successful" });
+    return NextResponse.json({ message: "Пароль успішно змінено" });
 
   } catch {
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ message: "Внутрішня помилка сервера" }, { status: 500 });
   }
 }

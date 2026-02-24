@@ -99,8 +99,9 @@ export function useAuth({ type }: AuthFormProps) {
         }
 
         router.push("/dashboard/profile");
-    } catch (err: any) {
-      setError(err.message || `Помилка під час ${type === 'register' ? 'реєстрації' : 'входу'}. Спробуйте ще раз.`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : undefined;
+      setError(message || `Помилка під час ${type === 'register' ? 'реєстрації' : 'входу'}. Спробуйте ще раз.`);
     } finally {
       setIsLoading(false);
     }
@@ -153,8 +154,9 @@ export function useAuth({ type }: AuthFormProps) {
       }
 
       router.push("/dashboard/profile");
-    } catch (err: any) {
-      setError(err.message || "Помилка підтвердження коду. Спробуйте ще раз.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : undefined;
+      setError(message || "Помилка підтвердження коду. Спробуйте ще раз.");
     } finally {
       setIsLoading(false);
     }
@@ -169,8 +171,9 @@ export function useAuth({ type }: AuthFormProps) {
     try {
       await sendOtp(pendingFormData.phoneNumber);
       setOtpSent(true);
-    } catch (err: any) {
-      setError(err.message || "Помилка надсилання коду. Спробуйте ще раз.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : undefined;
+      setError(message || "Помилка надсилання коду. Спробуйте ще раз.");
     } finally {
       setIsLoading(false);
     }

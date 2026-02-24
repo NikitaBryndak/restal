@@ -38,10 +38,10 @@ export default function ForgotPasswordPage() {
         setError("");
 
         try {
-            const res = await fetch("/api/auth/send-otp", {
+            const res = await fetch("/api/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phoneNumber, purpose: "forgot-password" }),
+                body: JSON.stringify({ phoneNumber }),
             });
 
             const data = await res.json();
@@ -50,19 +50,12 @@ export default function ForgotPasswordPage() {
                 throw new Error(data.message || "Щось пішло не так");
             }
 
-            // Also call forgot-password endpoint to store OTP hash on user record
-            await fetch("/api/auth/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phoneNumber }),
-            });
-
             // Move to next step
             setStep("verify");
             setMessage("Код підтвердження надіслано на ваш номер телефону.");
             setResendCooldown(60);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Щось пішло не так");
         } finally {
             setIsLoading(false);
         }
@@ -74,22 +67,22 @@ export default function ForgotPasswordPage() {
         setError("");
 
         try {
-            await fetch("/api/auth/send-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phoneNumber, purpose: "forgot-password" }),
-            });
-
-            await fetch("/api/auth/forgot-password", {
+            const res = await fetch("/api/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ phoneNumber }),
             });
 
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || "Щось пішло не так");
+            }
+
             setMessage("Код підтвердження надіслано повторно.");
             setResendCooldown(60);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Щось пішло не так");
         } finally {
             setIsLoading(false);
         }
@@ -131,8 +124,8 @@ export default function ForgotPasswordPage() {
                 router.push("/login");
             }, 2000);
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Щось пішло не так");
         } finally {
             setIsLoading(false);
         }

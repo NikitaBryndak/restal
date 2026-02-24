@@ -75,10 +75,14 @@ export default function NotificationBell() {
         if (isOpen && unreadCount > 0) {
             markAllAsRead();
         }
-    }, [isOpen, unreadCount]); // eslint-disable-line react-hooks/exhaustive-deps
+        // markAllAsRead is intentionally omitted from deps to prevent
+        // re-triggering when its identity changes; it only needs to run
+        // when the dropdown opens or unreadCount transitions from 0.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, unreadCount]);
 
     // Mark all as read
-    const markAllAsRead = async () => {
+    const markAllAsRead = useCallback(async () => {
         if (isLoading || unreadCount === 0) return;
 
         setIsLoading(true);
@@ -98,7 +102,7 @@ export default function NotificationBell() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [isLoading, unreadCount]);
 
     // Format date
     const formatDate = (dateString: string) => {

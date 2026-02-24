@@ -62,17 +62,17 @@ export default function SettingsPage() {
 
         // Validation
         if (!currentPassword || !newPassword) {
-            setPasswordChangeError("Please fill in all password fields");
+            setPasswordChangeError("Будь ласка, заповніть всі поля паролю");
             return;
         }
 
         if (newPassword.length < MIN_PASSWORD_LENGTH) {
-            setPasswordChangeError("New password must be at least 8 characters");
+            setPasswordChangeError(`Новий пароль повинен містити щонайменше ${MIN_PASSWORD_LENGTH} символів`);
             return;
         }
 
         if (currentPassword === newPassword) {
-            setPasswordChangeError("New password must be different from current password");
+            setPasswordChangeError("Новий пароль повинен відрізнятися від поточного");
             return;
         }
 
@@ -93,11 +93,11 @@ export default function SettingsPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setPasswordChangeError(data.message || "Failed to change password");
+                setPasswordChangeError(data.message || "Не вдалося змінити пароль");
                 return;
             }
 
-            setPasswordChangeSuccess("Password changed successfully!");
+            setPasswordChangeSuccess("Пароль успішно змінено!");
             setCurrentPassword("");
             setNewPassword("");
             setShowCurrentPassword(false);
@@ -108,8 +108,8 @@ export default function SettingsPage() {
                 setPasswordChangeSuccess("");
             }, 3000);
         } catch (err) {
-            setPasswordChangeError("An error occurred while changing password");
-            console.error(err);
+            setPasswordChangeError("Сталася помилка при зміні паролю");
+            console.error("Change password error:", err);
         } finally {
             setPasswordChangeLoading(false);
         }
@@ -122,22 +122,22 @@ export default function SettingsPage() {
 
         // Validation
         if (!newUsername.trim()) {
-            setUsernameChangeError("Username cannot be empty");
+            setUsernameChangeError("Ім'я користувача не може бути порожнім");
             return;
         }
 
         if (newUsername.trim().length < MIN_USERNAME_LENGTH) {
-            setUsernameChangeError("Username must be at least 2 characters");
+            setUsernameChangeError(`Ім'я користувача повинно містити щонайменше ${MIN_USERNAME_LENGTH} символи`);
             return;
         }
 
         if (newUsername.trim().length > MAX_USERNAME_LENGTH) {
-            setUsernameChangeError("Username must be no more than 100 characters");
+            setUsernameChangeError(`Ім'я користувача не може перевищувати ${MAX_USERNAME_LENGTH} символів`);
             return;
         }
 
         if (newUsername.trim() === userProfile?.userName) {
-            setUsernameChangeError("New username must be different from current username");
+            setUsernameChangeError("Нове ім'я повинно відрізнятися від поточного");
             return;
         }
 
@@ -157,11 +157,11 @@ export default function SettingsPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setUsernameChangeError(data.message || "Failed to change username");
+                setUsernameChangeError(data.message || "Не вдалося змінити ім'я користувача");
                 return;
             }
 
-            setUsernameChangeSuccess("Username changed successfully!");
+            setUsernameChangeSuccess("Ім'я користувача успішно змінено!");
             setIsEditingUsername(false);
 
             // Refetch user profile to update the display immediately
@@ -172,8 +172,8 @@ export default function SettingsPage() {
                 setUsernameChangeSuccess("");
             }, 3000);
         } catch (err) {
-            setUsernameChangeError("An error occurred while changing username");
-            console.error(err);
+            setUsernameChangeError("\u0421\u0442\u0430\u043b\u0430\u0441\u044f \u043f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0437\u043c\u0456\u043d\u0456 \u0456\u043c\u0435\u043d\u0456 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430");
+            console.error("Change username error:", err);
         } finally {
             setUsernameChangeLoading(false);
         }

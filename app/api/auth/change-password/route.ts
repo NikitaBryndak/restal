@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
         if (!session || !session.user?.phoneNumber) {
             return NextResponse.json({
-                message: "Unauthorized"
+                message: "Неавторизовано"
             }, { status: 401 });
         }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         const { allowed } = checkRateLimit("change-password", session.user.phoneNumber, 5, 15 * 60 * 1000);
         if (!allowed) {
             return NextResponse.json({
-                message: "Too many password change attempts. Please try again later."
+                message: "Забагато спроб зміни паролю. Спробуйте пізніше."
             }, { status: 429 });
         }
 
@@ -32,19 +32,19 @@ export async function POST(request: NextRequest) {
         // Input validation
         if (!currentPassword || !newPassword) {
             return NextResponse.json({
-                message: "Current password and new password are required"
+                message: "Поточний та новий паролі обов'язкові"
             }, { status: 400 });
         }
 
         if (newPassword.length < MIN_PASSWORD_LENGTH) {
             return NextResponse.json({
-                message: `New password must be at least ${MIN_PASSWORD_LENGTH} characters`
+                message: `Новий пароль повинен містити щонайменше ${MIN_PASSWORD_LENGTH} символів`
             }, { status: 400 });
         }
 
         if (currentPassword === newPassword) {
             return NextResponse.json({
-                message: "New password must be different from current password"
+                message: "Новий пароль повинен відрізнятися від поточного"
             }, { status: 400 });
         }
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json({
-                message: "User not found"
+                message: "Користувача не знайдено"
             }, { status: 404 });
         }
 
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
         if (!passwordMatch) {
             return NextResponse.json({
-                message: "Current password is incorrect"
+                message: "Поточний пароль невірний"
             }, { status: 401 });
         }
 
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
         await user.save();
 
         return NextResponse.json({
-            message: "Password changed successfully"
+            message: "Пароль успішно змінено"
         }, { status: 200 });
     } catch (error) {
         console.error("Change password error:", error);
         return NextResponse.json({
-            message: "Internal server error"
+            message: "Внутрішня помилка сервера"
         }, { status: 500 });
     }
 }

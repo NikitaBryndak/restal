@@ -3,9 +3,8 @@ import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import { sendSMS } from "@/lib/sms";
 import crypto, { randomInt } from "crypto";
-import bcrypt from "bcryptjs";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
-import { OTP_EXPIRY_MS } from "@/config/constants";
+import { OTP_EXPIRY_MS, PHONE_REGEX } from "@/config/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +14,7 @@ export async function POST(req: NextRequest) {
     const { allowed } = checkRateLimit("forgot-password", ip, 3, 15 * 60 * 1000);
     if (!allowed) {
       return NextResponse.json(
-        { message: "Too many requests. Please try again later." },
+        { message: "Забагато запитів. Спробуйте пізніше." },
         { status: 429 }
       );
     }
@@ -23,19 +22,26 @@ export async function POST(req: NextRequest) {
     const { phoneNumber } = await req.json();
 
     if (!phoneNumber) {
-      return NextResponse.json({ message: "Phone number is required" }, { status: 400 });
+      return NextResponse.json({ message: "Номер телефону обов'язковий" }, { status: 400 });
     }
 
     // Sanitize phone number - only allow digits and optional leading +
     const sanitizedPhone = phoneNumber.replace(/[^\d+]/g, '');
+
+    if (!PHONE_REGEX.test(sanitizedPhone)) {
+      return NextResponse.json(
+        { message: "Невірний формат номера телефону" },
+        { status: 400 }
+      );
+    }
 
     await connectToDatabase();
 
     const user = await User.findOne({ phoneNumber: sanitizedPhone });
 
     if (!user) {
-        // Safe fail - don't reveal if number exists or not
-      return NextResponse.json({ message: "If an account with that number exists, we have sent a verification code." }, { status: 200 });
+      // Safe fail - don't reveal if number exists or not
+      return NextResponse.json({ message: "Якщо акаунт з цим номером існує, ми надіслали код підтвердження." }, { status: 200 });
     }
 
     // Generate 6 digit OTP using cryptographically secure random number
@@ -57,24 +63,30 @@ export async function POST(req: NextRequest) {
 
     // Send SMS via Twilio
     try {
-        const message = `Your Restal password reset code is: ${otp}. Do not share this code.`;
-        await sendSMS(phoneNumber, message);
+        const message = `Ваш код відновлення пароля RestAL: ${otp}. Не повідомляйте цей код нікому.`;
+        await sendSMS(sanitizedPhone, message);
     } catch (smsError) {
         console.error("Error sending SMS:", smsError);
+        if (process.env.NODE_ENV === 'production') {
+          return NextResponse.json(
+            { message: "Не вдалося надіслати SMS. Перевірте правильність номера або спробуйте пізніше." },
+            { status: 500 }
+          );
+        }
     }
 
     // For development/debugging purposes, we still log it.
     if (process.env.NODE_ENV === "development") {
         console.log("----------------------------------------------------------------");
-        console.log(`[DEV ONLY] To: ${phoneNumber}`);
+        console.log(`[DEV ONLY] To: ${sanitizedPhone}`);
         console.log(`Code: ${otp}`);
         console.log("----------------------------------------------------------------");
     }
 
-    return NextResponse.json({ message: "If an account with that number exists, we have sent a verification code." });
+    return NextResponse.json({ message: "Якщо акаунт з цим номером існує, ми надіслали код підтвердження." });
 
   } catch (error) {
     console.error("Forgot password error:", error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ message: "Внутрішня помилка сервера" }, { status: 500 });
   }
 }
