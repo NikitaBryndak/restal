@@ -8,7 +8,6 @@ interface UserProfile {
     userName: string;
     cashbackAmount: number;
     privilegeLevel: number;
-    [key: string]: unknown;
 }
 
 export default function WideNavbar({ userProfile }: { userProfile: UserProfile | null }) {

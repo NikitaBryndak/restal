@@ -12,7 +12,13 @@ import {
     Download, ArrowUpRight, ArrowDownRight,
     Filter, CheckCircle2, Percent,
 } from 'lucide-react';
-import { ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
+import {
+    ADMIN_PRIVILEGE_LEVEL,
+    TOUR_STATUS_COLORS,
+    PIE_COLORS,
+    PERIOD_OPTIONS,
+} from '@/config/constants';
+import type { Period } from '@/config/constants';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell,
@@ -21,8 +27,6 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 
 // ─── Types ──────────────────────────────────────────────────────────
-
-type Period = '7d' | '30d' | '90d' | '12m' | 'all';
 
 interface AnalyticsData {
     period: Period;
@@ -64,26 +68,7 @@ interface AnalyticsData {
     conversionFunnel: { status: string; count: number; revenue: number }[];
 }
 
-// ─── Constants ──────────────────────────────────────────────────────
-
-const STATUS_COLORS: Record<string, string> = {
-    "In Booking": "#f59e0b",
-    "Booked": "#3b82f6",
-    "Paid": "#10b981",
-    "In Progress": "#8b5cf6",
-    "Completed": "#06b6d4",
-    "Archived": "#6b7280",
-};
-
-const PIE_COLORS = ['#0fa4e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#14b8a6', '#6366f1'];
-
-const PERIOD_OPTIONS: { value: Period; label: string }[] = [
-    { value: '7d', label: '7 днів' },
-    { value: '30d', label: '30 днів' },
-    { value: '90d', label: '90 днів' },
-    { value: '12m', label: '12 місяців' },
-    { value: 'all', label: 'Весь час' },
-];
+// STATUS_COLORS, PIE_COLORS, PERIOD_OPTIONS, Period — imported from @/config/constants
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -235,7 +220,7 @@ function ConversionFunnel({ data }: { data: AnalyticsData['conversionFunnel'] })
             {data.filter(d => d.count > 0).map((item, i) => {
                 const percentage = Math.round((item.count / total) * 100);
                 const statusLabel = TOUR_STATUS_LABELS[item.status as TourStatus] || item.status;
-                const color = STATUS_COLORS[item.status] || '#6b7280';
+                const color = TOUR_STATUS_COLORS[item.status] || '#6b7280';
                 return (
                     <motion.div
                         key={item.status}
@@ -409,7 +394,7 @@ export default function AnalyticsPage() {
     const statusChartData = tripsByStatus.map((s) => ({
         name: TOUR_STATUS_LABELS[s._id as TourStatus] || s._id,
         value: s.count,
-        fill: STATUS_COLORS[s._id] || '#6b7280',
+        fill: TOUR_STATUS_COLORS[s._id] || '#6b7280',
     }));
 
     const countryChartData = tripsByCountry.map((c) => ({
@@ -681,9 +666,9 @@ export default function AnalyticsPage() {
                                                     <span
                                                         className="text-[10px] px-1.5 py-0.5 rounded-full border shrink-0"
                                                         style={{
-                                                            color: STATUS_COLORS[trip.status] || '#6b7280',
-                                                            borderColor: `${STATUS_COLORS[trip.status] || '#6b7280'}40`,
-                                                            backgroundColor: `${STATUS_COLORS[trip.status] || '#6b7280'}10`,
+                                                            color: TOUR_STATUS_COLORS[trip.status] || '#6b7280',
+                                                            borderColor: `${TOUR_STATUS_COLORS[trip.status] || '#6b7280'}40`,
+                                                            backgroundColor: `${TOUR_STATUS_COLORS[trip.status] || '#6b7280'}10`,
                                                         }}
                                                     >
                                                         {TOUR_STATUS_LABELS[trip.status as TourStatus] || trip.status}

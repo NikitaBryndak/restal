@@ -56,6 +56,41 @@ export const TRUSTED_ORIGINS: readonly string[] = [
 // ─── UI ─────────────────────────────────────────────────────────────
 export const TITLE_FADE_DURATION = 3;
 
+// ─── Analytics ──────────────────────────────────────────────────────
+
+/** Hex colors for tour statuses (used in charts & badges) */
+export const TOUR_STATUS_COLORS: Record<string, string> = {
+    "In Booking": "#f59e0b",
+    "Booked": "#3b82f6",
+    "Paid": "#10b981",
+    "In Progress": "#8b5cf6",
+    "Completed": "#06b6d4",
+    "Archived": "#6b7280",
+};
+
+/** Palette for pie / bar charts */
+export const PIE_COLORS = [
+    '#0fa4e6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+    '#06b6d4', '#ec4899', '#f97316', '#14b8a6', '#6366f1',
+] as const;
+
+/** Analytics period filter */
+export type Period = '7d' | '30d' | '90d' | '12m' | 'all';
+
+export const PERIOD_OPTIONS: { value: Period; label: string }[] = [
+    { value: '7d', label: '7 днів' },
+    { value: '30d', label: '30 днів' },
+    { value: '90d', label: '90 днів' },
+    { value: '12m', label: '12 місяців' },
+    { value: 'all', label: 'Весь час' },
+];
+
+// ─── Notifications ──────────────────────────────────────────────────
+export const NOTIFICATION_RECIPIENTS = [
+    "nikitabryndak@gmail.com",
+    "eleonstrevel@gmail.com",
+];
+
 // ─── Date ───────────────────────────────────────────────────────────
 export const MIN_YEAR = 1940;
 export const MAX_YEAR = 2050;

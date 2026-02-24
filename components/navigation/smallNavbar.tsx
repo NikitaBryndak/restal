@@ -11,7 +11,6 @@ interface UserProfile {
     userName: string;
     cashbackAmount: number;
     privilegeLevel: number;
-    [key: string]: unknown;
 }
 
 export default function SmallNavbar({ userProfile }: { userProfile: UserProfile | null }) {

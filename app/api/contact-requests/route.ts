@@ -6,6 +6,7 @@ import ContactRequest from "@/models/contactRequest";
 import User from "@/models/user";
 import mongoose from "mongoose";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { sendContactRequestNotification } from "@/lib/email";
 
 // Rate limit: max 5 requests per IP per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -66,15 +67,24 @@ export async function POST(request: NextRequest) {
         }
 
         // Create contact request with sanitized inputs
-        const contactRequest = await ContactRequest.create({
+        const sanitizedData = {
             source,
             firstName: firstName?.trim().slice(0, 100) || "",
             lastName: lastName?.trim().slice(0, 100) || "",
             phone: phoneClean,
             message: message?.trim().slice(0, 2000) || "",
             managerName: managerName?.trim().slice(0, 100) || "",
+        };
+
+        const contactRequest = await ContactRequest.create({
+            ...sanitizedData,
             ip,
         });
+
+        // Send email notification (non-blocking — don't fail the request if email fails)
+        sendContactRequestNotification(sanitizedData).catch((err) =>
+            console.error("Failed to send contact request email:", err)
+        );
 
         return NextResponse.json(
             { message: "Запит успішно надіслано", id: contactRequest._id },
