@@ -19,9 +19,18 @@ export default function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     // Stable user indicator — avoids re-running effects when session object ref changes
     const isAuthenticated = status === 'authenticated' && !!session?.user;
+
+    // Stop polling helper
+    const stopPolling = useCallback(() => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+    }, []);
 
     // Fetch notifications
     const fetchNotifications = useCallback(async () => {
@@ -31,20 +40,23 @@ export default function NotificationBell() {
                 const data = await response.json();
                 setNotifications(data.notifications || []);
                 setUnreadCount(data.unreadCount || 0);
+            } else if (response.status === 401) {
+                // Not authenticated server-side — stop polling to avoid spam
+                stopPolling();
             }
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
         }
-    }, []);
+    }, [stopPolling]);
 
     // Fetch on mount and periodically
     useEffect(() => {
         if (!isAuthenticated) return;
 
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 60000); // Refresh every 60 seconds
-        return () => clearInterval(interval);
-    }, [isAuthenticated, fetchNotifications]);
+        intervalRef.current = setInterval(fetchNotifications, 60000); // Refresh every 60 seconds
+        return () => stopPolling();
+    }, [isAuthenticated, fetchNotifications, stopPolling]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
