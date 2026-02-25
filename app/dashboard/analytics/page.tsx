@@ -10,7 +10,7 @@ import {
     TrendingUp, MessageCircle, RefreshCw,
     Plane, Award, CreditCard, Clock,
     Download, ArrowUpRight, ArrowDownRight,
-    Filter, CheckCircle2, Percent,
+    Filter, CheckCircle2, Percent, Gift, UserCheck,
 } from 'lucide-react';
 import {
     ADMIN_PRIVILEGE_LEVEL,
@@ -43,6 +43,9 @@ interface AnalyticsData {
         collectionRate: number;
         avgResponseTimeMinutes: number | null;
         respondedCount: number;
+        totalCashbackUsed: number;
+        cashbackUsedCount: number;
+        totalTourists: number;
     };
     comparison: {
         trips: number | null;
@@ -51,11 +54,13 @@ interface AnalyticsData {
         revenue: number | null;
         paid: number | null;
         avgTripValue: number | null;
+        tourists: number | null;
     } | null;
     tripsByStatus: { _id: string; count: number }[];
     tripsByCountry: { _id: string; count: number }[];
     tripsOverTime: { month: string; count: number; revenue: number; paid: number }[];
     userGrowth: { month: string; count: number }[];
+    touristsOverTime: { month: string; tourists: number }[];
     recentTrips: {
         _id: string;
         number: string;
@@ -265,11 +270,13 @@ function ExportCSV({ data }: { data: AnalyticsData }) {
         rows.push(['--- Огляд ---']);
         rows.push(['Метрика', 'Значення']);
         rows.push(['Всього подорожей', String(data.overview.totalTrips)]);
+        rows.push(['Туристів', String(data.overview.totalTourists)]);
         rows.push(['Користувачі', String(data.overview.totalUsers)]);
         rows.push(['Загальний дохід', String(data.overview.totalRevenue)]);
         rows.push(['Оплачено', String(data.overview.totalPaid)]);
         rows.push(['Середній чек', String(data.overview.avgTripValue)]);
         rows.push(['Кешбек видано', String(data.overview.totalCashback)]);
+        rows.push(['Кешбек використано', String(data.overview.totalCashbackUsed)]);
         rows.push(['Запити', String(data.overview.totalContactRequests)]);
         rows.push(['Заборгованість', String(data.overview.outstandingPayments)]);
         rows.push([]);
@@ -391,7 +398,7 @@ export default function AnalyticsPage() {
 
     if (!data) return null;
 
-    const { overview, comparison, tripsByStatus, tripsByCountry, tripsOverTime, userGrowth, recentTrips, topManagers, conversionFunnel } = data;
+    const { overview, comparison, tripsByStatus, tripsByCountry, tripsOverTime, userGrowth, touristsOverTime, recentTrips, topManagers, conversionFunnel } = data;
 
     const statusChartData = tripsByStatus.map((s) => ({
         name: TOUR_STATUS_LABELS[s._id as TourStatus] || s._id,
@@ -491,6 +498,7 @@ export default function AnalyticsPage() {
                         {/* Overview Stats Grid */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                             <StatCard icon={Plane} label="Подорожей" value={overview.totalTrips} change={comparison?.trips} delay={0} />
+                            <StatCard icon={UserCheck} label="Туристів" value={overview.totalTourists} change={comparison?.tourists} color="text-teal-400" delay={0.03} />
                             <StatCard icon={Users} label="Користувачі" value={overview.totalUsers} change={comparison?.users} delay={0.05} />
                             <StatCard
                                 icon={DollarSign} label="Дохід"
@@ -512,6 +520,12 @@ export default function AnalyticsPage() {
                                 icon={Award} label="Кешбек"
                                 value={formatCurrency(overview.totalCashback)}
                                 color="text-purple-400" delay={0.25}
+                            />
+                            <StatCard
+                                icon={Gift} label="Кешбек використано"
+                                value={formatCurrency(overview.totalCashbackUsed)}
+                                subValue={overview.cashbackUsedCount > 0 ? `${overview.cashbackUsedCount} промокодів` : undefined}
+                                color="text-pink-400" delay={0.28}
                             />
                             <StatCard
                                 icon={MessageCircle} label="Запити"
@@ -838,6 +852,11 @@ export default function AnalyticsPage() {
                                         <div className="text-xl font-semibold text-purple-400">{formatCurrency(overview.totalCashback)}</div>
                                     </div>
                                     <div className="p-4 bg-white/3 rounded-xl">
+                                        <div className="text-xs text-secondary mb-1">Кешбек використано</div>
+                                        <div className="text-xl font-semibold text-pink-400">{formatCurrency(overview.totalCashbackUsed)}</div>
+                                        {overview.cashbackUsedCount > 0 && <div className="text-[10px] text-secondary mt-1">{overview.cashbackUsedCount} промокодів</div>}
+                                    </div>
+                                    <div className="p-4 bg-white/3 rounded-xl">
                                         <div className="text-xs text-secondary mb-1">Середній чек</div>
                                         <div className="text-xl font-semibold text-blue-400">{formatCurrency(overview.avgTripValue)}</div>
                                     </div>
@@ -859,12 +878,18 @@ export default function AnalyticsPage() {
                         {/* User KPIs */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                             <StatCard icon={Users} label="Користувачі" value={overview.totalUsers} change={comparison?.users} />
-                            <StatCard icon={MessageCircle} label="Запити" value={overview.totalContactRequests} color="text-yellow-400" change={comparison?.contactRequests} delay={0.05} />
-                            <StatCard icon={Plane} label="Подорожей" value={overview.totalTrips} change={comparison?.trips} delay={0.1} />
+                            <StatCard icon={UserCheck} label="Туристів" value={overview.totalTourists} change={comparison?.tourists} color="text-teal-400" delay={0.05} />
+                            <StatCard icon={MessageCircle} label="Запити" value={overview.totalContactRequests} color="text-yellow-400" change={comparison?.contactRequests} delay={0.1} />
+                            <StatCard icon={Plane} label="Подорожей" value={overview.totalTrips} change={comparison?.trips} delay={0.15} />
                             <StatCard
                                 icon={TrendingUp} label="Подорожей/корист."
                                 value={overview.totalUsers > 0 ? (overview.totalTrips / overview.totalUsers).toFixed(1) : '0'}
-                                color="text-cyan-400" delay={0.15}
+                                color="text-cyan-400" delay={0.2}
+                            />
+                            <StatCard
+                                icon={TrendingUp} label="Тур./подорож"
+                                value={overview.totalTrips > 0 ? (overview.totalTourists / overview.totalTrips).toFixed(1) : '0'}
+                                color="text-teal-400" delay={0.25}
                             />
                         </div>
 
@@ -888,6 +913,34 @@ export default function AnalyticsPage() {
                                             stroke="#8b5cf6" fill="url(#userGrowthGrad)" strokeWidth={2}
                                             dot={{ r: 3, fill: '#8b5cf6', strokeWidth: 0 }}
                                             activeDot={{ r: 5, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-secondary text-sm text-center py-8">Немає даних</p>
+                            )}
+                        </ChartCard>
+
+                        {/* Tourists Over Time */}
+                        <ChartCard title="Туристи за місяцями" icon={UserCheck}>
+                            {touristsOverTime.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <AreaChart data={touristsOverTime}>
+                                        <defs>
+                                            <linearGradient id="touristsGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.25} />
+                                                <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                        <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                        <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Area
+                                            type="monotone" dataKey="tourists" name="Туристів"
+                                            stroke="#14b8a6" fill="url(#touristsGrad)" strokeWidth={2}
+                                            dot={{ r: 3, fill: '#14b8a6', strokeWidth: 0 }}
+                                            activeDot={{ r: 5, fill: '#14b8a6', stroke: '#fff', strokeWidth: 2 }}
                                         />
                                     </AreaChart>
                                 </ResponsiveContainer>

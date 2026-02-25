@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import ContactRequest from "@/models/contactRequest";
+import PromoCode from "@/models/promoCode";
 import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -120,6 +121,12 @@ export async function GET(request: NextRequest) {
             conversionFunnel,
             // Avg response time
             avgResponseTimeData,
+            // Cashback used (redeemed promo codes)
+            cashbackUsedData,
+            // Tourist counts
+            totalTouristsData,
+            prevTouristsData,
+            touristsOverTimeData,
         ] = await Promise.all([
             // Total counts (filtered by period)
             Trip.countDocuments(dateFilter),
@@ -279,6 +286,62 @@ export async function GET(request: NextRequest) {
                     },
                 },
             ]),
+
+            // Cashback used: sum of redeemed (used) promo codes
+            PromoCode.aggregate([
+                {
+                    $match: {
+                        status: "used",
+                        ...(periodStart ? { usedAt: { $gte: periodStart } } : {}),
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalUsed: { $sum: "$amount" },
+                        count: { $sum: 1 },
+                    },
+                },
+            ]),
+
+            // Total tourists (sum of tourists array sizes, filtered by period)
+            Trip.aggregate([
+                ...(periodStart ? [{ $match: { createdAt: { $gte: periodStart } } }] : []),
+                {
+                    $group: {
+                        _id: null,
+                        totalTourists: { $sum: { $size: { $ifNull: ["$tourists", []] } } },
+                    },
+                },
+            ]),
+
+            // Previous period tourist count
+            previousPeriodStart && previousPeriodEnd
+                ? Trip.aggregate([
+                    { $match: { createdAt: { $gte: previousPeriodStart, $lt: previousPeriodEnd } } },
+                    {
+                        $group: {
+                            _id: null,
+                            totalTourists: { $sum: { $size: { $ifNull: ["$tourists", []] } } },
+                        },
+                    },
+                ])
+                : Promise.resolve([]),
+
+            // Tourists over time (for chart)
+            Trip.aggregate([
+                { $match: { createdAt: { $gte: chartDateStart } } },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$createdAt" },
+                            month: { $month: "$createdAt" },
+                        },
+                        tourists: { $sum: { $size: { $ifNull: ["$tourists", []] } } },
+                    },
+                },
+                { $sort: { "_id.year": 1, "_id.month": 1 } },
+            ]),
         ]);
 
         const monthNames = [
@@ -339,6 +402,20 @@ export async function GET(request: NextRequest) {
             : null;
         const respondedCount = avgResponseRaw?.count || 0;
 
+        // Cashback used
+        const cashbackUsedRaw = (cashbackUsedData as { totalUsed: number; count: number }[])[0];
+        const totalCashbackUsed = cashbackUsedRaw?.totalUsed || 0;
+        const cashbackUsedCount = cashbackUsedRaw?.count || 0;
+
+        // Tourists
+        const totalTourists = (totalTouristsData as { totalTourists: number }[])[0]?.totalTourists || 0;
+        const prevTourists = (prevTouristsData as { totalTourists: number }[])[0]?.totalTourists || 0;
+
+        const formattedTouristsOverTime = (touristsOverTimeData as { _id: { month: number; year: number }; tourists: number }[]).map((item) => ({
+            month: `${monthNames[item._id.month - 1]} ${item._id.year}`,
+            tourists: item.tourists,
+        }));
+
         return NextResponse.json(
             {
                 period,
@@ -355,6 +432,9 @@ export async function GET(request: NextRequest) {
                     collectionRate,
                     avgResponseTimeMinutes,
                     respondedCount,
+                    totalCashbackUsed,
+                    cashbackUsedCount,
+                    totalTourists,
                 },
                 comparison: previousPeriodStart ? {
                     trips: calcChange(totalTrips, prevTrips as number),
@@ -363,6 +443,7 @@ export async function GET(request: NextRequest) {
                     revenue: calcChange(revenue.totalRevenue, prevRevenue.totalRevenue),
                     paid: calcChange(revenue.totalPaid, prevRevenue.totalPaid),
                     avgTripValue: calcChange(Math.round(revenue.avgTripValue || 0), Math.round(prevRevenue.avgTripValue || 0)),
+                    tourists: calcChange(totalTourists, prevTourists),
                 } : null,
                 tripsByStatus,
                 tripsByCountry,
@@ -371,6 +452,7 @@ export async function GET(request: NextRequest) {
                 recentTrips,
                 topManagers,
                 conversionFunnel: funnelData,
+                touristsOverTime: formattedTouristsOverTime,
             },
             { headers: SECURITY_HEADERS }
         );
