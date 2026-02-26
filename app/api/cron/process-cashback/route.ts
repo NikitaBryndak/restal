@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import { REFERRAL_BONUS_REFERRER, REFERRAL_BONUS_REFEREE } from "@/config/constants";
+import { createNotification } from "@/lib/notifications";
+import { sendCashbackCreditedEmail } from "@/lib/email";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -79,6 +81,31 @@ export async function POST(request: Request) {
 
                 if (updatedUser) {
                     processedCount++;
+
+                    // Notify user about cashback credited
+                    try {
+                        await createNotification({
+                            userPhone: trip.ownerPhone,
+                            tripId: String(trip._id),
+                            tripNumber: trip.number,
+                            type: "status_change",
+                            message: `🎉 Кешбек +${(trip.cashbackAmount || 0).toLocaleString('uk-UA')} грн нараховано за подорож ${trip.number} (${trip.country})! Ваш баланс: ${(updatedUser.cashbackAmount || 0).toLocaleString('uk-UA')} грн`,
+                            data: { type: "cashback_credited", amount: trip.cashbackAmount },
+                        });
+                        // Send cashback email if user has email
+                        if (updatedUser.email) {
+                            await sendCashbackCreditedEmail({
+                                to: updatedUser.email,
+                                userName: updatedUser.name || "Шановний клієнт",
+                                tripNumber: trip.number,
+                                country: trip.country || "",
+                                cashbackAmount: trip.cashbackAmount || 0,
+                                newBalance: updatedUser.cashbackAmount || 0,
+                            });
+                        }
+                    } catch {
+                        // Notification/email failure is non-critical
+                    }
 
                     // --- Referral bonus processing ---
                     // If this user was referred and this is their first completed trip,

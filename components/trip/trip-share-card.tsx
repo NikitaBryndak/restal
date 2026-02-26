@@ -74,7 +74,7 @@ function CardScaler({ children }: { children: ReactNode }) {
         function calc() {
             if (!wrapperRef.current) return;
             const available = wrapperRef.current.parentElement?.clientWidth ?? 440;
-            const s = Math.min(1, (available - 16) / 440); // 16px breathing room
+            const s = Math.min(1, (available - 16) / 440);
             setScale(s);
         }
         calc();
@@ -128,7 +128,6 @@ export default function TripShareCard({
                 height: 780,
                 windowWidth: 440,
                 onclone: (_clonedDoc: Document, element: HTMLElement) => {
-                    // Remove parent scale transform so content fills the full 440×780 canvas
                     let el: HTMLElement | null = element.parentElement;
                     while (el) {
                         el.style.transform = "none";
@@ -176,7 +175,6 @@ export default function TripShareCard({
                 // User cancelled or error — fall through to download
             }
         }
-        // Fallback: download
         handleDownload();
     }, [generateImage, country, handleDownload]);
 

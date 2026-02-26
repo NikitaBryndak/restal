@@ -3,10 +3,20 @@ import Footer from "../components/navigation/Footer";
 import Navbar from "../components/navigation/Navbar";
 import "./globals.css";
 import { Spotlight } from "@/components/ui/spotlight-new";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BASE_URL } from "@/config/constants";
+import { PWARegistration } from "@/components/pwa/pwa-registration";
+import { OfflineBanner } from "@/components/pwa/offline-banner";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
+
+export const viewport: Viewport = {
+  themeColor: "#1e40af",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -60,7 +70,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/logo.png",
-    apple: "/logo.png",
+    apple: "/icons/icon-192x192.png",
+  },
+  manifest: "/manifest.json",
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
   verification: {
     // Add your verification codes here after setting up Google Search Console
@@ -86,7 +102,10 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Footer />
+          <OfflineBanner />
+          <InstallPrompt />
         </AuthProvider>
+        <PWARegistration />
         <Analytics />
         <SpeedInsights />
       </body>

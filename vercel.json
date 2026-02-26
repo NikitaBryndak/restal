@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/process-cashback",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/auto-status",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/promo-maintenance",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}

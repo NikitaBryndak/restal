@@ -42,7 +42,6 @@ export default function SettingsPage() {
     const notifications = {
         email: true,
         sms: true,
-        push: false,
         marketing: false
     };
     const theme = 'dark' as const;
@@ -378,8 +377,8 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        {/* Notifications Section (coming soon) */}
-                        <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden opacity-60">
+                        {/* Notifications Section */}
+                        <div className="backdrop-blur-sm bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden">
                             <div className="p-4 sm:p-6 border-b border-white/10">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center shrink-0">
@@ -389,11 +388,10 @@ export default function SettingsPage() {
                                         <h2 className="text-lg sm:text-xl font-bold text-white">Сповіщення</h2>
                                         <p className="text-xs sm:text-sm text-white/60">Налаштуйте способи отримання сповіщень</p>
                                     </div>
-                                    <span className="text-[10px] font-semibold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full shrink-0">Незабаром</span>
                                 </div>
                             </div>
-                            <div className="p-4 sm:p-6 space-y-4 pointer-events-none">
-                                <div className="flex items-center justify-between py-3 border-b border-white/10">
+                            <div className="p-4 sm:p-6 space-y-4">
+                                <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Mail className="w-5 h-5 text-white/60" />
                                         <div>
@@ -407,7 +405,7 @@ export default function SettingsPage() {
                                         <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.email ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between py-3 border-b border-white/10">
+                                <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Smartphone className="w-5 h-5 text-white/60" />
                                         <div>
@@ -421,18 +419,16 @@ export default function SettingsPage() {
                                         <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.sms ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between py-3">
+                                <div className="flex items-center justify-between py-3 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Bell className="w-5 h-5 text-white/60" />
                                         <div>
                                             <p className="font-medium text-white">Push-сповіщення</p>
-                                            <p className="text-sm text-white/60">Сповіщення в браузері</p>
+                                            <p className="text-sm text-white/60">Незабаром</p>
                                         </div>
                                     </div>
-                                    <div
-                                        className={`w-12 h-6 rounded-full ${notifications.push ? 'bg-accent' : 'bg-white/20'}`}
-                                    >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.push ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                    <div className="w-12 h-6 rounded-full bg-white/20">
+                                        <div className="w-5 h-5 rounded-full bg-white transform translate-x-0.5" />
                                     </div>
                                 </div>
                             </div>
