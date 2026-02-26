@@ -29,7 +29,7 @@ export default async function TripsPage(){
     ));
 
     return (
-        <div className="px-3 sm:px-6">
+        <div className="px-3 sm:px-6 pt-4 sm:pt-0">
             {tripCards.length ? <>{tripCards}</> : <p className="text-sm text-muted-foreground">У вас ще немає подорожей.</p>}
         </div>
     )

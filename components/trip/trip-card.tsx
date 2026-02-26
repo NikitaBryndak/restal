@@ -52,17 +52,14 @@ export default function TripCard({ data }: { data: Trip }) {
                 src={`/countryImages/${getCountryImageName(data.country)}.webp`}
                 alt={`Trip to ${data.country}`}
                 fill
-                sizes="(max-width: 768px) 0px, (max-width: 1280px) 100vw, 1280px"
-                className="object-cover hidden md:block"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="object-cover"
                 loading="lazy"
                 quality={75}
             />
 
-            {/* Glass Effect Overlay - desktop only (over image) */}
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm hidden md:block"></div>
-
-            {/* Mobile background gradient */}
-            <div className="absolute inset-0 bg-linear-to-br from-slate-900/95 to-slate-800/95 md:hidden"></div>
+            {/* Glass Effect Overlay */}
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm md:bg-black/40"></div>
 
             {/* Content Container */}
             <div className="relative md:absolute md:inset-0 flex flex-col md:flex-row md:items-stretch">
