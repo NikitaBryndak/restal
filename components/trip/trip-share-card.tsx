@@ -294,7 +294,7 @@ export default function TripShareCard({
                                         </div>
                                         <div className="flex-1 mx-4 flex items-center">
                                             <div className="flex-1 h-px" style={{ backgroundColor: `${palette.accent}40` }} />
-                                            <Plane className="w-4 h-4 mx-2 rotate-0" style={{ color: palette.accent }} />
+                                            <Plane className="w-4 h-4 mx-2 rotate-45" style={{ color: palette.accent }} />
                                             <div className="flex-1 h-px" style={{ backgroundColor: `${palette.accent}40` }} />
                                         </div>
                                         <div className="text-center">
