@@ -126,6 +126,15 @@ export default function TripShareCard({
                 logging: false,
                 width: 440,
                 height: 780,
+                windowWidth: 440,
+                onclone: (_clonedDoc: Document, element: HTMLElement) => {
+                    // Remove parent scale transform so content fills the full 440×780 canvas
+                    let el: HTMLElement | null = element.parentElement;
+                    while (el) {
+                        el.style.transform = "none";
+                        el = el.parentElement;
+                    }
+                },
             });
             return new Promise((resolve) => {
                 canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
