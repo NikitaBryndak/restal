@@ -15,7 +15,6 @@ import {
   Phone,
   CheckCircle,
   MapPin,
-  MessageCircle,
   Users,
   Heart,
   Percent,
@@ -184,15 +183,6 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
   return (
     <main className="relative overflow-x-hidden bg-black z-10">
 
-      {/* Floating contact button */}
-      <Link
-        href="/managers"
-        aria-label="Зв'язатися з менеджером"
-        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 bg-accent hover:bg-accent/90 text-white font-semibold rounded-full shadow-xl shadow-accent/30 transition-all hover:scale-105 active:scale-95 group"
-      >
-        <MessageCircle className="w-5 h-5" />
-        <span className="hidden sm:inline">Зв&apos;язатися з менеджером</span>
-      </Link>
       {/* ============================================================ */}
       {/*  HERO SECTION                                                 */}
       {/* ============================================================ */}
@@ -239,27 +229,63 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
             Від ідеї до посадки в літак — ми все візьмемо на себе.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* Quick-action buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.8 }}
-            className="flex flex-wrap justify-center gap-4 mt-2"
+            className="grid grid-cols-2 gap-3 sm:gap-4 mt-4 w-full max-w-2xl"
           >
-            <Link
-              href="/tour-screener#tour-widget"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-accent/25"
-            >
-              Підібрати тур
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/managers#managers"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl backdrop-blur-sm border border-white/20 transition-all hover:scale-105 active:scale-95"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Зв'язатися з менеджером
-            </Link>
+            {[
+              {
+                label: "Шукаю сам!",
+                desc: "Самостійний підбір туру",
+                href: "/tour-screener#tour-widget",
+                icon: Search,
+                iconColor: "text-sky-400",
+                border: "border-sky-400/30 hover:border-sky-400/60",
+              },
+              {
+                label: "Хочу пропозицію",
+                desc: "Менеджер підбере для вас",
+                href: "/contact",
+                icon: Sparkles,
+                iconColor: "text-amber-400",
+                border: "border-amber-400/30 hover:border-amber-400/60",
+              },
+              {
+                label: "Квитки та захист",
+                desc: "Авіаквитки й страхування",
+                href: "/info",
+                icon: Shield,
+                iconColor: "text-emerald-400",
+                border: "border-emerald-400/30 hover:border-emerald-400/60",
+              },
+              {
+                label: "Я вже з вами",
+                desc: "Увійти в кабінет",
+                href: "/login",
+                icon: Heart,
+                iconColor: "text-pink-400",
+                border: "border-pink-400/30 hover:border-pink-400/60",
+              },
+            ].map((btn) => (
+              <Link
+                key={btn.label}
+                href={btn.href}
+                className={`group flex items-center gap-3 px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-white/5 backdrop-blur-md border ${btn.border} transition-all hover:bg-white/10 hover:scale-[1.03] active:scale-95`}
+              >
+                <btn.icon className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 ${btn.iconColor}`} />
+                <div className="text-left min-w-0">
+                  <span className="block text-white font-semibold text-sm sm:text-base leading-tight">
+                    {btn.label}
+                  </span>
+                  <span className="block text-white/40 text-[11px] sm:text-xs mt-0.5 leading-tight">
+                    {btn.desc}
+                  </span>
+                </div>
+              </Link>
+            ))}
           </motion.div>
 
           {/* Trust badges */}

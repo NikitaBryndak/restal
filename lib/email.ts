@@ -218,7 +218,7 @@ export async function sendTripReminderEmail(data: TripReminderEmail) {
           </table>
           <div style="background: #0f172a; border-radius: 8px; padding: 12px; margin-top: 16px;">
             <p style="color: #94a3b8; font-size: 13px; margin: 0; line-height: 1.6;">
-              📋 <strong style="color: #e2e8f0;">Не забудьте:</strong> паспорт, квитки, страховий поліс, ваучер на готель. 
+              📋 <strong style="color: #e2e8f0;">Не забудьте:</strong> паспорт, квитки, страховий поліс, ваучер на готель.
               Все необхідне ви знайдете у розділі документів вашої подорожі.
             </p>
           </div>
