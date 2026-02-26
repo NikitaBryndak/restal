@@ -288,25 +288,20 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
             ))}
           </motion.div>
 
-          {/* Trust badges */}
+          {/* Phone Number */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
-            className="flex flex-wrap justify-center gap-6 mt-6 text-white/60 text-sm"
+            className="mt-6"
           >
-            <span className="flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4 text-accent" />
-              Ліцензовано
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              4.9 рейтинг
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Headphones className="w-4 h-4 text-accent" />
-              Підтримка 24/7
-            </span>
+            <a
+              href="tel:+380687772550"
+              className="flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors text-sm sm:text-base font-medium group"
+            >
+              <Phone className="w-4 h-4 text-accent group-hover:scale-110 transition-transform" />
+              +38 068 777 25 50
+            </a>
           </motion.div>
         </div>
 
@@ -622,6 +617,14 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
                 Підібрати тур самостійно
                 <ArrowRight className="w-5 h-5" />
               </Link>
+            </div>
+
+            <div className="mt-8">
+              <p className="text-white/50 text-sm mb-2">Або зателефонуйте нам:</p>
+              <a href="tel:+380687772550" className="text-2xl md:text-3xl font-bold text-white hover:text-accent transition-colors inline-flex items-center gap-3">
+                <Phone className="w-6 h-6 text-accent" />
+                +38 068 777 25 50
+              </a>
             </div>
           </FadeIn>
         </div>
