@@ -32,7 +32,7 @@ export default function TripCard({ data }: { data: Trip }) {
 
     const outdatedTrip = tripEnd < new Date();
 
-    const rootClass = `w-full h-auto md:h-84 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
+    const rootClass = `w-full h-auto md:min-h-80 mb-6 rounded-xl overflow-hidden relative ${outdatedTrip ? 'cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02] transition-transform'}`;
 
     // Get main documents (non-ticket) count
     const mainDocKeys = ['contract', 'invoice', 'confirmation', 'voucher', 'insurancePolicy', 'tourProgram', 'memo'];
@@ -52,8 +52,10 @@ export default function TripCard({ data }: { data: Trip }) {
                 src={`/countryImages/${getCountryImageName(data.country)}.webp`}
                 alt={`Trip to ${data.country}`}
                 fill
-                sizes="(max-width: 768px) 0px, 100vw"
+                sizes="(max-width: 768px) 0px, (max-width: 1280px) 100vw, 1280px"
                 className="object-cover hidden md:block"
+                loading="lazy"
+                quality={75}
             />
 
             {/* Glass Effect Overlay - desktop only (over image) */}
@@ -124,15 +126,15 @@ export default function TripCard({ data }: { data: Trip }) {
                                         {data.hotel.nights}
                                     </span>
                                 </div>
-                                <p className="text-xs sm:text-sm font-bold leading-tight pl-3">{data.hotel.name}</p>
-                                <div className="space-y-1 text-white/75 text-xs pl-3">
-                                    <p className="flex justify-between">
-                                        <span className="text-white/60">C-i:</span>
-                                        <span className="font-medium">{data.hotel.checkIn}</span>
+                                <p className="text-xs sm:text-sm font-bold leading-tight pl-3 wrap-break-word">{data.hotel.name}</p>
+                                <div className="space-y-1 text-white/75 text-xs pl-3 min-w-0">
+                                    <p className="flex justify-between gap-1">
+                                        <span className="text-white/60 shrink-0">С-:</span>
+                                        <span className="font-medium truncate">{data.hotel.checkIn}</span>
                                     </p>
-                                    <p className="flex justify-between">
-                                        <span className="text-white/60">C-o:</span>
-                                        <span className="font-medium">{data.hotel.checkOut}</span>
+                                    <p className="flex justify-between gap-1">
+                                        <span className="text-white/60 shrink-0">До:</span>
+                                        <span className="font-medium truncate">{data.hotel.checkOut}</span>
                                     </p>
                                     <div className="pt-1 border-t border-white/10 mt-2">
                                         <p className="flex justify-between">

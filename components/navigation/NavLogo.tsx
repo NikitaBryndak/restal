@@ -7,13 +7,15 @@ export default function NavLogo(data: {className?: string}) {
     return (
         <Link href="/" className={fullClassName}>
             <Image
-                width={512}
-                height={512}
+                width={40}
+                height={40}
                 src="/logo.png"
                 alt="RestAL Logo"
-                className="w-10 h-10 object-contain"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                sizes="40px"
+                priority
             />
-            <h1 className="text-3xl font-bold tracking-tight font-logo">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-logo">
                 RestAL
             </h1>
         </Link>

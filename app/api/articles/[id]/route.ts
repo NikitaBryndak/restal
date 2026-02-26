@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { MANAGER_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 export async function GET(
     request: NextRequest,
@@ -50,7 +51,9 @@ export async function GET(
             updatedAt: foundArticle.updatedAt ? new Date(foundArticle.updatedAt).toISOString() : null,
         };
 
-        return NextResponse.json({ article: sanitizedArticle });
+        const response = NextResponse.json({ article: sanitizedArticle });
+        response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+        return response;
     } catch (e) {
         console.error("Error in GET /api/articles/[id]:", e);
         return NextResponse.json(
@@ -121,6 +124,14 @@ export async function PUT(
             return NextResponse.json({ message: "Article not found" }, { status: 404 });
         }
 
+        logAudit({
+            action: "article.updated",
+            entityType: "article",
+            entityId: resolvedParams.id,
+            userId: session.user.phoneNumber,
+            details: { fields: Object.keys(updateData) },
+        });
+
         return NextResponse.json({ message: "Article updated successfully", article: updatedArticle }, { status: 200 });
     } catch (error) {
         console.error("Error updating article:", error);
@@ -158,6 +169,14 @@ export async function DELETE(
         if (!deletedArticle) {
             return NextResponse.json({ message: "Article not found" }, { status: 404 });
         }
+
+        logAudit({
+            action: "article.deleted",
+            entityType: "article",
+            entityId: resolvedParams.id,
+            userId: session.user.phoneNumber,
+            details: { title: (deletedArticle as any).title },
+        });
 
         return NextResponse.json({ message: "Article deleted successfully" }, { status: 200 });
     } catch (error) {

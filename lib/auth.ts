@@ -4,6 +4,7 @@ import type { Credential } from "@/types";
 import User from "@/models/user";
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 interface MongoUser {
     _id: { toString: () => string };
@@ -19,8 +20,15 @@ export const authOptions: AuthOptions = {
             credentials: {},
             async authorize(credentials) {
                 try {
-                    await connectToDatabase();
                     const { phoneNumber, password } = credentials as Credential;
+
+                    // SECURITY: Rate limit login attempts per phone number
+                    const rateLimitResult = checkRateLimit("login", phoneNumber, 10, 15 * 60 * 1000);
+                    if (!rateLimitResult.allowed) {
+                        throw new Error("Забагато спроб входу. Спробуйте через 15 хвилин.");
+                    }
+
+                    await connectToDatabase();
                     const user = await User.findOne({ phoneNumber }).lean() as MongoUser | null;
 
                     if (!user) {

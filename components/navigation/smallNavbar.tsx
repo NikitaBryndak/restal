@@ -107,14 +107,20 @@ export default function SmallNavbar({ userProfile }: { userProfile: UserProfile 
                                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                                 Admin
                                             </h3>
-                                            <NavLink href="/dashboard/add-article" onClick={toggleMobileMenu} className="text-lg">
-                                                Додати статтю
+                                            <NavLink href="/dashboard/analytics" onClick={toggleMobileMenu} className="text-lg">
+                                                Аналітика
                                             </NavLink>
                                             <NavLink href="/dashboard/manage-articles" onClick={toggleMobileMenu} className="text-lg">
                                                 Керування статтями
                                             </NavLink>
-                                            <NavLink href="/dashboard/analytics" onClick={toggleMobileMenu} className="text-lg">
-                                                Аналітика
+                                            <NavLink href="/dashboard/add-article" onClick={toggleMobileMenu} className="text-lg">
+                                                Додати статтю
+                                            </NavLink>
+                                            <NavLink href="/dashboard/manager-performance" onClick={toggleMobileMenu} className="text-lg">
+                                                Менеджери
+                                            </NavLink>
+                                            <NavLink href="/dashboard/audit-log" onClick={toggleMobileMenu} className="text-lg">
+                                                Журнал дій
                                             </NavLink>
                                         </div>
                                     )}

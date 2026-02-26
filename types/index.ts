@@ -137,6 +137,7 @@ export type Trip = {
   managerName?: string;
   cashbackProcessed?: boolean;
   cashbackAmount?: number;
+  shareToken?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

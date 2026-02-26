@@ -11,6 +11,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Cache static assets (country images, logos) for 30 days
+        source: "/countryImages/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=2592000, immutable",
+          },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           {

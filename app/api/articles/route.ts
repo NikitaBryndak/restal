@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Counter from "@/models/counter";
 import { MANAGER_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 export async function GET() {
     try {
@@ -27,7 +28,10 @@ export async function GET() {
              };
          });
 
-        return NextResponse.json({ articles: serializedArticles }, { status: 200 });
+        const response = NextResponse.json({ articles: serializedArticles }, { status: 200 });
+        // Cache publicly for 60s at CDN, serve stale for 5min while revalidating
+        response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+        return response;
     } catch {
         return NextResponse.json({ message: "Error fetching articles" }, { status: 500 });
     }
@@ -92,6 +96,14 @@ export async function POST(request: Request) {
         if (!created) {
             return NextResponse.json({ message: 'Failed to create article' }, { status: 500 });
         }
+
+        logAudit({
+            action: "article.created",
+            entityType: "article",
+            entityId: created._id.toString(),
+            userId: session.user.phoneNumber,
+            details: { title: toCreate.title, articleID },
+        });
 
         return NextResponse.json({ article: created }, { status: 201 });
     } catch {

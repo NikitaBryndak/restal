@@ -87,6 +87,14 @@ export default function SubDashboardNavbar() {
                             <NavLink href="/dashboard/analytics" className={NAV_ITEM_CLASS}>
                                 Аналітика
                             </NavLink>
+
+                            <NavLink href="/dashboard/manager-performance" className={NAV_ITEM_CLASS}>
+                                Менеджери
+                            </NavLink>
+
+                            <NavLink href="/dashboard/audit-log" className={NAV_ITEM_CLASS}>
+                                Журнал дій
+                            </NavLink>
                         </div>
                     )}
 

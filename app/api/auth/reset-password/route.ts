@@ -1,12 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
+import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    // SECURITY: Rate limit reset-password to prevent OTP brute-force
+    const ip = getServerIp(req);
+    const rateLimitResult = checkRateLimit("reset-password", ip, 5, 15 * 60 * 1000);
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { message: "Забагато спроб. Спробуйте пізніше." },
+        { status: 429 }
+      );
+    }
+
     const { phoneNumber, otp, password } = await req.json();
 
     if (!phoneNumber || !otp || !password) {

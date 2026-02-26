@@ -297,6 +297,9 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
             src="/login-bg.jpg"
             alt="Travel"
             className="absolute inset-0 w-full h-full object-cover"
+            sizes="55vw"
+            priority
+            quality={80}
           />
           <div className="absolute inset-0 backdrop-blur-[1px]" />
           <div className="relative z-10 p-12 h-full flex flex-col justify-end">

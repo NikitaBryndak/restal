@@ -7,6 +7,7 @@ import User from "@/models/user";
 import mongoose from "mongoose";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 import { sendContactRequestNotification } from "@/lib/email";
+import { logAudit } from "@/lib/audit";
 
 // Rate limit: max 5 requests per IP per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -212,6 +213,14 @@ export async function PUT(request: NextRequest) {
         if (!updated) {
             return NextResponse.json({ message: "Запит не знайдено" }, { status: 404 });
         }
+
+        logAudit({
+            action: "contact-request.updated",
+            entityType: "contact-request",
+            entityId: id,
+            userId: session.user.phoneNumber,
+            details: { status: updateData.status, adminNote: updateData.adminNote ? "updated" : undefined },
+        });
 
         return NextResponse.json({ message: "Оновлено", request: updated });
     } catch (error) {

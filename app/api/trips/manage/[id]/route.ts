@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
@@ -234,6 +235,19 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
                 }
             }
         }
+
+        logAudit({
+            action: existingTrip.status !== updates.status ? "trip.status_changed" : "trip.updated",
+            entityType: "trip",
+            entityId: existingTrip._id.toString(),
+            userId: session.user.phoneNumber,
+            userName: currentManager?.name || "",
+            details: {
+                number: existingTrip.number,
+                ...(existingTrip.status !== updates.status && { oldStatus: existingTrip.status, newStatus: updates.status }),
+                fields: Object.keys(rest),
+            },
+        });
 
         return NextResponse.json({ trip: updatedTrip }, { status: 200 });
     } catch {

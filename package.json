@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "flags": "^4.0.3",
+    "html2canvas-pro": "^2.0.1",
     "isomorphic-dompurify": "^2.35.0",
     "lucide-react": "^0.543.0",
     "mongodb": "^7.0.0",

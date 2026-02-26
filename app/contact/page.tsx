@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,8 @@ const trustBadges = [
 /*  PAGE                                                               */
 /* ================================================================== */
 export default function ContactPage() {
+   const searchParams = useSearchParams();
+
    const [firstName, setFirstName] = useState("");
    const [lastName, setLastName] = useState("");
    const [phone, setPhone] = useState("");
@@ -79,6 +82,21 @@ export default function ContactPage() {
    const [submitting, setSubmitting] = useState(false);
    const [success, setSuccess] = useState(false);
    const [error, setError] = useState<string | null>(null);
+
+   // Prefill from query params (e.g. from "Book again" button)
+   useEffect(() => {
+      const country = searchParams.get("country");
+      const region = searchParams.get("region");
+      const prefillMsg = searchParams.get("message");
+      if (prefillMsg) {
+         setMessage(prefillMsg);
+      } else if (country) {
+         const parts = [`Хочу повторно відвідати ${country}`];
+         if (region) parts[0] += ` (${region})`;
+         parts.push("Прошу підібрати подібний тур.");
+         setMessage(parts.join(". "));
+      }
+   }, [searchParams]);
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();

@@ -6,6 +6,7 @@ import PromoCode from "@/models/promoCode";
 import User from "@/models/user";
 import crypto from "crypto";
 import { UNAMBIGUOUS_CHARS, MAX_CODE_GEN_RETRIES, MIN_PROMO_AMOUNT, MAX_PROMO_AMOUNT, PROMO_CODE_EXPIRY_DAYS } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 // Generate a unique promo code string
 function generateCode(): string {
@@ -105,6 +106,15 @@ export async function POST(request: Request) {
             ownerName: user.name,
             status: "active",
             expiresAt,
+        });
+
+        logAudit({
+            action: "promo-code.created",
+            entityType: "promo-code",
+            entityId: promoCode._id.toString(),
+            userId: session.user.phoneNumber,
+            userName: user.name,
+            details: { code, amount: numericAmount },
         });
 
         return NextResponse.json({

@@ -4,6 +4,7 @@ import Trip from "@/models/trip";
 import User from "@/models/user";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL, PHONE_REGEX } from '@/config/constants';
 
 // Validate required trip fields
@@ -191,6 +192,15 @@ export async function POST(request: Request) {
 
         const newTrip = new Trip(payload);
         await newTrip.save();
+
+        logAudit({
+            action: "trip.created",
+            entityType: "trip",
+            entityId: newTrip._id.toString(),
+            userId: session.user.phoneNumber,
+            userName: currentManager?.name,
+            details: { number: body.number, country: body.country, ownerPhone: sanitizedOwnerPhone },
+        });
 
         // NOTE: Cashback is now added one day after the tour ends (tripEndDate)
         // This is handled by the /api/cron/process-cashback endpoint

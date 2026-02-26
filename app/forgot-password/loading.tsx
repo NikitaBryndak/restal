@@ -1,5 +1,5 @@
-import { PageSkeleton } from "@/components/ui/skeleton";
+import { AuthFormSkeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
-  return <PageSkeleton />;
+  return <AuthFormSkeleton />;
 }

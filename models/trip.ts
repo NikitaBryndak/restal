@@ -232,6 +232,12 @@ const tripSchema = new Schema({
     cashbackAmount: {
         type: Number,
         default: 0,
+    },
+    // Share token for public trip view
+    shareToken: {
+        type: String,
+        default: "",
+        index: true,
     }
 }, { timestamps: true });
 

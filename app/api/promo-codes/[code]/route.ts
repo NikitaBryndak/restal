@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import PromoCode from "@/models/promoCode";
 import User from "@/models/user";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 // GET - Validate a promo code (manager only)
 export async function GET(
@@ -141,6 +142,15 @@ export async function POST(
                 { status: 400 }
             );
         }
+
+        logAudit({
+            action: "promo-code.redeemed",
+            entityType: "promo-code",
+            entityId: promoCode._id.toString(),
+            userId: session.user.phoneNumber,
+            userName: manager.name,
+            details: { code: promoCode.code, amount: promoCode.amount, ownerPhone: promoCode.ownerPhone },
+        });
 
         return NextResponse.json({
             message: "Код успішно використано",

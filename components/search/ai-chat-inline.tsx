@@ -123,11 +123,11 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
   };
 
   const quickQuestions = [
+    { emoji: "🧳", text: "Спланувати подорож" },
     { emoji: "🏖️", text: "Куди поїхати на пляж?" },
     { emoji: "🔥", text: "Гарячі тури" },
     { emoji: "✈️", text: "Найкращі напрямки" },
     { emoji: "💰", text: "Бюджетний відпочинок" },
-    { emoji: "🏔️", text: "Активний відпочинок" },
     { emoji: "👨‍👩‍👧‍👦", text: "Відпочинок з дітьми" },
   ];
 

@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import RecentlyViewed from "@/components/trip/recently-viewed";
 
 function getGreeting(): string {
     const hour = new Date().getHours();
@@ -105,6 +106,11 @@ export default function DashboardPage() {
                         </Link>
                     ))}
                 </div>
+            </div>
+
+            {/* Recently Viewed Trips */}
+            <div className={`transition-all duration-700 delay-150 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                <RecentlyViewed />
             </div>
 
             {/* Manager Section */}

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
     try {
@@ -13,6 +14,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 message: "Неавторизовано"
             }, { status: 401 });
+        }
+
+        // SECURITY: Rate limit username changes
+        const rateLimitResult = checkRateLimit("change-username", session.user.phoneNumber, 5, 15 * 60 * 1000);
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json({
+                message: "Забагато спроб. Спробуйте пізніше."
+            }, { status: 429 });
         }
 
         const body = await request.json();
