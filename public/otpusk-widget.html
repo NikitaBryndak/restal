@@ -6,7 +6,7 @@
   <title>Пошук турів — RestAL</title>
   <script>
     var osGeo = '';
-    var osDefaultDeparture = 2025;
+    var osDefaultDeparture = 1831;
     var osDefaultDuration = '';
     var osDateFrom = '';
     var osDateTo = '';
@@ -513,6 +513,13 @@
       display: none !important;
     }
 
+    /* Hide days in parentheses in date modal table headers too */
+    body .new_t-date-modal-table th .new_t-date-modal-days,
+    body .new_t-date-modal-table th small,
+    body .new_t-date-modal-table th .days {
+      display: none !important;
+    }
+
     /* === CLEAR FILTERS BUTTON === */
     body .new_f-ext-clear-btn {
       color: #0fa4e6 !important;
@@ -952,7 +959,7 @@
       color: #0fa4e6 !important;
     }
 
-    /* Reviews tab */
+    /* Reviews tab — hide when empty */
     body .new_t-tab-content.reviews .new_t-tab-content-body {
       background-color: transparent !important;
     }
@@ -965,6 +972,23 @@
 
     /* Map */
     body .new_t-map-wrapper {
+      background-color: #1a1a1a !important;
+    }
+    body .new_t-map-wrapper * {
+      background-color: transparent !important;
+    }
+    body .new_t-map-wrapper .gm-style,
+    body .new_t-map-wrapper .gm-style > div,
+    body .new_t-map-wrapper iframe {
+      background-color: #1a1a1a !important;
+    }
+    body .new_t-map-wrapper .gm-style-cc,
+    body .new_t-map-wrapper .gmnoprint,
+    body .new_t-map-wrapper .gm-control-active {
+      background-color: rgba(26, 26, 26, 0.8) !important;
+    }
+    body .new_t-tab-content.map,
+    body .new_t-tab-content.map .new_t-tab-content-body {
       background-color: #1a1a1a !important;
     }
     body .new_map-infowindow-price {
@@ -1386,26 +1410,7 @@
         max-height: none !important;
       }
 
-      /* Collapsed state: hide extended search options when search is clicked */
-      body.ext-collapsed .new_f-ext-container,
-      body.ext-collapsed .new_f-ext-body,
-      body.ext-collapsed div[class*="ext-container"],
-      body.ext-collapsed div[class*="ext-body"],
-      body.ext-collapsed .new_f-ext-wrap,
-      body.ext-collapsed .os-form-advanced,
-      body.ext-collapsed .os-form .advanced,
-      body.ext-collapsed .os-form-ext,
-      body.ext-collapsed .os-form-extra,
-      body.ext-collapsed .os-form-more,
-      body.ext-collapsed .os-form-toggle + div,
-      body.ext-collapsed .os-form-toggle + fieldset {
-        display: none !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        max-height: 0 !important;
-      }
+      /* Collapsed state removed — advanced search visibility managed by widget toggle only */
     }
   </style>
 </head>
@@ -1557,48 +1562,7 @@
 
     })();
 
-    // Collapse extended search options when the search button is clicked
-    (function() {
-      function attachSearchCollapse() {
-        var searchBtn = document.querySelector(
-          'button[type="submit"], input[type="submit"], .new_f-submit, .new_f-search-btn, ' +
-          '[class*="submit"], [class*="search-btn"], .os-form button, .os-form input[type="submit"]'
-        );
-
-        if (!searchBtn) {
-          // Also try finding by text content
-          var btns = document.querySelectorAll('button, input[type="submit"], a.btn, [role="button"]');
-          for (var i = 0; i < btns.length; i++) {
-            var txt = (btns[i].textContent || btns[i].value || '').trim().toLowerCase();
-            if (txt === 'знайти' || txt === 'пошук' || txt === 'найти' || txt === 'поиск' || txt === 'search') {
-              searchBtn = btns[i];
-              break;
-            }
-          }
-        }
-
-        if (searchBtn && !searchBtn._collapseAttached) {
-          searchBtn._collapseAttached = true;
-          searchBtn.addEventListener('click', function() {
-            document.body.classList.add('ext-collapsed');
-          });
-          return true;
-        }
-        return false;
-      }
-
-      // Observe DOM for widget load, then attach
-      var obs2 = new MutationObserver(function() {
-        if (attachSearchCollapse()) {
-          setTimeout(function() { obs2.disconnect(); }, 2000);
-        }
-      });
-      obs2.observe(document.body, { childList: true, subtree: true });
-
-      [500, 1000, 2000, 4000, 8000].forEach(function(t) {
-        setTimeout(attachSearchCollapse, t);
-      });
-    })();
+    // Search collapse removed — let widget handle advanced search toggle natively
   </script>
   <script>
     // Fix inline styles: override white backgrounds & dark text for dark theme
@@ -1706,6 +1670,72 @@
         setTimeout(fixStyles, t);
       });
       setInterval(fixStyles, 3000);
+    })();
+  </script>
+  <script>
+    // Hide "(X днів)" text from date modal table headers
+    (function() {
+      function stripDaysFromHeaders() {
+        var headers = document.querySelectorAll('.new_t-date-modal-table th, .new_t-modal-table th');
+        headers.forEach(function(th) {
+          // Remove "(X днів)" or "(X дні)" patterns from text nodes
+          var walker = document.createTreeWalker(th, NodeFilter.SHOW_TEXT, null, false);
+          while (walker.nextNode()) {
+            var node = walker.currentNode;
+            if (/\(\d+\s*дн[іiв]+\)/.test(node.textContent)) {
+              node.textContent = node.textContent.replace(/\s*\(\d+\s*дн[іiв]+\)/g, '');
+            }
+          }
+        });
+      }
+
+      if (window.MutationObserver) {
+        new MutationObserver(function() {
+          requestAnimationFrame(stripDaysFromHeaders);
+        }).observe(document.body, { childList: true, subtree: true });
+      }
+      [500, 1000, 2000, 4000].forEach(function(t) { setTimeout(stripDaysFromHeaders, t); });
+    })();
+
+    // Hide empty Reviews/Відгуки tab
+    (function() {
+      function hideEmptyReviewsTab() {
+        // Find all tab menu items
+        var tabItems = document.querySelectorAll('.new_t-tab-menu-item, [class*="tab-menu"] a, [class*="tab-menu"] li');
+        tabItems.forEach(function(item) {
+          var text = (item.textContent || '').trim().toLowerCase();
+          if (text === 'відгуки' || text === 'отзывы' || text === 'reviews') {
+            // Check if the corresponding tab content is empty
+            var tabId = item.getAttribute('data-tab') || item.getAttribute('href') || '';
+            var tabContent = null;
+            if (tabId) {
+              tabContent = document.querySelector('.new_t-tab-content.reviews, .new_t-tab-content[data-tab="reviews"], ' + tabId);
+            }
+            // Also try finding the reviews content panel by class
+            if (!tabContent) {
+              tabContent = document.querySelector('.new_t-tab-content.reviews');
+            }
+            var isEmpty = !tabContent ||
+              !tabContent.querySelector('.new_t-rating-tab-container, .review-item, [class*="review"], [class*="rating-tab"]') ||
+              (tabContent.querySelector('.new_t-rating-tab-container') && tabContent.querySelector('.new_t-rating-tab-container').children.length === 0);
+
+            // Also check if turpravda iframe/content loaded with no reviews
+            var hasContent = tabContent && tabContent.textContent && tabContent.textContent.trim().length > 50;
+
+            if (!hasContent) {
+              item.style.setProperty('display', 'none', 'important');
+              if (tabContent) tabContent.style.setProperty('display', 'none', 'important');
+            }
+          }
+        });
+      }
+
+      if (window.MutationObserver) {
+        new MutationObserver(function() {
+          requestAnimationFrame(hideEmptyReviewsTab);
+        }).observe(document.body, { childList: true, subtree: true });
+      }
+      [1000, 2000, 4000, 8000].forEach(function(t) { setTimeout(hideEmptyReviewsTab, t); });
     })();
   </script>
   <script>
