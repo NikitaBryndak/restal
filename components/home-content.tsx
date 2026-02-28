@@ -256,7 +256,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
               {
                 label: "Квитки та захист",
                 desc: "Авіаквитки й страхування",
-                href: "/info",
+                href: "/info?tag=Послуги",
                 icon: Shield,
                 iconColor: "text-emerald-400",
                 border: "border-emerald-400/30 hover:border-emerald-400/60",

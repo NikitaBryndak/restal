@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
@@ -39,8 +40,12 @@ const infoBadges = [
 /* ================================================================== */
 /*  PAGE                                                               */
 /* ================================================================== */
-export default function InfoPage() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+function InfoPageInner() {
+  const searchParams = useSearchParams();
+  const tagFromUrl = searchParams.get("tag");
+  const [selectedCategory, setSelectedCategory] = useState(
+    tagFromUrl && categories.includes(tagFromUrl) ? tagFromUrl : "All"
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -301,7 +306,7 @@ export default function InfoPage() {
               {/* Decorative top gradient bar */}
               <div className="h-px w-full bg-linear-to-r from-transparent via-accent/50 to-transparent" />
 
-              <div className="p-4 sm:p-6" style={{ WebkitOverflowScrolling: 'touch', overflow: 'auto' }}>
+              <div className="p-4 sm:p-6" style={{ overflow: 'hidden' }}>
                 <iframe
                   ref={iframeRef}
                   src="/otpusk-top-countries.html"
@@ -322,5 +327,13 @@ export default function InfoPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function InfoPage() {
+  return (
+    <Suspense>
+      <InfoPageInner />
+    </Suspense>
   );
 }
