@@ -99,7 +99,7 @@ const managers = [
     color: "bg-emerald-600",
     hoverGlow: "group-hover:shadow-emerald-500/15",
     initials: "ІС",
-    specialties: ["Авіаквитки", "Страхування"],
+    specialties: ["Туреччина", "Болгарія", "Хорватія"],
   },
   {
     name: "Юлія Свідницька",
@@ -112,7 +112,7 @@ const managers = [
     color: "bg-purple-600",
     hoverGlow: "group-hover:shadow-purple-500/15",
     initials: "ЮС",
-    specialties: ["Екзотика", "All Inclusive"],
+    specialties: ["Чорногорія", "Іспанія", "Єгипет"],
   },
   {
     name: "Юлія Левадна",
