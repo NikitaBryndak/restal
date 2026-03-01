@@ -377,7 +377,7 @@ export default function ContactPage() {
 
                            <FormInput
                               labelText="Телефон"
-                              placeholder="+38 (XXX) XXX-XXXX"
+                              placeholder="+380XXXXXXXXX"
                               value={phone}
                               onChange={(e) => setPhone(e.target.value)}
                               containerClassName="space-y-1.5"

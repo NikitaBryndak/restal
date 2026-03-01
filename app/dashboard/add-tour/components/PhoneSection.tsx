@@ -46,7 +46,7 @@ export const PhoneSection = ({
             <div className="max-w-md">
                 <FormInput
                     labelText="Номер телефону клієнта"
-                    placeholder="напр. +380 (50) 000-0000"
+                    placeholder="напр. +380XXXXXXXXXX"
                     type="tel"
                     autoComplete="off"
                     formatType="phone"
