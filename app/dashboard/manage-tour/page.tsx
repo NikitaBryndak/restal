@@ -351,7 +351,7 @@ export default function ManageTourPage() {
                 return prev;
             }
 
-            if (field === 'country' || field === 'region') {
+            if (field === 'number' || field === 'country' || field === 'region') {
                 return {
                     ...prev,
                     [field]: value,
@@ -736,6 +736,7 @@ export default function ManageTourPage() {
                                 <BasicDetailsSection
                                     variant="edit"
                                     values={{
+                                        number: trip.number,
                                         country: trip.country,
                                         region: trip.region,
                                         tripStartDate: trip.tripStartDate,
@@ -744,7 +745,6 @@ export default function ManageTourPage() {
                                     onChange={handleBasicFieldChange}
                                     showHotelNights={false}
                                     showMealPlan={false}
-                                    showNumber={false}
                                     title="Напрямок"
                                     description="Оновіть куди і коли вирушають подорожуючі."
                                 />
