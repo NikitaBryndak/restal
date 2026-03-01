@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
+import Image from "next/image";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import FadeIn from "@/components/ui/fade-in";
@@ -85,6 +86,7 @@ const managers = [
     workingDays: [1, 2, 3, 4, 5, 6],
     color: "bg-cyan-600",
     hoverGlow: "group-hover:shadow-cyan-500/15",
+    photo: "/managers/OlenaB.jpg",
     initials: "ОБ",
     specialties: ["VIP", "Преміум", "Лідер"],
   },
@@ -98,6 +100,7 @@ const managers = [
     workingDays: [1, 2, 4, 5, 6],
     color: "bg-emerald-600",
     hoverGlow: "group-hover:shadow-emerald-500/15",
+    photo: "/managers/IrinaS.jpg",
     initials: "ІС",
     specialties: ["Туреччина", "Болгарія", "Хорватія"],
   },
@@ -111,6 +114,7 @@ const managers = [
     workingDays: [1, 2, 3, 4, 0],
     color: "bg-purple-600",
     hoverGlow: "group-hover:shadow-purple-500/15",
+    photo: "/managers/YuliaS.jpg",
     initials: "ЮС",
     specialties: ["Чорногорія", "Іспанія", "Єгипет"],
   },
@@ -124,6 +128,7 @@ const managers = [
     workingDays: [3, 4, 5, 6, 0],
     color: "bg-amber-600",
     hoverGlow: "group-hover:shadow-amber-500/15",
+    photo: "/managers/YuliaL.jpg",
     initials: "ЮЛ",
     specialties: ["Сімейні", "Автобусні тури"],
   },
@@ -384,8 +389,18 @@ export default function ManagersContent() {
                       {/* Left side for featured / header for regular */}
                       <div className={`${isFeatured ? 'md:w-1/3 flex flex-col items-center md:items-start gap-3 shrink-0' : 'flex items-start gap-4'}`}>
                         {/* Avatar */}
-                        <div className={`${isFeatured ? 'w-20 h-20 text-2xl rounded-3xl' : 'w-14 h-14 text-lg rounded-2xl'} ${manager.color} flex items-center justify-center text-white font-bold shrink-0 group-hover:scale-105 transition-transform duration-300 ${isAI ? 'ring-2 ring-accent/30 ring-offset-2 ring-offset-black' : ''}`}>
-                          {manager.initials}
+                        <div className={`${isFeatured ? 'w-20 h-20 text-2xl rounded-3xl' : 'w-14 h-14 text-lg rounded-2xl'} ${manager.color} flex items-center justify-center text-white font-bold shrink-0 group-hover:scale-105 transition-transform duration-300 overflow-hidden ${isAI ? 'ring-2 ring-accent/30 ring-offset-2 ring-offset-black' : ''}`}>
+                          {'photo' in manager && manager.photo ? (
+                            <Image
+                              src={manager.photo}
+                              alt={manager.name}
+                              width={isFeatured ? 80 : 56}
+                              height={isFeatured ? 80 : 56}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            manager.initials
+                          )}
                         </div>
 
                         <div className={`${isFeatured ? 'text-center md:text-left' : ''} flex-1 min-w-0`}>

@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, RotateCcw, Copy, Check, LayoutDashboard } from 'lucide-react';
+import { AlertTriangle, RotateCcw, Copy, Check, Home } from 'lucide-react';
 
-export default function DashboardError({
+export default function Error({
     error,
     reset,
 }: {
@@ -13,12 +13,12 @@ export default function DashboardError({
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        console.error('[Dashboard Error]', error);
+        console.error('[App Error]', error);
     }, [error]);
 
     const handleCopy = () => {
         const text = [
-            `Помилка (Dashboard): ${error?.message ?? 'Невідома помилка'}`,
+            `Помилка: ${error?.message ?? 'Невідома помилка'}`,
             `Час: ${new Date().toLocaleString('uk-UA')}`,
             `URL: ${typeof window !== 'undefined' ? window.location.href : ''}`,
             `Digest: ${error?.digest ?? 'N/A'}`,
@@ -34,16 +34,16 @@ export default function DashboardError({
     };
 
     return (
-        <div className="min-h-[50vh] flex items-center justify-center p-4">
+        <div className="min-h-[60vh] flex items-center justify-center p-4">
             <div className="w-full max-w-lg rounded-2xl border border-red-500/20 bg-red-500/5 p-6 sm:p-8 backdrop-blur-sm space-y-5">
                 <div className="flex items-start gap-4">
                     <div className="rounded-xl bg-red-500/15 p-3">
                         <AlertTriangle className="h-6 w-6 text-red-400" />
                     </div>
                     <div className="space-y-1.5">
-                        <h2 className="text-lg font-semibold text-red-400">Помилка в панелі</h2>
+                        <h2 className="text-lg font-semibold text-red-400">Щось пішло не так</h2>
                         <p className="text-sm text-white/60 leading-relaxed">
-                            Виникла непередбачена помилка. Спробуйте оновити сторінку або скопіюйте деталі та зверніться до адміністратора.
+                            Виникла непередбачена помилка на сторінці. Спробуйте оновити або скопіюйте деталі помилки та зверніться до адміністратора.
                         </p>
                     </div>
                 </div>
@@ -91,11 +91,11 @@ export default function DashboardError({
                         )}
                     </button>
                     <a
-                        href="/dashboard"
+                        href="/"
                         className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/70 hover:bg-white/10 transition-colors"
                     >
-                        <LayoutDashboard className="h-4 w-4" />
-                        До панелі
+                        <Home className="h-4 w-4" />
+                        На головну
                     </a>
                 </div>
 
