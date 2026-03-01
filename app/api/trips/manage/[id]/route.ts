@@ -135,7 +135,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         // SECURITY: Use ALLOWLIST pattern instead of blocklist to prevent mass assignment.
         // Only these fields can be updated by managers — any new fields must be explicitly added here.
         const ALLOWED_UPDATE_FIELDS = [
-            'status', 'country', 'city', 'hotel', 'roomType',
+            'number', 'status', 'country', 'city', 'hotel', 'roomType',
             'tripStartDate', 'tripEndDate', 'notes',
             'payment', 'flightInfo', 'documents',
             'tourists', 'description', 'boardBasis',
