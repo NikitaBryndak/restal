@@ -272,159 +272,6 @@ export default function ManageTourPage() {
         setPendingFiles(buildEmptyPendingFiles());
     }, [trip?._id, buildEmptyPendingFiles]);
 
-    if (status === "loading") {
-        return <DashboardFormSkeleton />;
-    }
-
-    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
-        return null;
-    }
-
-    const handleLookup = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const identifier = searchValue.trim();
-
-        if (!identifier) {
-            setErrorMessage('Enter a tour number (e.g. Trip #5468189) or internal ID to continue.');
-            setTrip(null);
-            setActiveId(null);
-            return;
-        }
-
-        setIsLoading(true);
-        setErrorMessage(null);
-        setSuccessMessage(null);
-
-        try {
-            const response = await fetch(`/api/trips/manage/${encodeURIComponent(identifier)}`);
-            const payload = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(payload?.message ?? 'Unable to locate the requested tour.');
-            }
-
-            const nextTrip = normalizeTrip(payload.trip);
-            setTrip(nextTrip);
-            setActiveId(identifier);
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'Unable to locate the requested tour.';
-            setErrorMessage(message);
-            setTrip(null);
-            setActiveId(null);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleSave = async () => {
-        if (!trip || !activeId) {
-            return;
-        }
-
-        const validationError = validateTripData(trip);
-        if (validationError) {
-            setErrorMessage(validationError);
-            setSuccessMessage(null);
-            return;
-        }
-
-        setIsSaving(true);
-        setErrorMessage(null);
-        setSuccessMessage(null);
-
-        try {
-            // 1. Upload pending documents first
-            const currentDocuments = { ...trip.documents }; // Clone from state
-
-            for (const key of DOCUMENT_KEYS) {
-                const file = pendingFiles[key];
-                if (file) {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('folder', 'documents');
-                    formData.append('tripNumber', trip.number);
-
-                    try {
-                        const uploadRes = await fetch('/api/upload', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        if (uploadRes.ok) {
-                            const { url } = await uploadRes.json();
-                            currentDocuments[key] = {
-                                ...currentDocuments[key],
-                                url: url,
-                                uploaded: true
-                            };
-                        } else {
-                            const errorText = await uploadRes.text();
-                            throw new Error(`Failed to upload ${DOCUMENT_LABELS[key]}: ${errorText}`);
-                        }
-                    } catch (uploadError) {
-                         const message = uploadError instanceof Error ? uploadError.message : `Error uploading ${DOCUMENT_LABELS[key]}`;
-                         setErrorMessage(message);
-                         setIsSaving(false);
-                         return;
-                    }
-                }
-            }
-
-            // 2. Prepare payload with updated documents
-            const { createdAt, updatedAt, ...rest } = trip;
-            const payload = {
-                ...rest,
-                hotel: {
-                    ...rest.hotel,
-                    nights: Number(rest.hotel.nights ?? 0),
-                },
-                payment: {
-                    ...rest.payment,
-                    totalAmount: Number(rest.payment.totalAmount ?? 0),
-                    paidAmount: Number(rest.payment.paidAmount ?? 0),
-                },
-                tourists: serialiseTourists(trip.tourists),
-                documents: currentDocuments,
-            };
-
-            const response = await fetch(`/api/trips/manage/${encodeURIComponent(activeId)}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(data?.message ?? 'Unable to update the tour.');
-            }
-
-            setTrip(normalizeTrip(data.trip));
-            setPendingFiles(buildEmptyPendingFiles());
-            setSuccessMessage('Зміни успішно збережено.');
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'Unable to update the tour.';
-            setErrorMessage(message);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleDocumentFileSelection = (key: keyof Documents, file: File) => {
-        setPendingFiles((prev) => ({
-            ...prev,
-            [key]: file,
-        }));
-    };
-
-    const clearPendingFile = (key: keyof Documents) => {
-        setPendingFiles((prev) => ({
-            ...prev,
-            [key]: null,
-        }));
-    };
-
-
     const handleFlightFieldChange = useCallback(
         (segment: 'departure' | 'arrival', field: keyof FlightInfo['departure'], value: string) => {
             setTrip((prev) =>
@@ -624,6 +471,158 @@ export default function ManageTourPage() {
                 : prev
         );
     }, []);
+
+    if (status === "loading") {
+        return <DashboardFormSkeleton />;
+    }
+
+    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        return null;
+    }
+
+    const handleLookup = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const identifier = searchValue.trim();
+
+        if (!identifier) {
+            setErrorMessage('Enter a tour number (e.g. Trip #5468189) or internal ID to continue.');
+            setTrip(null);
+            setActiveId(null);
+            return;
+        }
+
+        setIsLoading(true);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
+        try {
+            const response = await fetch(`/api/trips/manage/${encodeURIComponent(identifier)}`);
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(payload?.message ?? 'Unable to locate the requested tour.');
+            }
+
+            const nextTrip = normalizeTrip(payload.trip);
+            setTrip(nextTrip);
+            setActiveId(identifier);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to locate the requested tour.';
+            setErrorMessage(message);
+            setTrip(null);
+            setActiveId(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!trip || !activeId) {
+            return;
+        }
+
+        const validationError = validateTripData(trip);
+        if (validationError) {
+            setErrorMessage(validationError);
+            setSuccessMessage(null);
+            return;
+        }
+
+        setIsSaving(true);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
+        try {
+            // 1. Upload pending documents first
+            const currentDocuments = { ...trip.documents }; // Clone from state
+
+            for (const key of DOCUMENT_KEYS) {
+                const file = pendingFiles[key];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('folder', 'documents');
+                    formData.append('tripNumber', trip.number);
+
+                    try {
+                        const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (uploadRes.ok) {
+                            const { url } = await uploadRes.json();
+                            currentDocuments[key] = {
+                                ...currentDocuments[key],
+                                url: url,
+                                uploaded: true
+                            };
+                        } else {
+                            const errorText = await uploadRes.text();
+                            throw new Error(`Failed to upload ${DOCUMENT_LABELS[key]}: ${errorText}`);
+                        }
+                    } catch (uploadError) {
+                         const message = uploadError instanceof Error ? uploadError.message : `Error uploading ${DOCUMENT_LABELS[key]}`;
+                         setErrorMessage(message);
+                         setIsSaving(false);
+                         return;
+                    }
+                }
+            }
+
+            // 2. Prepare payload with updated documents
+            const { createdAt, updatedAt, ...rest } = trip;
+            const payload = {
+                ...rest,
+                hotel: {
+                    ...rest.hotel,
+                    nights: Number(rest.hotel.nights ?? 0),
+                },
+                payment: {
+                    ...rest.payment,
+                    totalAmount: Number(rest.payment.totalAmount ?? 0),
+                    paidAmount: Number(rest.payment.paidAmount ?? 0),
+                },
+                tourists: serialiseTourists(trip.tourists),
+                documents: currentDocuments,
+            };
+
+            const response = await fetch(`/api/trips/manage/${encodeURIComponent(activeId)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data?.message ?? 'Unable to update the tour.');
+            }
+
+            setTrip(normalizeTrip(data.trip));
+            setPendingFiles(buildEmptyPendingFiles());
+            setSuccessMessage('Зміни успішно збережено.');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to update the tour.';
+            setErrorMessage(message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleDocumentFileSelection = (key: keyof Documents, file: File) => {
+        setPendingFiles((prev) => ({
+            ...prev,
+            [key]: file,
+        }));
+    };
+
+    const clearPendingFile = (key: keyof Documents) => {
+        setPendingFiles((prev) => ({
+            ...prev,
+            [key]: null,
+        }));
+    };
 
     return (
         <ErrorBoundary fallbackTitle="Помилка на сторінці керування туром" fallbackDescription="Під час роботи зі сторінкою редагування туру виникла непередбачена помилка. Скопіюйте деталі помилки та надішліть адміністратору.">

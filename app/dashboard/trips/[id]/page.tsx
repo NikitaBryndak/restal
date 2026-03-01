@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
+import mongoose from "mongoose";
 import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL } from '@/config/constants';
 import { getCountryImageName } from '@/data';
 import TripCountdown from '@/components/trip/trip-countdown';
@@ -41,9 +42,9 @@ async function getTripData(id: string): Promise<EnrichedTrip | null> {
 
         await connectToDatabase();
 
-        const query = !isNaN(Number(id))
-            ? { number: Number(id) }
-            : { _id: id };
+        const query = mongoose.Types.ObjectId.isValid(id) && /^[a-f0-9]{24}$/i.test(id)
+            ? { _id: id }
+            : { number: id };
 
         const trip = await TripModel.findOne(query).lean() as Trip | null;
 

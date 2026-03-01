@@ -14,17 +14,12 @@ const buildQuery = (rawId: string) => {
     // Strip leading # if present (e.g., "Trip #5468189" -> "5468189")
     let identifier = rawId.trim().replace(/^#/, '');
 
-    // Check if it looks like a trip number (purely numeric string)
-    if (/^\d+$/.test(identifier)) {
-        return { number: identifier };
-    }
-
-    // Check if it's a valid MongoDB ObjectId
-    if (mongoose.Types.ObjectId.isValid(identifier)) {
+    // Check if it's a valid MongoDB ObjectId (24-char hex string)
+    if (mongoose.Types.ObjectId.isValid(identifier) && /^[a-f0-9]{24}$/i.test(identifier)) {
         return { _id: identifier };
     }
 
-    // Fallback: try as trip number anyway
+    // Otherwise treat as trip number (can be alphanumeric)
     return { number: identifier };
 };
 

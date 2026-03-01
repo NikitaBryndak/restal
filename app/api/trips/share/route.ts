@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import mongoose from "mongoose";
 import crypto from "crypto";
 
 // POST - Generate a share token for a trip
@@ -21,7 +22,9 @@ export async function POST(request: NextRequest) {
 
         await connectToDatabase();
 
-        const query = !isNaN(Number(tripId)) ? { number: Number(tripId) } : { _id: tripId };
+        const query = mongoose.Types.ObjectId.isValid(tripId) && /^[a-f0-9]{24}$/i.test(tripId)
+            ? { _id: tripId }
+            : { number: tripId };
         const trip = await TripModel.findOne(query);
 
         if (!trip) {
@@ -70,7 +73,9 @@ export async function DELETE(request: NextRequest) {
 
         await connectToDatabase();
 
-        const query = !isNaN(Number(tripId)) ? { number: Number(tripId) } : { _id: tripId };
+        const query = mongoose.Types.ObjectId.isValid(tripId) && /^[a-f0-9]{24}$/i.test(tripId)
+            ? { _id: tripId }
+            : { number: tripId };
         const trip = await TripModel.findOne(query);
 
         if (!trip) {

@@ -30,7 +30,7 @@ const primaryFields: Array<{
     pattern?: string;
     isSelect?: boolean;
 }> = [
-    { field: 'number', label: 'Номер туру', placeholder: 'напр. 12345', name: 'number', inputMode: 'numeric', pattern: '[0-9]*' },
+    { field: 'number', label: 'Номер туру', placeholder: 'напр. 12345 або AB123', name: 'number' },
     { field: 'country', label: 'Країна призначення', placeholder: 'Виберіть країну', name: 'country', isSelect: true },
     { field: 'region', label: 'Регіон', placeholder: 'Хургада, Тоскана, Санторіні...', name: 'region' },
     { field: 'hotelNights', label: 'Ночей у готелі', placeholder: 'напр. 7', name: 'hotelNights', inputMode: 'numeric', pattern: '[0-9]*' },
