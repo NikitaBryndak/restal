@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +11,10 @@ import { Documents, DEFAULT_DOCUMENTS, DOCUMENT_KEYS, DOCUMENT_LABELS } from '@/
 export const useAddTourForm = () => {
     const router = useRouter();
     const curDate = getCurrentDate();
+
+    // Error / success banner state
+    const [formError, setFormError] = useState<string | null>(null);
+    const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
     // Document state
     const [documents, setDocuments] = useState<Documents>(DEFAULT_DOCUMENTS);
@@ -147,6 +151,8 @@ export const useAddTourForm = () => {
 
     const onSubmit = async (data: TourFormValues) => {
         setIsUploading(true);
+        setFormError(null);
+        setFormSuccess(null);
         try {
             const finalDocuments = { ...documents };
             const tripNumber = data.number || '';
@@ -174,12 +180,12 @@ export const useAddTourForm = () => {
                             };
                         } else {
                             const errorText = await uploadRes.text();
-                            alert(`Failed to upload ${DOCUMENT_LABELS[key] || key}: ${errorText}`);
+                            setFormError(`Не вдалося завантажити ${DOCUMENT_LABELS[key] || key}: ${errorText}`);
                             setIsUploading(false);
                             return;
                         }
                     } catch {
-                        alert(`Error uploading ${DOCUMENT_LABELS[key] || key}.`);
+                        setFormError(`Помилка при завантаженні ${DOCUMENT_LABELS[key] || key}. Спробуйте ще раз.`);
                         setIsUploading(false);
                         return;
                     }
@@ -251,17 +257,21 @@ export const useAddTourForm = () => {
 
             if (!res.ok) {
                 const resData = await res.json().catch(() => ({}));
-                alert('Error creating trip: ' + (resData.message || res.statusText));
+                setFormError('Помилка при створенні туру: ' + (resData.message || res.statusText));
                 return;
             }
-            alert('Trip created');
-            router.push('/dashboard');
-        } catch {
-            alert('Error creating trip');
+            setFormSuccess('Тур успішно створено! Перенаправлення...');
+            setTimeout(() => router.push('/dashboard'), 1500);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Невідома помилка';
+            setFormError(`Помилка при створенні туру: ${msg}. Перевірте з\'єднання та спробуйте ще раз.`);
         } finally {
             setIsUploading(false);
         }
     };
+
+    const clearFormError = useCallback(() => setFormError(null), []);
+    const clearFormSuccess = useCallback(() => setFormSuccess(null), []);
 
     const onError = (errors: FieldErrors<TourFormValues>) => {
         // Recursively collect all error messages from potentially nested FieldErrors
@@ -273,7 +283,7 @@ export const useAddTourForm = () => {
                 // If it has a `message` it's a leaf error
                 if (typeof val.message === 'string' && val.message) {
                     const label = prefix ? `${prefix}.${key}` : key;
-                    msgs.push(`• ${label}: ${val.message}`);
+                    msgs.push(`${label}: ${val.message}`);
                 } else if (typeof val === 'object') {
                     // Array (travellers) or nested object
                     msgs.push(...collectMessages(val as Record<string, any>, prefix ? `${prefix}.${key}` : key));
@@ -285,12 +295,12 @@ export const useAddTourForm = () => {
         // Also handle root-level refinement errors (e.g. paymentPaid > paymentTotal)
         const rootMessage = (errors as any)?.root?.message;
         const errorMessages = collectMessages(errors as Record<string, any>);
-        if (rootMessage) errorMessages.unshift(`• ${rootMessage}`);
+        if (rootMessage) errorMessages.unshift(rootMessage);
 
         if (errorMessages.length > 0) {
-            alert(`Будь ласка, виправте наступні помилки:\n${errorMessages.join('\n')}`);
+            setFormError(`Будь ласка, виправте наступні помилки:\n${errorMessages.join('\n')}`);
         } else {
-            alert('Будь ласка, перевірте форму на наявність помилок.');
+            setFormError('Будь ласка, перевірте форму на наявність помилок.');
         }
 
         // Scroll to first error field
@@ -309,6 +319,10 @@ export const useAddTourForm = () => {
         documents,
         pendingFiles,
         isUploading,
+        formError,
+        formSuccess,
+        clearFormError,
+        clearFormSuccess,
         handleFileSelect,
         handleFileClear,
         handleToggleReady

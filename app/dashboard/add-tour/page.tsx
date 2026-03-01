@@ -8,9 +8,10 @@ import { useAddTourForm } from './hooks/useAddTourForm';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, DocumentsSection } from './components';
 
@@ -32,6 +33,10 @@ export default function AddTourPage() {
         documents,
         pendingFiles,
         isUploading,
+        formError,
+        formSuccess,
+        clearFormError,
+        clearFormSuccess,
         handleFileSelect,
         handleFileClear,
         handleToggleReady
@@ -47,6 +52,7 @@ export default function AddTourPage() {
     }
 
     return (
+        <ErrorBoundary fallbackTitle="Помилка на сторінці створення туру" fallbackDescription="Під час роботи зі сторінкою створення туру виникла непередбачена помилка. Скопіюйте деталі помилки та надішліть адміністратору.">
         <div className="min-h-screen py-10 sm:py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
@@ -94,7 +100,34 @@ export default function AddTourPage() {
                             </div>
 
                             <div className="mt-10 flex flex-col gap-4 border-t border-white/5 pt-6">
-                                {Object.keys(form.formState.errors).length > 0 && (
+                                {formSuccess && (
+                                    <div className="flex items-start gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4">
+                                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                                        <p className="text-sm font-semibold text-emerald-400 flex-1">
+                                            {formSuccess}
+                                        </p>
+                                        <button onClick={clearFormSuccess} className="text-emerald-400/60 hover:text-emerald-400 transition-colors">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                                {formError && (
+                                    <div className="flex items-start gap-3 rounded-xl border border-red-500/25 bg-red-500/10 p-4">
+                                        <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                                        <div className="space-y-1 flex-1">
+                                            <p className="text-sm font-semibold text-red-400">
+                                                Помилка
+                                            </p>
+                                            <p className="text-xs text-red-400/70 whitespace-pre-line">
+                                                {formError}
+                                            </p>
+                                        </div>
+                                        <button onClick={clearFormError} className="text-red-400/60 hover:text-red-400 transition-colors">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                                {!formError && Object.keys(form.formState.errors).length > 0 && (
                                     <div className="flex items-start gap-3 rounded-xl border border-red-500/25 bg-red-500/10 p-4">
                                         <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                                         <div className="space-y-1">
@@ -118,5 +151,6 @@ export default function AddTourPage() {
                 </div>
             </div>
         </div>
+        </ErrorBoundary>
     );
 }

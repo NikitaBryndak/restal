@@ -22,6 +22,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { AlertTriangle, CheckCircle2, X } from "lucide-react";
 
 type EditableTourist = Tourist & {
     passportNumber?: string;
@@ -624,6 +626,7 @@ export default function ManageTourPage() {
     }, []);
 
     return (
+        <ErrorBoundary fallbackTitle="Помилка на сторінці керування туром" fallbackDescription="Під час роботи зі сторінкою редагування туру виникла непередбачена помилка. Скопіюйте деталі помилки та надішліть адміністратору.">
         <div className="py-10 sm:py-12">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
                 <header className="space-y-2 text-center">
@@ -652,14 +655,25 @@ export default function ManageTourPage() {
                         </div>
                     </form>
                     {errorMessage && (
-                        <p className="mt-4 rounded-lg border border-red-400/20 bg-red-500/10 px-4 py-2 text-sm text-red-400">
-                            {errorMessage}
-                        </p>
+                        <div className="mt-4 flex items-start gap-3 rounded-xl border border-red-500/25 bg-red-500/10 p-4">
+                            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                            <div className="space-y-1 flex-1">
+                                <p className="text-sm font-semibold text-red-400">Помилка</p>
+                                <p className="text-sm text-red-400/80 whitespace-pre-line">{errorMessage}</p>
+                            </div>
+                            <button onClick={() => setErrorMessage(null)} className="text-red-400/60 hover:text-red-400 transition-colors">
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
                     )}
                     {successMessage && (
-                        <p className="mt-4 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
-                            {successMessage}
-                        </p>
+                        <div className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                            <p className="text-sm font-semibold text-emerald-400 flex-1">{successMessage}</p>
+                            <button onClick={() => setSuccessMessage(null)} className="text-emerald-400/60 hover:text-emerald-400 transition-colors">
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
                     )}
                 </section>
 
@@ -817,5 +831,6 @@ export default function ManageTourPage() {
                 )}
             </div>
         </div>
+        </ErrorBoundary>
     );
 }

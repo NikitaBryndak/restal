@@ -102,7 +102,7 @@ const managers = [
     specialties: ["Туреччина", "Болгарія", "Хорватія"],
   },
   {
-    name: "Юлія Свідницька",
+    name: "Юлія Свідніцька",
     role: "Турагент",
     phone: "+380671525500",
     telegram: "Julia_Svidnitska",
