@@ -229,6 +229,20 @@ function TourScreenerContent() {
 
   // Booking modal state
   const [showBooking, setShowBooking] = useState(false);
+
+  // Auto-scroll to widget when opening a shared search link
+  useEffect(() => {
+    if (searchActive) {
+      // Small delay to let the page render first
+      const timer = setTimeout(() => {
+        document
+          .getElementById("tour-widget")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [tourCode, setTourCode] = useState("");
   const [hotelName, setHotelName] = useState("");
   const [firstName, setFirstName] = useState("");
