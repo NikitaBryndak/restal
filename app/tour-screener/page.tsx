@@ -86,10 +86,44 @@ function compressDate(d: string): string {
 /** Expand YYMMDD → YYYY-MM-DD */
 function expandDate(d: string): string {
   if (/^\d{6}$/.test(d)) return `20${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}`;
-  return d; // already long or unknown format
+  return d;
 }
 
 const DATE_SHORT_KEYS = new Set(["ci", "co"]);
+
+/* ------------------------------------------------------------------ */
+/*  Pack / unpack: all params → single compact `q` value               */
+/*  Format: key.value separated by `-`                                 */
+/*  Commas in values → `~`, brackets stripped.                         */
+/*  Example: t.49-ci.260511-co.260518-n.7-s.1~2~3~4~5-p.2500-c.eur    */
+/* ------------------------------------------------------------------ */
+function packParams(entries: [string, string][]): string {
+  return entries
+    .map(([k, v]) => {
+      // Strip [] from array-style keys like toCities[]
+      const cleanK = k.replace(/\[\]/g, "");
+      const short = LONG_TO_SHORT[cleanK] || cleanK;
+      // Compress dates
+      const val = short === "ci" || short === "co" ? compressDate(v) : v;
+      // Replace commas with ~ (URL-safe)
+      return `${short}.${val.replace(/,/g, "~")}`;
+    })
+    .join("-");
+}
+
+function unpackParams(q: string): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const part of q.split("-")) {
+    const dot = part.indexOf(".");
+    if (dot === -1) continue;
+    const shortKey = part.slice(0, dot);
+    const rawVal = part.slice(dot + 1).replace(/~/g, ",");
+    const longKey = SHORT_TO_LONG[shortKey] || shortKey;
+    const val = DATE_SHORT_KEYS.has(shortKey) ? expandDate(rawVal) : rawVal;
+    params.set(longKey, val);
+  }
+  return params;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Fade-in wrapper                                                    */
@@ -162,22 +196,31 @@ function TourScreenerContent() {
   const [searchActive, setSearchActive] = useState(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
-      return sp.has("geo") || sp.has("to") || sp.has("t") || sp.has("show");
+      return sp.has("q") || sp.has("geo") || sp.has("to") || sp.has("t") || sp.has("show");
     }
     return false;
   });
 
   // Build iframe src ONCE from initial URL params.
-  // Expand short aliases back to long names so the widget understands them.
+  // If `q` param exists, unpack it; otherwise expand short aliases.
   const [iframeSrc] = useState(() => {
     if (typeof window !== "undefined") {
       const src = new URLSearchParams(window.location.search);
-      const expanded = new URLSearchParams();
-      src.forEach((v, k) => {
-        const longKey = SHORT_TO_LONG[k] || k;
-        const val = DATE_SHORT_KEYS.has(k) ? expandDate(v) : v;
-        if (!expanded.has(longKey)) expanded.set(longKey, val);
-      });
+      let expanded: URLSearchParams;
+
+      if (src.has("q")) {
+        // Packed format: ?q=t.49-ci.260511-...
+        expanded = unpackParams(src.get("q")!);
+      } else {
+        // Legacy / individual params
+        expanded = new URLSearchParams();
+        src.forEach((v, k) => {
+          const longKey = SHORT_TO_LONG[k] || k;
+          const val = DATE_SHORT_KEYS.has(k) ? expandDate(v) : v;
+          if (!expanded.has(longKey)) expanded.set(longKey, val);
+        });
+      }
+
       const qs = expanded.toString();
       return `/otpusk-widget.html${qs ? "?" + qs : ""}`;
     }
@@ -281,10 +324,10 @@ function TourScreenerContent() {
       }
 
       // Capture search params from Otpusk API calls inside the iframe.
-      // Build a compact shareable URL using short aliases & compressed dates.
+      // Pack everything into a single compact `q` param.
       if (event.data.type === "otpusk-search-params" && event.data.params) {
         const raw = event.data.params as Record<string, string>;
-        const urlParams = new URLSearchParams();
+        const entries: [string, string][] = [];
         const seen = new Set<string>();
 
         for (const [k, v] of Object.entries(raw)) {
@@ -296,16 +339,13 @@ function TourScreenerContent() {
           const short = LONG_TO_SHORT[k] || k;
           if (seen.has(short)) continue;
           seen.add(short);
-
-          // Compress dates for ci/co keys
-          const isDate = short === "ci" || short === "co";
-          urlParams.set(short, isDate ? compressDate(v) : v);
+          entries.push([k, v]);
         }
 
-        const qs = urlParams.toString();
-        if (qs) {
+        if (entries.length) {
+          const packed = packParams(entries);
           setSearchActive(true);
-          window.history.replaceState(null, "", `/tour-screener?${qs}`);
+          window.history.replaceState(null, "", `/tour-screener?q=${packed}`);
         }
       }
     }

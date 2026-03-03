@@ -23,11 +23,34 @@
     var osAutoStart = false;
 
     // Shareable search: initialize widget from URL parameters
-    // Supports long names (geo, departure, to, deptCity, …),
-    // short aliases (t, d, ci, co, n, …) and expanded-from-short via parent.
+    // Supports: packed `q` format, long names, and short aliases.
     (function() {
       try {
         var p = new URLSearchParams(window.location.search);
+
+        // If packed `q` param exists, unpack it into individual params
+        if (p.has('q')) {
+          var q = p.get('q');
+          var shortToLong = {t:'to',ci:'checkIn',co:'checkTo',n:'length',d:'deptCity',
+            p:'price',px:'priceTo',c:'currency',tr:'transport',s:'stars',f:'food',
+            a:'people',ch:'children',r:'rating',tg:'target'};
+          var dateKeys = {ci:1, co:1};
+          var parts = q.split('-');
+          p = new URLSearchParams();
+          for (var i = 0; i < parts.length; i++) {
+            var dot = parts[i].indexOf('.');
+            if (dot === -1) continue;
+            var sk = parts[i].substr(0, dot);
+            var sv = parts[i].substr(dot + 1).replace(/~/g, ',');
+            var lk = shortToLong[sk] || sk;
+            // Expand YYMMDD → YYYY-MM-DD
+            if (dateKeys[sk] && /^\d{6}$/.test(sv)) {
+              sv = '20' + sv.substr(0,2) + '-' + sv.substr(2,2) + '-' + sv.substr(4,2);
+            }
+            p.set(lk, sv);
+          }
+        }
+
         // Helper: first non-empty value from a list of param names
         function g() {
           for (var i = 0; i < arguments.length; i++) {
