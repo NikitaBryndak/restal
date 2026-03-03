@@ -37,9 +37,59 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Otpusk: params to skip when building shareable URLs                */
+/*  Otpusk: params to skip/drop when building shareable URLs           */
 /* ------------------------------------------------------------------ */
 const SKIP_PARAMS = new Set(["access_token", "callback", "jsonp", "_", "lang"]);
+
+const DROP_PARAMS = new Set([
+  "page", "number", "group", "currencyLocal", "show",
+]);
+
+const DEFAULT_VALUES: Record<string, string> = {
+  deptCity: "1831", rating: "0-10", price: "0",
+  priceTo: "500000", transport: "air", people: "2",
+};
+
+// Long → short aliases for compact shareable URLs
+const LONG_TO_SHORT: Record<string, string> = {
+  to: "t", countryId: "t", country: "t", geo: "t",
+  checkIn: "ci", dateFrom: "ci",
+  checkTo: "co", dateTo: "co",
+  length: "n", duration: "n", nights: "n",
+  deptCity: "d", departure: "d", departureId: "d", from: "d",
+  price: "p",
+  priceTo: "px",
+  currency: "c",
+  transport: "tr",
+  stars: "s", hotelCategory: "s",
+  food: "f", meal: "f",
+  people: "a", adults: "a",
+  children: "ch",
+  rating: "r",
+  target: "tg",
+};
+
+// Short → canonical long names (for expanding short URLs → widget params)
+const SHORT_TO_LONG: Record<string, string> = {
+  t: "to", ci: "checkIn", co: "checkTo", n: "length",
+  d: "deptCity", p: "price", px: "priceTo", c: "currency",
+  tr: "transport", s: "stars", f: "food", a: "people",
+  ch: "children", r: "rating", tg: "target",
+};
+
+/** Compress YYYY-MM-DD → YYMMDD */
+function compressDate(d: string): string {
+  const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? m[1].slice(2) + m[2] + m[3] : d;
+}
+
+/** Expand YYMMDD → YYYY-MM-DD */
+function expandDate(d: string): string {
+  if (/^\d{6}$/.test(d)) return `20${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}`;
+  return d; // already long or unknown format
+}
+
+const DATE_SHORT_KEYS = new Set(["ci", "co"]);
 
 /* ------------------------------------------------------------------ */
 /*  Fade-in wrapper                                                    */
@@ -112,18 +162,24 @@ function TourScreenerContent() {
   const [searchActive, setSearchActive] = useState(() => {
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search);
-      return sp.has("geo") || sp.has("to") || sp.has("show");
+      return sp.has("geo") || sp.has("to") || sp.has("t") || sp.has("show");
     }
     return false;
   });
 
   // Build iframe src ONCE from initial URL params.
-  // Pass ALL query params through so both normalized (geo, departure, …)
-  // and raw Otpusk params (to, deptCity, length, …) reach the widget.
+  // Expand short aliases back to long names so the widget understands them.
   const [iframeSrc] = useState(() => {
     if (typeof window !== "undefined") {
-      const qs = window.location.search; // includes leading "?"
-      return `/otpusk-widget.html${qs}`;
+      const src = new URLSearchParams(window.location.search);
+      const expanded = new URLSearchParams();
+      src.forEach((v, k) => {
+        const longKey = SHORT_TO_LONG[k] || k;
+        const val = DATE_SHORT_KEYS.has(k) ? expandDate(v) : v;
+        if (!expanded.has(longKey)) expanded.set(longKey, val);
+      });
+      const qs = expanded.toString();
+      return `/otpusk-widget.html${qs ? "?" + qs : ""}`;
     }
     return `/otpusk-widget.html`;
   });
@@ -225,18 +281,26 @@ function TourScreenerContent() {
       }
 
       // Capture search params from Otpusk API calls inside the iframe.
-      // Store raw Otpusk params as-is so shared URLs work when re-opened.
+      // Build a compact shareable URL using short aliases & compressed dates.
       if (event.data.type === "otpusk-search-params" && event.data.params) {
         const raw = event.data.params as Record<string, string>;
         const urlParams = new URLSearchParams();
+        const seen = new Set<string>();
 
         for (const [k, v] of Object.entries(raw)) {
-          if (SKIP_PARAMS.has(k) || !v) continue;
-          urlParams.set(k, v);
-        }
+          if (!v) continue;
+          if (SKIP_PARAMS.has(k)) continue;
+          if (DROP_PARAMS.has(k)) continue;
+          if (DEFAULT_VALUES[k] === v) continue;
 
-        // Add show=true so auto-start triggers when the link is opened
-        urlParams.set("show", "true");
+          const short = LONG_TO_SHORT[k] || k;
+          if (seen.has(short)) continue;
+          seen.add(short);
+
+          // Compress dates for ci/co keys
+          const isDate = short === "ci" || short === "co";
+          urlParams.set(short, isDate ? compressDate(v) : v);
+        }
 
         const qs = urlParams.toString();
         if (qs) {

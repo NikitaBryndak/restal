@@ -23,33 +23,54 @@
     var osAutoStart = false;
 
     // Shareable search: initialize widget from URL parameters
-    // Supports both normalized names (geo, departure, …) and raw Otpusk API names (to, deptCity, …)
+    // Supports long names (geo, departure, to, deptCity, …),
+    // short aliases (t, d, ci, co, n, …) and expanded-from-short via parent.
     (function() {
       try {
         var p = new URLSearchParams(window.location.search);
-        // Country / geo
-        if (p.get('geo'))                              osGeo = p.get('geo');
-        else if (p.get('to'))                          osGeo = p.get('to');
-        // Departure city
-        if (p.get('departure'))                        osDefaultDeparture = parseInt(p.get('departure')) || 1831;
-        else if (p.get('deptCity'))                     osDefaultDeparture = parseInt(p.get('deptCity')) || 1831;
-        // Duration / nights
-        if (p.get('duration'))                         osDefaultDuration = p.get('duration');
-        else if (p.get('length'))                      osDefaultDuration = p.get('length');
-        // Dates
-        if (p.get('dateFrom'))                         osDateFrom = p.get('dateFrom');
-        if (p.get('dateTo'))                           osDateTo = p.get('dateTo');
-        else if (p.get('checkTo'))                     osDateTo = p.get('checkTo');
-        // Stars
-        if (p.get('stars'))                            osHotelCategory = p.get('stars');
-        // Food
-        if (p.get('food'))                             osFood = p.get('food');
-        // Transport
-        if (p.get('transport'))                        osTransport = p.get('transport');
-        // Target
-        if (p.get('target'))                           osTarget = p.get('target');
-        // Auto-start search when meaningful params are present
-        if (p.has('geo') || p.has('to') || p.get('show') === 'true') osAutoStart = true;
+        // Helper: first non-empty value from a list of param names
+        function g() {
+          for (var i = 0; i < arguments.length; i++) {
+            var v = p.get(arguments[i]);
+            if (v) return v;
+          }
+          return '';
+        }
+        // Expand YYMMDD → YYYY-MM-DD
+        function expD(v) {
+          if (/^\d{6}$/.test(v)) return '20' + v.substr(0,2) + '-' + v.substr(2,2) + '-' + v.substr(4,2);
+          return v;
+        }
+
+        var geo = g('geo', 'to', 't');
+        if (geo) osGeo = geo;
+
+        var dept = g('departure', 'deptCity', 'd');
+        if (dept) osDefaultDeparture = parseInt(dept) || 1831;
+
+        var dur = g('duration', 'length', 'n');
+        if (dur) osDefaultDuration = dur;
+
+        var df = g('dateFrom', 'checkIn', 'ci');
+        if (df) osDateFrom = expD(df);
+
+        var dt = g('dateTo', 'checkTo', 'co');
+        if (dt) osDateTo = expD(dt);
+
+        var st = g('stars', 's');
+        if (st) osHotelCategory = st;
+
+        var fd = g('food', 'f');
+        if (fd) osFood = fd;
+
+        var tr = g('transport', 'tr');
+        if (tr) osTransport = tr;
+
+        var tg = g('target', 'tg');
+        if (tg) osTarget = tg;
+
+        // Auto-start when any meaningful search param is present
+        if (geo || p.get('show') === 'true') osAutoStart = true;
       } catch(e) {}
     })();
   </script>
