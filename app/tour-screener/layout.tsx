@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "Підбір туру | RestAL",
     description:
       "Підберіть ідеальний тур онлайн. Пошук серед тисяч пропозицій з найкращими цінами.",
+    images: ["/og-image.png"],
   },
 };
 

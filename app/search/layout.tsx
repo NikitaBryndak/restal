@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "ШІ Пошук турів | RestAL",
     description:
       "Знайдіть ідеальний тур за допомогою штучного інтелекту. Розумний підбір подорожей за вашими побажаннями.",
+    images: ["/og-image.png"],
   },
 };
 

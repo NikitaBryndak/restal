@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "Cashback програма | RestAL",
     description:
       "Отримуйте кешбек за кожну подорож з RestAL. Накопичуйте бонуси та заощаджуйте.",
+    images: ["/og-image.png"],
   },
 };
 
