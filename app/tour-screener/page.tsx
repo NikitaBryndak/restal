@@ -5,10 +5,8 @@ import {
   useRef,
   useState,
   useCallback,
-  useMemo,
   Suspense,
 } from "react";
-import { useSearchParams } from "next/navigation";
 import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -129,7 +127,6 @@ const highlights = [
 /*  Inner component (uses useSearchParams)                              */
 /* ------------------------------------------------------------------ */
 function TourScreenerContent() {
-  const searchParams = useSearchParams();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeHeightRef = useRef(1200);
 
@@ -142,8 +139,10 @@ function TourScreenerContent() {
     return false;
   });
 
-  // Build iframe src with search params from URL
-  const iframeSrc = useMemo(() => {
+  // Build iframe src ONCE from initial URL params.
+  // Using useState initializer so the src is stable across re-renders
+  // and the iframe never reloads when the URL updates for sharing.
+  const [iframeSrc] = useState(() => {
     const p = new URLSearchParams();
     const keys = [
       "geo",
@@ -158,13 +157,16 @@ function TourScreenerContent() {
       "adults",
       "children",
     ];
-    keys.forEach((k) => {
-      const v = searchParams.get(k);
-      if (v) p.set(k, v);
-    });
+    if (typeof window !== "undefined") {
+      const current = new URLSearchParams(window.location.search);
+      keys.forEach((k) => {
+        const v = current.get(k);
+        if (v) p.set(k, v);
+      });
+    }
     const qs = p.toString();
     return `/otpusk-widget.html${qs ? "?" + qs : ""}`;
-  }, [searchParams]);
+  });
 
   // Booking modal state
   const [showBooking, setShowBooking] = useState(false);
