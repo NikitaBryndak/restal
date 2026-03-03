@@ -36,6 +36,24 @@
     }
     body { padding: 0; }
 
+    /* Hide Map and Reviews tabs and content unconditionally */
+    .new_t-tab-menu li[data-tab="map"],
+    .new_t-tab-menu li[data-tab="reviews"],
+    .new_t-tab-menu-item[data-tab="map"],
+    .new_t-tab-menu-item[data-tab="reviews"],
+    .new_t-tab-content.map,
+    .new_t-tab-content.reviews,
+    .new_t-tab-content[data-tab="map"],
+    .new_t-tab-content[data-tab="reviews"],
+    li:has(> a[href*="map"]),
+    li:has(> a[href*="reviews"]),
+    li.map,
+    li.reviews,
+    li.tab-map,
+    li.tab-reviews {
+      display: none !important;
+    }
+
     /* ============================================================
        DARK THEME OVERRIDES — targeting actual otpusk widget classes
        ============================================================ */
@@ -1697,34 +1715,33 @@
       [500, 1000, 2000, 4000].forEach(function(t) { setTimeout(stripDaysFromHeaders, t); });
     })();
 
-    // Hide empty Reviews/Відгуки tab
+    // Hide Map and Reviews tabs
     (function() {
-      function hideEmptyReviewsTab() {
+      function hideTabs() {
         // Find all tab menu items
         var tabItems = document.querySelectorAll('.new_t-tab-menu-item, [class*="tab-menu"] a, [class*="tab-menu"] li');
         tabItems.forEach(function(item) {
           var text = (item.textContent || '').trim().toLowerCase();
-          if (text === 'відгуки' || text === 'отзывы' || text === 'reviews') {
-            // Check if the corresponding tab content is empty
+          var isReviews = text === 'відгуки' || text === 'отзывы' || text === 'reviews';
+          var isMap = text === 'мапа' || text === 'карта' || text === 'карта готелю' || text === 'map';
+
+          if (isReviews || isMap) {
+            item.style.setProperty('display', 'none', 'important');
+            // Also try to hide the corresponding content just in case
             var tabId = item.getAttribute('data-tab') || item.getAttribute('href') || '';
-            var tabContent = null;
             if (tabId) {
-              tabContent = document.querySelector('.new_t-tab-content.reviews, .new_t-tab-content[data-tab="reviews"], ' + tabId);
+              var tabContent = document.querySelector(tabId);
+              if (tabContent) {
+                tabContent.style.setProperty('display', 'none', 'important');
+              }
             }
-            // Also try finding the reviews content panel by class
-            if (!tabContent) {
-              tabContent = document.querySelector('.new_t-tab-content.reviews');
+            if (isReviews) {
+              var reviewsContent = document.querySelector('.new_t-tab-content.reviews, .new_t-tab-content[data-tab="reviews"]');
+              if (reviewsContent) reviewsContent.style.setProperty('display', 'none', 'important');
             }
-            var isEmpty = !tabContent ||
-              !tabContent.querySelector('.new_t-rating-tab-container, .review-item, [class*="review"], [class*="rating-tab"]') ||
-              (tabContent.querySelector('.new_t-rating-tab-container') && tabContent.querySelector('.new_t-rating-tab-container').children.length === 0);
-
-            // Also check if turpravda iframe/content loaded with no reviews
-            var hasContent = tabContent && tabContent.textContent && tabContent.textContent.trim().length > 50;
-
-            if (!hasContent) {
-              item.style.setProperty('display', 'none', 'important');
-              if (tabContent) tabContent.style.setProperty('display', 'none', 'important');
+            if (isMap) {
+              var mapContent = document.querySelector('.new_t-tab-content.map, .new_t-tab-content[data-tab="map"]');
+              if (mapContent) mapContent.style.setProperty('display', 'none', 'important');
             }
           }
         });
@@ -1732,10 +1749,10 @@
 
       if (window.MutationObserver) {
         new MutationObserver(function() {
-          requestAnimationFrame(hideEmptyReviewsTab);
+          requestAnimationFrame(hideTabs);
         }).observe(document.body, { childList: true, subtree: true });
       }
-      [1000, 2000, 4000, 8000].forEach(function(t) { setTimeout(hideEmptyReviewsTab, t); });
+      [500, 1000, 2000, 4000, 8000].forEach(function(t) { setTimeout(hideTabs, t); });
     })();
   </script>
   <script>
