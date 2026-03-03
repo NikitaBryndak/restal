@@ -23,11 +23,10 @@ import { TRUSTED_ORIGINS } from "@/config/constants";
 /* ------------------------------------------------------------------ */
 const categories = [
   "All",
-  "Популярні країни",
+  "Каталог Послуг",
   "Корисно знати",
   "Шпаргалки мандрівникам",
   "Інструкції сайта",
-  "Послуги",
   "Умови бронювання",
 ];
 
@@ -182,7 +181,7 @@ function InfoPageInner() {
       {/*  SEARCH & FILTER                                              */}
       {/* ============================================================ */}
       <section className="relative py-6 md:py-10">
-        <div className="relative z-10 max-w-6xl mx-auto px-4 max-sm:px-3">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 max-sm:px-3">
           <FadeIn>
             <div className="relative p-5 sm:p-6 rounded-2xl border border-white/6 overflow-hidden backdrop-blur-sm">
               {/* Glass background */}

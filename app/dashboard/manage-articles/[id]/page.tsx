@@ -17,7 +17,7 @@ import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 
 // Schema Definition (duplicated from add-article/schema.ts for safety)
 const articleSchema = z.object({
-    tag: z.enum(["Популярні країни", "Корисно знати", "Шпаргалки мандрівникам", "Інструкції сайта", "Послуги", "Умови бронювання"]),
+    tag: z.enum(["Каталог Послуг", "Корисно знати", "Шпаргалки мандрівникам", "Інструкції сайта", "Умови бронювання"]),
     images: z.string().min(1, "Image URL is required"),
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
@@ -46,7 +46,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
             description: "",
             content: "",
             images: "",
-            tag: "Популярні країни",
+            tag: "Каталог Послуг",
             creatorPhone: "",
         },
         mode: 'onChange',
@@ -106,7 +106,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
             description: formValues.description || "No description provided",
             content: formValues.content || "Start writing your article...",
             images: formValues.images || "",
-            tag: (formValues.tag as any) || "Популярні країни",
+            tag: (formValues.tag as any) || "Каталог Послуг",
             creatorPhone: formValues.creatorPhone || session?.user?.phoneNumber || "",
             _id: params?.id || "preview-id",
             articleID: 0,
@@ -221,11 +221,10 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                                 className="flex h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50"
                                                 {...register("tag")}
                                             >
-                                                <option value="Популярні країни">Популярні країни</option>
+                                                <option value="Каталог Послуг">Каталог Послуг</option>
                                                 <option value="Корисно знати">Корисно знати</option>
                                                 <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
                                                 <option value="Інструкції сайта">Інструкції сайта</option>
-                                                <option value="Послуги">Послуги</option>
                                                 <option value="Умови бронювання">Умови бронювання</option>
                                             </select>
                                         </div>

@@ -93,7 +93,7 @@ export default function ManageArticlesPage() {
     }, [articles, searchQuery, filterTag]);
 
     const uniqueTags = useMemo(() => {
-        const predefinedTags = ["Популярні країни", "Корисно знати", "Шпаргалки мандрівникам", "Інструкції сайта", "Послуги", "Умови бронювання"];
+        const predefinedTags = ["Каталог Послуг", "Корисно знати", "Шпаргалки мандрівникам", "Інструкції сайта", "Умови бронювання"];
         const loadedTags = Array.from(new Set(articles.map(a => a.tag)));
         // Combine and dedup
         const allTags = Array.from(new Set([...predefinedTags, ...loadedTags]));

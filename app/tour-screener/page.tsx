@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  Suspense,
+} from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -25,7 +33,38 @@ import {
   Phone,
   ArrowRight,
   Star,
+  Share2,
+  Check,
+  Link2,
 } from "lucide-react";
+
+/* ------------------------------------------------------------------ */
+/*  Otpusk API → URL param mapping                                     */
+/* ------------------------------------------------------------------ */
+const API_TO_URL_MAP: Record<string, string> = {
+  countryId: "geo",
+  country: "geo",
+  geo: "geo",
+  departureId: "departure",
+  departure: "departure",
+  from: "departure",
+  checkIn: "dateFrom",
+  dateFrom: "dateFrom",
+  date_from: "dateFrom",
+  checkOut: "dateTo",
+  dateTo: "dateTo",
+  date_to: "dateTo",
+  duration: "duration",
+  nights: "duration",
+  stars: "stars",
+  hotelCategory: "stars",
+  food: "food",
+  meal: "food",
+  transport: "transport",
+  adults: "adults",
+  children: "children",
+};
+const SKIP_PARAMS = new Set(["access_token", "callback", "jsonp", "_", "lang"]);
 
 /* ------------------------------------------------------------------ */
 /*  Fade-in wrapper                                                    */
@@ -86,9 +125,46 @@ const highlights = [
   { icon: Sparkles, text: "Кращі ціни" },
 ];
 
-export default function TourScreenerPage() {
+/* ------------------------------------------------------------------ */
+/*  Inner component (uses useSearchParams)                              */
+/* ------------------------------------------------------------------ */
+function TourScreenerContent() {
+  const searchParams = useSearchParams();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeHeightRef = useRef(1200);
+
+  // Shareable search state
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [searchActive, setSearchActive] = useState(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).has("geo");
+    }
+    return false;
+  });
+
+  // Build iframe src with search params from URL
+  const iframeSrc = useMemo(() => {
+    const p = new URLSearchParams();
+    const keys = [
+      "geo",
+      "departure",
+      "duration",
+      "dateFrom",
+      "dateTo",
+      "stars",
+      "food",
+      "transport",
+      "target",
+      "adults",
+      "children",
+    ];
+    keys.forEach((k) => {
+      const v = searchParams.get(k);
+      if (v) p.set(k, v);
+    });
+    const qs = p.toString();
+    return `/otpusk-widget.html${qs ? "?" + qs : ""}`;
+  }, [searchParams]);
 
   // Booking modal state
   const [showBooking, setShowBooking] = useState(false);
@@ -185,6 +261,28 @@ export default function TourScreenerPage() {
         resetForm();
         setShowBooking(true);
       }
+
+      // Capture search params from Otpusk API calls inside the iframe
+      if (event.data.type === "otpusk-search-params" && event.data.params) {
+        const raw = event.data.params as Record<string, string>;
+        const urlParams = new URLSearchParams();
+
+        for (const [k, v] of Object.entries(raw)) {
+          if (SKIP_PARAMS.has(k)) continue;
+          const mapped = API_TO_URL_MAP[k];
+          if (mapped && !urlParams.has(mapped)) {
+            urlParams.set(mapped, v);
+          } else if (!mapped && !urlParams.has(k)) {
+            urlParams.set(k, v);
+          }
+        }
+
+        const qs = urlParams.toString();
+        if (qs) {
+          setSearchActive(true);
+          window.history.replaceState(null, "", `/tour-screener?${qs}`);
+        }
+      }
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
@@ -267,7 +365,11 @@ export default function TourScreenerPage() {
             className="mt-10"
           >
             <button
-              onClick={() => document.getElementById("tour-widget")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onClick={() =>
+                document
+                  .getElementById("tour-widget")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
               className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl shadow-lg shadow-accent/25 hover:scale-105 active:scale-95 transition-all duration-200 text-base"
             >
               <Search className="w-5 h-5" />
@@ -320,7 +422,10 @@ export default function TourScreenerPage() {
       {/* ============================================================ */}
       {/*  WIDGET SECTION                                               */}
       {/* ============================================================ */}
-      <section id="tour-widget" className="relative py-10 md:py-14 px-4 max-sm:px-3 scroll-mt-4">
+      <section
+        id="tour-widget"
+        className="relative py-10 md:py-14 px-4 max-sm:px-3 scroll-mt-4"
+      >
         {/* Glow behind widget */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-accent/4 rounded-full blur-[150px] pointer-events-none" />
 
@@ -329,24 +434,33 @@ export default function TourScreenerPage() {
             {/* Widget label */}
             <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-white/40 text-sm font-medium tracking-wide uppercase">Пошук турів</span>
+              <span className="text-white/40 text-sm font-medium tracking-wide uppercase">
+                Пошук турів
+              </span>
             </div>
 
-            <div className="relative bg-white/3 border border-white/10 rounded-3xl shadow-2xl shadow-accent/5" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
+            <div
+              className="relative bg-white/3 border border-white/10 rounded-3xl shadow-2xl shadow-accent/5"
+              style={{
+                WebkitMaskImage: "-webkit-radial-gradient(white, black)",
+              }}
+            >
               {/* Decorative top gradient bar */}
               <div className="h-px w-full bg-linear-to-r from-transparent via-accent/50 to-transparent" />
 
-              <div style={{ WebkitOverflowScrolling: 'touch', overflow: 'auto' }}>
+              <div
+                style={{ WebkitOverflowScrolling: "touch", overflow: "auto" }}
+              >
                 <iframe
                   ref={iframeRef}
-                  src="/otpusk-widget.html"
+                  src={iframeSrc}
                   title="Пошук турів"
                   style={{
                     width: "100%",
                     height: "1200px",
                     border: "none",
                     display: "block",
-                    WebkitTransform: 'translateZ(0)',
+                    WebkitTransform: "translateZ(0)",
                   }}
                   allow="clipboard-write"
                   loading="eager"
@@ -354,6 +468,48 @@ export default function TourScreenerPage() {
               </div>
             </div>
           </FadeIn>
+
+          {/* Share search link button */}
+          {searchActive && (
+            <FadeIn>
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(window.location.href);
+                    } catch {
+                      const ta = document.createElement("textarea");
+                      ta.value = window.location.href;
+                      ta.style.position = "fixed";
+                      ta.style.opacity = "0";
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand("copy");
+                      document.body.removeChild(ta);
+                    }
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 2500);
+                  }}
+                  className="group inline-flex items-center gap-2.5 px-6 py-3 bg-white/5 hover:bg-accent/15 border border-white/10 hover:border-accent/30 rounded-2xl text-white/70 hover:text-white text-sm font-medium transition-all duration-300 backdrop-blur-sm"
+                >
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-400" />
+                      <span className="text-emerald-400">
+                        Посилання скопійовано!
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" />
+                      <span>Поділитися пошуком</span>
+                      <Link2 className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 transition-colors" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </FadeIn>
+          )}
         </div>
       </section>
 
@@ -383,7 +539,8 @@ export default function TourScreenerPage() {
                   Потрібна допомога з вибором?
                 </h2>
                 <p className="text-white/60 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
-                  Наші експерти підберуть ідеальний тур за вашими побажаннями — безкоштовно та без зобов&apos;язань
+                  Наші експерти підберуть ідеальний тур за вашими побажаннями —
+                  безкоштовно та без зобов&apos;язань
                 </p>
 
                 <div className="flex flex-wrap justify-center gap-4">
@@ -453,7 +610,10 @@ export default function TourScreenerPage() {
             <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="bookFirstName" className="text-white/70 text-sm">
+                  <Label
+                    htmlFor="bookFirstName"
+                    className="text-white/70 text-sm"
+                  >
                     Ім&apos;я
                   </Label>
                   <Input
@@ -465,7 +625,10 @@ export default function TourScreenerPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bookLastName" className="text-white/70 text-sm">
+                  <Label
+                    htmlFor="bookLastName"
+                    className="text-white/70 text-sm"
+                  >
                     Прізвище
                   </Label>
                   <Input
@@ -536,5 +699,16 @@ export default function TourScreenerPage() {
         </div>
       )}
     </main>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Default export with Suspense boundary                              */
+/* ------------------------------------------------------------------ */
+export default function TourScreenerPage() {
+  return (
+    <Suspense>
+      <TourScreenerContent />
+    </Suspense>
   );
 }

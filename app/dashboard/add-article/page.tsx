@@ -99,11 +99,10 @@ export default function AddArticlePage() {
                                                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-accent/50"
                                                 {...register("tag")}
                                             >
-                                                <option value="Популярні країни" className="bg-black">Популярні країни</option>
+                                                <option value="Каталог Послуг" className="bg-black">Каталог Послуг</option>
                                                 <option value="Корисно знати" className="bg-black">Корисно знати</option>
                                                 <option value="Шпаргалки мандрівникам" className="bg-black">Шпаргалки мандрівникам</option>
                                                 <option value="Інструкції сайта" className="bg-black">Інструкції сайта</option>
-                                                <option value="Послуги" className="bg-black">Послуги</option>
                                                 <option value="Умови бронювання" className="bg-black">Умови бронювання</option>
                                             </select>
                                         </div>

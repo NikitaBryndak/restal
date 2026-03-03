@@ -21,6 +21,24 @@
     var osOrderUrl = null;
     var osCurrency = 'converted';
     var osAutoStart = false;
+
+    // Shareable search: initialize widget from URL parameters
+    (function() {
+      try {
+        var p = new URLSearchParams(window.location.search);
+        if (p.get('geo'))        osGeo = p.get('geo');
+        if (p.get('departure'))  osDefaultDeparture = parseInt(p.get('departure')) || 1831;
+        if (p.get('duration'))   osDefaultDuration = p.get('duration');
+        if (p.get('dateFrom'))   osDateFrom = p.get('dateFrom');
+        if (p.get('dateTo'))     osDateTo = p.get('dateTo');
+        if (p.get('stars'))      osHotelCategory = p.get('stars');
+        if (p.get('food'))       osFood = p.get('food');
+        if (p.get('transport'))  osTransport = p.get('transport');
+        if (p.get('target'))     osTarget = p.get('target');
+        // Auto-start search when params are present
+        if (p.has('geo')) osAutoStart = true;
+      } catch(e) {}
+    })();
   </script>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=cyrillic" rel="stylesheet" />
   <link rel="stylesheet" href="https://export.otpusk.com/os/onsite/form.css" type="text/css" />
@@ -1455,6 +1473,51 @@
         el = el.parentElement;
       }
     }, true);
+  </script>
+  <script>
+    // Capture Otpusk search API calls and forward params to parent for shareable URLs
+    (function() {
+      var lastSent = '';
+
+      function forward(url) {
+        try {
+          var u = new URL(url);
+          var p = {};
+          u.searchParams.forEach(function(v, k) { p[k] = v; });
+          var key = JSON.stringify(p);
+          if (key === lastSent) return;
+          // Only forward if it looks like a real search call (more than token + callback)
+          var meaningful = Object.keys(p).filter(function(k) {
+            return k !== 'access_token' && k !== 'callback' && k !== '_' && k !== 'jsonp';
+          });
+          if (meaningful.length < 2) return;
+          lastSent = key;
+          window.parent.postMessage({ type: 'otpusk-search-params', params: p }, '*');
+        } catch(e) {}
+      }
+
+      // Intercept XHR
+      var _open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url) {
+        if (typeof url === 'string' && url.indexOf('api.otpusk.com') !== -1) forward(url);
+        return _open.apply(this, arguments);
+      };
+
+      // Intercept JSONP script tags
+      if (window.MutationObserver) {
+        new MutationObserver(function(ms) {
+          for (var i = 0; i < ms.length; i++) {
+            var nodes = ms[i].addedNodes;
+            for (var j = 0; j < nodes.length; j++) {
+              var n = nodes[j];
+              if (n.nodeName === 'SCRIPT' && n.src && n.src.indexOf('api.otpusk.com') !== -1) {
+                forward(n.src);
+              }
+            }
+          }
+        }).observe(document.documentElement, { childList: true, subtree: true });
+      }
+    })();
   </script>
   <script src="https://api.otpusk.com/api/2.4/session?access_token=3f80a-01423-b3ca6-0bbab-1a284"></script>
   <script src="https://export.otpusk.com/js/onsite/"></script>
