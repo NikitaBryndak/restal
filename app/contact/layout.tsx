@@ -8,7 +8,6 @@ export const metadata: Metadata = {
     title: "Контакти | RestAL",
     description:
       "Зв'яжіться з турагенцією RestAL — телефон, email, месенджери. Ми на зв'язку 24/7.",
-    images: ["/og-image.png"],
   },
 };
 

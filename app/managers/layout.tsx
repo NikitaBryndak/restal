@@ -8,7 +8,6 @@ export const metadata: Metadata = {
     title: "Наші менеджери | RestAL",
     description:
       "Познайомтесь з командою досвідчених менеджерів RestAL. Оберіть свого персонального консультанта.",
-    images: ["/og-image.png"],
   },
 };
 

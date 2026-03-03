@@ -41,21 +41,12 @@ export const metadata: Metadata = {
     title: "Турагенція RestAL — Експертне планування вашого відпочинку",
     description:
       "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "RestAL — Турагенція",
-      },
-    ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Турагенція RestAL — Експертне планування вашого відпочинку",
     description:
       "Перетворюємо мрії про подорожі на реальність. Ваш комфорт — наш пріоритет. Повний супровід 24/7, глибока експертиза в напрямках та увага до кожної деталі вашої відпустки. Забронюйте тур онлайн!",
-    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -69,12 +60,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
+    apple: "/icons/icon-192x192.png",
   },
   manifest: "/manifest.json",
   other: {
