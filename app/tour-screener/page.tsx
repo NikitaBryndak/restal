@@ -37,31 +37,8 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Otpusk API → URL param mapping                                     */
+/*  Otpusk: params to skip when building shareable URLs                */
 /* ------------------------------------------------------------------ */
-const API_TO_URL_MAP: Record<string, string> = {
-  countryId: "geo",
-  country: "geo",
-  geo: "geo",
-  departureId: "departure",
-  departure: "departure",
-  from: "departure",
-  checkIn: "dateFrom",
-  dateFrom: "dateFrom",
-  date_from: "dateFrom",
-  checkOut: "dateTo",
-  dateTo: "dateTo",
-  date_to: "dateTo",
-  duration: "duration",
-  nights: "duration",
-  stars: "stars",
-  hotelCategory: "stars",
-  food: "food",
-  meal: "food",
-  transport: "transport",
-  adults: "adults",
-  children: "children",
-};
 const SKIP_PARAMS = new Set(["access_token", "callback", "jsonp", "_", "lang"]);
 
 /* ------------------------------------------------------------------ */
@@ -134,38 +111,21 @@ function TourScreenerContent() {
   const [linkCopied, setLinkCopied] = useState(false);
   const [searchActive, setSearchActive] = useState(() => {
     if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).has("geo");
+      const sp = new URLSearchParams(window.location.search);
+      return sp.has("geo") || sp.has("to") || sp.has("show");
     }
     return false;
   });
 
   // Build iframe src ONCE from initial URL params.
-  // Using useState initializer so the src is stable across re-renders
-  // and the iframe never reloads when the URL updates for sharing.
+  // Pass ALL query params through so both normalized (geo, departure, …)
+  // and raw Otpusk params (to, deptCity, length, …) reach the widget.
   const [iframeSrc] = useState(() => {
-    const p = new URLSearchParams();
-    const keys = [
-      "geo",
-      "departure",
-      "duration",
-      "dateFrom",
-      "dateTo",
-      "stars",
-      "food",
-      "transport",
-      "target",
-      "adults",
-      "children",
-    ];
     if (typeof window !== "undefined") {
-      const current = new URLSearchParams(window.location.search);
-      keys.forEach((k) => {
-        const v = current.get(k);
-        if (v) p.set(k, v);
-      });
+      const qs = window.location.search; // includes leading "?"
+      return `/otpusk-widget.html${qs}`;
     }
-    const qs = p.toString();
-    return `/otpusk-widget.html${qs ? "?" + qs : ""}`;
+    return `/otpusk-widget.html`;
   });
 
   // Booking modal state
@@ -264,20 +224,19 @@ function TourScreenerContent() {
         setShowBooking(true);
       }
 
-      // Capture search params from Otpusk API calls inside the iframe
+      // Capture search params from Otpusk API calls inside the iframe.
+      // Store raw Otpusk params as-is so shared URLs work when re-opened.
       if (event.data.type === "otpusk-search-params" && event.data.params) {
         const raw = event.data.params as Record<string, string>;
         const urlParams = new URLSearchParams();
 
         for (const [k, v] of Object.entries(raw)) {
-          if (SKIP_PARAMS.has(k)) continue;
-          const mapped = API_TO_URL_MAP[k];
-          if (mapped && !urlParams.has(mapped)) {
-            urlParams.set(mapped, v);
-          } else if (!mapped && !urlParams.has(k)) {
-            urlParams.set(k, v);
-          }
+          if (SKIP_PARAMS.has(k) || !v) continue;
+          urlParams.set(k, v);
         }
+
+        // Add show=true so auto-start triggers when the link is opened
+        urlParams.set("show", "true");
 
         const qs = urlParams.toString();
         if (qs) {

@@ -23,20 +23,33 @@
     var osAutoStart = false;
 
     // Shareable search: initialize widget from URL parameters
+    // Supports both normalized names (geo, departure, …) and raw Otpusk API names (to, deptCity, …)
     (function() {
       try {
         var p = new URLSearchParams(window.location.search);
-        if (p.get('geo'))        osGeo = p.get('geo');
-        if (p.get('departure'))  osDefaultDeparture = parseInt(p.get('departure')) || 1831;
-        if (p.get('duration'))   osDefaultDuration = p.get('duration');
-        if (p.get('dateFrom'))   osDateFrom = p.get('dateFrom');
-        if (p.get('dateTo'))     osDateTo = p.get('dateTo');
-        if (p.get('stars'))      osHotelCategory = p.get('stars');
-        if (p.get('food'))       osFood = p.get('food');
-        if (p.get('transport'))  osTransport = p.get('transport');
-        if (p.get('target'))     osTarget = p.get('target');
-        // Auto-start search when params are present
-        if (p.has('geo')) osAutoStart = true;
+        // Country / geo
+        if (p.get('geo'))                              osGeo = p.get('geo');
+        else if (p.get('to'))                          osGeo = p.get('to');
+        // Departure city
+        if (p.get('departure'))                        osDefaultDeparture = parseInt(p.get('departure')) || 1831;
+        else if (p.get('deptCity'))                     osDefaultDeparture = parseInt(p.get('deptCity')) || 1831;
+        // Duration / nights
+        if (p.get('duration'))                         osDefaultDuration = p.get('duration');
+        else if (p.get('length'))                      osDefaultDuration = p.get('length');
+        // Dates
+        if (p.get('dateFrom'))                         osDateFrom = p.get('dateFrom');
+        if (p.get('dateTo'))                           osDateTo = p.get('dateTo');
+        else if (p.get('checkTo'))                     osDateTo = p.get('checkTo');
+        // Stars
+        if (p.get('stars'))                            osHotelCategory = p.get('stars');
+        // Food
+        if (p.get('food'))                             osFood = p.get('food');
+        // Transport
+        if (p.get('transport'))                        osTransport = p.get('transport');
+        // Target
+        if (p.get('target'))                           osTarget = p.get('target');
+        // Auto-start search when meaningful params are present
+        if (p.has('geo') || p.has('to') || p.get('show') === 'true') osAutoStart = true;
       } catch(e) {}
     })();
   </script>
