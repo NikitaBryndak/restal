@@ -11,6 +11,7 @@ import {
     Plane, Award, CreditCard, Clock,
     Download, ArrowUpRight, ArrowDownRight,
     Filter, CheckCircle2, Percent, Gift, UserCheck,
+    Wallet, Search, Phone, ArrowUpDown,
 } from 'lucide-react';
 import {
     ADMIN_PRIVILEGE_LEVEL,
@@ -76,6 +77,30 @@ interface AnalyticsData {
 }
 
 // STATUS_COLORS, PIE_COLORS, PERIOD_OPTIONS, Period — imported from @/config/constants
+
+interface BonusUser {
+    phoneNumber: string;
+    name: string;
+    balance: number;
+    totalAccrued: number;
+    accruedFromTrips: number;
+    referralBonus: number;
+    totalUsed: number;
+    usedCount: number;
+    tripCashbackCount: number;
+    createdAt: string;
+}
+
+interface BonusData {
+    date: string;
+    totals: {
+        balance: number;
+        accrued: number;
+        used: number;
+        userCount: number;
+    };
+    users: BonusUser[];
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -338,7 +363,12 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [period, setPeriod] = useState<Period>('all');
-    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users' | 'bonuses'>('overview');
+    const [bonusData, setBonusData] = useState<BonusData | null>(null);
+    const [bonusLoading, setBonusLoading] = useState(false);
+    const [bonusSearch, setBonusSearch] = useState('');
+    const [bonusSortField, setBonusSortField] = useState<'balance' | 'totalAccrued' | 'totalUsed' | 'name'>('balance');
+    const [bonusSortDir, setBonusSortDir] = useState<'asc' | 'desc'>('desc');
 
     const isAdmin = userProfile && userProfile.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
 
@@ -361,6 +391,20 @@ export default function AnalyticsPage() {
         setPeriod(p);
         fetchAnalytics(p);
     }, [fetchAnalytics]);
+
+    const fetchBonuses = useCallback(async () => {
+        try {
+            setBonusLoading(true);
+            const res = await fetch('/api/analytics/bonuses');
+            if (!res.ok) throw new Error('Помилка завантаження');
+            const json = await res.json();
+            setBonusData(json);
+        } catch {
+            setError('Не вдалося завантажити дані бонусів');
+        } finally {
+            setBonusLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         if (isAdmin) fetchAnalytics();
@@ -470,10 +514,14 @@ export default function AnalyticsPage() {
                     { id: 'overview' as const, label: 'Огляд', icon: BarChart3 },
                     { id: 'revenue' as const, label: 'Фінанси', icon: DollarSign },
                     { id: 'users' as const, label: 'Користувачі', icon: Users },
+                    { id: 'bonuses' as const, label: 'Бонуси', icon: Wallet },
                 ]).map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                            setActiveTab(tab.id);
+                            if (tab.id === 'bonuses' && !bonusData) fetchBonuses();
+                        }}
                         className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all duration-200 ${activeTab === tab.id
                             ? 'bg-white/8 text-white'
                             : 'text-secondary hover:text-white hover:bg-white/3'
@@ -1004,6 +1052,226 @@ export default function AnalyticsPage() {
                                 </div>
                             </ChartCard>
                         </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'bonuses' && (
+                    <motion.div
+                        key="bonuses"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 sm:space-y-8"
+                    >
+                        {bonusLoading && !bonusData ? (
+                            <div className="flex justify-center items-center py-20">
+                                <RefreshCw size={20} className="animate-spin text-accent" />
+                            </div>
+                        ) : bonusData ? (
+                            <>
+                                {/* Summary header */}
+                                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                                    <div>
+                                        <p className="text-xs text-secondary">
+                                            Дані станом на {new Date(bonusData.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })}, {new Date(bonusData.date).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => fetchBonuses()}
+                                        disabled={bonusLoading}
+                                        className="flex items-center gap-2 text-xs bg-white/3 border border-white/8 rounded-xl px-3 py-2 text-secondary hover:text-white hover:bg-white/6 transition-all duration-200 self-start sm:self-auto"
+                                    >
+                                        <RefreshCw size={13} className={bonusLoading ? 'animate-spin' : ''} />
+                                        <span className="hidden sm:inline">Оновити</span>
+                                    </button>
+                                </div>
+
+                                {/* KPI cards */}
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                                    <StatCard icon={Wallet} label="Сума на рахунках" value={formatCurrency(bonusData.totals.balance)} color="text-amber-400" delay={0} />
+                                    <StatCard icon={TrendingUp} label="Нараховано" value={formatCurrency(bonusData.totals.accrued)} color="text-green-400" delay={0.05} />
+                                    <StatCard icon={CreditCard} label="Використано" value={formatCurrency(bonusData.totals.used)} color="text-pink-400" delay={0.1} />
+                                    <StatCard icon={Users} label="Користувачів" value={bonusData.totals.userCount} color="text-blue-400" delay={0.15} />
+                                </div>
+
+                                {/* Search + sort controls */}
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <div className="relative flex-1 max-w-md">
+                                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" />
+                                        <input
+                                            type="text"
+                                            placeholder="Пошук за номером телефону або ім'ям…"
+                                            value={bonusSearch}
+                                            onChange={(e) => setBonusSearch(e.target.value)}
+                                            className="w-full pl-9 pr-3 py-2 text-sm bg-white/3 border border-white/8 rounded-xl text-white placeholder:text-secondary/60 focus:outline-none focus:border-accent/40 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-1 bg-white/3 border border-white/8 rounded-xl p-1">
+                                        {([
+                                            { field: 'balance' as const, label: 'Баланс' },
+                                            { field: 'totalAccrued' as const, label: 'Нараховано' },
+                                            { field: 'totalUsed' as const, label: 'Використано' },
+                                            { field: 'name' as const, label: 'Ім\'я' },
+                                        ]).map((opt) => (
+                                            <button
+                                                key={opt.field}
+                                                onClick={() => {
+                                                    if (bonusSortField === opt.field) {
+                                                        setBonusSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+                                                    } else {
+                                                        setBonusSortField(opt.field);
+                                                        setBonusSortDir(opt.field === 'name' ? 'asc' : 'desc');
+                                                    }
+                                                }}
+                                                className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-all duration-200 ${bonusSortField === opt.field
+                                                    ? 'bg-accent text-white shadow-sm shadow-accent/20'
+                                                    : 'text-secondary hover:text-white hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                {opt.label}
+                                                {bonusSortField === opt.field && (
+                                                    <ArrowUpDown size={11} className="opacity-70" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Table */}
+                                <div className="bg-white/3 border border-white/8 rounded-xl overflow-hidden">
+                                    {/* Desktop header */}
+                                    <div className="hidden md:grid grid-cols-[1fr_140px_140px_140px_140px] gap-2 px-4 py-3 bg-white/3 border-b border-white/8 text-xs text-secondary font-medium">
+                                        <div className="flex items-center gap-1">
+                                            <Phone size={11} />
+                                            Телефон / Ім&apos;я
+                                        </div>
+                                        <div className="text-right">Баланс</div>
+                                        <div className="text-right">Нараховано</div>
+                                        <div className="text-right">Використано</div>
+                                        <div className="text-right">Деталі</div>
+                                    </div>
+
+                                    <div className="max-h-[600px] overflow-y-auto divide-y divide-white/4">
+                                        {(() => {
+                                            const filtered = bonusData.users
+                                                .filter((u) => {
+                                                    if (!bonusSearch) return true;
+                                                    const q = bonusSearch.toLowerCase();
+                                                    return u.phoneNumber.includes(q) || u.name.toLowerCase().includes(q);
+                                                })
+                                                .sort((a, b) => {
+                                                    let cmp = 0;
+                                                    if (bonusSortField === 'name') {
+                                                        cmp = a.name.localeCompare(b.name, 'uk');
+                                                    } else {
+                                                        cmp = (a[bonusSortField] ?? 0) - (b[bonusSortField] ?? 0);
+                                                    }
+                                                    return bonusSortDir === 'asc' ? cmp : -cmp;
+                                                });
+
+                                            if (filtered.length === 0) {
+                                                return (
+                                                    <p className="text-secondary text-sm text-center py-8">
+                                                        {bonusSearch ? 'Нічого не знайдено' : 'Немає даних'}
+                                                    </p>
+                                                );
+                                            }
+
+                                            return filtered.map((user, i) => (
+                                                <motion.div
+                                                    key={user.phoneNumber}
+                                                    initial={{ opacity: 0, y: 4 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: Math.min(i * 0.015, 0.3) }}
+                                                    className="grid grid-cols-1 md:grid-cols-[1fr_140px_140px_140px_140px] gap-1 md:gap-2 px-4 py-3 hover:bg-white/3 transition-colors"
+                                                >
+                                                    {/* Phone + Name */}
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span className="text-sm text-white font-medium">{user.phoneNumber}</span>
+                                                        <span className="text-xs text-secondary">{user.name}</span>
+                                                    </div>
+
+                                                    {/* Balance */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Баланс:</span>
+                                                        <span className={`text-sm font-semibold ${user.balance > 0 ? 'text-amber-400' : 'text-secondary'}`}>
+                                                            {formatCurrency(user.balance)}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Accrued */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Нараховано:</span>
+                                                        <span className="text-sm text-green-400 font-medium">
+                                                            {formatCurrency(user.totalAccrued)}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Used */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Використано:</span>
+                                                        <span className={`text-sm font-medium ${user.totalUsed > 0 ? 'text-pink-400' : 'text-secondary'}`}>
+                                                            {formatCurrency(user.totalUsed)}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Details */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Деталі:</span>
+                                                        <div className="flex flex-wrap gap-1.5 justify-end">
+                                                            {user.tripCashbackCount > 0 && (
+                                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-400/10 text-green-400 border border-green-400/20">
+                                                                    {user.tripCashbackCount} подор.
+                                                                </span>
+                                                            )}
+                                                            {user.referralBonus > 0 && (
+                                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-400/10 text-blue-400 border border-blue-400/20">
+                                                                    Реф. {formatCurrency(user.referralBonus)}
+                                                                </span>
+                                                            )}
+                                                            {user.usedCount > 0 && (
+                                                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-pink-400/10 text-pink-400 border border-pink-400/20">
+                                                                    {user.usedCount} промо
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ));
+                                        })()}
+                                    </div>
+
+                                    {/* Footer totals */}
+                                    <div className="grid grid-cols-1 md:grid-cols-[1fr_140px_140px_140px_140px] gap-1 md:gap-2 px-4 py-3 bg-white/3 border-t border-white/8 text-sm font-medium">
+                                        <div className="text-secondary">Всього ({bonusData.totals.userCount} корист.)</div>
+                                        <div className="flex items-center justify-between md:justify-end gap-2">
+                                            <span className="text-xs text-secondary md:hidden">Баланс:</span>
+                                            <span className="text-amber-400">{formatCurrency(bonusData.totals.balance)}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between md:justify-end gap-2">
+                                            <span className="text-xs text-secondary md:hidden">Нараховано:</span>
+                                            <span className="text-green-400">{formatCurrency(bonusData.totals.accrued)}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between md:justify-end gap-2">
+                                            <span className="text-xs text-secondary md:hidden">Використано:</span>
+                                            <span className="text-pink-400">{formatCurrency(bonusData.totals.used)}</span>
+                                        </div>
+                                        <div />
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col justify-center items-center py-20 gap-4">
+                                <p className="text-secondary text-sm">Натисніть кнопку для завантаження</p>
+                                <button
+                                    onClick={() => fetchBonuses()}
+                                    className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                    <RefreshCw size={14} /> Завантажити
+                                </button>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
