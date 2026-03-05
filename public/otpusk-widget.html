@@ -1509,6 +1509,67 @@
 </head>
 <body>
   <script>
+    // Auto-deselect all region/resort checkboxes when the resort list (#ctyList) appears
+    // so the client can choose regions manually instead of having all pre-selected.
+    (function() {
+      var lastCountry = '';
+
+      function uncheckResorts() {
+        var ctyList = document.getElementById('ctyList');
+        if (!ctyList) return;
+
+        // Detect current country selection to know when it changes
+        var countryInput = document.querySelector('#cntList .ui-menu-item.active, .new_f-autocomplete-input[name="geo"], input[name="countryId"]');
+        var currentCountry = countryInput ? (countryInput.value || countryInput.textContent || '').trim() : '';
+
+        var checkboxes = ctyList.querySelectorAll('input[type="checkbox"]');
+        if (checkboxes.length === 0) return;
+
+        // Check if all are currently checked (meaning it's a fresh load, not user interaction)
+        var allChecked = true;
+        for (var i = 0; i < checkboxes.length; i++) {
+          if (!checkboxes[i].checked) { allChecked = false; break; }
+        }
+
+        if (allChecked && checkboxes.length > 1) {
+          for (var j = 0; j < checkboxes.length; j++) {
+            checkboxes[j].checked = false;
+            // Trigger change event so the widget registers the change
+            var evt = new Event('change', { bubbles: true });
+            checkboxes[j].dispatchEvent(evt);
+          }
+          // Also try clicking via jQuery if available (Otpusk uses jQuery)
+          if (window.jQuery) {
+            window.jQuery('#ctyList input[type="checkbox"]:checked').prop('checked', false).trigger('change');
+          }
+        }
+      }
+
+      // Observe #ctyList for changes (resort list appearing after country selection)
+      if (window.MutationObserver) {
+        new MutationObserver(function(mutations) {
+          for (var i = 0; i < mutations.length; i++) {
+            var added = mutations[i].addedNodes;
+            for (var j = 0; j < added.length; j++) {
+              var node = added[j];
+              if (node.nodeType !== 1) continue;
+              if (node.id === 'ctyList' || (node.querySelectorAll && node.querySelectorAll('#ctyList').length)) {
+                setTimeout(uncheckResorts, 100);
+                setTimeout(uncheckResorts, 300);
+                return;
+              }
+            }
+          }
+          // Also check if #ctyList content changed (e.g., new checkboxes added)
+          var target = mutations[0] && mutations[0].target;
+          if (target && (target.id === 'ctyList' || (target.closest && target.closest('#ctyList')))) {
+            setTimeout(uncheckResorts, 100);
+          }
+        }).observe(document.body, { childList: true, subtree: true });
+      }
+    })();
+  </script>
+  <script>
     // Intercept "Замовити тур" button clicks (capture phase, runs before widget handlers)
     document.addEventListener('click', function(e) {
       var el = e.target;
