@@ -23,7 +23,22 @@ import { useRouter } from "next/navigation";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+
+type ActiveTripSummary = {
+    _id: string;
+    number: string;
+    country: string;
+    status: string;
+    ownerPhone: string;
+    managerPhone?: string;
+    managerName?: string;
+    tripStartDate: string;
+    tripEndDate: string;
+    payment?: { totalAmount?: number; paidAmount?: number };
+    createdAt?: string;
+};
 
 type EditableTourist = Tourist & {
     passportNumber?: string;
@@ -246,6 +261,13 @@ export default function ManageTourPage() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [activeTrips, setActiveTrips] = useState<ActiveTripSummary[]>([]);
+    const [showActiveTrips, setShowActiveTrips] = useState(false);
+    const [activeTripsPagination, setActiveTripsPagination] = useState({ page: 1, totalPages: 1, totalCount: 0 });
+    const [isLoadingActiveTrips, setIsLoadingActiveTrips] = useState(false);
+    const [managers, setManagers] = useState<{ name: string; phoneNumber: string; privilegeLevel: number }[]>([]);
+
+    const isAdmin = (session?.user?.privilegeLevel ?? 0) >= ADMIN_PRIVILEGE_LEVEL;
 
     const documentKeys = useMemo(() => DOCUMENT_KEYS, []);
     const buildEmptyPendingFiles = useCallback(
@@ -271,6 +293,17 @@ export default function ManageTourPage() {
     useEffect(() => {
         setPendingFiles(buildEmptyPendingFiles());
     }, [trip?._id, buildEmptyPendingFiles]);
+
+    useEffect(() => {
+        if (status === 'loading') return;
+        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) return;
+        fetch('/api/managers')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data.managers)) setManagers(data.managers);
+            })
+            .catch(() => {});
+    }, [session, status]);
 
     const handleFlightFieldChange = useCallback(
         (segment: 'departure' | 'arrival', field: keyof FlightInfo['departure'], value: string) => {
@@ -480,12 +513,61 @@ export default function ManageTourPage() {
         return null;
     }
 
+    const loadActiveTrips = async (page = 1) => {
+        setIsLoadingActiveTrips(true);
+        setErrorMessage(null);
+        try {
+            const response = await fetch(`/api/trips/manage?page=${page}&limit=20`);
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(payload?.message ?? 'Не вдалося завантажити активні договори.');
+            }
+            setActiveTrips(payload.trips ?? []);
+            setActiveTripsPagination(payload.pagination ?? { page: 1, totalPages: 1, totalCount: 0 });
+            setShowActiveTrips(true);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Не вдалося завантажити активні договори.';
+            setErrorMessage(message);
+        } finally {
+            setIsLoadingActiveTrips(false);
+        }
+    };
+
+    const handleSelectActiveTrip = async (tripId: string) => {
+        setIsLoading(true);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+        try {
+            const response = await fetch(`/api/trips/manage/${encodeURIComponent(tripId)}`);
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(payload?.message ?? 'Unable to locate the requested tour.');
+            }
+            const nextTrip = normalizeTrip(payload.trip);
+            setTrip(nextTrip);
+            setActiveId(tripId);
+            setShowActiveTrips(false);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unable to locate the requested tour.';
+            setErrorMessage(message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleLookup = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const identifier = searchValue.trim();
 
         if (!identifier) {
-            setErrorMessage('Enter a tour number (e.g. Trip #5468189) or internal ID to continue.');
+            if (isAdmin) {
+                // Admin: show all active trips
+                setTrip(null);
+                setActiveId(null);
+                await loadActiveTrips(1);
+                return;
+            }
+            setErrorMessage('Введіть номер туру (напр. Тур #5468189) або внутрішній ID.');
             setTrip(null);
             setActiveId(null);
             return;
@@ -494,6 +576,7 @@ export default function ManageTourPage() {
         setIsLoading(true);
         setErrorMessage(null);
         setSuccessMessage(null);
+        setShowActiveTrips(false);
 
         try {
             const response = await fetch(`/api/trips/manage/${encodeURIComponent(identifier)}`);
@@ -646,11 +729,13 @@ export default function ManageTourPage() {
                                 autoComplete="off"
                             />
                         </div>
-                        <Button type="submit" size="lg" disabled={isLoading} className="bg-accent hover:bg-accent/80 text-white border-0">
-                            {isLoading ? 'Пошук…' : 'Знайти тур'}
+                        <Button type="submit" size="lg" disabled={isLoading || isLoadingActiveTrips} className="bg-accent hover:bg-accent/80 text-white border-0">
+                            {isLoading || isLoadingActiveTrips ? 'Пошук…' : 'Знайти тур'}
                         </Button>
                         <div className="flex-1 text-sm text-white/40">
-                            Тільки менеджери з підвищеним доступом можуть редагувати існуючі тури.
+                            {isAdmin
+                                ? 'Натисніть «Знайти тур» без вводу номера, щоб побачити всі активні договори.'
+                                : 'Тільки менеджери з підвищеним доступом можуть редагувати існуючі тури.'}
                         </div>
                     </form>
                     {errorMessage && (
@@ -675,6 +760,100 @@ export default function ManageTourPage() {
                         </div>
                     )}
                 </section>
+
+                {showActiveTrips && !trip && (
+                    <section className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-semibold text-white">Активні договори</h2>
+                                <p className="text-sm text-white/50">Всього: {activeTripsPagination.totalCount} активних турів</p>
+                            </div>
+                            <button
+                                onClick={() => setShowActiveTrips(false)}
+                                className="text-sm text-white/40 hover:text-white transition-colors"
+                            >
+                                Закрити список
+                            </button>
+                        </div>
+
+                        {isLoadingActiveTrips ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                            </div>
+                        ) : activeTrips.length === 0 ? (
+                            <p className="text-center text-sm text-white/40 py-8">Немає активних договорів.</p>
+                        ) : (
+                            <>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider text-white/40">
+                                                <th className="pb-3 pr-4">Номер</th>
+                                                <th className="pb-3 pr-4">Країна</th>
+                                                <th className="pb-3 pr-4">Статус</th>
+                                                <th className="pb-3 pr-4">Дати</th>
+                                                <th className="pb-3 pr-4">Менеджер</th>
+                                                <th className="pb-3 pr-4">Оплата</th>
+                                                <th className="pb-3"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {activeTrips.map((t) => (
+                                                <tr key={t._id} className="hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleSelectActiveTrip(t._id)}>
+                                                    <td className="py-3 pr-4 font-medium text-white">#{t.number}</td>
+                                                    <td className="py-3 pr-4 text-white/70">{t.country || '—'}</td>
+                                                    <td className="py-3 pr-4">
+                                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                                            t.status === 'In Booking' ? 'bg-yellow-500/15 text-yellow-400' :
+                                                            t.status === 'Booked' ? 'bg-blue-500/15 text-blue-400' :
+                                                            t.status === 'Paid' ? 'bg-emerald-500/15 text-emerald-400' :
+                                                            t.status === 'In Progress' ? 'bg-purple-500/15 text-purple-400' :
+                                                            'bg-white/10 text-white/60'
+                                                        }`}>
+                                                            {TOUR_STATUS_LABELS[t.status as TourStatus] || t.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 pr-4 text-white/70 whitespace-nowrap">
+                                                        {t.tripStartDate || '—'} — {t.tripEndDate || '—'}
+                                                    </td>
+                                                    <td className="py-3 pr-4 text-white/70">{t.managerName || '—'}</td>
+                                                    <td className="py-3 pr-4 text-white/70 whitespace-nowrap">
+                                                        {t.payment?.paidAmount ?? 0} / {t.payment?.totalAmount ?? 0} ₴
+                                                    </td>
+                                                    <td className="py-3 text-right">
+                                                        <span className="text-accent text-xs hover:underline">Редагувати →</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {activeTripsPagination.totalPages > 1 && (
+                                    <div className="mt-6 flex items-center justify-center gap-4">
+                                        <button
+                                            onClick={() => loadActiveTrips(activeTripsPagination.page - 1)}
+                                            disabled={activeTripsPagination.page <= 1 || isLoadingActiveTrips}
+                                            className="flex items-center gap-1 text-sm text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" /> Назад
+                                        </button>
+                                        <span className="text-sm text-white/50">
+                                            {activeTripsPagination.page} / {activeTripsPagination.totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => loadActiveTrips(activeTripsPagination.page + 1)}
+                                            disabled={activeTripsPagination.page >= activeTripsPagination.totalPages || isLoadingActiveTrips}
+                                            className="flex items-center gap-1 text-sm text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            Далі <ChevronRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </section>
+                )}
 
                 {trip ? (
                     <section className="space-y-6">
@@ -711,8 +890,34 @@ export default function ManageTourPage() {
                                     formatType="date"
                                 />
                                 <div>
-                                    <Label htmlFor="manager-name">Менеджер туру</Label>
-                                    <Input id="manager-name" value={trip.managerName ?? 'Не вказано'} disabled className="bg-white/5" />
+                                    <Label htmlFor="manager-phone">Менеджер туру</Label>
+                                    {isAdmin ? (
+                                        <select
+                                            id="manager-phone"
+                                            value={trip.managerPhone ?? ''}
+                                            onChange={(event) =>
+                                                setTrip((prev) => {
+                                                    if (!prev) return prev;
+                                                    const selected = managers.find(m => m.phoneNumber === event.target.value);
+                                                    return {
+                                                        ...prev,
+                                                        managerPhone: event.target.value || undefined,
+                                                        managerName: selected?.name || '',
+                                                    };
+                                                })
+                                            }
+                                            className="w-full h-10 px-3 py-2 text-sm border border-white/10 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-accent/30"
+                                        >
+                                            <option value="">Не призначено</option>
+                                            {managers.map((m) => (
+                                                <option key={m.phoneNumber} value={m.phoneNumber}>
+                                                    {m.name || m.phoneNumber}{m.privilegeLevel >= 3 ? ' (Адмін)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <Input id="manager-phone" value={trip.managerName || 'Не призначено'} disabled className="bg-white/5" />
+                                    )}
                                 </div>
                                 <div>
                                     <Label htmlFor="tour-status">Статус туру</Label>

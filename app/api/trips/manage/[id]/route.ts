@@ -140,6 +140,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             'payment', 'flightInfo', 'documents',
             'tourists', 'description', 'boardBasis',
             'insurance', 'transfer', 'nightsCount',
+            'managerPhone',
         ];
 
         const rest: Record<string, unknown> = {};
@@ -156,14 +157,31 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             newCashbackAmount = (payment.totalAmount || 0) * CASHBACK_RATE;
         }
 
-        // Get current manager's name
-        const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
+        // SECURITY: Only admins can reassign the manager of a trip
+        const selectedManagerPhone = rest.managerPhone as string | undefined;
+        let managerName: string | undefined;
+        if (selectedManagerPhone) {
+            if (!isAdmin) {
+                return NextResponse.json({ message: "Forbidden: Only admins can reassign the tour manager." }, { status: 403 });
+            }
+            // Validate that the target phone belongs to an actual manager (privilege >= 2)
+            const selectedManager = await User.findOne({
+                phoneNumber: selectedManagerPhone,
+                privilegeLevel: { $gte: MANAGER_PRIVILEGE_LEVEL },
+            }).lean() as any;
+            if (!selectedManager) {
+                return NextResponse.json({ message: "Invalid manager: the selected phone does not belong to a manager." }, { status: 400 });
+            }
+            managerName = selectedManager.name || '';
+        }
+
+        // Get current user name for audit logging
+        const currentUser = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
 
         const payload: Record<string, any> = {
             ...rest,
             ...(newCashbackAmount !== undefined && { cashbackAmount: newCashbackAmount }),
-            managerPhone: session.user.phoneNumber, // Update to current manager
-            managerName: currentManager?.name || '',
+            ...(managerName !== undefined && { managerName }),
         };
 
         // Auto-fill flight dates and return country based on tour dates and country
@@ -236,7 +254,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             entityType: "trip",
             entityId: existingTrip._id.toString(),
             userId: session.user.phoneNumber,
-            userName: currentManager?.name || "",
+            userName: currentUser?.name || "",
             details: {
                 number: existingTrip.number,
                 ...(existingTrip.status !== updates.status && { oldStatus: existingTrip.status, newStatus: updates.status }),

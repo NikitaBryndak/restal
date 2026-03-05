@@ -200,6 +200,13 @@ export default async function TripPage({
                 <h1 className="text-3xl sm:text-5xl font-bold text-white mb-1 sm:mb-2 truncate">
                   {trip.country}
                 </h1>
+                {trip.number && (
+                  <div className="flex items-center mt-2 sm:mt-3">
+                    <div className="inline-flex items-center px-3 py-1 rounded-lg bg-black/20 backdrop-blur-md border border-white/10 text-sm font-medium text-white/80 shadow-sm">
+                      Тур <span className="ml-1 text-white font-bold tracking-wide">#{trip.number}</span>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex items-end gap-2 sm:gap-3 shrink-0 flex-wrap">
                 <TripShareCard
