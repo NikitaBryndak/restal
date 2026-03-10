@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
 const contactRequestSchema = new Schema({
-    // Source: "contact" (contact page) or "manager" (managers page consultation)
+    // Source: "contact" (contact page), "manager" (managers page consultation), "tour", or "ai-trip-plan"
     source: {
         type: String,
-        enum: ["contact", "manager", "tour"],
+        enum: ["contact", "manager", "tour", "ai-trip-plan"],
         required: true,
     },
     // Contact info
