@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
-import { Send, ArrowLeft, ArrowDown, Loader2, Bot, Sparkles } from "lucide-react";
+import { Send, ArrowLeft, ArrowDown, Loader2, Bot, Sparkles, Plane } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import TripPlanCard, { type TripPlan } from "./trip-plan-card";
 
 type Message = {
   role: "user" | "assistant";
@@ -21,6 +22,9 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
   const [isLoading, setIsLoading] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [tripPlan, setTripPlan] = useState<TripPlan | null>(null);
+  const [isPlanLoading, setIsPlanLoading] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -121,6 +125,44 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
+
+  const generateTripPlan = async () => {
+    if (messages.length < 2 || isPlanLoading) return;
+    setIsPlanLoading(true);
+    setPlanError(null);
+    setTripPlan(null);
+
+    try {
+      const res = await fetch("/api/chat/trip-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        if (data.error === "not_enough_info") {
+          setPlanError("Поки недостатньо деталей для плану. Розкажіть більше про вашу подорож!");
+        } else if (res.status === 429) {
+          setPlanError("Ви досягли ліміту запитів на сьогодні. Зверніться до менеджера через сторінку контактів.");
+        } else {
+          setPlanError("Не вдалося сформувати план. Спробуйте ще раз.");
+        }
+        return;
+      }
+
+      const data = await res.json();
+      setTripPlan(data.plan);
+      setTimeout(scrollToBottom, 100);
+    } catch {
+      setPlanError("Помилка з'єднання. Спробуйте ще раз.");
+    } finally {
+      setIsPlanLoading(false);
+    }
+  };
+
+  // Show "Generate Plan" button after 4+ messages (at least 2 exchanges)
+  const showPlanButton = messages.length >= 4 && !tripPlan;
 
   const quickQuestions = [
     { emoji: "🧳", text: "Спланувати подорож" },
@@ -246,6 +288,47 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
                 </div>
               </div>
             )}
+
+            {/* Trip Plan: generate button */}
+            {showPlanButton && !isLoading && (
+              <div className="flex justify-center py-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <button
+                  onClick={generateTripPlan}
+                  disabled={isPlanLoading}
+                  className="group flex items-center gap-2.5 px-5 py-3 bg-linear-to-r from-accent/15 to-accent/10 hover:from-accent hover:to-accent/90 border border-accent/25 hover:border-accent rounded-2xl text-accent hover:text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-accent/10 hover:shadow-accent/25 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                >
+                  {isPlanLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Формую план...
+                    </>
+                  ) : (
+                    <>
+                      <Plane className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      ✨ Сформувати план подорожі
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Trip Plan: error message */}
+            {planError && (
+              <div className="flex justify-center py-2 animate-in fade-in duration-300">
+                <p className="text-orange-400/80 text-xs text-center max-w-sm">{planError}</p>
+              </div>
+            )}
+
+            {/* Trip Plan: visual card */}
+            {tripPlan && (
+              <div className="py-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <TripPlanCard
+                  plan={tripPlan}
+                  onClose={() => setTripPlan(null)}
+                />
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { Suspense, useRef, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -21,6 +21,7 @@ import {
    Headphones,
    Shield,
    MessageCircle,
+   Sparkles,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -124,6 +125,14 @@ const trustBadges = [
 /*  PAGE                                                               */
 /* ================================================================== */
 export default function ContactPage() {
+   return (
+      <Suspense>
+         <ContactPageContent />
+      </Suspense>
+   );
+}
+
+function ContactPageContent() {
    const searchParams = useSearchParams();
 
    const [firstName, setFirstName] = useState("");
@@ -134,7 +143,10 @@ export default function ContactPage() {
    const [success, setSuccess] = useState(false);
    const [error, setError] = useState<string | null>(null);
 
-   // Prefill from query params (e.g. from "Book again" button)
+   const isAiTripPlan = searchParams.get("source") === "ai-trip-plan";
+   const formRef = useRef<HTMLFormElement>(null);
+
+   // Prefill from query params (e.g. from "Book again" button or AI trip plan)
    useEffect(() => {
       const country = searchParams.get("country");
       const region = searchParams.get("region");
@@ -147,7 +159,13 @@ export default function ContactPage() {
          parts.push("Прошу підібрати подібний тур.");
          setMessage(parts.join(". "));
       }
-   }, [searchParams]);
+      // Auto-scroll to form when coming from AI trip plan
+      if (isAiTripPlan) {
+         setTimeout(() => {
+            formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+         }, 800);
+      }
+   }, [searchParams, isAiTripPlan]);
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -162,7 +180,7 @@ export default function ContactPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-               source: "contact",
+               source: isAiTripPlan ? "ai-trip-plan" : "contact",
                firstName,
                lastName,
                phone,
@@ -329,9 +347,9 @@ export default function ContactPage() {
 
                {/* Right — Form (3 cols) */}
                <FadeIn delay={0.15} className="lg:col-span-3">
-                  <div className="relative p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 overflow-hidden backdrop-blur-sm">
+                  <div className="relative p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 backdrop-blur-sm">
                      {/* Gradient background fill */}
-                     <div className="absolute inset-0 bg-linear-to-br from-white/3 via-white/1.5 to-accent/2.5" />
+                     <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden bg-linear-to-br from-white/3 via-white/1.5 to-accent/2.5" />
 
                      {/* Decorative top gradient bar */}
                      <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/25 to-transparent" />
@@ -345,13 +363,25 @@ export default function ContactPage() {
                            <Send className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                         </div>
                         <h3 className="text-base sm:text-xl font-bold text-white mb-1 text-center">
-                           Індивідуальний підбір туру
+                           {isAiTripPlan ? "Бронювання за AI-планом" : "Індивідуальний підбір туру"}
                         </h3>
                         <p className="text-white/40 text-xs sm:text-sm text-center mb-4 sm:mb-6">
-                           Залиште заявку — ми зв&apos;яжемося найближчим часом
+                           {isAiTripPlan
+                              ? "Ваш план подорожі вже заповнено — додайте контакти і ми підберемо найкращий тур"
+                              : "Залиште заявку — ми зв&apos;яжемося найближчим часом"
+                           }
                         </p>
 
-                        <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
+                        {isAiTripPlan && (
+                           <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-accent/10 border border-accent/20 mb-1">
+                              <Sparkles className="w-4 h-4 text-accent shrink-0" />
+                              <p className="text-accent/80 text-xs leading-snug">
+                                 Деталі подорожі заповнено автоматично з вашого AI-плану. Перевірте та додайте номер телефону.
+                              </p>
+                           </div>
+                        )}
+
+                        <form ref={formRef} className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                               <div className="space-y-1.5">
                                  <Label htmlFor="firstName" className="text-white/60 text-sm">Ім&apos;я</Label>
@@ -390,7 +420,9 @@ export default function ContactPage() {
                                  id="message"
                                  value={message}
                                  onChange={(e) => setMessage(e.target.value)}
-                                 className="flex min-h-[80px] sm:min-h-[100px] w-full rounded-xl border border-white/8 bg-white/5 px-4 py-3 text-sm ring-offset-background placeholder:text-white/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/40 resize-none"
+                                 className={`flex w-full rounded-xl border border-white/8 bg-white/5 px-4 py-3 text-sm ring-offset-background placeholder:text-white/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50 focus:border-accent/40 ${
+                                    isAiTripPlan ? "min-h-60 sm:min-h-70 resize-y" : "min-h-20 sm:min-h-25 resize-none"
+                                 }`}
                                  placeholder="Розкажіть про ваші плани подорожі..."
                               />
                            </div>

@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!["contact", "manager", "tour"].includes(source)) {
+        if (!["contact", "manager", "tour", "ai-trip-plan"].includes(source)) {
             return NextResponse.json(
                 { message: "Невірне джерело запиту" },
                 { status: 400 }

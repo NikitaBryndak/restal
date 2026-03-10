@@ -13,7 +13,6 @@ import {
   Plane,
   Star,
   Phone,
-  CheckCircle,
   MapPin,
   Users,
   Heart,
