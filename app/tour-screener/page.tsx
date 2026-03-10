@@ -273,6 +273,10 @@ function TourScreenerContent() {
       setError("Введіть номер телефону");
       return;
     }
+    if (!/^\+38\d{9}$/.test(phone.trim())) {
+      setError("Формат: +38XXXXXXXXX (9 цифр після +38)");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -722,7 +726,7 @@ function TourScreenerContent() {
 
               <FormInput
                 labelText="Телефон"
-                placeholder="+38 (XXX) XXX-XXXX"
+                placeholder="+38XXXXXXXXX"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 containerClassName="space-y-2"

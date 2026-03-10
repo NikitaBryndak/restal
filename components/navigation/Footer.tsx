@@ -42,7 +42,7 @@ export default function Footer() {
         pathname !== '/register' &&
         pathname !== '/login' &&
 
-            <footer className="bottom-0 left-0 right-0 flex flex-col items-center my-6 gap-4 text-sm text-white/50 px-4">
+            <footer className="w-full mt-auto flex flex-col items-center my-6 gap-4 text-sm text-white/50 px-4">
                 <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
                     <NavLink href="/contact">Контакти</NavLink>
                     <NavLink href="/info">Допомога</NavLink>
@@ -57,7 +57,7 @@ export default function Footer() {
                             aria-label={s.label}
                             className="text-white/40 transition-colors hover:text-white/70"
                         >
-                            <s.icon />
+                            <s.icon className="w-4 h-4" />
                         </a>
                     ))}
                 </div>
