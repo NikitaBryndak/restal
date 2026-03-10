@@ -264,7 +264,7 @@ function InfoPageInner() {
             </FadeIn>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredArticles.slice(0, 6).map((article: any, index: number) => (
+              {filteredArticles.map((article: any, index: number) => (
                 <FadeIn key={article._id} delay={index * 0.06}>
                   <ArticleCard data={article} />
                 </FadeIn>

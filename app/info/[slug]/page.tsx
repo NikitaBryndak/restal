@@ -1,39 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Calendar, Tag, BookOpen } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { ArrowLeft, Calendar, Tag, BookOpen, Clock, Share2, Check, ArrowRight } from "lucide-react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { use } from "react";
-import { motion, useInView } from "motion/react";
+import { motion } from "motion/react";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import ArticleContentPreview from "@/components/article/article-content-preview";
+import FadeIn from "@/components/ui/fade-in";
+import ArticleCard from "@/components/article/article-card";
 
-/* ------------------------------------------------------------------ */
-/*  Fade-in wrapper                                                    */
-/* ------------------------------------------------------------------ */
-function FadeIn({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "Нещодавно";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "Нещодавно";
+  return date.toLocaleDateString("uk-UA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+function getReadingTime(html: string): number {
+  const text = html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  const words = text.split(" ").filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
 }
 
 /* ================================================================== */
@@ -46,8 +37,10 @@ export default function ArticlePage({
 }) {
   const resolvedParams = use(params);
   const [article, setArticle] = useState<any>(null);
+  const [allArticles, setAllArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -58,7 +51,6 @@ export default function ArticlePage({
           const data = await res.json();
           setArticle(data.article || data);
           setLoading(false);
-          return;
         } else if (res.status === 400 || res.status === 404) {
           const allRes = await fetch("/api/articles");
           if (allRes.ok) {
@@ -73,6 +65,7 @@ export default function ArticlePage({
             );
             if (found) {
               setArticle(found);
+              setAllArticles(articlesArray);
             } else {
               setNotFound(true);
             }
@@ -92,6 +85,54 @@ export default function ArticlePage({
 
     fetchArticle();
   }, [resolvedParams.slug]);
+
+  // Fetch all articles for related section (if not already fetched via fallback)
+  useEffect(() => {
+    if (allArticles.length > 0 || !article) return;
+    const fetchAll = async () => {
+      try {
+        const res = await fetch("/api/articles");
+        if (res.ok) {
+          const data = await res.json();
+          setAllArticles(Array.isArray(data) ? data : data?.articles || []);
+        }
+      } catch {
+        // silently fail — related articles are non-critical
+      }
+    };
+    fetchAll();
+  }, [article, allArticles.length]);
+
+  const readingTime = useMemo(
+    () => (article?.content ? getReadingTime(article.content) : 0),
+    [article?.content]
+  );
+
+  const relatedArticles = useMemo(() => {
+    if (!article || allArticles.length === 0) return [];
+    return allArticles
+      .filter(
+        (a) =>
+          a._id !== article._id &&
+          a.tag === article.tag
+      )
+      .slice(0, 3);
+  }, [article, allArticles]);
+
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: article?.title, url });
+        return;
+      } catch {
+        // user cancelled or not supported — fall through to clipboard
+      }
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [article?.title]);
 
   /* Loading state */
   if (loading) {
@@ -151,6 +192,8 @@ export default function ArticlePage({
     );
   }
 
+  const dateLabel = formatDate(article.createdAt);
+
   /* Article view */
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-black">
@@ -167,12 +210,13 @@ export default function ArticlePage({
           duration={9}
         />
 
-        {/* Back navigation */}
+        {/* Back navigation + share */}
         <div className="relative z-20 max-w-5xl mx-auto px-4 max-sm:px-3 pt-24 max-sm:pt-20">
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex items-center justify-between"
           >
             <Link
               href="/info"
@@ -181,6 +225,23 @@ export default function ArticlePage({
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
               Назад до Інфо центру
             </Link>
+
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:border-accent/30 transition-all duration-200 text-sm"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-green-400" />
+                  <span className="text-green-400">Скопійовано</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-3.5 h-3.5" />
+                  Поділитися
+                </>
+              )}
+            </button>
           </motion.div>
         </div>
 
@@ -220,7 +281,11 @@ export default function ArticlePage({
                 )}
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs sm:text-sm backdrop-blur-sm">
                   <Calendar className="w-3 h-3" />
-                  Нещодавно опубліковано
+                  {dateLabel}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs sm:text-sm backdrop-blur-sm">
+                  <Clock className="w-3 h-3" />
+                  {readingTime} хв читання
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
@@ -244,7 +309,11 @@ export default function ArticlePage({
                 )}
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/50 text-xs">
                   <Calendar className="w-3 h-3" />
-                  Нещодавно
+                  {dateLabel}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/50 text-xs">
+                  <Clock className="w-3 h-3" />
+                  {readingTime} хв
                 </span>
               </div>
               <h1 className="text-xl font-bold text-white leading-snug">
@@ -295,6 +364,46 @@ export default function ArticlePage({
           </FadeIn>
         </div>
       </section>
+
+      {/* ============================================================ */}
+      {/*  RELATED ARTICLES                                             */}
+      {/* ============================================================ */}
+      {relatedArticles.length > 0 && (
+        <section className="relative py-10 md:py-14">
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[400px] bg-accent/4 rounded-full blur-[150px] pointer-events-none" />
+
+          <div className="relative z-10 max-w-5xl mx-auto px-4 max-sm:px-3">
+            <FadeIn className="text-center mb-8 md:mb-12">
+              <span className="text-accent text-xs font-semibold uppercase tracking-[0.2em]">
+                Рекомендації
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
+                Схожі статті
+              </h2>
+            </FadeIn>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedArticles.map((related: any, index: number) => (
+                <FadeIn key={related._id} delay={index * 0.08}>
+                  <ArticleCard data={related} />
+                </FadeIn>
+              ))}
+            </div>
+
+            <FadeIn delay={0.2}>
+              <div className="mt-8 text-center">
+                <Link
+                  href={`/info?tag=${encodeURIComponent(article.tag)}`}
+                  className="inline-flex items-center gap-2 text-accent text-sm font-medium hover:underline group"
+                >
+                  Усі статті в «{article.tag}»
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+            </FadeIn>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

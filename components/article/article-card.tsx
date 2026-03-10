@@ -3,6 +3,19 @@
 import { ArrowRight, Calendar, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+function formatCardDate(dateStr?: string | null): string {
+  if (!dateStr) return "Нещодавно";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "Нещодавно";
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Сьогодні";
+  if (diffDays === 1) return "Вчора";
+  if (diffDays < 7) return `${diffDays} дн. тому`;
+  return date.toLocaleDateString("uk-UA", { day: "numeric", month: "short" });
+}
+
 type ArticleProps = {
   data: {
     title: string;
@@ -11,6 +24,7 @@ type ArticleProps = {
     tag: string;
     content?: string;
     _id?: string;
+    createdAt?: string | null;
   };
 };
 
@@ -72,7 +86,7 @@ export default function ArticleCard({ data }: ArticleProps) {
         <div className="pt-3 border-t border-white/6 flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-white/30">
             <Calendar className="w-3.5 h-3.5" />
-            <span className="text-xs">Нещодавно</span>
+            <span className="text-xs">{formatCardDate(data.createdAt)}</span>
           </div>
           <div className="flex items-center gap-1 text-accent text-xs font-medium group-hover:translate-x-1 transition-transform duration-300">
             Читати

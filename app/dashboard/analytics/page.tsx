@@ -78,6 +78,45 @@ interface AnalyticsData {
 
 // STATUS_COLORS, PIE_COLORS, PERIOD_OPTIONS, Period — imported from @/config/constants
 
+interface RequestsData {
+    period: string;
+    total: number;
+    comparison: number | null;
+    bySource: { _id: string; count: number }[];
+    byStatus: { _id: string; count: number }[];
+    sourceStatus: { source: string; new: number; in_progress: number; completed: number; dismissed: number; total: number }[];
+    overTime: { month: string; contact: number; manager: number; tour: number; 'ai-trip-plan': number; total: number }[];
+    responseTimeBySource: { source: string; avgMinutes: number; count: number }[];
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+    contact: 'Контактна форма',
+    manager: 'Консультація менеджера',
+    tour: 'Сторінка туру',
+    'ai-trip-plan': 'AI підбір туру',
+};
+
+const SOURCE_COLORS: Record<string, string> = {
+    contact: '#0fa4e6',
+    manager: '#8b5cf6',
+    tour: '#10b981',
+    'ai-trip-plan': '#f59e0b',
+};
+
+const STATUS_LABELS_REQUESTS: Record<string, string> = {
+    new: 'Новий',
+    in_progress: 'В роботі',
+    completed: 'Завершений',
+    dismissed: 'Відхилений',
+};
+
+const STATUS_COLORS_REQUESTS: Record<string, string> = {
+    new: '#0fa4e6',
+    in_progress: '#f59e0b',
+    completed: '#10b981',
+    dismissed: '#ef4444',
+};
+
 interface BonusUser {
     phoneNumber: string;
     name: string;
@@ -363,7 +402,9 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [period, setPeriod] = useState<Period>('all');
-    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users' | 'bonuses'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users' | 'requests' | 'bonuses'>('overview');
+    const [requestsData, setRequestsData] = useState<RequestsData | null>(null);
+    const [requestsLoading, setRequestsLoading] = useState(false);
     const [bonusData, setBonusData] = useState<BonusData | null>(null);
     const [bonusLoading, setBonusLoading] = useState(false);
     const [bonusSearch, setBonusSearch] = useState('');
@@ -387,10 +428,25 @@ export default function AnalyticsPage() {
         }
     }, [period]);
 
+    const fetchRequests = useCallback(async (p: Period = period) => {
+        try {
+            setRequestsLoading(true);
+            const res = await fetch(`/api/analytics/requests?period=${p}`);
+            if (!res.ok) throw new Error('Помилка завантаження');
+            const json = await res.json();
+            setRequestsData(json);
+        } catch {
+            setError('Не вдалося завантажити дані запитів');
+        } finally {
+            setRequestsLoading(false);
+        }
+    }, [period]);
+
     const handlePeriodChange = useCallback((p: Period) => {
         setPeriod(p);
         fetchAnalytics(p);
-    }, [fetchAnalytics]);
+        if (requestsData) fetchRequests(p);
+    }, [fetchAnalytics, fetchRequests, requestsData]);
 
     const fetchBonuses = useCallback(async () => {
         try {
@@ -514,12 +570,14 @@ export default function AnalyticsPage() {
                     { id: 'overview' as const, label: 'Огляд', icon: BarChart3 },
                     { id: 'revenue' as const, label: 'Фінанси', icon: DollarSign },
                     { id: 'users' as const, label: 'Користувачі', icon: Users },
+                    { id: 'requests' as const, label: 'Запити', icon: MessageCircle },
                     { id: 'bonuses' as const, label: 'Бонуси', icon: Wallet },
                 ]).map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => {
                             setActiveTab(tab.id);
+                            if (tab.id === 'requests' && !requestsData) fetchRequests();
                             if (tab.id === 'bonuses' && !bonusData) fetchBonuses();
                         }}
                         className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all duration-200 ${activeTab === tab.id
@@ -684,6 +742,7 @@ export default function AnalyticsPage() {
                                                         backgroundColor: 'rgba(17,17,17,0.95)',
                                                         border: '1px solid rgba(255,255,255,0.15)',
                                                         borderRadius: 12, fontSize: 12, backdropFilter: 'blur(8px)',
+                                                        color: '#fff',
                                                     }}
                                                 />
                                             </PieChart>
@@ -1052,6 +1111,263 @@ export default function AnalyticsPage() {
                                 </div>
                             </ChartCard>
                         </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'requests' && (
+                    <motion.div
+                        key="requests"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 sm:space-y-8"
+                    >
+                        {requestsLoading && !requestsData ? (
+                            <div className="flex justify-center items-center py-20">
+                                <RefreshCw size={20} className="animate-spin text-accent" />
+                            </div>
+                        ) : requestsData ? (
+                            <>
+                                {/* KPI cards */}
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                                    <StatCard icon={MessageCircle} label="Всього запитів" value={requestsData.total} change={requestsData.comparison} color="text-yellow-400" delay={0} />
+                                    {requestsData.bySource.map((s, i) => (
+                                        <StatCard
+                                            key={s._id}
+                                            icon={s._id === 'contact' ? Phone : s._id === 'manager' ? Users : s._id === 'tour' ? Map : Search}
+                                            label={SOURCE_LABELS[s._id] || s._id}
+                                            value={s.count}
+                                            subValue={requestsData.total > 0 ? `${Math.round((s.count / requestsData.total) * 100)}%` : undefined}
+                                            color={`text-[${SOURCE_COLORS[s._id] || '#6b7280'}]`}
+                                            delay={(i + 1) * 0.05}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Charts Row 1: By Source + By Status */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                                    <ChartCard title="Запити за джерелом" icon={MessageCircle}>
+                                        {requestsData.bySource.length > 0 ? (
+                                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                                <ResponsiveContainer width="100%" height={220}>
+                                                    <PieChart>
+                                                        <Pie
+                                                            data={requestsData.bySource.map(s => ({
+                                                                name: SOURCE_LABELS[s._id] || s._id,
+                                                                value: s.count,
+                                                                fill: SOURCE_COLORS[s._id] || '#6b7280',
+                                                            }))}
+                                                            cx="50%" cy="50%"
+                                                            innerRadius={55} outerRadius={90}
+                                                            paddingAngle={3} dataKey="value"
+                                                            animationBegin={0} animationDuration={800}
+                                                        >
+                                                            {requestsData.bySource.map((s, index) => (
+                                                                <Cell key={index} fill={SOURCE_COLORS[s._id] || '#6b7280'} stroke="transparent" />
+                                                            ))}
+                                                        </Pie>
+                                                        <Tooltip
+                                                            contentStyle={{
+                                                                backgroundColor: 'rgba(17,17,17,0.95)',
+                                                                border: '1px solid rgba(255,255,255,0.15)',
+                                                                borderRadius: 12, fontSize: 12, backdropFilter: 'blur(8px)',
+                                                                color: '#fff',
+                                                            }}
+                                                        />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                                <div className="flex flex-wrap sm:flex-col gap-2 text-xs">
+                                                    {requestsData.bySource.map((s) => (
+                                                        <div key={s._id} className="flex items-center gap-2">
+                                                            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: SOURCE_COLORS[s._id] || '#6b7280' }} />
+                                                            <span className="text-secondary whitespace-nowrap">{SOURCE_LABELS[s._id] || s._id}</span>
+                                                            <span className="text-white font-medium">{s.count}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-secondary text-sm text-center py-8">Немає даних</p>
+                                        )}
+                                    </ChartCard>
+
+                                    <ChartCard title="Запити за статусом" icon={CheckCircle2}>
+                                        {requestsData.byStatus.length > 0 ? (
+                                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                                <ResponsiveContainer width="100%" height={220}>
+                                                    <PieChart>
+                                                        <Pie
+                                                            data={requestsData.byStatus.map(s => ({
+                                                                name: STATUS_LABELS_REQUESTS[s._id] || s._id,
+                                                                value: s.count,
+                                                                fill: STATUS_COLORS_REQUESTS[s._id] || '#6b7280',
+                                                            }))}
+                                                            cx="50%" cy="50%"
+                                                            innerRadius={55} outerRadius={90}
+                                                            paddingAngle={3} dataKey="value"
+                                                            animationBegin={0} animationDuration={800}
+                                                        >
+                                                            {requestsData.byStatus.map((s, index) => (
+                                                                <Cell key={index} fill={STATUS_COLORS_REQUESTS[s._id] || '#6b7280'} stroke="transparent" />
+                                                            ))}
+                                                        </Pie>
+                                                        <Tooltip
+                                                            contentStyle={{
+                                                                backgroundColor: 'rgba(17,17,17,0.95)',
+                                                                border: '1px solid rgba(255,255,255,0.15)',
+                                                                borderRadius: 12, fontSize: 12, backdropFilter: 'blur(8px)',
+                                                                color: '#fff',
+                                                            }}
+                                                        />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                                <div className="flex flex-wrap sm:flex-col gap-2 text-xs">
+                                                    {requestsData.byStatus.map((s) => (
+                                                        <div key={s._id} className="flex items-center gap-2">
+                                                            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: STATUS_COLORS_REQUESTS[s._id] || '#6b7280' }} />
+                                                            <span className="text-secondary whitespace-nowrap">{STATUS_LABELS_REQUESTS[s._id] || s._id}</span>
+                                                            <span className="text-white font-medium">{s.count}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-secondary text-sm text-center py-8">Немає даних</p>
+                                        )}
+                                    </ChartCard>
+                                </div>
+
+                                {/* Requests over time by source */}
+                                <ChartCard title="Запити за місяцями (по джерелах)" icon={TrendingUp}>
+                                    {requestsData.overTime.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height={320}>
+                                            <BarChart data={requestsData.overTime}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                                <XAxis dataKey="month" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                                <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Legend wrapperStyle={{ fontSize: 12, color: '#666' }} />
+                                                <Bar dataKey="contact" name="Контактна форма" fill="#0fa4e6" stackId="a" radius={[0, 0, 0, 0]} />
+                                                <Bar dataKey="manager" name="Консультація" fill="#8b5cf6" stackId="a" radius={[0, 0, 0, 0]} />
+                                                <Bar dataKey="tour" name="Сторінка туру" fill="#10b981" stackId="a" radius={[0, 0, 0, 0]} />
+                                                <Bar dataKey="ai-trip-plan" name="AI підбір" fill="#f59e0b" stackId="a" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <p className="text-secondary text-sm text-center py-8">Немає даних</p>
+                                    )}
+                                </ChartCard>
+
+                                {/* Response time by source + Source-Status table */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                                    <ChartCard title="Час відповіді за джерелом" icon={Clock}>
+                                        {requestsData.responseTimeBySource.length > 0 ? (
+                                            <div className="space-y-3">
+                                                {requestsData.responseTimeBySource.map((item, i) => {
+                                                    const label = SOURCE_LABELS[item.source] || item.source;
+                                                    const maxMinutes = Math.max(...requestsData.responseTimeBySource.map(r => r.avgMinutes));
+                                                    const percentage = maxMinutes > 0 ? Math.round((item.avgMinutes / maxMinutes) * 100) : 0;
+                                                    const displayTime = item.avgMinutes < 60
+                                                        ? `${item.avgMinutes} хв`
+                                                        : item.avgMinutes < 1440
+                                                            ? `${Math.round(item.avgMinutes / 60)} год`
+                                                            : `${Math.round(item.avgMinutes / 1440)} д`;
+                                                    return (
+                                                        <motion.div
+                                                            key={item.source}
+                                                            initial={{ opacity: 0, x: -8 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            transition={{ delay: i * 0.08 }}
+                                                        >
+                                                            <div className="flex items-center justify-between text-xs mb-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: SOURCE_COLORS[item.source] || '#6b7280' }} />
+                                                                    <span className="text-secondary">{label}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-white font-medium">{displayTime}</span>
+                                                                    <span className="text-secondary text-[10px]">({item.count} відп.)</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                                <motion.div
+                                                                    initial={{ width: 0 }}
+                                                                    animate={{ width: `${percentage}%` }}
+                                                                    transition={{ duration: 0.6, delay: i * 0.08 }}
+                                                                    className="h-full rounded-full"
+                                                                    style={{ backgroundColor: SOURCE_COLORS[item.source] || '#6b7280' }}
+                                                                />
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <p className="text-secondary text-sm text-center py-8">Немає даних про час відповіді</p>
+                                        )}
+                                    </ChartCard>
+
+                                    <ChartCard title="Джерело × Статус" icon={Filter}>
+                                        {requestsData.sourceStatus.length > 0 ? (
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-xs">
+                                                    <thead>
+                                                        <tr className="border-b border-white/8">
+                                                            <th className="text-left text-secondary font-medium py-2 pr-3">Джерело</th>
+                                                            <th className="text-right text-secondary font-medium py-2 px-2">Новий</th>
+                                                            <th className="text-right text-secondary font-medium py-2 px-2">В роботі</th>
+                                                            <th className="text-right text-secondary font-medium py-2 px-2">Заверш.</th>
+                                                            <th className="text-right text-secondary font-medium py-2 px-2">Відхил.</th>
+                                                            <th className="text-right text-secondary font-medium py-2 pl-2">Всього</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {requestsData.sourceStatus.map((row) => (
+                                                            <tr key={row.source} className="border-b border-white/4 hover:bg-white/3 transition-colors">
+                                                                <td className="py-2.5 pr-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: SOURCE_COLORS[row.source] || '#6b7280' }} />
+                                                                        <span className="text-white">{SOURCE_LABELS[row.source] || row.source}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="text-right py-2.5 px-2 text-blue-400 font-medium">{row.new || '—'}</td>
+                                                                <td className="text-right py-2.5 px-2 text-yellow-400 font-medium">{row.in_progress || '—'}</td>
+                                                                <td className="text-right py-2.5 px-2 text-green-400 font-medium">{row.completed || '—'}</td>
+                                                                <td className="text-right py-2.5 px-2 text-red-400 font-medium">{row.dismissed || '—'}</td>
+                                                                <td className="text-right py-2.5 pl-2 text-white font-semibold">{row.total}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr className="border-t border-white/8">
+                                                            <td className="py-2.5 pr-3 text-secondary font-medium">Всього</td>
+                                                            <td className="text-right py-2.5 px-2 text-blue-400 font-semibold">{requestsData.sourceStatus.reduce((s, r) => s + r.new, 0) || '—'}</td>
+                                                            <td className="text-right py-2.5 px-2 text-yellow-400 font-semibold">{requestsData.sourceStatus.reduce((s, r) => s + r.in_progress, 0) || '—'}</td>
+                                                            <td className="text-right py-2.5 px-2 text-green-400 font-semibold">{requestsData.sourceStatus.reduce((s, r) => s + r.completed, 0) || '—'}</td>
+                                                            <td className="text-right py-2.5 px-2 text-red-400 font-semibold">{requestsData.sourceStatus.reduce((s, r) => s + r.dismissed, 0) || '—'}</td>
+                                                            <td className="text-right py-2.5 pl-2 text-white font-bold">{requestsData.total}</td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        ) : (
+                                            <p className="text-secondary text-sm text-center py-8">Немає даних</p>
+                                        )}
+                                    </ChartCard>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col justify-center items-center py-20 gap-4">
+                                <p className="text-secondary text-sm">Натисніть кнопку для завантаження</p>
+                                <button
+                                    onClick={() => fetchRequests()}
+                                    className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                    <RefreshCw size={14} /> Завантажити
+                                </button>
+                            </div>
+                        )}
                     </motion.div>
                 )}
 
