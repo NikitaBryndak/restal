@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
     try {
@@ -79,6 +80,14 @@ export async function POST(request: NextRequest) {
         const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
         user.password = hashedPassword;
         await user.save();
+
+        logAudit({
+            action: "user.password_changed",
+            entityType: "auth",
+            userId: session.user.phoneNumber,
+            userPhone: session.user.phoneNumber,
+            userName: session.user.name || "",
+        });
 
         return NextResponse.json({
             message: "Пароль успішно змінено"

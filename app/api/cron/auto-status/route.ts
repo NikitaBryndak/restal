@@ -5,6 +5,7 @@ import { createNotification } from "@/lib/notifications";
 import { sendTripStatusEmail, sendTripReminderEmail } from "@/lib/email";
 import User from "@/models/user";
 import { TOUR_STATUS_LABELS } from "@/types";
+import { logAudit } from "@/lib/audit";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -67,6 +68,13 @@ export async function POST(request: Request) {
                     );
                     if (updated) {
                         results.paidToInProgress++;
+                        logAudit({
+                            action: "trip.auto_status_changed",
+                            entityType: "trip",
+                            entityId: String(trip._id),
+                            userId: "system",
+                            details: { tripNumber: trip.number, oldStatus: "Paid", newStatus: "In Progress" },
+                        });
                         // Notify user
                         await createNotification({
                             userPhone: trip.ownerPhone,
@@ -101,6 +109,13 @@ export async function POST(request: Request) {
                     );
                     if (updated) {
                         results.inProgressToCompleted++;
+                        logAudit({
+                            action: "trip.auto_status_changed",
+                            entityType: "trip",
+                            entityId: String(trip._id),
+                            userId: "system",
+                            details: { tripNumber: trip.number, oldStatus: "In Progress", newStatus: "Completed" },
+                        });
                         await createNotification({
                             userPhone: trip.ownerPhone,
                             tripId: String(trip._id),
@@ -136,6 +151,13 @@ export async function POST(request: Request) {
                     );
                     if (updated) {
                         results.completedToArchived++;
+                        logAudit({
+                            action: "trip.auto_status_changed",
+                            entityType: "trip",
+                            entityId: String(trip._id),
+                            userId: "system",
+                            details: { tripNumber: trip.number, oldStatus: "Completed", newStatus: "Archived" },
+                        });
                         await createNotification({
                             userPhone: trip.ownerPhone,
                             tripId: String(trip._id),

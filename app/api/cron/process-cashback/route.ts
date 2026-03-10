@@ -5,6 +5,7 @@ import User from "@/models/user";
 import { REFERRAL_BONUS_REFERRER, REFERRAL_BONUS_REFEREE } from "@/config/constants";
 import { createNotification } from "@/lib/notifications";
 import { sendCashbackCreditedEmail } from "@/lib/email";
+import { logAudit } from "@/lib/audit";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -82,6 +83,19 @@ export async function POST(request: Request) {
                 if (updatedUser) {
                     processedCount++;
 
+                    logAudit({
+                        action: "cashback.credited",
+                        entityType: "cashback",
+                        entityId: String(trip._id),
+                        userId: "system",
+                        details: {
+                            ownerPhone: trip.ownerPhone,
+                            tripNumber: trip.number,
+                            amount: trip.cashbackAmount,
+                            newBalance: updatedUser.cashbackAmount,
+                        },
+                    });
+
                     // Notify user about cashback credited
                     try {
                         await createNotification({
@@ -140,6 +154,20 @@ export async function POST(request: Request) {
                                         },
                                     }
                                 );
+
+                                logAudit({
+                                    action: "cashback.referral_bonus",
+                                    entityType: "cashback",
+                                    entityId: String(trip._id),
+                                    userId: "system",
+                                    details: {
+                                        referrerId: String(updatedUser.referredBy),
+                                        refereePhone: trip.ownerPhone,
+                                        tripNumber: trip.number,
+                                        referrerBonus: bonusToAward,
+                                        refereeBonus: REFERRAL_BONUS_REFEREE,
+                                    },
+                                });
 
                                 // First completed trip — award referee (this user) their referral bonus
                                 if (!updatedUser.referralBonusReceived) {

@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
     try {
@@ -62,6 +63,15 @@ export async function POST(request: NextRequest) {
                 message: "Користувача не знайдено"
             }, { status: 404 });
         }
+
+        logAudit({
+            action: "user.name_changed",
+            entityType: "user",
+            userId: session.user.phoneNumber,
+            userPhone: session.user.phoneNumber,
+            userName: sanitizedUsername,
+            details: { oldName: session.user.name, newName: sanitizedUsername },
+        });
 
         return NextResponse.json({
             message: "Ім'я користувача успішно змінено",

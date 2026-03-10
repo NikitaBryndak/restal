@@ -9,7 +9,7 @@ const auditLogSchema = new Schema({
     entityType: {
         type: String,
         required: true,
-        enum: ["trip", "user", "article", "promo-code", "contact-request", "notification", "document", "system"],
+        enum: ["trip", "user", "article", "promo-code", "contact-request", "notification", "document", "system", "cashback", "auth"],
         index: true,
     },
     entityId: {

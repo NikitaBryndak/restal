@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import User from "@/models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 // SECURITY: Allowed file types for upload
 const ALLOWED_MIME_TYPES = [
@@ -118,6 +119,15 @@ export async function POST(request: NextRequest) {
     // Instead of relying on public access (which fails if bucket is private),
     // we return a proxy URL that routes through our API to check authentication.
     const publicUrl = `/api/documents/view?file=${encodeURIComponent(destination)}`;
+
+    logAudit({
+        action: "document.uploaded",
+        entityType: "document",
+        userId: session.user.phoneNumber,
+        userPhone: session.user.phoneNumber,
+        userName: session.user.name || "",
+        details: { fileName: sanitizedFilename, fileType: file.type, folder, tripNumber: tripNumber || undefined },
+    });
 
     return NextResponse.json({
         url: publicUrl,

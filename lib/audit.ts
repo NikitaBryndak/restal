@@ -1,7 +1,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import AuditLog from "@/models/auditLog";
 
-type EntityType = "trip" | "user" | "article" | "promo-code" | "contact-request" | "notification" | "document" | "system";
+type EntityType = "trip" | "user" | "article" | "promo-code" | "contact-request" | "notification" | "document" | "system" | "cashback" | "auth";
 
 interface AuditParams {
     action: string;

@@ -4,6 +4,7 @@ import PhoneVerification from "@/models/phoneVerification";
 import crypto from "crypto";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 import { PHONE_REGEX, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -107,6 +108,14 @@ export async function POST(req: NextRequest) {
     // OTP is valid — mark as verified
     verification.verified = true;
     await verification.save();
+
+    logAudit({
+        action: "auth.otp_verified",
+        entityType: "auth",
+        userId: sanitizedPhone,
+        userPhone: sanitizedPhone,
+        ip,
+    });
 
     return NextResponse.json({
       message: "Номер телефону підтверджено!",

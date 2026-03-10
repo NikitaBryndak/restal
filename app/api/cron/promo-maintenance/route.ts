@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import PromoCode from "@/models/promoCode";
 import Notification from "@/models/notification";
+import { logAudit } from "@/lib/audit";
 
 /**
  * Promo code expiry reminder cron job.
@@ -38,6 +39,15 @@ export async function POST(request: Request) {
                 { $set: { status: "expired" } }
             );
             results.expired = expiredResult.modifiedCount;
+
+            if (expiredResult.modifiedCount > 0) {
+                logAudit({
+                    action: "promo-code.auto_expired",
+                    entityType: "promo-code",
+                    userId: "system",
+                    details: { expiredCount: expiredResult.modifiedCount },
+                });
+            }
         } catch (err) {
             results.errors.push("Error auto-expiring promo codes");
         }

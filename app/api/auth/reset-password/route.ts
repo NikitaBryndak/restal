@@ -5,6 +5,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -92,6 +93,15 @@ export async function POST(req: NextRequest) {
     userByPhone.resetPasswordLockUntil = undefined;
 
     await userByPhone.save();
+
+    logAudit({
+        action: "user.password_reset",
+        entityType: "auth",
+        userId: sanitizedPhone,
+        userPhone: sanitizedPhone,
+        userName: userByPhone.name || "",
+        ip,
+    });
 
     return NextResponse.json({ message: "Пароль успішно змінено" });
 

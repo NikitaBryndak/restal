@@ -6,6 +6,7 @@ import TripModel from "@/models/trip";
 import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import mongoose from "mongoose";
 import crypto from "crypto";
+import { logAudit } from "@/lib/audit";
 
 // POST - Generate a share token for a trip
 export async function POST(request: NextRequest) {
@@ -51,6 +52,16 @@ export async function POST(request: NextRequest) {
         trip.shareToken = token;
         await trip.save();
 
+        logAudit({
+            action: "trip.share_created",
+            entityType: "trip",
+            entityId: String(trip._id),
+            userId: userPhone,
+            userPhone,
+            userName: session.user.name || "",
+            details: { tripNumber: trip.number },
+        });
+
         return NextResponse.json({ token });
     } catch (error) {
         console.error("Error generating share token:", error);
@@ -93,6 +104,16 @@ export async function DELETE(request: NextRequest) {
 
         trip.shareToken = "";
         await trip.save();
+
+        logAudit({
+            action: "trip.share_revoked",
+            entityType: "trip",
+            entityId: String(trip._id),
+            userId: userPhone,
+            userPhone,
+            userName: session.user.name || "",
+            details: { tripNumber: trip.number },
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {
