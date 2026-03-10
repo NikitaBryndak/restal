@@ -53,6 +53,9 @@ export const TRUSTED_ORIGINS: readonly string[] = [
   "https://export.otpusk.com",
 ];
 
+// ─── AI / Chat ──────────────────────────────────────────────────────
+export const AI_DAILY_RATE_LIMIT = 120;  // Max AI chat requests per IP per day
+
 // ─── UI ─────────────────────────────────────────────────────────────
 export const TITLE_FADE_DURATION = 3;
 

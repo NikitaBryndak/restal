@@ -3,8 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { connectToDatabase } from "@/lib/mongodb";
 import AiRateLimit from "@/models/aiRateLimit";
 import { getServerIp } from "@/lib/rate-limit";
-
-const DAILY_LIMIT = 50;
+import { AI_DAILY_RATE_LIMIT } from "@/config/constants";
 
 const SYSTEM_PROMPT = `Ти — дружній ШІ-помічник турагенції RestAL (restal.in.ua). Відповідай ТІЛЬКИ українською мовою.
 
@@ -108,7 +107,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (rateLimit.count >= DAILY_LIMIT) {
+    if (rateLimit.count >= AI_DAILY_RATE_LIMIT) {
       return NextResponse.json({
          message: "Ви досягли ліміту запитів на сьогодні. Будь ласка, зв'яжіться з нашим менеджером для детальної консультації! 📞",
          limitReached: true

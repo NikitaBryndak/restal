@@ -3,8 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { connectToDatabase } from "@/lib/mongodb";
 import AiRateLimit from "@/models/aiRateLimit";
 import { getServerIp } from "@/lib/rate-limit";
-
-const DAILY_LIMIT = 50;
+import { AI_DAILY_RATE_LIMIT } from "@/config/constants";
 
 const EXTRACT_PROMPT = `Ти — точний екстрактор даних. Твоє завдання: витягнути ТІЛЬКИ ту інформацію, яку користувач ЯВНО вказав у розмові. НЕ вигадуй, НЕ припускай, НЕ доповнюй з власних знань.
 
@@ -110,7 +109,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (rateLimit.count >= DAILY_LIMIT) {
+    if (rateLimit.count >= AI_DAILY_RATE_LIMIT) {
       return NextResponse.json(
         { error: "Rate limit exceeded" },
         { status: 429 }
