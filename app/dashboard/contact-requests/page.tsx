@@ -64,6 +64,8 @@ const STATUS_DOT_COLORS: Record<string, string> = {
 const SOURCE_LABELS: Record<string, string> = {
     contact: 'Контактна форма',
     manager: 'Запит до менеджера',
+    tour: 'Запит на тур',
+    'ai-trip-plan': 'AI-планувальник',
 };
 
 export default function ContactRequestsPage() {

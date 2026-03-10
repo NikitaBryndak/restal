@@ -708,7 +708,7 @@ function TourScreenerContent() {
                     htmlFor="bookLastName"
                     className="text-white/70 text-sm"
                   >
-                    Прізвище
+                    Прізвище <span className="text-white/40 text-xs font-normal">(необов&apos;язково)</span>
                   </Label>
                   <Input
                     id="bookLastName"

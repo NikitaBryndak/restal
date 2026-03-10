@@ -394,7 +394,7 @@ function ContactPageContent() {
                                  />
                               </div>
                               <div className="space-y-1.5">
-                                 <Label htmlFor="lastName" className="text-white/60 text-sm">Прізвище</Label>
+                                 <Label htmlFor="lastName" className="text-white/60 text-sm">Прізвище <span className="text-white/35 text-xs font-normal">(необов&apos;язково)</span></Label>
                                  <Input
                                     id="lastName"
                                     placeholder="Петренко"
