@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         userId: session.user.phoneNumber,
         userPhone: session.user.phoneNumber,
         userName: session.user.name || "",
-        details: { fileName: sanitizedFilename, fileType: file.type, folder, tripNumber: tripNumber || undefined },
+        details: { fileName: sanitizedFilename, fileType: file.type, folder, ...(tripNumber ? { tripNumber } : {}) },
     });
 
     return NextResponse.json({

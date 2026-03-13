@@ -224,6 +224,15 @@ const tripSchema = new Schema({
         required: false,
         default: "",
     },
+    // Promo code applied to this trip
+    promoCode: {
+        type: String,
+        default: "",
+    },
+    promoDiscount: {
+        type: Number,
+        default: 0,
+    },
     // Cashback tracking
     cashbackProcessed: {
         type: Boolean,

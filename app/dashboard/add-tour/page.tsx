@@ -13,7 +13,7 @@ import { DashboardFormSkeleton } from "@/components/ui/skeleton";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
-import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, DocumentsSection } from './components';
+import { BasicDetailsSection, FlightsSection, TravellerSection, PhoneSection, StaySection, ExtrasSection, PaymentSection, PromoCodeSection, DocumentsSection } from './components';
 
 export default function AddTourPage() {
     const { data: session, status } = useSession();
@@ -97,6 +97,7 @@ export default function AddTourPage() {
                                 />
                                 <ExtrasSection />
                                 <PaymentSection />
+                                <PromoCodeSection />
                             </div>
 
                             <div className="mt-10 flex flex-col gap-4 border-t border-white/5 pt-6">

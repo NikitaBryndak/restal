@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import PromoCode from "@/models/promoCode";
 import User from "@/models/user";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
-import { logAudit } from "@/lib/audit";
 
 // GET - Validate a promo code (manager only)
 export async function GET(
@@ -63,106 +62,6 @@ export async function GET(
         console.error("Promo code validation error:", error);
         return NextResponse.json(
             { message: "Помилка при перевірці коду" },
-            { status: 500 }
-        );
-    }
-}
-
-// POST - Redeem / use a promo code (manager only)
-export async function POST(
-    request: NextRequest,
-    { params }: { params: Promise<{ code: string }> }
-) {
-    try {
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.phoneNumber) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
-        await connectToDatabase();
-
-        // Check manager privilege
-        const manager = await User.findOne({ phoneNumber: session.user.phoneNumber });
-        if (!manager || manager.privilegeLevel < MANAGER_PRIVILEGE_LEVEL) {
-            return NextResponse.json(
-                { message: "Доступ лише для менеджерів" },
-                { status: 403 }
-            );
-        }
-
-        const { code } = await params;
-        const upperCode = code.toUpperCase();
-
-        // Expire old codes first
-        await PromoCode.updateMany(
-            { status: "active", expiresAt: { $lt: new Date() } },
-            { $set: { status: "expired" } }
-        );
-
-        // SECURITY: Atomic redemption — prevents double-spend race condition.
-        // findOneAndUpdate with status: "active" ensures only one concurrent
-        // request can redeem the code.
-        const promoCode = await PromoCode.findOneAndUpdate(
-            { code: upperCode, status: "active", expiresAt: { $gte: new Date() } },
-            {
-                $set: {
-                    status: "used",
-                    usedAt: new Date(),
-                    usedByManagerId: manager._id,
-                    usedByManagerPhone: manager.phoneNumber,
-                },
-            },
-            { new: true }
-        );
-
-        if (!promoCode) {
-            // Check why it failed — code doesn't exist, already used, or expired
-            const existing = await PromoCode.findOne({ code: upperCode }).lean() as Record<string, unknown> | null;
-            if (!existing) {
-                return NextResponse.json(
-                    { message: "Код не знайдено" },
-                    { status: 404 }
-                );
-            }
-            if (existing.status === "used") {
-                return NextResponse.json(
-                    { message: "Цей код вже було використано" },
-                    { status: 400 }
-                );
-            }
-            if (existing.status === "expired" || (existing.expiresAt && new Date(existing.expiresAt as string) < new Date())) {
-                return NextResponse.json(
-                    { message: "Термін дії коду закінчився" },
-                    { status: 400 }
-                );
-            }
-            return NextResponse.json(
-                { message: "Не вдалося використати код" },
-                { status: 400 }
-            );
-        }
-
-        logAudit({
-            action: "promo-code.redeemed",
-            entityType: "promo-code",
-            entityId: promoCode._id.toString(),
-            userId: session.user.phoneNumber,
-            userName: manager.name,
-            details: { code: promoCode.code, amount: promoCode.amount, ownerPhone: promoCode.ownerPhone },
-        });
-
-        return NextResponse.json({
-            message: "Код успішно використано",
-            code: promoCode.code,
-            amount: promoCode.amount,
-            ownerName: promoCode.ownerName,
-            ownerPhone: promoCode.ownerPhone,
-        });
-    } catch (error) {
-        console.error("Promo code redeem error:", error);
-        return NextResponse.json(
-            { message: "Помилка при використанні коду" },
             { status: 500 }
         );
     }

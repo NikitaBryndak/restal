@@ -219,7 +219,7 @@ export async function PUT(request: NextRequest) {
             entityType: "contact-request",
             entityId: id,
             userId: session.user.phoneNumber,
-            details: { status: updateData.status, adminNote: updateData.adminNote ? "updated" : undefined },
+            details: { status: updateData.status, ...(updateData.adminNote ? { adminNote: "updated" } : {}) },
         });
 
         return NextResponse.json({ message: "Оновлено", request: updated });

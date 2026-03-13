@@ -14,43 +14,56 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const privilegeLevel = session.user.privilegeLevel ?? 1;
-        if (privilegeLevel < ADMIN_PRIVILEGE_LEVEL) {
+        if ((session.user.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        // Rate limit
-        const rateLimitResult = checkRateLimit("audit-log", session.user.phoneNumber, 30, 5 * 60 * 1000);
+        const rateLimitResult = checkRateLimit(
+            "audit-log",
+            session.user.phoneNumber,
+            30,
+            5 * 60 * 1000,
+        );
         if (!rateLimitResult.allowed) {
-            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+            return NextResponse.json(
+                { error: "Too many requests" },
+                { status: 429 },
+            );
         }
 
         await connectToDatabase();
 
         const { searchParams } = request.nextUrl;
-        const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "50")));
-        const entityType = searchParams.get("entityType") ?? "";
-        const action = searchParams.get("action") ?? "";
-        const userId = searchParams.get("userId") ?? "";
-        const from = searchParams.get("from") ?? "";
-        const to = searchParams.get("to") ?? "";
+        const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+        const limit = Math.min(
+            100,
+            Math.max(1, parseInt(searchParams.get("limit") ?? "50", 10)),
+        );
+        const entityType = searchParams.get("entityType") || "";
+        const action = searchParams.get("action") || "";
+        const userId = searchParams.get("userId") || "";
+        const from = searchParams.get("from") || "";
+        const to = searchParams.get("to") || "";
 
-        // Build filter
         const filter: Record<string, unknown> = {};
+
         if (entityType) filter.entityType = entityType;
         if (action) filter.action = { $regex: action, $options: "i" };
         if (userId) filter.userId = userId;
+
         if (from || to) {
-            filter.createdAt = {};
-            if (from) (filter.createdAt as Record<string, Date>).$gte = new Date(from);
-            if (to) (filter.createdAt as Record<string, Date>).$lte = new Date(to);
+            const dateFilter: Record<string, Date> = {};
+            if (from) dateFilter.$gte = new Date(from);
+            if (to) dateFilter.$lte = new Date(to);
+            filter.createdAt = dateFilter;
         }
+
+        const skip = (page - 1) * limit;
 
         const [logs, total] = await Promise.all([
             AuditLog.find(filter)
                 .sort({ createdAt: -1 })
-                .skip((page - 1) * limit)
+                .skip(skip)
                 .limit(limit)
                 .lean(),
             AuditLog.countDocuments(filter),
@@ -62,11 +75,14 @@ export async function GET(request: NextRequest) {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit),
+                totalPages: Math.ceil(total / limit) || 1,
             },
         });
     } catch (error) {
         console.error("[audit-log] GET error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 },
+        );
     }
 }

@@ -1,7 +1,17 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import AuditLog from "@/models/auditLog";
 
-type EntityType = "trip" | "user" | "article" | "promo-code" | "contact-request" | "notification" | "document" | "system" | "cashback" | "auth";
+export type EntityType =
+    | "trip"
+    | "user"
+    | "article"
+    | "promo-code"
+    | "contact-request"
+    | "notification"
+    | "document"
+    | "system"
+    | "cashback"
+    | "auth";
 
 interface AuditParams {
     action: string;
@@ -20,6 +30,16 @@ interface AuditParams {
 export async function logAudit(params: AuditParams): Promise<void> {
     try {
         await connectToDatabase();
+
+        // Strip undefined values from details to avoid BSON serialisation issues
+        const rawDetails = params.details ?? {};
+        const cleanDetails: Record<string, unknown> = {};
+        for (const key of Object.keys(rawDetails)) {
+            if (rawDetails[key] !== undefined) {
+                cleanDetails[key] = rawDetails[key];
+            }
+        }
+
         await AuditLog.create({
             action: params.action,
             entityType: params.entityType,
@@ -27,11 +47,10 @@ export async function logAudit(params: AuditParams): Promise<void> {
             userId: params.userId,
             userPhone: params.userPhone ?? "",
             userName: params.userName ?? "",
-            details: params.details ?? {},
+            details: cleanDetails,
             ip: params.ip ?? "",
         });
-    } catch {
-        // Silently fail — audit should never break main flow
-        console.error("[audit] Failed to log:", params.action);
+    } catch (err) {
+        console.error("[audit] Failed to log:", params.action, err);
     }
 }

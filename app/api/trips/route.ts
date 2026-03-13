@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
+import PromoCode from "@/models/promoCode";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
@@ -147,6 +148,51 @@ export async function POST(request: Request) {
         // Get current manager's name
         const currentManager = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as any;
 
+        // Handle optional promo code
+        let promoCode = '';
+        let promoDiscount = 0;
+        if (body.promoCode && typeof body.promoCode === 'string' && body.promoCode.trim()) {
+            const upperCode = body.promoCode.trim().toUpperCase();
+
+            // Expire old codes first
+            await PromoCode.updateMany(
+                { status: "active", expiresAt: { $lt: new Date() } },
+                { $set: { status: "expired" } }
+            );
+
+            // Atomically claim the promo code to prevent double-spend
+            const claimedPromo = await PromoCode.findOneAndUpdate(
+                { code: upperCode, status: "active", expiresAt: { $gte: new Date() } },
+                {
+                    $set: {
+                        status: "used",
+                        usedAt: new Date(),
+                        usedByManagerId: currentManager?._id || null,
+                        usedByManagerPhone: session.user.phoneNumber,
+                    },
+                },
+                { new: true }
+            );
+
+            if (!claimedPromo) {
+                // Check why it failed
+                const existing = await PromoCode.findOne({ code: upperCode }).lean() as Record<string, unknown> | null;
+                if (!existing) {
+                    return NextResponse.json({ message: "Промокод не знайдено" }, { status: 400 });
+                }
+                if (existing.status === "used") {
+                    return NextResponse.json({ message: "Цей промокод вже було використано" }, { status: 400 });
+                }
+                if (existing.status === "expired") {
+                    return NextResponse.json({ message: "Термін дії промокоду закінчився" }, { status: 400 });
+                }
+                return NextResponse.json({ message: "Не вдалося застосувати промокод" }, { status: 400 });
+            }
+
+            promoCode = claimedPromo.code;
+            promoDiscount = claimedPromo.amount;
+        }
+
         // Auto-fill flight dates from tour dates and return country from tour country
         const flightInfo = body.flightInfo || {};
         if (body.tripStartDate) {
@@ -169,6 +215,7 @@ export async function POST(request: Request) {
         }
 
         // SECURITY: Whitelist only allowed fields to prevent mass assignment
+        const finalTotalAmount = Math.max(0, (body.payment?.totalAmount || 0) - promoDiscount);
         const payload = {
             number: body.number,
             bookingDate: body.bookingDate,
@@ -181,11 +228,17 @@ export async function POST(request: Request) {
             tourists: body.tourists,
             addons: body.addons,
             documents: body.documents,
-            payment: body.payment,
+            payment: {
+                totalAmount: finalTotalAmount,
+                paidAmount: body.payment?.paidAmount || 0,
+                deadline: body.payment?.deadline || '',
+            },
             ownerPhone: sanitizedOwnerPhone,
             managerPhone: session.user.phoneNumber,
             managerName: currentManager?.name || '',
             status: 'In Booking',
+            promoCode,
+            promoDiscount,
             cashbackAmount: cashbackAmount,
             cashbackProcessed: false,
         };
@@ -193,13 +246,21 @@ export async function POST(request: Request) {
         const newTrip = new Trip(payload);
         await newTrip.save();
 
+        // Link promo code to this trip
+        if (promoCode) {
+            await PromoCode.updateOne(
+                { code: promoCode },
+                { $set: { tripId: newTrip._id, tripNumber: newTrip.number } }
+            );
+        }
+
         logAudit({
             action: "trip.created",
             entityType: "trip",
             entityId: newTrip._id.toString(),
             userId: session.user.phoneNumber,
             userName: currentManager?.name,
-            details: { number: body.number, country: body.country, ownerPhone: sanitizedOwnerPhone },
+            details: { number: body.number, country: body.country, ownerPhone: sanitizedOwnerPhone, ...(promoCode ? { promoCode, promoDiscount } : {}) },
         });
 
         // NOTE: Cashback is now added one day after the tour ends (tripEndDate)

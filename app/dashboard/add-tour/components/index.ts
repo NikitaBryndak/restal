@@ -6,4 +6,5 @@ export { PhoneSection } from './PhoneSection';
 export { StaySection } from './StaySection';
 export { ExtrasSection } from './ExtrasSection';
 export { PaymentSection } from './PaymentSection';
+export { PromoCodeSection } from './PromoCodeSection';
 export { DocumentsSection } from './DocumentsSection';

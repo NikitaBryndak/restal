@@ -135,6 +135,8 @@ export type Trip = {
   ownerPhone: string;
   managerPhone?: string;
   managerName?: string;
+  promoCode?: string;
+  promoDiscount?: number;
   cashbackProcessed?: boolean;
   cashbackAmount?: number;
   shareToken?: string;

@@ -54,6 +54,16 @@ const promoCodeSchema = new Schema({
         type: String,
         default: null,
     },
+    // The trip this code was applied to
+    tripId: {
+        type: Schema.Types.ObjectId,
+        ref: "Trip",
+        default: null,
+    },
+    tripNumber: {
+        type: String,
+        default: null,
+    },
 }, { timestamps: true });
 
 // Index for quick lookups (code index already created by unique: true)

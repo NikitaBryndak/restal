@@ -72,6 +72,9 @@ export const tourSchema = z.object({
     paymentPaid: z.coerce.number().min(0, "Сума не може бути від'ємною").default(0),
     paymentDeadline: optionalDateSchema,
 
+    // Promo code (optional)
+    promoCode: z.string().optional().default(''),
+
     // Other — phone is required; validated after stripping formatting
     ownerPhone: z.string().min(1, "Номер телефону є обов'язковим"),
 

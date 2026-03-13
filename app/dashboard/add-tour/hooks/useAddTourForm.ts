@@ -65,6 +65,7 @@ export const useAddTourForm = () => {
             paymentTotal: 0,
             paymentPaid: 0,
             paymentDeadline: '',
+            promoCode: '',
             ownerPhone: '',
         },
         mode: 'onChange',
@@ -243,6 +244,7 @@ export const useAddTourForm = () => {
                 deadline: data.paymentDeadline,
             },
             ownerPhone: data.ownerPhone,
+            promoCode: data.promoCode || '',
             documents: finalDocuments,
         };
 
