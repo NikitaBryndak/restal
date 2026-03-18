@@ -194,32 +194,32 @@ export default function TripPlanCard({
       transition={{ duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
       className="w-full max-w-2xl mx-auto"
     >
-      <div className="relative rounded-2xl border border-white/8 overflow-hidden">
+      <div className="relative rounded-3xl rounded-tl-[4px] border border-white/5 overflow-hidden shadow-2xl backdrop-blur-md">
         {/* Background */}
-        <div className="absolute inset-0 bg-linear-to-br from-white/4 via-accent/2 to-white/1" />
-        <div className="absolute -top-20 -right-20 w-48 h-48 bg-accent/8 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] to-transparent" />
+        <div className="absolute -top-20 -right-20 w-48 h-48 bg-accent/10 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-accent/5 rounded-full blur-[60px] pointer-events-none" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
 
-        <div className="relative z-10 p-5 sm:p-6 space-y-5">
+        <div className="relative z-10 p-5 sm:p-7 space-y-6">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-accent/15 border border-accent/25 flex items-center justify-center">
-                <Plane className="w-5 h-5 text-accent" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center shadow-inner">
+                <Plane className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <h3 className="text-white text-lg font-bold leading-tight">
+                <h3 className="text-white text-xl font-bold tracking-tight">
                   {plan.destination || "Ваша подорож"}
                 </h3>
                 {plan.region && (
-                  <p className="text-accent/70 text-sm">{plan.region}</p>
+                  <p className="text-accent/80 text-sm font-medium mt-0.5">{plan.region}</p>
                 )}
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white/70 transition-colors"
+              className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all shadow-sm"
             >
               <X className="w-4 h-4" />
             </button>
@@ -231,16 +231,17 @@ export default function TripPlanCard({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
+              className="w-fit"
             >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium">
-                <Globe className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm font-semibold tracking-wide shadow-sm">
+                <Globe className="w-4 h-4" />
                 {plan.tripType}
               </span>
             </motion.div>
           )}
 
           {/* Details grid */}
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Dates */}
             {plan.dates && (plan.dates.from || plan.dates.to) && (
               <PlanSection icon={Calendar} title="Дати" delay={0.15}>
@@ -288,24 +289,24 @@ export default function TripPlanCard({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     {plan.hotel.stars && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-400 text-xs">
-                        <Star className="w-3 h-3" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-xs font-semibold">
+                        <Star className="w-3.5 h-3.5" />
                         {plan.hotel.stars}
                       </span>
                     )}
                     {plan.hotel.mealPlan && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-xs">
-                        <Utensils className="w-3 h-3" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-xs font-semibold">
+                        <Utensils className="w-3.5 h-3.5" />
                         {plan.hotel.mealPlan}
                       </span>
                     )}
                   </div>
                   {plan.hotel.preferences?.length ? (
-                    <div className="flex flex-wrap gap-1.5 mt-1">
+                    <div className="flex flex-wrap gap-1.5 mt-2">
                       {plan.hotel.preferences.map((pref) => (
                         <span
                           key={pref}
-                          className="px-2 py-0.5 bg-white/5 border border-white/8 rounded-lg text-white/60 text-xs"
+                          className="px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-white/70 text-xs font-medium backdrop-blur-sm"
                         >
                           {pref}
                         </span>
@@ -319,16 +320,16 @@ export default function TripPlanCard({
             {/* Activities */}
             {plan.activities?.length ? (
               <PlanSection icon={Sparkles} title="Активності" delay={0.35}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-1">
                   {plan.activities.map((activity, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-2 px-3 py-2 bg-white/3 border border-white/6 rounded-xl"
+                      className="flex items-start gap-2.5 px-3.5 py-3 bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 rounded-xl"
                     >
-                      <span className="text-base shrink-0 mt-0.5">{activity.icon}</span>
+                      <span className="text-lg shrink-0 mt-0.5">{activity.icon}</span>
                       <div className="min-w-0">
-                        <p className="text-white/90 text-xs font-medium">{activity.name}</p>
-                        <p className="text-white/40 text-xs leading-snug">{activity.description}</p>
+                        <p className="text-white/95 text-sm font-semibold">{activity.name}</p>
+                        <p className="text-white/50 text-[13px] leading-snug mt-0.5">{activity.description}</p>
                       </div>
                     </div>
                   ))}
@@ -344,27 +345,27 @@ export default function TripPlanCard({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <div className="h-px bg-linear-to-r from-white/6 via-white/10 to-transparent my-2" />
-              <p className="text-white/40 text-xs uppercase tracking-wider font-medium mb-3 flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5 text-accent" />
+              <div className="h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent my-6" />
+              <p className="text-white/50 text-xs uppercase tracking-widest font-semibold mb-4 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-accent" />
                 Рекомендовані напрямки
               </p>
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {plan.recommendations.map((rec, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.45 + i * 0.1 }}
-                    className="px-4 py-3 bg-white/3 border border-white/6 rounded-xl hover:border-accent/20 transition-colors"
+                    className="px-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl hover:border-accent/40 transition-colors shadow-sm backdrop-blur-sm"
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-white text-sm font-semibold">{rec.destination}</p>
-                        <p className="text-white/50 text-xs mt-0.5 leading-relaxed">{rec.reason}</p>
+                        <p className="text-white text-[15px] font-bold tracking-tight">{rec.destination}</p>
+                        <p className="text-white/60 text-sm mt-1 leading-relaxed">{rec.reason}</p>
                       </div>
                       {rec.estimatedCost && (
-                        <span className="text-accent text-xs font-medium whitespace-nowrap shrink-0">
+                        <span className="text-emerald-400/90 bg-emerald-500/10 px-2 py-1 rounded-md text-xs font-bold whitespace-nowrap shrink-0 border border-emerald-500/20">
                           {rec.estimatedCost}
                         </span>
                       )}

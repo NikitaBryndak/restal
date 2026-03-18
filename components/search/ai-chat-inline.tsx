@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
-import { Send, ArrowLeft, ArrowDown, Loader2, Bot, Sparkles, Plane } from "lucide-react";
+import { Send, ArrowLeft, ArrowDown, Loader2, Bot, Sparkles, Plane, User, MapPin, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import TripPlanCard, { type TripPlan } from "./trip-plan-card";
@@ -29,6 +29,32 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const initialQuerySent = useRef(false);
+
+  // Load chat history from session storage on mount
+  useEffect(() => {
+    const savedChat = sessionStorage.getItem("ai_chat_history");
+    if (savedChat) {
+      try {
+        setMessages(JSON.parse(savedChat));
+      } catch (e) {
+        console.error("Failed to parse chat history", e);
+      }
+    }
+  }, []);
+
+  // Save chat history to session storage when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem("ai_chat_history", JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  const clearChat = () => {
+    setMessages([]);
+    sessionStorage.removeItem("ai_chat_history");
+    setTripPlan(null);
+    setPlanError(null);
+  };
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -124,6 +150,7 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    if (e.key === "Escape") { e.preventDefault(); onClose(); }
   };
 
   const generateTripPlan = async () => {
@@ -181,121 +208,160 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
       <div className="w-full max-w-3xl flex flex-col h-full relative px-4 sm:px-6">
 
       {/* Header */}
-      <div className="flex items-center gap-3 py-4 sticky top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-white/5">
+      <div className="flex items-center gap-4 py-4 sticky top-0 z-20 bg-black/60 backdrop-blur-2xl border-b border-white/10 px-2 sm:px-0">
         <button
           onClick={onClose}
-          className="group flex items-center gap-2 text-white/60 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-2 rounded-xl border border-white/8 hover:border-white/15 text-sm font-medium"
+          className="group flex items-center justify-center w-10 h-10 text-white/70 hover:text-white transition-all bg-white/5 hover:bg-white/10 rounded-full border border-white/10 hover:border-white/20 hover:scale-105 active:scale-95"
         >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Назад</span>
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
         </button>
-        <div className="flex items-center gap-2.5 flex-1">
+        <div className="flex items-center gap-3 flex-1">
           <div className="relative">
-            <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-accent" />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center shadow-lg shadow-accent/10">
+              <Bot className="w-5 h-5 text-accent" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-black animate-pulse" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black" />
           </div>
-          <div className="leading-tight">
-            <span className="text-white text-sm font-semibold">RestAL AI</span>
-            <span className="text-white/30 text-xs block">онлайн</span>
+          <div className="leading-tight flex-1 text-left flex flex-col items-start justify-center">
+            <h2 className="text-white text-[15px] font-semibold tracking-wide m-0 p-0">RestAL Assistant</h2>
+            <div className="text-emerald-400/90 text-[11px] font-medium flex items-center gap-1.5 mt-0.5 justify-start">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              онлайн
+            </div>
           </div>
+
+          {messages.length > 0 && (
+            <button
+              onClick={clearChat}
+              title="Очистити чат"
+              className="p-2.5 text-white/50 hover:text-red-400 hover:bg-white/5 rounded-full transition-colors"
+            >
+              <Trash2 className="w-[18px] h-[18px]" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Messages area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto space-y-3 relative"
+        className="flex-1 overflow-y-auto space-y-3 relative px-1 scroll-smooth pb-32"
         style={{ scrollbarWidth: "none" }}
       >
-        {messages.length === 0 && !isLoading ? (
+        {messages.length === 0 ? (
           <div className={`flex flex-col items-center justify-center h-full gap-8 transition-all duration-500 delay-200 ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-            {/* Glowing orb */}
-            <div className="relative">
-              <div className="absolute inset-0 w-24 h-24 -m-2 rounded-full bg-accent/15 blur-3xl animate-pulse" />
-              <div className="relative w-20 h-20 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center shadow-lg shadow-accent/10">
-                <Sparkles className="w-8 h-8 text-accent" />
+            {/* Elegant intro graphic */}
+            <div className="relative group">
+              <div className="absolute inset-0 w-32 h-32 -m-6 rounded-full bg-accent/20 blur-3xl animate-pulse group-hover:bg-accent/30 transition-colors duration-700" />
+              <div className="relative w-20 h-20 rounded-[2rem] bg-gradient-to-tr from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center shadow-2xl shadow-accent/20 rotate-3 group-hover:rotate-6 transition-transform duration-500">
+                <Plane className="w-8 h-8 text-white -rotate-12 group-hover:scale-110 transition-transform duration-500" />
               </div>
             </div>
 
-            <div className="text-center space-y-3 max-w-md">
-              <h3 className="text-white text-2xl font-bold">Чим можу допомогти?</h3>
-              <p className="text-white/40 text-sm leading-relaxed">
-                Запитайте мене про будь-що пов&apos;язане з подорожами — напрямки, погоду, візи, найкращий час для поїздки.
+            <div className="text-center space-y-4 max-w-md mt-2">
+              <h3 className="text-white text-3xl font-bold tracking-tight">Персональний Тур-AI</h3>
+              <p className="text-white/50 text-[15px] leading-relaxed font-medium">
+                Почнемо складати вашу ідеальну подорож. Я допоможу знайти напрямок, дізнатися про погоду та обрати готель.
               </p>
             </div>
 
-            {/* Quick questions grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full max-w-lg">
+            {/* Quick questions layout - Masonry style tags */}
+            <div className="flex flex-wrap justify-center gap-3 w-full max-w-xl mt-4 px-2">
               {quickQuestions.map((q, i) => (
                 <button
                   key={q.text}
                   onClick={() => sendMessage(`${q.emoji} ${q.text}`)}
-                  className={`group relative px-4 py-3.5 text-sm text-white/60 hover:text-white bg-white/3 hover:bg-accent/10 border border-white/8 hover:border-accent/30 rounded-2xl transition-all duration-300 text-left overflow-hidden hover:shadow-lg hover:shadow-accent/5 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-                  style={{ transitionDelay: `${300 + i * 80}ms` }}
+                  disabled={isLoading}
+                  className={`group relative px-5 py-3 text-[14px] text-white/80 hover:text-white bg-white/5 hover:bg-accent/15 border border-white/10 hover:border-accent/40 rounded-full transition-all duration-300 flex items-center gap-2.5 overflow-hidden hover:shadow-[0_0_20px_rgba(15,164,230,0.15)] disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                  style={{ transitionDelay: `${300 + i * 60}ms` }}
                 >
-                  <span className="text-lg">{q.emoji}</span>
-                  <span className="block text-xs mt-1.5 leading-snug font-medium">{q.text}</span>
-                  <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+                  <span className="text-lg group-hover:scale-110 transition-transform">{q.emoji}</span>
+                  <span className="font-medium tracking-wide">{q.text}</span>
                 </button>
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="py-4 space-y-5">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                {msg.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 mt-1">
-                    <Bot className="w-4 h-4 text-accent" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 text-sm leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-accent text-white rounded-2xl rounded-br-md shadow-lg shadow-accent/15"
-                      : "bg-white/4 text-white/90 rounded-2xl rounded-bl-md border border-white/8"
-                  }`}
-                >
-                  {msg.role === "user" ? (
-                    msg.content
-                  ) : (
-                    <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-white/10 prose-pre:p-3 prose-pre:rounded-xl">
-                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {msg.content}
-                      </ReactMarkdown>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
 
             {isLoading && (
-              <div className="flex gap-3 justify-start animate-in fade-in duration-300">
-                <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 text-accent" />
-                </div>
-                <div className="bg-white/4 border border-white/8 rounded-2xl rounded-bl-md px-5 py-4">
-                  <div className="flex gap-1.5">
-                    <span className="w-2 h-2 bg-accent/40 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-accent/40 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-accent/40 rounded-full animate-bounce [animation-delay:300ms]" />
-                  </div>
-                </div>
+              <div className="flex gap-1.5 items-center mt-4">
+                <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce" />
               </div>
             )}
+          </div>
+        ) : (
+          <div className="py-4 space-y-5 px-0 sm:px-2">
+            {/** AI Travel Planner timeline style */}
+            <div className="space-y-8 pb-10 mt-4 relative">
+              {/* Central dashed line for timeline - coordinates with icons */}
+              <div className="absolute left-[23px] sm:left-[27px] top-6 bottom-4 w-px border-l-2 border-dashed border-white/10 z-0" />
+
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className="flex gap-5 sm:gap-7 items-start relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                >
+                  {/* Timeline icon */}
+                  {msg.role === "assistant" ? (
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-accent to-accent/80 border-[4px] border-black flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(15,164,230,0.3)] z-10 relative">
+                      <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/5 border-[4px] border-black flex items-center justify-center shrink-0 shadow-lg backdrop-blur-md z-10 relative mt-1">
+                      <User className="w-5 h-5 sm:w-6 sm:h-6 text-white/50" />
+                    </div>
+                  )}
+
+                  {/* Content block */}
+                  <div
+                    className={`flex-1 pt-1 ${
+                      msg.role === "user"
+                        ? "min-h-[3rem] sm:min-h-[3.5rem] flex items-center mt-1"
+                        : ""
+                    }`}
+                  >
+                    {msg.role === "user" ? (
+                      <p className="text-[16px] sm:text-[18px] font-semibold text-white/90 text-left whitespace-pre-wrap tracking-wide leading-snug">
+                        {msg.content}
+                      </p>
+                    ) : (
+                      <div className="bg-gradient-to-br from-white/[0.04] to-transparent border border-white/5 rounded-3xl rounded-tl-[4px] p-5 sm:p-7 shadow-xl shadow-black/20 backdrop-blur-md">
+                        <div className="text-left prose prose-invert prose-sm sm:prose-base max-w-none prose-p:leading-[1.7] prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/10 prose-a:text-accent hover:prose-a:text-accent/80 prose-strong:text-white/95 prose-ul:ml-2 prose-ol:ml-2 prose-headings:font-bold prose-headings:text-white/95 prose-headings:tracking-tight">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {msg.content}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {isLoading && (
+                <div className="flex gap-5 sm:gap-7 items-start relative z-10 animate-in fade-in duration-300 mt-8">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/5 border-[4px] border-black flex items-center justify-center shrink-0 shadow-lg backdrop-blur-md z-10 relative">
+                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-accent animate-pulse" />
+                  </div>
+                  <div className="flex-1 mt-1.5">
+                    <div className="bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-3xl rounded-tl-[4px] px-6 py-5 w-fit flex items-center shadow-lg backdrop-blur-md">
+                      <div className="flex gap-2 items-center h-4">
+                        <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                        <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                        <span className="w-2 h-2 bg-accent/60 rounded-full animate-bounce" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Trip Plan: generate button */}
             {showPlanButton && !isLoading && (
-              <div className="flex justify-center py-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="flex justify-center py-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <button
                   onClick={generateTripPlan}
                   disabled={isPlanLoading}
-                  className="group flex items-center gap-2.5 px-5 py-3 bg-linear-to-r from-accent/15 to-accent/10 hover:from-accent hover:to-accent/90 border border-accent/25 hover:border-accent rounded-2xl text-accent hover:text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-accent/10 hover:shadow-accent/25 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                  className="group flex items-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-accent/20 to-accent/10 hover:from-accent hover:to-accent/90 border border-accent/30 hover:border-accent rounded-full text-accent hover:text-white text-sm font-semibold transition-all duration-300 shadow-[0_0_20px_rgba(15,164,230,0.15)] hover:shadow-[0_0_30px_rgba(15,164,230,0.3)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {isPlanLoading ? (
                     <>
@@ -304,7 +370,7 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
                     </>
                   ) : (
                     <>
-                      <Plane className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      <Plane className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                       ✨ Сформувати план подорожі
                     </>
                   )}
@@ -336,46 +402,46 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
 
       {/* Scroll to bottom */}
       {showScrollButton && (
-        <div className="flex justify-center -mt-12 mb-2 relative z-10">
+        <div className="absolute bottom-28 right-4 sm:right-6 z-20 animate-in fade-in slide-in-from-bottom-5 duration-300 delay-100">
           <button
             onClick={scrollToBottom}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/50 hover:text-white transition-all border border-white/10 backdrop-blur-sm shadow-lg"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all border border-white/10 backdrop-blur-md shadow-2xl hover:scale-105 active:scale-95"
           >
-            <ArrowDown className="w-3.5 h-3.5" />
+            <ArrowDown className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Input area — always at the bottom */}
-      <div className={`py-4 transition-all duration-500 delay-300 border-t border-white/5 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-        <div className="relative">
-          <div className="flex items-center gap-2.5 bg-white/4 border border-white/10 focus-within:border-accent/40 rounded-2xl px-4 py-1 transition-all duration-300 focus-within:bg-white/6 focus-within:shadow-[0_0_40px_rgba(15,164,230,0.08)]">
+      <div className={`absolute bottom-0 left-0 right-0 py-4 px-4 sm:px-6 transition-all duration-500 delay-300 bg-gradient-to-t from-black via-black/95 to-transparent pt-12 z-10 pointer-events-none ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <div className="relative max-w-3xl mx-auto pointer-events-auto">
+          <div className="flex items-center gap-2.5 bg-black/60 backdrop-blur-2xl border border-white/10 focus-within:border-accent/40 rounded-2xl px-4 py-1.5 transition-all duration-300 focus-within:bg-black/80 focus-within:shadow-[0_0_40px_rgba(15,164,230,0.1)]">
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Напишіть повідомлення..."
+              placeholder="Напишіть повідомлення (наприклад: Готелі в Дубаї)..."
               disabled={isLoading}
-              className="flex-1 bg-transparent text-white text-sm placeholder-white/25 outline-none py-3.5 disabled:opacity-50"
+              className="flex-1 bg-transparent text-white text-[15px] placeholder-white/30 outline-none py-3.5 disabled:opacity-50"
             />
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || isLoading}
-              className="w-10 h-10 rounded-xl bg-accent/15 hover:bg-accent text-accent hover:text-white flex items-center justify-center transition-all duration-200 disabled:opacity-20 disabled:hover:bg-accent/15 disabled:hover:text-accent shrink-0"
+              className="w-10 h-10 rounded-xl bg-accent/20 hover:bg-accent text-accent hover:text-white flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:hover:bg-accent/20 disabled:hover:text-accent shrink-0"
             >
               {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <Send className="w-4 h-4" />
+                <Send className="w-4 h-4 ml-0.5" />
               )}
             </button>
           </div>
+          <p className="text-[11px] text-white/30 text-center mt-3 tracking-wide font-medium">
+            AI може допускати помилки. Перевіряйте важливу інформацію.
+          </p>
         </div>
-        <p className="text-[10px] text-white/20 text-center mt-2.5 tracking-wide">
-          ШІ може помилятися
-        </p>
       </div>
       </div>
     </div>
