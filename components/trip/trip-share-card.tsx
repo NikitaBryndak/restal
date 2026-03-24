@@ -192,8 +192,8 @@ export default function TripShareCard({
 
             {/* Modal Overlay — rendered via portal to escape overflow-hidden ancestors */}
             {showModal && portalTarget && createPortal(
-                <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4" onClick={() => setShowModal(false)}>
-                    <div className="relative flex flex-col items-center gap-4 max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div role="presentation" className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4" onClick={() => setShowModal(false)}>
+                    <div role="presentation" className="relative flex flex-col items-center gap-4 max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         {/* Close — sticky at top so it's always visible */}
                         <button
                             onClick={() => setShowModal(false)}

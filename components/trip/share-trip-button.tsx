@@ -85,7 +85,11 @@ export default function ShareTripButton({ tripId, existingToken }: ShareTripButt
             {showPanel && (
                 <>
                     {/* Mobile: fixed bottom sheet overlay */}
-                    <div className="sm:hidden fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm" onClick={() => setShowPanel(false)} />
+                    <div
+                        role="presentation"
+                        className="sm:hidden fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
+                        onClick={() => setShowPanel(false)}
+                    />
                     <div className="sm:hidden fixed left-4 right-4 bottom-6 z-[91] bg-gray-900/95 backdrop-blur-xl rounded-xl border border-white/10 p-4 shadow-2xl">
                         <p className="text-sm font-semibold text-white mb-3">Публічне посилання</p>
                         {loading ? (

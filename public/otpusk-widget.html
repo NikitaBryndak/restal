@@ -69,7 +69,7 @@
         if (geo) osGeo = geo;
 
         var dept = g('departure', 'deptCity', 'd');
-        if (dept) osDefaultDeparture = parseInt(dept) || 1831;
+        if (dept) osDefaultDeparture = Number.parseInt(dept) || 1831;
 
         var dur = g('duration', 'length', 'n');
         if (dur) osDefaultDuration = dur;
@@ -1827,7 +1827,7 @@
           if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
             var match = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
             if (match) {
-              var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+              var r = Number.parseInt(match[1]), g = Number.parseInt(match[2]), b = Number.parseInt(match[3]);
               // If it's a light color (luminance > 180), darken it
               if (r > 180 && g > 180 && b > 180) {
                 el.style.setProperty('background', 'rgba(255, 255, 255, 0.06)', 'important');
@@ -1847,7 +1847,7 @@
           if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
             var match = bg.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
             if (match) {
-              var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+              var r = Number.parseInt(match[1]), g = Number.parseInt(match[2]), b = Number.parseInt(match[3]);
               if (r > 180 && g > 180 && b > 180) {
                 el.style.setProperty('background-color', 'rgba(255, 255, 255, 0.04)', 'important');
               }

@@ -16,7 +16,7 @@ export async function GET(
         await connectToDatabase();
 
         let article = null;
-        if (!isNaN(Number(resolvedParams.id))) {
+        if (!Number.isNaN(Number(resolvedParams.id))) {
             const numericId = Number(resolvedParams.id);
             article = await Article.findOne({ articleID: numericId }).lean();
         }

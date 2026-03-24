@@ -10,7 +10,7 @@ type TripCountdownProps = {
 };
 
 function parseDDMMYYYY(dateStr: string): Date | null {
-    const parts = dateStr.split("/").map((p) => parseInt(p, 10));
+    const parts = dateStr.split("/").map((p) => Number.parseInt(p, 10));
     if (parts.length !== 3 || parts.some(isNaN)) return null;
     const [day, month, year] = parts;
     return new Date(year, month - 1, day);

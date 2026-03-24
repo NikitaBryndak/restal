@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 function formatCardDate(dateStr?: string | null): string {
   if (!dateStr) return "Нещодавно";
   const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "Нещодавно";
+  if (Number.isNaN(date.getTime())) return "Нещодавно";
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));

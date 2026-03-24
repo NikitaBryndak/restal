@@ -653,6 +653,7 @@ function TourScreenerContent() {
       {/* ============================================================ */}
       {showBooking && (
         <div
+          role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();

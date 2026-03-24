@@ -218,8 +218,9 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                             {...register("images")}
                                         />
                                          <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-white/60">Tag</label>
+                                            <label htmlFor="article-tag" className="text-sm font-medium text-white/60">Tag</label>
                                             <select
+                                                id="article-tag"
                                                 className="flex h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50"
                                                 {...register("tag")}
                                             >
@@ -231,7 +232,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                             </select>
                                         </div>
                                         <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-white/60">
+                                            <label htmlFor="article-content" className="text-sm font-medium text-white/60">
                                                 Content <span className="text-red-500">*</span>
                                             </label>
                                             <div className="min-h-[400px] overflow-hidden rounded-md border border-white/10 focus-within:ring-2 focus-within:ring-accent/30">
@@ -240,6 +241,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                                     control={control}
                                                     render={({ field }) => (
                                                         <RichTextEditor
+                                                            id="article-content"
                                                             value={field.value || ""}
                                                             onChange={field.onChange}
                                                             placeholder="Start writing..."

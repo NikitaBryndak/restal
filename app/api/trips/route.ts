@@ -74,10 +74,10 @@ export async function GET(request: Request) {
         // SECURITY: Pagination to prevent memory exhaustion on large datasets
         const DEFAULT_LIMIT = 50;
         const MAX_LIMIT = 200;
-        const pageParam = parseInt(url.searchParams.get('page') || '1', 10);
-        const limitParam = parseInt(url.searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
-        const page = Math.max(1, isNaN(pageParam) ? 1 : pageParam);
-        const limit = Math.min(MAX_LIMIT, Math.max(1, isNaN(limitParam) ? DEFAULT_LIMIT : limitParam));
+        const pageParam = Number.parseInt(url.searchParams.get('page') || '1', 10);
+        const limitParam = Number.parseInt(url.searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
+        const page = Math.max(1, Number.isNaN(pageParam) ? 1 : pageParam);
+        const limit = Math.min(MAX_LIMIT, Math.max(1, Number.isNaN(limitParam) ? DEFAULT_LIMIT : limitParam));
         const skip = (page - 1) * limit;
 
         // Whitelist of safe fields that can be projected

@@ -75,7 +75,7 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
 
     let id = localStorage.getItem("ai_visitor_id");
     if (!id) {
-      id = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      id = crypto.randomUUID();
       localStorage.setItem("ai_visitor_id", id);
     }
     setVisitorId(id);

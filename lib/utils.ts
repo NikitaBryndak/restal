@@ -7,6 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function chooseRandomItem<T>(items: T[]): T {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return items[array[0] % items.length];
+  }
   return items[Math.floor(Math.random() * items.length)];
 }
 
@@ -39,9 +44,9 @@ export const validateDate = (dateStr: string): string | null => {
     const parts = dateStr.split('/');
     if (parts.length !== 3) return 'Невірний формат дати.';
 
-    const [day, month, year] = parts.map(p => parseInt(p, 10));
+    const [day, month, year] = parts.map(p => Number.parseInt(p, 10));
 
-    if (isNaN(day) || isNaN(month) || isNaN(year)) return 'Невірний формат дати.';
+    if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year)) return 'Невірний формат дати.';
     if (month < 1 || month > 12) return 'Місяць має бути від 01 до 12.';
     if (day < 1 || day > 31) return 'День має бути від 01 до 31.';
     if (year < 1940 || year > 2050) return 'Рік має бути від 1940 до 2050.';

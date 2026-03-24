@@ -53,6 +53,7 @@ export const DocumentsSection = ({
                         </label>
                     </div>
                     <div
+                        role="presentation"
                         className="rounded-lg border border-dashed border-white/10 bg-white/5 p-2 text-center text-xs text-white/40 transition-colors hover:border-white/30"
                         onDragOver={(event) => {
                             event.preventDefault();
@@ -122,6 +123,7 @@ export const DocumentsSection = ({
                     </label>
                 </div>
                 <div
+                    role="presentation"
                     className="mt-3 rounded-xl border border-dashed border-white/10 bg-white/5 p-4 text-center text-sm text-white/40 transition-colors hover:border-white/30"
                     onDragOver={(event) => {
                         event.preventDefault();

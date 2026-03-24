@@ -94,10 +94,11 @@ export default function AddArticlePage() {
                                             {...register("images")}
                                         />
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-white/60">
+                                            <label htmlFor="article-tag" className="text-sm font-medium text-white/60">
                                                 Тег статті
                                             </label>
                                             <select
+                                                id="article-tag"
                                                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-accent/50"
                                                 {...register("tag")}
                                             >
@@ -109,7 +110,7 @@ export default function AddArticlePage() {
                                             </select>
                                         </div>
                                         <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-sm font-medium text-white/60">
+                                            <label htmlFor="article-content" className="text-sm font-medium text-white/60">
                                                 Контент <span className="text-red-400">*</span>
                                             </label>
                                             <Controller
@@ -118,6 +119,7 @@ export default function AddArticlePage() {
                                                 rules={{ required: true }}
                                                 render={({ field }) => (
                                                     <RichTextEditor
+                                                        id="article-content"
                                                         value={field.value}
                                                         onChange={field.onChange}
                                                         placeholder="Почніть писати статтю… Використовуйте панель інструментів або вставте простий текст та натисніть Авто-формат."

@@ -93,7 +93,7 @@ const PAGE_SIZE = 50;
 function formatDate(iso: string): string {
     if (!iso) return "—";
     const d = new Date(iso);
-    if (isNaN(d.getTime())) return "—";
+    if (Number.isNaN(d.getTime())) return "—";
     return d.toLocaleString("uk-UA", {
         day: "2-digit",
         month: "2-digit",
@@ -279,10 +279,11 @@ export default function AuditLogPage() {
                 <div className="bg-white/5 rounded-xl border border-white/10 p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Entity type */}
                     <div>
-                        <label className="text-xs text-white/40 mb-1 block">
+                        <label htmlFor="filter-entity-type" className="text-xs text-white/40 mb-1 block">
                             Тип
                         </label>
                         <select
+                            id="filter-entity-type"
                             value={entityType}
                             onChange={(e) => setEntityType(e.target.value)}
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/50"
@@ -301,12 +302,13 @@ export default function AuditLogPage() {
 
                     {/* Action search */}
                     <div>
-                        <label className="text-xs text-white/40 mb-1 block">
+                        <label htmlFor="filter-action" className="text-xs text-white/40 mb-1 block">
                             Дія
                         </label>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
                             <input
+                                id="filter-action"
                                 value={actionSearch}
                                 onChange={(e) => setActionSearch(e.target.value)}
                                 placeholder="Пошук..."

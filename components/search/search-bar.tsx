@@ -14,8 +14,8 @@ export default function SearchBar({ className }: { className?: string }) {
     // typing and deleting effect
     useEffect(() => {
         if (index >= searchTexts.length) return;
-        const randomTypeDelay = Math.random() * 70 + 50;
-        const randomDeleteDelay = Math.random() * 100 + 50;
+        const randomTypeDelay = (typeof crypto !== 'undefined' && crypto.getRandomValues ? crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF : Math.random()) * 70 + 50;
+        const randomDeleteDelay = (typeof crypto !== 'undefined' && crypto.getRandomValues ? crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF : Math.random()) * 100 + 50;
         const timeout = setTimeout(() => {
         setSubIndex((prev) => prev + (deleting ? -1 : 1));
 

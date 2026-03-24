@@ -121,9 +121,9 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url);
         const status = searchParams.get("status");
-        const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+        const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1", 10));
         // SECURITY: Bound limit to prevent memory exhaustion (max 100)
-        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
+        const limit = Math.min(100, Math.max(1, Number.parseInt(searchParams.get("limit") || "20", 10)));
 
         const filter: Record<string, unknown> = {};
         if (status && status !== "all") {

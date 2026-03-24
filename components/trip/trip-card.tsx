@@ -31,7 +31,7 @@ export default function TripCard({ data }: { data: Trip }) {
 
   const [day, month, year] = data.tripEndDate
     .split("/")
-    .map((part: string) => parseInt(part, 10));
+    .map((part: string) => Number.parseInt(part, 10));
 
   const tripEnd = new Date(
     `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,

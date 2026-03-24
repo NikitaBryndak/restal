@@ -111,10 +111,11 @@ const TravellerSectionCreate = ({
                                 )}
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-white/60">
+                                <label htmlFor={`traveller-${index}-sex`} className="text-sm font-medium text-white/60">
                                     Стать
                                 </label>
                                 <select
+                                    id={`traveller-${index}-sex`}
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
                                     {...register(`travellers.${index}.sex`)}
                                 >
@@ -249,8 +250,9 @@ const TravellerSectionEdit = ({
                                 required
                             />
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-white/60">Стать</label>
+                                <label htmlFor={`tourist-${index}-sex`} className="text-sm font-medium text-white/60">Стать</label>
                                 <select
+                                    id={`tourist-${index}-sex`}
                                     value={tourist.sex ?? ''}
                                     onChange={(e) => onChange?.(index, 'sex', e.target.value)}
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"

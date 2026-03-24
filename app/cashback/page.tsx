@@ -929,7 +929,7 @@ export default function CashbackPage() {
                               <div className="h-px bg-linear-to-r from-white/5 via-white/10 to-white/5 mb-8" />
 
                               <div>
-                                 <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+                                 <label htmlFor="claim-amount" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
                                     Сума для використання
                                  </label>
 
@@ -964,6 +964,7 @@ export default function CashbackPage() {
 
                                  <div className="relative">
                                     <input
+                                       id="claim-amount"
                                        type="number"
                                        min="100"
                                        max={cashbackBalance}

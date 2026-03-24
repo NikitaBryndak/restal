@@ -13,7 +13,7 @@ import ArticleCard from "@/components/article/article-card";
 function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return "Нещодавно";
   const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "Нещодавно";
+  if (Number.isNaN(date.getTime())) return "Нещодавно";
   return date.toLocaleDateString("uk-UA", {
     day: "numeric",
     month: "long",

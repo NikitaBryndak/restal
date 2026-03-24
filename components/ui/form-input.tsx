@@ -78,10 +78,10 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             const parts = timeStr.split(':');
             if (parts.length !== 2) return null;
 
-            const hours = parseInt(parts[0], 10);
-            const minutes = parseInt(parts[1], 10);
+            const hours = Number.parseInt(parts[0], 10);
+            const minutes = Number.parseInt(parts[1], 10);
 
-            if (isNaN(hours) || isNaN(minutes)) {
+            if (Number.isNaN(hours) || Number.isNaN(minutes)) {
                 return 'Invalid time format.';
             }
 

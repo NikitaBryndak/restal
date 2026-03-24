@@ -177,6 +177,9 @@ self.addEventListener('sync', (event) => {
 
 /* ── Message handler for cache management ─────────────────────────── */
 self.addEventListener('message', (event) => {
+  // Verify the origin of the received message
+  if (event.origin && event.origin !== self.location.origin) return;
+
   if (event.data?.type === 'CACHE_TRIP_DATA') {
     // Cache trip data for offline access
     event.waitUntil(

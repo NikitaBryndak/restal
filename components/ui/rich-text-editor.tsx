@@ -35,6 +35,7 @@ type ToolbarSeparator = { separator: true };
 type ToolbarItem = ToolbarAction | ToolbarSeparator;
 
 interface RichTextEditorProps {
+  id?: string;
   value: string;
   onChange: (html: string) => void;
   placeholder?: string;
@@ -47,6 +48,7 @@ interface RichTextEditorProps {
 /* ------------------------------------------------------------------ */
 
 export default function RichTextEditor({
+  id,
   value,
   onChange,
   placeholder = "Start writing your article…",
@@ -373,6 +375,7 @@ export default function RichTextEditor({
         />
       ) : (
         <textarea
+          id={id}
           ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, RotateCcw, Copy, Check, Home } from 'lucide-react';
 
-export default function Error({
+export default function ErrorPage({
     error,
     reset,
 }: {
