@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2, Plus, Search, Trash2, Edit, AlertCircle } from 'lucide-react';
 import { TableSkeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
-import { MANAGER_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 interface Article {
     _id: string;
@@ -49,7 +49,8 @@ export default function ManageArticlesPage() {
 
     useEffect(() => {
         if (status === 'authenticated') {
-            if ((session?.user?.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
+            const level = session?.user?.privilegeLevel ?? 1;
+            if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
                 router.replace('/dashboard');
             } else {
                 fetchArticles();
@@ -104,7 +105,8 @@ export default function ManageArticlesPage() {
         return <TableSkeleton rows={5} />;
     }
 
-    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+    const userLevel = session?.user?.privilegeLevel ?? 1;
+    if (!session || (userLevel !== EDITOR_PRIVILEGE_LEVEL && userLevel !== ADMIN_PRIVILEGE_LEVEL)) {
         return null; // Redirect handled in useEffect
     }
 

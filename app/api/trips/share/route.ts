@@ -17,15 +17,15 @@ export async function POST(request: NextRequest) {
         }
 
         const { tripId } = await request.json();
-        if (!tripId) {
-            return NextResponse.json({ error: "Trip ID is required" }, { status: 400 });
+        if (!tripId || typeof tripId !== 'string') {
+            return NextResponse.json({ error: "Trip ID is required and must be a string" }, { status: 400 });
         }
 
         await connectToDatabase();
 
         const query = mongoose.Types.ObjectId.isValid(tripId) && /^[a-f0-9]{24}$/i.test(tripId)
             ? { _id: tripId }
-            : { number: tripId };
+            : { number: tripId.trim() };
         const trip = await TripModel.findOne(query);
 
         if (!trip) {
@@ -78,15 +78,15 @@ export async function DELETE(request: NextRequest) {
         }
 
         const { tripId } = await request.json();
-        if (!tripId) {
-            return NextResponse.json({ error: "Trip ID is required" }, { status: 400 });
+        if (!tripId || typeof tripId !== 'string') {
+            return NextResponse.json({ error: "Trip ID is required and must be a string" }, { status: 400 });
         }
 
         await connectToDatabase();
 
         const query = mongoose.Types.ObjectId.isValid(tripId) && /^[a-f0-9]{24}$/i.test(tripId)
             ? { _id: tripId }
-            : { number: tripId };
+            : { number: tripId.trim() };
         const trip = await TripModel.findOne(query);
 
         if (!trip) {

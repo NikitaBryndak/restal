@@ -5,8 +5,10 @@ export const BASE_URL = "https://restal.in.ua";
 export const CASHBACK_RATE = 0.02;
 
 /** Privilege levels (higher = more access) */
-export const MANAGER_PRIVILEGE_LEVEL = 2;  // Can manage tours, promo codes, contact requests
-export const ADMIN_PRIVILEGE_LEVEL = 3;    // Full admin — analytics, articles, manage any trip
+export const CLIENT_PRIVILEGE_LEVEL = 1;
+export const EDITOR_PRIVILEGE_LEVEL = 2;   // Can manage and add articles
+export const MANAGER_PRIVILEGE_LEVEL = 3;  // Can manage tours, promo codes, contact requests
+export const ADMIN_PRIVILEGE_LEVEL = 4;    // Full admin — analytics, audit logs
 
 /** Historical trip count offset shown on the homepage counter */
 export const TRIP_COUNT_OFFSET = 7860;

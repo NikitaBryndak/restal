@@ -4,7 +4,7 @@ import Article from '@/models/article';
 import mongoose from 'mongoose';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { MANAGER_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
+import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
 import { logAudit } from "@/lib/audit";
 
 export async function GET(
@@ -74,8 +74,9 @@ export async function PUT(
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be manager or above
-        if ((session.user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        // Check privilege level - must be editor or admin
+        const level = session.user.privilegeLevel ?? 1;
+        if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 
@@ -150,8 +151,9 @@ export async function DELETE(
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be manager or above
-        if ((session.user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        // Check privilege level - must be editor or admin
+        const level = session.user.privilegeLevel ?? 1;
+        if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 

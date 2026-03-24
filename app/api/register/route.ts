@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
         const { name, phoneNumber, email, password, referralCode } = body;
 
         // Input validation
-        if (!name || !phoneNumber || !password) {
+        if (!name || typeof name !== 'string' || !phoneNumber || typeof phoneNumber !== 'string' || !password || typeof password !== 'string') {
             return NextResponse.json({
-                message: "Name, phone number, and password are required"
+                message: "Name, phone number, and password are required and must be strings"
             }, { status: 400 });
         }
 

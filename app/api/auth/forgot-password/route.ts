@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     const { phoneNumber } = await req.json();
 
-    if (!phoneNumber) {
+    if (!phoneNumber || typeof phoneNumber !== 'string') {
       return NextResponse.json({ message: "Номер телефону обов'язковий" }, { status: 400 });
     }
 

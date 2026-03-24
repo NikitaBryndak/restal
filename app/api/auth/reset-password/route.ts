@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
 
     const { phoneNumber, otp, password } = await req.json();
 
-    if (!phoneNumber || !otp || !password) {
-      return NextResponse.json({ message: "Номер телефону, код та пароль обов'язкові" }, { status: 400 });
+    if (!phoneNumber || typeof phoneNumber !== 'string' || !otp || typeof otp !== 'string' || !password || typeof password !== 'string') {
+      return NextResponse.json({ message: "Номер телефону, код та пароль обов'язкові і повинні бути рядками" }, { status: 400 });
     }
 
     if (password.length < MIN_PASSWORD_LENGTH) {
