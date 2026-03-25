@@ -233,7 +233,7 @@ function ContactPageContent() {
                >
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs sm:text-sm font-medium backdrop-blur-sm">
                      <MessageCircle className="w-4 h-4" />
-                     Ми на зв&apos;язку
+                     Ми на зв'язку
                   </span>
                </motion.div>
 
@@ -434,7 +434,7 @@ function ContactPageContent() {
                            {success && (
                               <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
                                  <CheckCircle2 className="w-4 h-4" />
-                                 <span>Надіслано! Ми зв&apos;яжемося з вами найближчим часом.</span>
+                                 <span>Надіслано! Ми зв'яжемося з вами найближчим часом.</span>
                               </div>
                            )}
 

@@ -58,10 +58,10 @@ export default function ArticleContentPreview({
         </pre>
       ) : (
         <div
-          className="prose prose-invert prose-sm sm:prose-lg max-w-none
-            prose-headings:text-white prose-p:text-secondary prose-strong:text-white
+          className="prose prose-invert prose-sm sm:prose-lg max-w-none text-justify
+            prose-headings:text-white prose-headings:text-left prose-p:text-secondary prose-strong:text-white
             prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-            prose-li:text-secondary prose-blockquote:border-accent prose-blockquote:bg-white/5 prose-blockquote:p-4 prose-blockquote:rounded-r-lg
+            prose-li:text-secondary prose-blockquote:border-accent prose-blockquote:bg-white/5 prose-blockquote:p-4 prose-blockquote:rounded-r-lg prose-blockquote:text-left
             prose-img:rounded-xl prose-img:mx-auto prose-figcaption:text-center prose-figcaption:text-secondary/70 prose-figcaption:text-sm
             prose-mark:bg-accent/30 prose-mark:text-white prose-mark:px-1 prose-mark:rounded
             prose-hr:border-white/20"

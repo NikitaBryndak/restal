@@ -106,9 +106,6 @@ export default function SubDashboardNavbar() {
                                 Менеджери
                             </NavLink>
 
-                            <NavLink href="/dashboard/clients" className={NAV_ITEM_CLASS}>
-                                Клієнти
-                            </NavLink>
                         </div>
                     )}
 

@@ -129,9 +129,6 @@ export default function SmallNavbar({ userProfile }: { userProfile: UserProfile 
                                             <NavLink href="/dashboard/manager-performance" onClick={toggleMobileMenu} className="text-lg">
                                                 Менеджери
                                             </NavLink>
-                                            <NavLink href="/dashboard/clients" onClick={toggleMobileMenu} className="text-lg">
-                                                Клієнти
-                                            </NavLink>
                                         </div>
                                     )}
                                 </div>
