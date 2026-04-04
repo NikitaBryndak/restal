@@ -66,7 +66,7 @@ export const PromoCodeSection = ({ variant = 'create' }: PromoCodeSectionProps) 
                 </div>
                 <div className="space-y-1">
                     <h2 className="text-lg font-semibold text-white">Промокод</h2>
-                    <p className="text-sm text-white/50">Необов&apos;язково. Введіть промокод клієнта для знижки на тур.</p>
+                    <p className="text-sm text-white/50">Необов'язково. Введіть промокод клієнта для знижки на тур.</p>
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">

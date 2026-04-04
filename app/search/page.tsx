@@ -213,7 +213,7 @@ export default function SearchPage() {
                       Бажаєте поговорити з людиною?
                     </h2>
                     <p className="text-white/60 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
-                      Наші менеджери завжди на зв&apos;язку — залиште заявку і отримайте персональну консультацію
+                      Наші менеджери завжди на зв'язку — залиште заявку і отримайте персональну консультацію
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-4">

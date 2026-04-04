@@ -224,7 +224,7 @@ export default function SettingsPage() {
                             <div className="p-4 sm:p-6 space-y-4">
                                 <div className="flex items-center justify-between py-3 border-b border-white/10">
                                     <div className="flex-1">
-                                        <p className="font-medium text-white">Ім&apos;я</p>
+                                        <p className="font-medium text-white">Ім'я</p>
                                         {!isEditingUsername ? (
                                             <p className="text-sm text-white/60">{userProfile?.userName || 'Не вказано'}</p>
                                         ) : (

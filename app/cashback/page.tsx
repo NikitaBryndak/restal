@@ -679,7 +679,7 @@ export default function CashbackPage() {
                                        <Clock className="w-7 h-7 text-white/20" />
                                     </div>
                                     <p className="text-white/45 text-sm font-medium mb-1">Ще немає нарахувань</p>
-                                    <p className="text-white/25 text-xs">Cash-back з&apos;явиться тут після завершення вашого першого туру</p>
+                                    <p className="text-white/25 text-xs">Cash-back з'явиться тут після завершення вашого першого туру</p>
                                  </div>
                               ) : (
                                  <div className="overflow-x-auto">
@@ -1072,7 +1072,7 @@ export default function CashbackPage() {
                                        <FileText className="w-7 h-7 text-white/20" />
                                     </div>
                                     <p className="text-white/45 text-sm font-medium mb-1">Ще немає кодів</p>
-                                    <p className="text-white/25 text-xs">Згенеровані коди знижок з&apos;являться тут</p>
+                                    <p className="text-white/25 text-xs">Згенеровані коди знижок з'являться тут</p>
                                  </div>
                               ) : (
                                  <div className="space-y-1">

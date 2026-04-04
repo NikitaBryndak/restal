@@ -623,7 +623,7 @@ function TourScreenerContent() {
                 </h2>
                 <p className="text-white/60 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
                   Наші експерти підберуть ідеальний тур за вашими побажаннями —
-                  безкоштовно та без зобов&apos;язань
+                  безкоштовно та без зобов'язань
                 </p>
 
                 <div className="flex flex-wrap justify-center gap-4">
@@ -698,7 +698,7 @@ function TourScreenerContent() {
                     htmlFor="bookFirstName"
                     className="text-white/70 text-sm"
                   >
-                    Ім&apos;я
+                    Ім'я
                   </Label>
                   <Input
                     id="bookFirstName"
@@ -713,7 +713,7 @@ function TourScreenerContent() {
                     htmlFor="bookLastName"
                     className="text-white/70 text-sm"
                   >
-                    Прізвище <span className="text-white/40 text-xs font-normal">(необов&apos;язково)</span>
+                    Прізвище <span className="text-white/40 text-xs font-normal">(необов'язково)</span>
                   </Label>
                   <Input
                     id="bookLastName"
@@ -755,7 +755,7 @@ function TourScreenerContent() {
                 <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
                   <CheckCircle2 className="w-4 h-4" />
                   <span>
-                    Заявку надіслано! Ми зв&apos;яжемося з вами найближчим
+                    Заявку надіслано! Ми зв'яжемося з вами найближчим
                     часом.
                   </span>
                 </div>

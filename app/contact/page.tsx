@@ -368,7 +368,7 @@ function ContactPageContent() {
                         <p className="text-white/40 text-xs sm:text-sm text-center mb-4 sm:mb-6">
                            {isAiTripPlan
                               ? "Ваш план подорожі вже заповнено — додайте контакти і ми підберемо найкращий тур"
-                              : "Залиште заявку — ми зв&apos;яжемося найближчим часом"
+                              : "Залиште заявку — ми зв'яжемося найближчим часом"
                            }
                         </p>
 
@@ -384,7 +384,7 @@ function ContactPageContent() {
                         <form ref={formRef} className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                               <div className="space-y-1.5">
-                                 <Label htmlFor="firstName" className="text-white/60 text-sm">Ім&apos;я</Label>
+                                 <Label htmlFor="firstName" className="text-white/60 text-sm">Ім'я</Label>
                                  <Input
                                     id="firstName"
                                     placeholder="Іван"
@@ -394,7 +394,7 @@ function ContactPageContent() {
                                  />
                               </div>
                               <div className="space-y-1.5">
-                                 <Label htmlFor="lastName" className="text-white/60 text-sm">Прізвище <span className="text-white/35 text-xs font-normal">(необов&apos;язково)</span></Label>
+                                 <Label htmlFor="lastName" className="text-white/60 text-sm">Прізвище <span className="text-white/35 text-xs font-normal">(необов'язково)</span></Label>
                                  <Input
                                     id="lastName"
                                     placeholder="Петренко"

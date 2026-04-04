@@ -1460,7 +1460,7 @@ export default function AnalyticsPage() {
                                     <div className="hidden md:grid grid-cols-[1fr_140px_140px_140px_140px] gap-2 px-4 py-3 bg-white/3 border-b border-white/8 text-xs text-secondary font-medium">
                                         <div className="flex items-center gap-1">
                                             <Phone size={11} />
-                                            Телефон / Ім&apos;я
+                                            Телефон / Ім'я
                                         </div>
                                         <div className="text-right">Баланс</div>
                                         <div className="text-right">Нараховано</div>

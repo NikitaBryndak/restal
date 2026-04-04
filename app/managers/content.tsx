@@ -620,7 +620,7 @@ export default function ManagersContent() {
                 {submitSuccess && (
                   <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Запит надіслано! Ми зв&apos;яжемося з вами.</span>
+                    <span>Запит надіслано! Ми зв'яжемося з вами.</span>
                   </div>
                 )}
 

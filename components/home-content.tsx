@@ -597,7 +597,7 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
               Готові до подорожі?
             </h2>
             <p className="text-white/50 text-base md:text-lg max-w-xl mx-auto mb-8">
-              Залиште заявку — і наш менеджер зв&apos;яжеться з вами протягом
+              Залиште заявку — і наш менеджер зв'яжеться з вами протягом
               15 хвилин з найкращими пропозиціями
             </p>
 
