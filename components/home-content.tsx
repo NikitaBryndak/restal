@@ -239,7 +239,8 @@ export default function HomeContent({ tripCount }: HomeContentProps) {
               {
                 label: "Шукаю сам!",
                 desc: "Самостійний підбір туру",
-                href: "/tour-screener#tour-widget",
+                // href: "/tour-screener#tour-widget",
+                href: "https://restal.tat.ua/tours/searchtour/",
                 icon: Search,
                 iconColor: "text-sky-400",
                 border: "border-sky-400/30 hover:border-sky-400/60",
