@@ -165,6 +165,13 @@ function ContactPageContent() {
             formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
          }, 800);
       }
+      // Scroll to section when arriving via #hash link (e.g. /contact#tour-form)
+      const hash = window.location.hash;
+      if (!isAiTripPlan && hash.length > 1) {
+         setTimeout(() => {
+            document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "center" });
+         }, 800);
+      }
    }, [searchParams, isAiTripPlan]);
 
    const handleSubmit = async (e: React.FormEvent) => {
@@ -347,7 +354,7 @@ function ContactPageContent() {
 
                {/* Right — Form (3 cols) */}
                <FadeIn delay={0.15} className="lg:col-span-3">
-                  <div className="relative p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 backdrop-blur-sm">
+                  <div id="tour-form" className="relative p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 backdrop-blur-sm">
                      {/* Gradient background fill */}
                      <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden bg-linear-to-br from-white/3 via-white/1.5 to-accent/2.5" />
 
