@@ -75,7 +75,8 @@ export default function AiChatInline({ onClose, initialQuery }: AiChatInlineProp
 
     let id = localStorage.getItem("ai_visitor_id");
     if (!id) {
-      id = crypto.randomUUID();
+      // crypto.randomUUID is unavailable in non-secure contexts (plain HTTP on LAN IPs) — fall back to a generated id
+      id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `v-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
       localStorage.setItem("ai_visitor_id", id);
     }
     setVisitorId(id);
