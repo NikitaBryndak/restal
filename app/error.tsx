@@ -90,6 +90,8 @@ export default function ErrorPage({
                             </>
                         )}
                     </button>
+                    {/* Full reload is deliberate here: if the router crashed, client-side nav may not recover */}
+                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                     <a
                         href="/"
                         className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/70 hover:bg-white/10 transition-colors"

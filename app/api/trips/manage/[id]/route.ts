@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 
 const buildQuery = (rawId: string) => {
     // Strip leading # if present (e.g., "Trip #5468189" -> "5468189")
-    let identifier = rawId.trim().replace(/^#/, '');
+    const identifier = rawId.trim().replace(/^#/, '');
 
     // Check if it's a valid MongoDB ObjectId (24-char hex string)
     if (mongoose.Types.ObjectId.isValid(identifier) && /^[a-f0-9]{24}$/i.test(identifier)) {

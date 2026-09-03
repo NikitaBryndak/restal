@@ -249,7 +249,7 @@ export default function RichTextEditor({
     const ta = textareaRef.current;
     if (!ta) return;
 
-    let text = ta.value;
+    const text = ta.value;
 
     // Don't auto-format if already has HTML tags
     if (/<[a-z][\s\S]*>/i.test(text)) {

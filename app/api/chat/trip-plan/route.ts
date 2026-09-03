@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     let planData;
     try {
       // Strategy 1: Remove markdown code fences if present
-      let cleaned = responseText
+      const cleaned = responseText
         .replace(/^```(?:json)?\s*/i, "")
         .replace(/\s*```$/i, "")
         .trim();

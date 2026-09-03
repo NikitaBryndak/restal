@@ -3,7 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export default function NavLogo(data: {className?: string}) {
-    let fullClassName = cn("flex items-center gap-3", data.className);
+    const fullClassName = cn("flex items-center gap-3", data.className);
     return (
         <Link href="/" className={fullClassName}>
             <Image
