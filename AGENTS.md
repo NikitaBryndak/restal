@@ -17,6 +17,14 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 - **Production** URI has no path segment → prod data lives in a database literally named **`test`**.
 - **Local dev** appends `/dev_restal` to the same cluster URI → isolated dev database on the same Atlas cluster; collections/indexes auto-create via mongoose, so schema converges with prod naturally. Never point local at the bare prod URI.
 
+## Commits & deploys
+
+- **Commit policy**: commit only major features or massive/critical fixes. No routine/intermediate commits, and agents never push — pushing is a human action.
+- **Deploy topology** (set 2026-09-03): Vercel's production branch is **`production`**, not `master`. Pushes to `master` create **Preview (dev)** deployments only — they never touch prod. Production deploys are manual, from the server only:
+  - promote a specific commit: `git push origin <commit>:production`
+  - or promote a deployment in the Vercel dashboard / `vercel --prod`.
+- The live site (restal.in.ua) keeps serving the last production deploy until one of the above runs.
+
 ## Gotchas
 
 - **Twilio (`lib/sms.ts`)**: mock mode only activates when `TWILIO_*` creds are *absent*. With real creds present it sends **real SMS even in development**. Local `.env.local` deliberately omits them (user decision 2026-09-03) → OTP codes print to server logs; the commented values sit at the bottom of that file if real local SMS is ever needed.
@@ -26,4 +34,4 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 
 ## Memory
 
-Persistent project memory lives in `.memory/` (gitignored; **English-only** content, no secret values). The full protocol — when to write, file format, hybrid retrieval — is defined by the **restal-memory** skill. Read `skill://restal-memory` (file: `.claude/skills/restal-memory/SKILL.md`) before non-trivial work in this repo, and follow it whenever recording decisions or findings.
+Persistent project memory lives in `.memory/` (gitignored; **English-only** content, no secret values). The full protocol — when to write, file format, hybrid retrieval — is defined by the **restal-memory** skill. Read `skill://restal-memory` (file: `.claude/skills/restal-memory/SKILL.md`) before non-trivial work in this repo, and follow it whenever recording decisions or findings. For browser-driven UI testing/smoke passes, read `skill://restal-browser-testing` first — it catalogs every automation error hit so far with the working technique.
