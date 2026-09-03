@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.18.0",
@@ -51,8 +52,10 @@
     "@types/react-dom": "^19",
     "eslint": "9.39.3",
     "eslint-config-next": "16.1.6",
+    "mongodb-memory-server": "^11.2.0",
     "tailwindcss": "^4.1.13",
     "tw-animate-css": "^1.3.8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
