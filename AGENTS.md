@@ -19,11 +19,18 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 
 ## Commits & deploys
 
-- **Commit policy**: commit only major features or massive/critical fixes. No routine/intermediate commits, and agents never push — pushing is a human action.
+- **Commit policy**: commit only major features or massive/critical fixes. No routine/intermediate commits, and agents never push — pushing is a human action (exception: an explicit user instruction to push).
 - **Deploy topology** (set 2026-09-03): Vercel's production branch is **`production`**, not `master`. Pushes to `master` create **Preview (dev)** deployments only — they never touch prod. Production deploys are manual, from the server only:
   - promote a specific commit: `git push origin <commit>:production`
   - or promote a deployment in the Vercel dashboard / `vercel --prod`.
 - The live site (restal.in.ua) keeps serving the last production deploy until one of the above runs.
+
+## Testing & commit loop (mandatory)
+
+- **After every new feature, before committing**: run the full local verification loop — `npm test` (vitest suite) AND `next build --turbopack`. Both must pass. **Build before you commit**, no exceptions; a red build or failing test blocks the commit.
+- **Tests are LOCAL ONLY** (user decision 2026-09-04): agents never run tests against Vercel remote deployments — not Preview, not Production. All verification happens against the local dev server on port 3001 with the `dev_restal` database. Remote behavior is confirmed by the user manually after deploy.
+- **New feature → new tests**: every feature ships with tests covering its observable contract (auth/permission boundaries, validation errors, data shapes, side effects like audit entries). Tests mirror app structure under `tests/` (`lib/`, `api/`, `models/`, `middleware`). API routes are tested by importing the handler and calling it with a `NextRequest`; sessions come from mocking `getServerSession` (see `tests/api/users-roles.test.ts`); audit writes are fire-and-forget, so assert on a mocked `logAudit` call, not DB state.
+- **Build vs dev server**: stop the `restal-dev` hub process before running `next build` — a concurrent Turbopack dev server sharing `.next` corrupts page collection (`PageNotFoundError ... ENOENT`, e.g. `/api/promo-codes/[code]`). Restart it afterwards for UI work.
 
 ## Gotchas
 
