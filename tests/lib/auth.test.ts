@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import bcrypt from 'bcryptjs';
 import { authOptions } from '@/lib/auth';
 import User from '@/models/user';
+import Role from '@/models/role';
 
 const authorize = (credentials: Record<string, string>) =>
   // next-auth v4 CredentialsProvider nests the handler under `options`
@@ -17,26 +18,26 @@ describe('authOptions shape', () => {
 describe('authorize()', () => {
   it('returns user identity for valid phone + password', async () => {
     const hash = await bcrypt.hash('correct-horse', 10);
-    await User.create({ name: 'Auth Test', phoneNumber: '+380679000001', password: hash, privilegeLevel: 2 });
+    await User.create({ name: 'Auth Test', phoneNumber: '+380679000001', password: hash, role: 'editor' });
 
     const result = (await authorize({ phoneNumber: '+380679000001', password: 'correct-horse' })) as {
       id: string;
       phoneNumber: string;
-      privilegeLevel: number;
+      role: string;
     };
     expect(result.phoneNumber).toBe('+380679000001');
-    expect(result.privilegeLevel).toBe(2);
+    expect(result.role).toBe('editor');
     expect(result.id).toMatch(/^[a-f\d]{24}$/i);
   });
 
-  it('defaults privilegeLevel to 1 when unset', async () => {
+  it('defaults the role to client when unset', async () => {
     const hash = await bcrypt.hash('pw-2', 10);
     await User.create({ name: 'Auth Test 2', phoneNumber: '+380679000002', password: hash });
 
     const result = (await authorize({ phoneNumber: '+380679000002', password: 'pw-2' })) as {
-      privilegeLevel: number;
+      role: string;
     };
-    expect(result.privilegeLevel).toBe(1);
+    expect(result.role).toBe('client');
   });
 
   it('returns null for an unknown phone number', async () => {
@@ -69,45 +70,49 @@ describe('jwt callback', () => {
   const jwtCb = (params: Record<string, unknown>) =>
     authOptions.callbacks!.jwt!(params as never) as unknown as Promise<Record<string, unknown>>;
 
-  it('copies identity fields from the user object on first sign-in', async () => {
-    // Phone not in DB → re-fetch finds nothing and keeps the user-provided values.
+  it('copies identity fields from the user object and flattens role pages on first sign-in', async () => {
+    await User.create({ name: 'JWT First', phoneNumber: '+380679000010', password: 'x', role: 'editor' });
+    await Role.create({ slug: 'editor', name: 'Редактор', isSystem: true, groups: ['client', 'articles'], pageOverrides: {} });
+
     const token = await jwtCb({
       token: {},
-      user: { id: 'u1', phoneNumber: '+380679000010', privilegeLevel: 3 },
+      user: { id: 'u1', phoneNumber: '+380679000010', role: 'editor' },
     });
-    expect(token.privilegeLevel).toBe(3);
+    expect(token.role).toBe('editor');
     expect(token.phoneNumber).toBe('+380679000010');
+    expect(token.allowedPages).toEqual(expect.arrayContaining(['profile', 'manage-articles', 'add-article']));
   });
 
-  it('re-fetches privilegeLevel from the DB on token refresh (demoted users lose access)', async () => {
+  it('re-fetches the role slug from the DB on token refresh (demoted users lose access)', async () => {
     const hash = await bcrypt.hash('pw', 10);
-    await User.create({ name: 'JWT Test', phoneNumber: '+380679000011', password: hash, privilegeLevel: 4 });
+    await User.create({ name: 'JWT Test', phoneNumber: '+380679000011', password: hash, role: 'admin' });
 
-    // Simulate a refresh where the token still claims level 4 but DB now says 2.
+    // Simulate a refresh where the token still claims admin but DB now says editor.
     const user = await User.findOne({ phoneNumber: '+380679000011' });
     if (user) {
-      user.privilegeLevel = 2;
+      user.role = 'editor';
       await user.save();
     }
 
-    const token = await jwtCb({ token: { phoneNumber: '+380679000011', privilegeLevel: 4 }, user: undefined });
-    expect(token.privilegeLevel).toBe(2);
+    const token = await jwtCb({ token: { phoneNumber: '+380679000011', role: 'admin' }, user: undefined });
+    expect(token.role).toBe('editor');
   });
 
-  it('keeps the existing level when the DB lookup finds no user', async () => {
-    const token = await jwtCb({ token: { phoneNumber: '+380679000012', privilegeLevel: 5 }, user: undefined });
-    expect(token.privilegeLevel).toBe(5);
+  it('falls back to the client role when the DB lookup finds no user', async () => {
+    const token = await jwtCb({ token: { phoneNumber: '+380679000012', role: 'admin' }, user: undefined });
+    expect(token.role).toBe('client');
   });
 });
 
 describe('session callback', () => {
-  it('exposes privilegeLevel and phoneNumber on session.user', async () => {
+  it('exposes role, allowedPages and phoneNumber on session.user', async () => {
     const session = await authOptions.callbacks!.session!({
       session: { user: {} },
-      token: { privilegeLevel: 3, phoneNumber: '+380679000013' },
+      token: { role: 'manager', allowedPages: ['profile'], phoneNumber: '+380679000013' },
     } as never) as { user: Record<string, unknown> };
 
-    expect(session.user.privilegeLevel).toBe(3);
+    expect(session.user.role).toBe('manager');
+    expect(session.user.allowedPages).toEqual(['profile']);
     expect(session.user.phoneNumber).toBe('+380679000013');
   });
 });

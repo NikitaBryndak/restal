@@ -3,6 +3,8 @@ import { NextRequest } from 'next/server';
 import Article from '@/models/article';
 import { getServerSession } from 'next-auth';
 import { logAudit } from '@/lib/audit';
+import Role from '@/models/role';
+import { invalidateRoleCache } from '@/lib/role-cache';
 import { GET as listArticles, POST as createArticle } from '@/app/api/articles/route';
 import { GET as getArticleById } from '@/app/api/articles/[id]/route';
 
@@ -18,14 +20,19 @@ vi.mock('@/lib/audit', () => ({ logAudit: vi.fn().mockResolvedValue(undefined) }
 const mockGetServerSession = vi.mocked(getServerSession);
 const mockLogAudit = vi.mocked(logAudit);
 
-function session(phoneNumber: string, privilegeLevel: number) {
-  return { user: { phoneNumber, privilegeLevel } };
+function session(phoneNumber: string, role: string) {
+  return { user: { phoneNumber, role } };
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   mockGetServerSession.mockReset();
   mockLogAudit.mockClear();
+  invalidateRoleCache();
+  await Role.create({ slug: 'client', name: 'Клієнт', isSystem: true, groups: ['client'], pageOverrides: {} });
+  await Role.create({ slug: 'editor', name: 'Редактор', isSystem: true, groups: ['client', 'articles'], pageOverrides: {} });
+  await Role.create({ slug: 'admin', name: 'Адмін', isSystem: true, groups: ['client', 'articles', 'tours', 'admin'], pageOverrides: {} });
 });
+
 
 async function seedArticle(overrides: Record<string, unknown> = {}) {
   return Article.create({
@@ -79,12 +86,12 @@ describe('POST /api/articles', () => {
     mockGetServerSession.mockResolvedValue(null as never);
     expect((await post(validBody)).status).toBe(401);
 
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 1) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'client') as never);
     expect((await post(validBody)).status).toBe(403);
   });
 
   it('creates a draft with an image array and logs article.created', async () => {
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 2) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'editor') as never);
 
     const res = await post({ ...validBody, status: 'draft' });
     expect(res.status).toBe(201);
@@ -101,7 +108,7 @@ describe('POST /api/articles', () => {
   });
 
   it('normalizes a legacy single-string image into an array and defaults to published', async () => {
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 4) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'admin') as never);
 
     const res = await post({ ...validBody, images: 'https://img.example/one.jpg' });
     expect(res.status).toBe(201);
@@ -111,7 +118,7 @@ describe('POST /api/articles', () => {
   });
 
   it('rejects empty or missing images with 400', async () => {
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 2) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'editor') as never);
     const noImages = { ...validBody };
     delete (noImages as Record<string, unknown>).images;
     expect((await post(noImages)).status).toBe(400);
@@ -119,7 +126,7 @@ describe('POST /api/articles', () => {
   });
 
   it('rejects an invalid status with 400', async () => {
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 2) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'editor') as never);
     expect((await post({ ...validBody, status: 'archived' })).status).toBe(400);
   });
 });
@@ -151,7 +158,7 @@ describe('GET /api/articles (list)', () => {
 
   it('ignores includeDrafts for non-editor sessions', async () => {
     await seedArticle({ articleID: 101, title: 'Hidden Draft', status: 'draft' });
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 1) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'client') as never);
 
     const res = await listArticles(new NextRequest('http://localhost/api/articles?includeDrafts=true'));
     const body = (await res.json()) as { articles: Array<Record<string, unknown>> };
@@ -161,7 +168,7 @@ describe('GET /api/articles (list)', () => {
   it('includes drafts for editors and marks the response non-cacheable', async () => {
     await seedArticle();
     await seedArticle({ articleID: 101, title: 'Hidden Draft', status: 'draft' });
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 2) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'editor') as never);
 
     const res = await listArticles(new NextRequest('http://localhost/api/articles?includeDrafts=true'));
     const body = (await res.json()) as { articles: Array<Record<string, unknown>> };
@@ -184,13 +191,13 @@ describe('GET /api/articles/[id]', () => {
     mockGetServerSession.mockResolvedValue(null as never);
     expect((await byId(String(draft._id))).status).toBe(404);
 
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 1) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'client') as never);
     expect((await byId(String(draft._id))).status).toBe(404);
   });
 
   it('serves drafts to editors/admins with a no-store cache header', async () => {
     const draft = await seedArticle({ articleID: 200, title: 'Secret Draft', status: 'draft' });
-    mockGetServerSession.mockResolvedValue(session('+380672000001', 4) as never);
+    mockGetServerSession.mockResolvedValue(session('+380672000001', 'admin') as never);
 
     const res = await byId(String(draft._id));
     expect(res.status).toBe(200);

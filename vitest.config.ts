@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  esbuild: { jsx: "automatic" }, // React 19 automatic runtime for .tsx test files
   resolve: {
     alias: { '@': root },
   },

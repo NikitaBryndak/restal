@@ -96,6 +96,7 @@ Dead ends already proven — do not retry:
 | Page crashes "crypto.randomUUID is not a function" over HTTP | Secure-context API on non-secure origin (fixed in app; see section 6) |
 | Save in settings UI "does nothing" | Controlled combobox ignores programmatic value set — type real keystrokes; Enter submits the form (may save accidentally) |
 | Text won't select in a web input | Ctrl+A/triple-click intercepted — clear with repeated Backspace |
+| Page crashes "X is not defined" although the fix IS on disk | The app's service worker (`public/sw.js`, `networkFirstHTML`) caches page HTML/JS in the test profile — a stale dev-era bundle keeps being served even after code changes, cache clears and server restarts. Unregister it before re-verifying: `navigator.serviceWorker.getRegistrations()` → `unregister()`, then delete all `caches.keys()`, then reload |
 
 ## 8. Vercel dashboard settings edits (via relay)
 

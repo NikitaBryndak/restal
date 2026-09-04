@@ -143,7 +143,7 @@ describe('POST /api/register', () => {
     const user = (await User.findOne({ phoneNumber: VALID_PHONE }))!;
     expect(user.name).toBe('Test User');
     expect(user.cashbackAmount).toBe(1000); // WELCOME_BONUS
-    expect(user.privilegeLevel).toBe(1);
+    expect(user.role).toBe('client'); // schema default — new registrations are plain clients
     expect(user.referralCode).toMatch(/^REF-[A-Z0-9]{4}-[A-Z0-9]{4}$/);
     expect(user.password).not.toBe('Password123'); // stored hashed
   });

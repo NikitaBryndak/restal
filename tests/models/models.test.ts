@@ -49,9 +49,9 @@ describe('User model', () => {
     expect(randomBytesSpy).toHaveBeenCalledTimes(4);
   });
 
-  it('applies default privilegeLevel 1 and the welcome cashback bonus', async () => {
+  it('applies default client role and the welcome cashback bonus', async () => {
     const user = await User.create({ name: 'Defaults Test', phoneNumber: '+380679100005', password: 'x' });
-    expect(user.privilegeLevel).toBe(1);
+    expect(user.role).toBe('client');
     expect(user.cashbackAmount).toBe(WELCOME_BONUS);
   });
 });

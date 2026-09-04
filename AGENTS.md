@@ -2,6 +2,10 @@
 
 Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mongoose (single default connection), next-auth v4 (credentials), Twilio SMS, Gmail/nodemailer notifications, GCS document storage, Gemini AI chat. Ukrainian-language travel/rental product; deployed on Vercel at restal.in.ua.
 
+## Hard rules
+
+- **Subagents**: YOU ARE NEVER ALLOWED TO USE SUBAGENTS — no `task` tool, no delegation of any kind; do all work directly in this session.
+
 ## Running locally
 
 - `npm install`, then dev server on port **3001** — port 3000 is occupied by Docker Desktop on the dev machine:
@@ -30,6 +34,7 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 - **After every new feature, before committing**: run the full local verification loop — `npm test` (vitest suite) AND `next build --turbopack`. Both must pass. **Build before you commit**, no exceptions; a red build or failing test blocks the commit.
 - **Tests are LOCAL ONLY — NEVER use production details or APIs** (user decision 2026-09-04): agents never run tests against Vercel remote deployments (not Preview, not Production), never query the prod database (`test`), and never call restal.in.ua endpoints or touch real user data. All verification happens against the local dev server on port 3001 with the `dev_restal` database; reusable fixture users/creds are cataloged in `.memory/test-fixtures-dev-restal.md`. Remote behavior is confirmed by the user manually after deploy.
 - **New feature → new tests**: every feature ships with tests covering its observable contract (auth/permission boundaries, validation errors, data shapes, side effects like audit entries). Tests mirror app structure under `tests/` (`lib/`, `api/`, `models/`, `middleware`). API routes are tested by importing the handler and calling it with a `NextRequest`; sessions come from mocking `getServerSession` (see `tests/api/users-roles.test.ts`); audit writes are fire-and-forget, so assert on a mocked `logAudit` call, not DB state.
+- **Bug fix → immediate regression test** (user decision 2026-09-04): every bug found and fixed MUST ship with a test covering the broken behavior in the same change — "fix now, test later" is forbidden. The test must exercise the exact path that was broken (ideally failing on the pre-fix code). Type-level-only fixes (caught by `tsc`/build) are exempt; any behavioral bug always gets a test.
 - **Feature removed or changed → remove/update its tests** in the same change (user decision 2026-09-04): a test for deleted code must not survive — dead tests rot, mask regressions, and keep the suite red.
 - **Build vs dev server**: stop the `restal-dev` hub process before running `next build` — a concurrent Turbopack dev server sharing `.next` corrupts page collection (`PageNotFoundError ... ENOENT`, e.g. `/api/promo-codes/[code]`). Restart it afterwards for UI work.
 

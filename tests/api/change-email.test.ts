@@ -61,7 +61,7 @@ describe('POST /api/auth/change-email', () => {
     expect((await post(phone, undefined)).status).toBe(400);
     expect((await post(phone, 42)).status).toBe(400);
 
-    const reloaded = await User.findOne({ phoneNumber: phone }).lean();
+    const reloaded = (await User.findOne({ phoneNumber: phone }).lean()) as { email?: string } | null;
     expect(reloaded?.email).toBe('keep@me.com');
   });
 
@@ -90,7 +90,7 @@ describe('POST /api/auth/change-email', () => {
     const body = (await res.json()) as { message: string; userEmail: string };
     expect(body.userEmail).toBe('new@me.com');
 
-    const reloaded = await User.findById(user._id).lean();
+    const reloaded = (await User.findById(user._id).lean()) as { email?: string } | null;
     expect(reloaded?.email).toBe('new@me.com');
 
     expect(mockLogAudit).toHaveBeenCalledTimes(1);
