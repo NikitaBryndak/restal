@@ -346,6 +346,11 @@ export default function CashbackPage() {
       setCopiedReferral(true);
       setTimeout(() => setCopiedReferral(false), 2000);
    };
+   const copyReferralLink = () => {
+      navigator.clipboard.writeText(`${window.location.origin}/register?ref=${referralCode}`);
+      setCopiedReferral(true);
+      setTimeout(() => setCopiedReferral(false), 2000);
+   };
 
    const copyPromoCode = (code: string) => {
       navigator.clipboard.writeText(code);
@@ -623,7 +628,7 @@ export default function CashbackPage() {
                                  <h3 className="text-xl font-bold text-white">Ваш реферальний код</h3>
                               </div>
                               <p className="text-white/45 text-sm mb-6 leading-relaxed">
-                                 Поділіться цим кодом з друзями. Коли вони зареєструються та здійснять перше бронювання,
+                                 Поділіться посиланням або кодом з друзями. Коли вони зареєструються та здійснять перше бронювання,
                                  ви отримаєте бонус до 2 000 грн, а вони — додатковий бонус 800 грн.
                               </p>
 
@@ -642,7 +647,7 @@ export default function CashbackPage() {
                                     </button>
                                  </div>
                                  <Button
-                                    onClick={copyReferralCode}
+                                    onClick={copyReferralLink}
                                     className="bg-accent hover:bg-accent/90 text-white font-semibold rounded-xl px-6 shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
                                  >
                                     Поділитися

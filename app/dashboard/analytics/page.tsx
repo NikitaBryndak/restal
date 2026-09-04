@@ -141,6 +141,29 @@ interface BonusData {
     };
     users: BonusUser[];
 }
+interface ReferralsRow {
+    name: string;
+    phone: string;
+    code: string;
+    registeredCount: number;
+    referredCount: number;
+    bonusEarned: number;
+    refereeTrips: number;
+    refereeRevenue: number;
+}
+
+interface ReferralsData {
+    date: string;
+    overview: {
+        referrers: number;
+        referredUsers: number;
+        bonusEarned: number;
+        refereeTrips: number;
+        refereeRevenue: number;
+        refereePaid: number;
+    };
+    topReferrers: ReferralsRow[];
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -403,11 +426,13 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [period, setPeriod] = useState<Period>('all');
-    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users' | 'requests' | 'bonuses'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'users' | 'requests' | 'bonuses' | 'referrals'>('overview');
     const [requestsData, setRequestsData] = useState<RequestsData | null>(null);
     const [requestsLoading, setRequestsLoading] = useState(false);
     const [bonusData, setBonusData] = useState<BonusData | null>(null);
     const [bonusLoading, setBonusLoading] = useState(false);
+    const [referralsData, setReferralsData] = useState<ReferralsData | null>(null);
+    const [referralsLoading, setReferralsLoading] = useState(false);
     const [bonusSearch, setBonusSearch] = useState('');
     const [bonusSortField, setBonusSortField] = useState<'balance' | 'totalAccrued' | 'totalUsed' | 'name'>('balance');
     const [bonusSortDir, setBonusSortDir] = useState<'asc' | 'desc'>('desc');
@@ -460,6 +485,19 @@ export default function AnalyticsPage() {
             setError('Не вдалося завантажити дані бонусів');
         } finally {
             setBonusLoading(false);
+        }
+    }, []);
+    const fetchReferrals = useCallback(async () => {
+        try {
+            setReferralsLoading(true);
+            const res = await fetch('/api/analytics/referrals');
+            if (!res.ok) throw new Error('Помилка завантаження');
+            const json = await res.json();
+            setReferralsData(json);
+        } catch {
+            setError('Не вдалося завантажити дані рефералів');
+        } finally {
+            setReferralsLoading(false);
         }
     }, []);
 
@@ -573,6 +611,7 @@ export default function AnalyticsPage() {
                     { id: 'users' as const, label: 'Користувачі', icon: Users },
                     { id: 'requests' as const, label: 'Запити', icon: MessageCircle },
                     { id: 'bonuses' as const, label: 'Бонуси', icon: Wallet },
+                    { id: 'referrals' as const, label: 'Реферали', icon: Gift },
                 ]).map((tab) => (
                     <button
                         key={tab.id}
@@ -580,6 +619,7 @@ export default function AnalyticsPage() {
                             setActiveTab(tab.id);
                             if (tab.id === 'requests' && !requestsData) fetchRequests();
                             if (tab.id === 'bonuses' && !bonusData) fetchBonuses();
+                            if (tab.id === 'referrals' && !referralsData) fetchReferrals();
                         }}
                         className={`flex shrink-0 whitespace-nowrap items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all duration-200 ${activeTab === tab.id
                             ? 'bg-white/8 text-white'
@@ -1622,6 +1662,125 @@ export default function AnalyticsPage() {
                                 <p className="text-secondary text-sm">Натисніть кнопку для завантаження</p>
                                 <button
                                     onClick={() => fetchBonuses()}
+                                    className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                    <RefreshCw size={14} /> Завантажити
+                                </button>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+                {activeTab === 'referrals' && (
+                    <motion.div
+                        key="referrals"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        className="space-y-6 sm:space-y-8"
+                    >
+                        {referralsLoading && !referralsData ? (
+                            <div className="flex justify-center items-center py-20">
+                                <RefreshCw size={20} className="animate-spin text-accent" />
+                            </div>
+                        ) : referralsData ? (
+                            <>
+                                {/* Summary header */}
+                                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                                    <p className="text-xs text-secondary">
+                                        Дані станом на {new Date(referralsData.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </p>
+                                    <button
+                                        onClick={() => fetchReferrals()}
+                                        disabled={referralsLoading}
+                                        className="flex items-center gap-2 text-xs bg-white/3 border border-white/8 rounded-xl px-3 py-2 text-secondary hover:text-white hover:bg-white/6 transition-all duration-200 self-start sm:self-auto"
+                                    >
+                                        <RefreshCw size={13} className={referralsLoading ? 'animate-spin' : ''} />
+                                        <span className="hidden sm:inline">Оновити</span>
+                                    </button>
+                                </div>
+
+                                {/* KPI cards */}
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                                    <StatCard icon={Users} label="Реферери" value={referralsData.overview.referrers} color="text-blue-400" delay={0} />
+                                    <StatCard icon={UserCheck} label="Запрошено користувачів" value={referralsData.overview.referredUsers} color="text-green-400" delay={0.05} />
+                                    <StatCard icon={Gift} label="Бонуси нараховано" value={formatCurrency(referralsData.overview.bonusEarned)} color="text-amber-400" delay={0.1} />
+                                    <StatCard icon={TrendingUp} label="Виручка від рефералів" value={formatCurrency(referralsData.overview.refereeRevenue)} color="text-pink-400" delay={0.15} />
+                                </div>
+
+                                {/* Table */}
+                                {referralsData.topReferrers.length === 0 ? (
+                                    <p className="text-secondary text-sm text-center py-8">Поки що немає рефералів</p>
+                                ) : (
+                                    <div className="bg-white/3 border border-white/8 rounded-xl overflow-hidden">
+                                        {/* Desktop header */}
+                                        <div className="hidden md:grid grid-cols-[1fr_90px_90px_120px_70px_140px] gap-2 px-4 py-3 bg-white/3 border-b border-white/8 text-xs text-secondary font-medium">
+                                            <div>Телефон / Ім'я</div>
+                                            <div className="text-right">Запрошено</div>
+                                            <div className="text-right">Успішних</div>
+                                            <div className="text-right">Бонус</div>
+                                            <div className="text-right">Тури</div>
+                                            <div className="text-right">Виручка рефералів</div>
+                                        </div>
+
+                                        <div className="max-h-[600px] overflow-y-auto divide-y divide-white/4">
+                                            {referralsData.topReferrers.map((row, i) => (
+                                                <motion.div
+                                                    key={row.phone}
+                                                    initial={{ opacity: 0, y: 4 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: Math.min(i * 0.015, 0.3) }}
+                                                    className="grid grid-cols-2 md:grid-cols-[1fr_90px_90px_120px_70px_140px] gap-1 md:gap-2 px-4 py-3 hover:bg-white/3 transition-colors"
+                                                >
+                                                    {/* Phone + Name */}
+                                                    <div className="col-span-2 md:col-span-1 flex flex-col gap-0.5">
+                                                        <span className="text-sm text-white font-medium">{row.phone}</span>
+                                                        <span className="text-xs text-secondary">
+                                                            {row.name}
+                                                            {row.code && <span className="ml-2 font-mono text-accent/70">{row.code}</span>}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Registered */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Запрошено:</span>
+                                                        <span className="text-sm font-medium text-white">{row.registeredCount}</span>
+                                                    </div>
+
+                                                    {/* Successful */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Успішних:</span>
+                                                        <span className={`text-sm font-medium ${row.referredCount > 0 ? 'text-green-400' : 'text-secondary'}`}>{row.referredCount}</span>
+                                                    </div>
+
+                                                    {/* Bonus */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Бонус:</span>
+                                                        <span className={`text-sm font-medium ${row.bonusEarned > 0 ? 'text-amber-400' : 'text-secondary'}`}>{formatCurrency(row.bonusEarned)}</span>
+                                                    </div>
+
+                                                    {/* Referee trips */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Тури:</span>
+                                                        <span className="text-sm font-medium text-white">{row.refereeTrips}</span>
+                                                    </div>
+
+                                                    {/* Referee revenue */}
+                                                    <div className="flex items-center justify-between md:justify-end gap-2">
+                                                        <span className="text-xs text-secondary md:hidden">Виручка:</span>
+                                                        <span className={`text-sm font-semibold ${row.refereeRevenue > 0 ? 'text-pink-400' : 'text-secondary'}`}>{formatCurrency(row.refereeRevenue)}</span>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="flex flex-col justify-center items-center py-20 gap-4">
+                                <p className="text-secondary text-sm">Натисніть кнопку для завантаження</p>
+                                <button
+                                    onClick={() => fetchReferrals()}
                                     className="flex items-center gap-2 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-secondary hover:text-white hover:bg-white/10 transition-colors"
                                 >
                                     <RefreshCw size={14} /> Завантажити
