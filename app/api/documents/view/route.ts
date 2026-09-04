@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
-import { ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 
 export const dynamic = 'force-dynamic';
 
@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
                 }
 
                 const userPhone = session.user.phoneNumber;
-                const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-                const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+                // Global oversight bypass stays tied to the admin role.
+                const isAdmin = (session.user as { role?: string }).role === "admin";
                 const isOwnerOrManager = trip.ownerPhone === userPhone || trip.managerPhone === userPhone;
 
                 // Only allow access if user is owner, manager, or admin
@@ -69,10 +69,10 @@ export async function GET(request: NextRequest) {
                 }
         }
 
-        // SECURITY: Articles require at least manager-level access
+        // SECURITY: Articles require tour-management access (previously manager level)
         if (filePath.startsWith('articles/')) {
-            const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-            if (userPrivilegeLevel < MANAGER_PRIVILEGE_LEVEL) {
+            const role = await getSessionRole(session);
+            if (!hasAnyScope(role, ["manage-tour"])) {
                 return NextResponse.json({ message: "Forbidden" }, { status: 403 });
             }
         }

@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Article from "@/models/article";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 
 /**
  * One-time migration endpoint to:
@@ -15,7 +15,7 @@ import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 export async function POST() {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        if (!session || !hasAnyScope(await getSessionRole(session), ["manage-articles", "add-article"])) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 

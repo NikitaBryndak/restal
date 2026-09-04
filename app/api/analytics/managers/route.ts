@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
-import { ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope, getRoleSlugsGrantingPage } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
@@ -15,8 +15,8 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const privilegeLevel = session.user.privilegeLevel ?? 1;
-        if (privilegeLevel < ADMIN_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["managers"])) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
@@ -28,10 +28,11 @@ export async function GET(request: Request) {
 
         await connectToDatabase();
 
-        // Get all managers
+        // Get all users whose role grants tour management (previously privilegeLevel >= MANAGER)
+        const managerRoleSlugs = await getRoleSlugsGrantingPage("manage-tour");
         const managers = await UserModel.find(
-            { privilegeLevel: { $gte: MANAGER_PRIVILEGE_LEVEL } },
-            { name: 1, phoneNumber: 1, privilegeLevel: 1 }
+            { role: { $in: managerRoleSlugs } },
+            { name: 1, phoneNumber: 1, role: 1 }
         ).lean();
 
         // Get all trips with manager info
@@ -116,7 +117,7 @@ export async function GET(request: Request) {
             return {
                 name: manager.name || "Без імені",
                 phone: manager.phoneNumber,
-                isAdmin: manager.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL,
+                isAdmin: manager.role === "admin",
                 totalTrips,
                 completedTrips,
                 activeTrips,

@@ -6,7 +6,7 @@ import Trip from "@/models/trip";
 import User from "@/models/user";
 import ContactRequest from "@/models/contactRequest";
 import PromoCode from "@/models/promoCode";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 // Security headers for sensitive data
@@ -77,8 +77,8 @@ export async function GET(request: NextRequest) {
 
         await connectToDatabase();
 
-        const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["analytics"])) {
             return NextResponse.json(
                 { message: "Недостатньо прав" },
                 { status: 403, headers: SECURITY_HEADERS }

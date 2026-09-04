@@ -2,9 +2,9 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
-import User from "@/models/user";
 import ContactRequest from "@/models/contactRequest";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import User from "@/models/user";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 const SECURITY_HEADERS = {
@@ -74,8 +74,8 @@ export async function GET(request: NextRequest) {
 
         await connectToDatabase();
 
-        const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["analytics"])) {
             return NextResponse.json(
                 { message: "Недостатньо прав" },
                 { status: 403, headers: SECURITY_HEADERS }

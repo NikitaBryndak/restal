@@ -1,15 +1,29 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { canAccessPath } from "./config/access"
+import { ACCESS_GROUPS, findPageForPath } from "./config/access"
 
 export default withAuth(
     function middleware(req) {
         const url = req.nextUrl.pathname;
-        const userLevel = req.nextauth.token?.privilegeLevel as number || 1;
+        const allowedPages = (req.nextauth.token?.allowedPages as string[] | undefined) ?? [];
 
-        if (!canAccessPath(url, userLevel)) {
-            // Redirect unauthorized users to dashboard home
-            return NextResponse.redirect(new URL('/dashboard/profile', req.url));
+        // Only catalog pages are gated here. Paths outside the catalog
+        // (/dashboard root, trip detail pages, ...) stay open to any
+        // authenticated user — ownership is enforced by server components.
+        const page = findPageForPath(url);
+        if (page && !allowedPages.includes(page.slug)) {
+            // Redirect to the first allowed client page, or home if none.
+            let fallback = "/";
+            for (const group of ACCESS_GROUPS) {
+                for (const p of group.pages) {
+                    if (allowedPages.includes(p.slug)) {
+                        fallback = p.paths[0];
+                        break;
+                    }
+                }
+                if (fallback !== "/") break;
+            }
+            return NextResponse.redirect(new URL(fallback, req.url));
         }
 
         return NextResponse.next()

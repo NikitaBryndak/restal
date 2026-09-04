@@ -3,7 +3,8 @@ import User from "@/models/user";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-
+import { getRoleBySlug } from "@/lib/role-cache";
+import { allowedPagesForRole } from "@/lib/role-eval";
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export async function GET() {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber })
-            .select("name email phoneNumber createdAt cashbackAmount privilegeLevel referralCode referralCount referralBonusEarned notifyEmail notifySms");
+            .select("name email phoneNumber createdAt cashbackAmount role referralCode referralCount referralBonusEarned notifyEmail notifySms");
 
         if (!user) {
             return NextResponse.json({
@@ -38,7 +39,8 @@ export async function GET() {
             phoneNumber: user.phoneNumber,
             createdAt: user.createdAt,
             cashbackAmount: user.cashbackAmount,
-            privilegeLevel: user.privilegeLevel,
+            role: user.role ?? "client",
+            allowedPages: allowedPagesForRole(await getRoleBySlug(user.role)),
             referralCode: user.referralCode || null,
             referralCount: user.referralCount || 0,
             referralBonusEarned: user.referralBonusEarned || 0,

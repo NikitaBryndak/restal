@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Storage } from "@google-cloud/storage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import User from "@/models/user";
-import { connectToDatabase } from "@/lib/mongodb";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { logAudit } from "@/lib/audit";
 
 // SECURITY: Allowed file types for upload
@@ -47,9 +45,9 @@ export async function POST(request: NextRequest) {
 
     // SECURITY: documents and articles folders require manager privileges
     if (folder === 'documents' || folder === 'articles') {
-      await connectToDatabase();
-      const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-      if (!user || (user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+      // documents and articles folders require tour-management access (previously manager level)
+      const role = await getSessionRole(session);
+      if (!hasAnyScope(role, ["add-tour", "manage-tour"])) {
         return NextResponse.json(
           { message: "Insufficient privileges to upload to this folder" },
           { status: 403 }

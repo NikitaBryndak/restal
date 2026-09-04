@@ -6,7 +6,8 @@ import PromoCode from "@/models/promoCode";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
-import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL, PHONE_REGEX } from '@/config/constants';
+import { CASHBACK_RATE, PHONE_REGEX } from '@/config/constants';
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 
 // Validate required trip fields
 function validateTripData(body: any): string | null {
@@ -55,8 +56,8 @@ export async function GET(request: Request) {
         await connectToDatabase();
 
         const userPhone = session.user.phoneNumber;
-        const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-        const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+        // Global oversight (seeing all trips) stays tied to the admin role.
+        const isAdmin = (session.user as { role?: string }).role === "admin";
 
         // Admins can see all trips
         const query = isAdmin ? {} : {
@@ -123,9 +124,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check if user has manager privileges (level 2+) to create trips
-        const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-        if (userPrivilegeLevel < MANAGER_PRIVILEGE_LEVEL) {
+        // Check access to the add-tour page (previously manager level)
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["add-tour"])) {
             return NextResponse.json({ message: "Insufficient privileges to create trips" }, { status: 403 });
         }
 

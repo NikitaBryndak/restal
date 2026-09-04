@@ -5,7 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import Trip from "@/models/trip";
 import PromoCode from "@/models/promoCode";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 const SECURITY_HEADERS = {
@@ -41,11 +41,8 @@ export async function GET() {
 
         await connectToDatabase();
 
-        const currentUser = await User.findOne({ phoneNumber: session.user.phoneNumber })
-            .select("privilegeLevel")
-            .lean() as { privilegeLevel?: number } | null;
-
-        if (!currentUser || (currentUser.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["analytics"])) {
             return NextResponse.json(
                 { message: "Недостатньо прав" },
                 { status: 403, headers: SECURITY_HEADERS }

@@ -4,9 +4,10 @@ import Article, { normalizeArticleImages } from '@/models/article';
 import mongoose from 'mongoose';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
-import { logAudit } from "@/lib/audit";
+import { ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { serializeArticle, type ArticleDoc } from "@/lib/articles";
+import { logAudit } from "@/lib/audit";
 
 export async function GET(
     request: NextRequest,
@@ -43,9 +44,9 @@ export async function GET(
 
         // Drafts are only visible to editors/admins — everyone else gets a plain 404
         if (foundArticle.status === "draft") {
-            const session = (await getServerSession(authOptions as any) as any);
-            const level = session?.user?.privilegeLevel ?? 1;
-            if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
+            const session = await getServerSession(authOptions);
+            const role = await getSessionRole(session);
+            if (!hasAnyScope(role, ["manage-articles", "add-article"])) {
                 return NextResponse.json(
                     { message: 'Article not found' },
                     { status: 404 }
@@ -84,9 +85,9 @@ export async function PUT(
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be editor or admin
-        const level = session.user.privilegeLevel ?? 1;
-        if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
+        // Check article management access (editor/admin or a custom role granted the pages)
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["manage-articles", "add-article"])) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 
@@ -167,9 +168,9 @@ export async function DELETE(
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        // Check privilege level - must be editor or admin
-        const level = session.user.privilegeLevel ?? 1;
-        if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
+        // Check article management access (editor/admin or a custom role granted the pages)
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["manage-articles", "add-article"])) {
             return NextResponse.json({ message: "Insufficient privileges" }, { status: 403 });
         }
 

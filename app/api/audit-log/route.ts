@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import AuditLog from "@/models/auditLog";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        if ((session.user.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["audit-log"])) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 

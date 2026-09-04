@@ -4,14 +4,14 @@ import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 /**
  * GET /api/trips/manage
  *
  * Returns all active (non-archived, non-completed) trips.
- * Admin-only endpoint (privilegeLevel >= 3).
+ * Requires access to the manage-tour page (previously manager level).
  */
 export async function GET(request: Request) {
     try {
@@ -21,8 +21,9 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: "Forbidden: No phone number in session." }, { status: 403 });
         }
 
-        if ((session.user.privilegeLevel ?? 0) < ADMIN_PRIVILEGE_LEVEL) {
-            return NextResponse.json({ message: "Forbidden: Admin access required." }, { status: 403 });
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["manage-tour"])) {
+            return NextResponse.json({ message: "Forbidden: Tour management access required." }, { status: 403 });
         }
 
         const rateLimitResult = checkRateLimit("manage-trips-list", session.user.phoneNumber, 30, 60 * 1000);

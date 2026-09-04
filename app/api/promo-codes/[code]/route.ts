@@ -3,8 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import PromoCode from "@/models/promoCode";
-import User from "@/models/user";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 
 // GET - Validate a promo code (manager only)
 export async function GET(
@@ -20,9 +19,9 @@ export async function GET(
 
         await connectToDatabase();
 
-        // Check manager privilege
-        const manager = await User.findOne({ phoneNumber: session.user.phoneNumber });
-        if (!manager || manager.privilegeLevel < MANAGER_PRIVILEGE_LEVEL) {
+        // Check access to the promo codes page (previously manager level)
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["promo-codes"])) {
             return NextResponse.json(
                 { message: "Доступ лише для менеджерів" },
                 { status: 403 }

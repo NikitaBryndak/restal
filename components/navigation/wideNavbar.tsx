@@ -7,7 +7,7 @@ import NotificationBell from "./NotificationBell";
 interface UserProfile {
     userName: string;
     cashbackAmount: number;
-    privilegeLevel: number;
+    allowedPages?: string[];
 }
 
 export default function WideNavbar({ userProfile }: { userProfile: UserProfile | null }) {

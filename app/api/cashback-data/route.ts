@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import User from "@/models/user";
 import Trip from "@/models/trip";
 import PromoCode from "@/models/promoCode";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 /**
  * Combined cashback data endpoint.
@@ -23,8 +22,8 @@ export async function GET() {
         await connectToDatabase();
 
         const userPhone = session.user.phoneNumber;
-        const userPrivilegeLevel = session.user.privilegeLevel ?? 1;
-        const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+        // Global oversight (seeing all users' trips) stays tied to the admin role.
+        const isAdmin = (session.user as { role?: string }).role === "admin";
 
         const tripQuery = isAdmin
             ? {}
@@ -33,7 +32,7 @@ export async function GET() {
         // Run all 3 DB queries in parallel
         const [userDoc, trips, _expireResult] = await Promise.all([
             User.findOne({ phoneNumber: userPhone })
-                .select("name email phoneNumber createdAt cashbackAmount privilegeLevel referralCode referralCount referralBonusEarned")
+                .select("name email phoneNumber createdAt cashbackAmount role referralCode referralCount referralBonusEarned")
                 .lean(),
             Trip.find(tripQuery)
                 .select("number country payment cashbackAmount cashbackProcessed status updatedAt ownerPhone")
@@ -62,7 +61,7 @@ export async function GET() {
                       phoneNumber: user.phoneNumber,
                       createdAt: user.createdAt,
                       cashbackAmount: user.cashbackAmount,
-                      privilegeLevel: user.privilegeLevel,
+                      role: user.role ?? "client",
                       referralCode: user.referralCode || null,
                       referralCount: user.referralCount || 0,
                       referralBonusEarned: user.referralBonusEarned || 0,

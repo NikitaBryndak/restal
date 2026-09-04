@@ -9,7 +9,8 @@ interface UserProfile {
     phoneNumber: string;
     createdAt: string;
     cashbackAmount: number;
-    privilegeLevel: number;
+    role?: string;
+    allowedPages?: string[];
     referralCode: string | null;
     referralCount: number;
     referralBonusEarned: number;

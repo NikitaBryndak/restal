@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import { logAudit } from "@/lib/audit";
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
         const userPhone = session.user.phoneNumber;
         const isOwner = trip.ownerPhone === userPhone;
         const isManager = trip.managerPhone === userPhone;
-        const hasAdminAccess = (session.user.privilegeLevel || 1) >= ADMIN_PRIVILEGE_LEVEL;
+        const hasAdminAccess = (session.user as { role?: string }).role === "admin";
 
         if (!isOwner && !isManager && !hasAdminAccess) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -96,7 +95,7 @@ export async function DELETE(request: NextRequest) {
         const userPhone = session.user.phoneNumber;
         const isOwner = trip.ownerPhone === userPhone;
         const isManager = trip.managerPhone === userPhone;
-        const hasAdminAccess = (session.user.privilegeLevel || 1) >= ADMIN_PRIVILEGE_LEVEL;
+        const hasAdminAccess = (session.user as { role?: string }).role === "admin";
 
         if (!isOwner && !isManager && !hasAdminAccess) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });

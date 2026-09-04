@@ -21,10 +21,8 @@ import type { BasicDetailsField } from '../add-tour/components';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AlertTriangle, CheckCircle2, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 type ActiveTripSummary = {
     _id: string;
@@ -265,9 +263,9 @@ export default function ManageTourPage() {
     const [showActiveTrips, setShowActiveTrips] = useState(false);
     const [activeTripsPagination, setActiveTripsPagination] = useState({ page: 1, totalPages: 1, totalCount: 0 });
     const [isLoadingActiveTrips, setIsLoadingActiveTrips] = useState(false);
-    const [managers, setManagers] = useState<{ name: string; phoneNumber: string; privilegeLevel: number }[]>([]);
+    const [managers, setManagers] = useState<{ name: string; phoneNumber: string; role?: string }[]>([]);
 
-    const isAdmin = (session?.user?.privilegeLevel ?? 0) >= ADMIN_PRIVILEGE_LEVEL;
+    const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
 
     const documentKeys = useMemo(() => DOCUMENT_KEYS, []);
     const buildEmptyPendingFiles = useCallback(
@@ -285,7 +283,7 @@ export default function ManageTourPage() {
 
     useEffect(() => {
         if (status === "loading") return;
-        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        if (!session || !(session.user?.allowedPages ?? []).includes("manage-tour")) {
             router.replace("/dashboard");
         }
     }, [session, status, router]);
@@ -296,7 +294,7 @@ export default function ManageTourPage() {
 
     useEffect(() => {
         if (status === 'loading') return;
-        if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) return;
+        if (!session || !(session.user?.allowedPages ?? []).includes("manage-tour")) return;
         fetch('/api/managers')
             .then(res => res.json())
             .then(data => {
@@ -509,7 +507,7 @@ export default function ManageTourPage() {
         return <DashboardFormSkeleton />;
     }
 
-    if (!session || (session.user?.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+    if (!session || !(session.user?.allowedPages ?? []).includes("manage-tour")) {
         return null;
     }
 
@@ -911,7 +909,7 @@ export default function ManageTourPage() {
                                             <option value="">Не призначено</option>
                                             {managers.map((m) => (
                                                 <option key={m.phoneNumber} value={m.phoneNumber}>
-                                                    {m.name || m.phoneNumber}{m.privilegeLevel >= 3 ? ' (Адмін)' : ''}
+                                                    {m.name || m.phoneNumber}{m.role === "admin" ? ' (Адмін)' : ''}
                                                 </option>
                                             ))}
                                         </select>

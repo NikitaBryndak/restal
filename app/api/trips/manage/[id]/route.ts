@@ -6,7 +6,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import Notification from "@/models/notification";
-import { MANAGER_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL, CASHBACK_RATE } from "@/config/constants";
+import { CASHBACK_RATE } from "@/config/constants";
+import { getSessionRole, hasAnyScope, getRoleSlugsGrantingPage } from "@/lib/role-access";
 import { DOCUMENT_LABELS, TOUR_STATUS_LABELS, TourStatus } from "@/types";
 import mongoose from "mongoose";
 
@@ -56,7 +57,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
              return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
         }
 
-        if ((session.user.privilegeLevel ?? 0) < MANAGER_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["manage-tour"])) {
              return NextResponse.json({ message: "Forbidden: Insufficient privileges." }, { status: 403 });
         }
 
@@ -71,8 +73,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
 
         // Check if user has access to this trip
         const userPhone = session.user.phoneNumber;
-        const userPrivilegeLevel = session.user.privilegeLevel ?? 0;
-        const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+        // Global oversight (any trip) stays tied to the admin role.
+        const isAdmin = (session.user as { role?: string }).role === "admin";
         const isOwnerOrManager = trip.ownerPhone === userPhone || trip.managerPhone === userPhone;
 
         // Admins can access any trip, others need ownership/manager access
@@ -103,7 +105,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
              return NextResponse.json({ message: "Forbidden: No phone number in session. Please re-login." }, { status: 403 });
         }
 
-        if ((session.user.privilegeLevel ?? 0) < MANAGER_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["manage-tour"])) {
              return NextResponse.json({ message: "Forbidden: Insufficient privileges." }, { status: 403 });
         }
 
@@ -123,8 +126,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
         // Check if user has access to modify this trip
         const userPhone = session.user.phoneNumber;
-        const userPrivilegeLevel = session.user.privilegeLevel ?? 0;
-        const isAdmin = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+        // Global oversight (any trip) stays tied to the admin role.
+        const isAdmin = (session.user as { role?: string }).role === "admin";
         const isOwnerOrManager = existingTrip.ownerPhone === userPhone || existingTrip.managerPhone === userPhone;
 
         // Admins can modify any trip, others need ownership/manager access
@@ -164,10 +167,11 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             if (!isAdmin) {
                 return NextResponse.json({ message: "Forbidden: Only admins can reassign the tour manager." }, { status: 403 });
             }
-            // Validate that the target phone belongs to an actual manager (privilege >= 2)
+            // Validate that the target phone belongs to a user whose role grants tour management
+            const managerRoleSlugs = await getRoleSlugsGrantingPage("manage-tour");
             const selectedManager = await User.findOne({
                 phoneNumber: selectedManagerPhone,
-                privilegeLevel: { $gte: MANAGER_PRIVILEGE_LEVEL },
+                role: { $in: managerRoleSlugs },
             }).lean() as any;
             if (!selectedManager) {
                 return NextResponse.json({ message: "Invalid manager: the selected phone does not belong to a manager." }, { status: 400 });

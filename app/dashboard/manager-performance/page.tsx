@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import {
     Users, TrendingUp, Award, DollarSign, BarChart3,
     Globe, Activity, ArrowUp, ArrowDown, Minus, Loader2
@@ -37,7 +36,7 @@ export default function ManagerPerformancePage() {
     const [error, setError] = useState("");
     const [selectedManager, setSelectedManager] = useState<string | null>(null);
 
-    const isAdmin = (session?.user?.privilegeLevel ?? 1) >= ADMIN_PRIVILEGE_LEVEL;
+    const isAdmin = (session?.user?.allowedPages ?? []).includes("managers");
 
     useEffect(() => {
         if (status !== "authenticated" || !isAdmin) return;

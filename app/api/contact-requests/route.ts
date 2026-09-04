@@ -3,9 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import ContactRequest from "@/models/contactRequest";
-import User from "@/models/user";
 import mongoose from "mongoose";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { sendContactRequestNotification } from "@/lib/email";
 import { logAudit } from "@/lib/audit";
 import { extractUtm } from "@/lib/utm";
@@ -119,9 +118,9 @@ export async function GET(request: NextRequest) {
 
         await connectToDatabase();
 
-        // Check admin privileges
-        const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        // Check access to the contact requests page
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["contact-requests"])) {
             return NextResponse.json({ message: "Недостатньо прав" }, { status: 403 });
         }
 
@@ -182,8 +181,8 @@ export async function PUT(request: NextRequest) {
 
         await connectToDatabase();
 
-        const user = await User.findOne({ phoneNumber: session.user.phoneNumber }).lean() as { privilegeLevel?: number } | null;
-        if (!user || (user.privilegeLevel ?? 1) < MANAGER_PRIVILEGE_LEVEL) {
+        const role = await getSessionRole(session);
+        if (!hasAnyScope(role, ["contact-requests"])) {
             return NextResponse.json({ message: "Недостатньо прав" }, { status: 403 });
         }
 

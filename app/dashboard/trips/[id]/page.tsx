@@ -29,7 +29,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
 import mongoose from "mongoose";
-import { CASHBACK_RATE, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { CASHBACK_RATE } from "@/config/constants";
 import { getCountryImageName } from "@/data";
 import TripCountdown from "@/components/trip/trip-countdown";
 import TripTimeline from "@/components/trip/trip-timeline";
@@ -73,11 +73,11 @@ async function getTripData(id: string): Promise<EnrichedTrip | null> {
     if (!trip) return null;
 
     const userPhone = session.user.phoneNumber;
-    const userPrivilegeLevel = session.user.privilegeLevel || 1;
+    const userRole = (session.user as { role?: string }).role;
 
     const isOwner = trip.ownerPhone === userPhone;
     const isManager = trip.managerPhone === userPhone;
-    const hasAdminAccess = userPrivilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+    const hasAdminAccess = userRole === "admin";
 
     // Admins can access any trip
     if (!isOwner && !isManager && !hasAdminAccess) {

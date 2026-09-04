@@ -3,88 +3,123 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { CLIENT_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope, listAllRoles } from "@/lib/role-access";
 import { logAudit } from "@/lib/audit";
 
-const VALID_LEVELS = [1, 2, 3, 4]; // CLIENT..ADMIN — mirrors config/access.ts RoleLevel
-
-async function requireAdmin() {
-    const session = (await getServerSession(authOptions as any) as any);
-    if (!session) {
+async function requireUsersAccess() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.phoneNumber) {
         return { error: NextResponse.json({ message: "Unauthorized" }, { status: 401 }) };
     }
-    if ((session.user.privilegeLevel ?? 1) < ADMIN_PRIVILEGE_LEVEL) {
-        return { error: NextResponse.json({ message: "Forbidden: admin access required" }, { status: 403 }) };
+    const role = await getSessionRole(session);
+    if (!hasAnyScope(role, ["users"])) {
+        return { error: NextResponse.json({ message: "Forbidden: access to the users page required" }, { status: 403 }) };
     }
     return { session };
 }
 
 /**
- * GET /api/users/roles — list users with their roles (admin only).
+ * GET /api/users/roles — list users with their roles (requires the users page scope).
+ * Query params: page (default 1), search (case-insensitive match on name or phone,
+ * applied to the full user base before pagination). Fixed page size of 50.
  */
-export async function GET() {
+const PAGE_SIZE = 50;
+
+function escapeRegex(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export async function GET(request: NextRequest) {
     try {
-        const auth = await requireAdmin();
+        const auth = await requireUsersAccess();
         if (auth.error) return auth.error;
 
-        await connectToDatabase();
-        const users = await User.find()
-            .select("name phoneNumber privilegeLevel createdAt")
-            .sort({ name: 1 })
-            .limit(500)
-            .lean();
+        const pageParam = Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10);
+        const page = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : 1;
+        const search = (request.nextUrl.searchParams.get("search") ?? "").trim();
 
-        return NextResponse.json({ users }, { status: 200 });
+        await connectToDatabase();
+        const filter: Record<string, unknown> = {};
+        if (search) {
+            const rx = new RegExp(escapeRegex(search), "i");
+            filter.$or = [{ name: rx }, { phoneNumber: rx }];
+        }
+
+        const [users, total] = await Promise.all([
+            User.find(filter)
+                .select("name phoneNumber role createdAt")
+                .sort({ name: 1 })
+                .skip((page - 1) * PAGE_SIZE)
+                .limit(PAGE_SIZE)
+                .lean(),
+            User.countDocuments(filter),
+        ]);
+
+        // Attach the display name of each user's role (cached lookup).
+        const roles = await listAllRoles();
+        const roleNameBySlug: Record<string, string> = {};
+        for (const r of roles) roleNameBySlug[r.slug] = r.name;
+        const usersWithRoleName = (users as Array<Record<string, unknown>>).map((u) => ({
+            ...u,
+            role: u.role ?? "client",
+            roleName: roleNameBySlug[String(u.role)] ?? String(u.role),
+        }));
+
+        return NextResponse.json({ users: usersWithRoleName, total, page, pageSize: PAGE_SIZE }, { status: 200 });
     } catch {
         return NextResponse.json({ message: "Error fetching users" }, { status: 500 });
     }
 }
 
 /**
- * PATCH /api/users/roles — change a user's role (admin only).
- * Body: { phone: string, privilegeLevel: number }
+ * PATCH /api/users/roles — change a user's role (requires the users page scope).
+ * Body: { phone: string, role: string } — role is an existing role slug.
  * Self-modification is rejected to prevent admin lockout.
  */
 export async function PATCH(request: NextRequest) {
     try {
-        const auth = await requireAdmin();
+        const auth = await requireUsersAccess();
         if (auth.error) return auth.error;
         const session = auth.session!;
 
         const body = await request.json().catch(() => null);
         const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
-        const level = Number(body?.privilegeLevel);
+        const roleSlug = typeof body?.role === "string" ? body.role.trim().toLowerCase() : "";
 
-        if (!phone || !VALID_LEVELS.includes(level)) {
-            return NextResponse.json({ message: "Invalid phone or privilegeLevel" }, { status: 400 });
+        if (!phone || !roleSlug) {
+            return NextResponse.json({ message: "Invalid phone or role" }, { status: 400 });
         }
         if (phone === session.user.phoneNumber) {
             return NextResponse.json({ message: "You cannot change your own role" }, { status: 400 });
         }
 
         await connectToDatabase();
+        const roles = await listAllRoles();
+        const targetRole = roles.find((r) => r.slug === roleSlug);
+        if (!targetRole) {
+            return NextResponse.json({ message: "Unknown role" }, { status: 400 });
+        }
+
         const user = await User.findOne({ phoneNumber: phone });
         if (!user) {
             return NextResponse.json({ message: "User not found" }, { status: 404 });
         }
 
-        const prevLevel = user.privilegeLevel ?? CLIENT_PRIVILEGE_LEVEL;
-        if (prevLevel === level) {
-            return NextResponse.json({ ok: true, privilegeLevel: level }, { status: 200 });
+        const prevRole = user.role ?? "client";
+        if (prevRole !== roleSlug) {
+            user.role = roleSlug;
+            await user.save();
+
+            logAudit({
+                action: "user.role.changed",
+                entityType: "user",
+                entityId: String(user._id),
+                userId: session.user.phoneNumber,
+                details: { targetPhone: phone, from: prevRole, to: roleSlug },
+            });
         }
 
-        user.privilegeLevel = level;
-        await user.save();
-
-        logAudit({
-            action: "user.role.changed",
-            entityType: "user",
-            entityId: String(user._id),
-            userId: session.user.phoneNumber,
-            details: { targetPhone: phone, from: prevLevel, to: level },
-        });
-
-        return NextResponse.json({ ok: true, privilegeLevel: level }, { status: 200 });
+        return NextResponse.json({ ok: true, role: roleSlug, roleName: targetRole.name }, { status: 200 });
     } catch {
         return NextResponse.json({ message: "Error updating user role" }, { status: 500 });
     }

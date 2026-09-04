@@ -5,17 +5,18 @@ import { useSession, signOut } from "next-auth/react";
 import React from "react";
 import { NavLink } from "./nav-link";
 import NotificationBell from "./NotificationBell";
-import { EDITOR_PRIVILEGE_LEVEL, MANAGER_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { ACCESS_GROUPS } from "@/config/access";
 
 interface UserProfile {
     userName: string;
     cashbackAmount: number;
-    privilegeLevel: number;
+    allowedPages?: string[];
 }
 
 export default function SmallNavbar({ userProfile }: { userProfile: UserProfile | null }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
     const { data: session } = useSession();
+    const allowed = new Set(userProfile?.allowedPages ?? []);
 
     function toggleMobileMenu() {
         setIsMobileMenuOpen((prev) => !prev);
@@ -65,75 +66,22 @@ export default function SmallNavbar({ userProfile }: { userProfile: UserProfile 
                             {/* Dashboard Navigation - Only if logged in */}
                             {session && userProfile && (
                                 <div className="flex flex-col space-y-4 pt-4">
-                                    <div className="flex flex-col space-y-2">
-                                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b">
-                                            Кабінет
-                                        </h3>
-                                        <NavLink href="/dashboard/profile" onClick={toggleMobileMenu} className="text-lg">
-                                            Профіль
-                                        </NavLink>
-                                        <NavLink href="/dashboard/trips" onClick={toggleMobileMenu} className="text-lg">
-                                            Мої подорожі
-                                        </NavLink>
-                                        <NavLink href="/cashback" onClick={toggleMobileMenu} className="text-lg">
-                                            Бонуси
-                                        </NavLink>
-                                        <NavLink href="/dashboard/settings" onClick={toggleMobileMenu} className="text-lg">
-                                            Налаштування
-                                        </NavLink>
-                                    </div>
-
-                                    {(userProfile.privilegeLevel === EDITOR_PRIVILEGE_LEVEL || userProfile.privilegeLevel === ADMIN_PRIVILEGE_LEVEL) && (
-                                        <div className="flex flex-col space-y-2 pt-2">
-                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                Редактор
-                                            </h3>
-                                            <NavLink href="/dashboard/manage-articles" onClick={toggleMobileMenu} className="text-lg">
-                                                Керування статтями
-                                            </NavLink>
-                                            <NavLink href="/dashboard/add-article" onClick={toggleMobileMenu} className="text-lg">
-                                                Додати статтю
-                                            </NavLink>
-                                        </div>
-                                    )}
-                                    {(userProfile.privilegeLevel === MANAGER_PRIVILEGE_LEVEL || userProfile.privilegeLevel === ADMIN_PRIVILEGE_LEVEL) && (
-                                        <div className="flex flex-col space-y-2 pt-2">
-                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                Менеджер
-                                            </h3>
-                                            <NavLink href="/dashboard/manage-tour" onClick={toggleMobileMenu} className="text-lg">
-                                                Керування турами
-                                            </NavLink>
-                                            <NavLink href="/dashboard/add-tour" onClick={toggleMobileMenu} className="text-lg">
-                                                Додати тур
-                                            </NavLink>
-                                            <NavLink href="/dashboard/promo-codes" onClick={toggleMobileMenu} className="text-lg">
-                                                Промокоди
-                                            </NavLink>
-                                            <NavLink href="/dashboard/contact-requests" onClick={toggleMobileMenu} className="text-lg">
-                                                Запити
-                                            </NavLink>
-                                        </div>
-                                    )}
-                                    {userProfile.privilegeLevel === ADMIN_PRIVILEGE_LEVEL && (
-                                        <div className="flex flex-col space-y-2 pt-2">
-                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                Адмін
-                                            </h3>
-                                            <NavLink href="/dashboard/analytics" onClick={toggleMobileMenu} className="text-lg">
-                                                Аналітика
-                                            </NavLink>
-                                            <NavLink href="/dashboard/audit-log" onClick={toggleMobileMenu} className="text-lg">
-                                                Журнал дій
-                                            </NavLink>
-                                            <NavLink href="/dashboard/manager-performance" onClick={toggleMobileMenu} className="text-lg">
-                                                Менеджери
-                                            </NavLink>
-                                            <NavLink href="/dashboard/users" onClick={toggleMobileMenu} className="text-lg">
-                                                Користувачі
-                                            </NavLink>
-                                        </div>
-                                    )}
+                                    {ACCESS_GROUPS.map((group) => {
+                                        const visiblePages = group.pages.filter((p) => allowed.has(p.slug));
+                                        if (visiblePages.length === 0) return null;
+                                        return (
+                                            <div key={group.slug} className="flex flex-col space-y-2">
+                                                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                                    {group.label}
+                                                </h3>
+                                                {visiblePages.map((page) => (
+                                                    <NavLink key={page.slug} href={page.paths[0]} onClick={toggleMobileMenu} className="text-lg">
+                                                        {page.label}
+                                                    </NavLink>
+                                                ))}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>

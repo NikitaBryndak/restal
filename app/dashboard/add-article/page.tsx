@@ -12,7 +12,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { DashboardFormSkeleton } from "@/components/ui/skeleton";
-import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 
 export default function AddArticlePage() {
     const { data: session, status } = useSession();
@@ -24,8 +23,8 @@ export default function AddArticlePage() {
 
     useEffect(() => {
         if (status === "loading") return;
-        const level = session?.user?.privilegeLevel ?? 1;
-        if (!session || (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL)) {
+        const allowed = session?.user?.allowedPages ?? [];
+        if (!session || !allowed.includes("add-article")) {
             router.replace("/dashboard");
         }
     }, [session, status, router]);
@@ -34,8 +33,8 @@ export default function AddArticlePage() {
         return <DashboardFormSkeleton />;
     }
 
-    const userLevel = session?.user?.privilegeLevel ?? 1;
-    if (!session || (userLevel !== EDITOR_PRIVILEGE_LEVEL && userLevel !== ADMIN_PRIVILEGE_LEVEL)) {
+    const allowed = session?.user?.allowedPages ?? [];
+    if (!session || !allowed.includes("add-article")) {
         return null;
     }
 

@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 import RecentlyViewed from "@/components/trip/recently-viewed";
 
 function getGreeting(): string {
@@ -43,7 +42,7 @@ export default function DashboardPage() {
     }
 
     const greeting = getGreeting();
-    const isManager = (session?.user?.privilegeLevel ?? 1) >= MANAGER_PRIVILEGE_LEVEL;
+    const allowed = new Set(session?.user?.allowedPages ?? []);
 
     const quickLinks = [
         { href: "/dashboard/profile", icon: User, label: "Профіль", desc: "Переглянути інформацію", color: "text-blue-400", bg: "bg-blue-500/20" },
@@ -53,11 +52,11 @@ export default function DashboardPage() {
     ];
 
     const managerLinks = [
-        { href: "/dashboard/manage-tour", icon: Globe, label: "Керування турами", color: "text-accent", bg: "bg-accent/20" },
-        { href: "/dashboard/add-tour", icon: Plane, label: "Додати тур", color: "text-blue-400", bg: "bg-blue-500/20" },
-        { href: "/dashboard/promo-codes", icon: CreditCard, label: "Промокоди", color: "text-emerald-400", bg: "bg-emerald-500/20" },
-        { href: "/dashboard/contact-requests", icon: MessageCircle, label: "Запити", color: "text-amber-400", bg: "bg-amber-500/20" },
-    ];
+        { page: "manage-tour", href: "/dashboard/manage-tour", icon: Globe, label: "Керування турами", color: "text-accent", bg: "bg-accent/20" },
+        { page: "add-tour", href: "/dashboard/add-tour", icon: Plane, label: "Додати тур", color: "text-blue-400", bg: "bg-blue-500/20" },
+        { page: "promo-codes", href: "/dashboard/promo-codes", icon: CreditCard, label: "Промокоди", color: "text-emerald-400", bg: "bg-emerald-500/20" },
+        { page: "contact-requests", href: "/dashboard/contact-requests", icon: MessageCircle, label: "Запити", color: "text-amber-400", bg: "bg-amber-500/20" },
+    ].filter((l) => allowed.has(l.page));
 
     return (
         <div className="max-w-5xl mx-auto px-4 max-sm:px-3 py-8 sm:py-12 space-y-6">
@@ -114,7 +113,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Manager Section */}
-            {isManager && (
+            {managerLinks.length > 0 && (
                 <div className={`transition-all duration-700 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                     <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4 px-1">Менеджер</h2>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

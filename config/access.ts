@@ -1,70 +1,110 @@
-export enum RoleLevel {
-    CLIENT = 1,
-    EDITOR = 2,
-    MANAGER = 3,
-    ADMIN = 4,
+// Access scope catalog — single source of truth for the app's protected pages,
+// how they are grouped, and which URL paths each page owns.
+//
+// Roles (models/role.ts) grant access to whole groups and/or individual pages
+// via overrides; evaluation lives in lib/role-access.ts. The session token
+// carries the flattened `allowedPages` list so middleware and client nav can
+// check access without a DB hit.
+
+export interface AccessPage {
+    slug: string;      // stable identifier used in role permissions & session token
+    label: string;     // Ukrainian display name (nav + roles config UI)
+    paths: string[];   // URL prefixes this page owns (longest match wins)
 }
 
-export type PageAccessControl = {
-    path: string;
-    minLevel: number;
-};
+export interface AccessGroup {
+    slug: string;
+    label: string;
+    pages: AccessPage[];
+}
 
-// Define access rules for dashboard pages and other protected routes
-export const PAGE_ACCESS_CONTROLS: PageAccessControl[] = [
-    // Client pages (Accessible by everyone level 1+)
-    { path: '/dashboard/profile', minLevel: RoleLevel.CLIENT },
-    { path: '/dashboard/trips', minLevel: RoleLevel.CLIENT },
-    { path: '/dashboard/settings', minLevel: RoleLevel.CLIENT },
-    { path: '/cashback', minLevel: RoleLevel.CLIENT },
-
-    // Editor pages (Accessible by level 2+)
-    { path: '/dashboard/manage-articles', minLevel: RoleLevel.EDITOR },
-    { path: '/dashboard/add-article', minLevel: RoleLevel.EDITOR },
-
-    // Manager pages (Accessible by level 3+)
-    { path: '/dashboard/manage-tour', minLevel: RoleLevel.MANAGER },
-    { path: '/dashboard/add-tour', minLevel: RoleLevel.MANAGER },
-    { path: '/dashboard/promo-codes', minLevel: RoleLevel.MANAGER },
-    { path: '/dashboard/contact-requests', minLevel: RoleLevel.MANAGER },
-
-    // Admin pages (Accessible by level 4+)
-    { path: '/dashboard/analytics', minLevel: RoleLevel.ADMIN },
-    { path: '/dashboard/audit-log', minLevel: RoleLevel.ADMIN },
-    { path: '/dashboard/manager-performance', minLevel: RoleLevel.ADMIN },
-    { path: '/dashboard/users', minLevel: RoleLevel.ADMIN },
+export const ACCESS_GROUPS: AccessGroup[] = [
+    {
+        slug: "client",
+        label: "Кабінет",
+        pages: [
+            { slug: "profile", label: "Профіль", paths: ["/dashboard/profile"] },
+            { slug: "my-trips", label: "Мої подорожі", paths: ["/dashboard/trips"] },
+            { slug: "bonuses", label: "Бонуси", paths: ["/cashback"] },
+            { slug: "settings", label: "Налаштування", paths: ["/dashboard/settings"] },
+        ],
+    },
+    {
+        slug: "articles",
+        label: "Статті",
+        pages: [
+            { slug: "manage-articles", label: "Керування статтями", paths: ["/dashboard/manage-articles"] },
+            { slug: "add-article", label: "Додати статтю", paths: ["/dashboard/add-article"] },
+        ],
+    },
+    {
+        slug: "tours",
+        label: "Тури та маркетинг",
+        pages: [
+            { slug: "manage-tour", label: "Керування турами", paths: ["/dashboard/manage-tour"] },
+            { slug: "add-tour", label: "Додати тур", paths: ["/dashboard/add-tour"] },
+            { slug: "promo-codes", label: "Промокоди", paths: ["/dashboard/promo-codes"] },
+            { slug: "contact-requests", label: "Запити", paths: ["/dashboard/contact-requests"] },
+        ],
+    },
+    {
+        slug: "admin",
+        label: "Адміністрування",
+        pages: [
+            { slug: "analytics", label: "Аналітика", paths: ["/dashboard/analytics"] },
+            { slug: "audit-log", label: "Журнал дій", paths: ["/dashboard/audit-log"] },
+            { slug: "managers", label: "Менеджери", paths: ["/dashboard/manager-performance"] },
+            { slug: "users", label: "Користувачі", paths: ["/dashboard/users"] },
+            { slug: "roles", label: "Ролі та доступ", paths: ["/dashboard/roles"] },
+        ],
+    },
 ];
 
-/**
- * Checks if a user can access a specific path.
- */
-export function canAccessPath(path: string, userLevel: number): boolean {
-    // If it's the exact dashboard root, allow any authed user (CLIENT)
-    if (path === '/dashboard') return userLevel >= RoleLevel.CLIENT;
+/* Derived lookup tables (built once at module load). */
 
-    // Find the most specific rule that matches the path
-    const rules = PAGE_ACCESS_CONTROLS.filter(rule => path.startsWith(rule.path));
-    if (rules.length === 0) {
-        // Default to not requiring extra permissions beyond being logged in
-        // for paths not explicitly mapped (or you can dictate otherwise)
-        return true;
+export const PAGE_BY_SLUG: Record<string, AccessPage> = {};
+export const PAGE_GROUP_OF: Record<string, string> = {}; // page slug -> group slug
+
+for (const group of ACCESS_GROUPS) {
+    for (const page of group.pages) {
+        PAGE_BY_SLUG[page.slug] = page;
+        PAGE_GROUP_OF[page.slug] = group.slug;
     }
-
-    // Must satisfy all matching rules (or rather, the highest required minLevel of the matching path)
-    const requiredLevel = Math.max(...rules.map(r => r.minLevel));
-
-    // Admin can access everything
-    if (userLevel === RoleLevel.ADMIN) return true;
-
-    // Client pages are accessible by anyone logged in
-    if (requiredLevel === RoleLevel.CLIENT) return userLevel >= RoleLevel.CLIENT;
-
-    // Editor pages are accessible ONLY by Editor (and Admin, which is handled above)
-    if (requiredLevel === RoleLevel.EDITOR) return userLevel === RoleLevel.EDITOR;
-
-    // Manager pages are accessible ONLY by Manager (and Admin, which is handled above)
-    if (requiredLevel === RoleLevel.MANAGER) return userLevel === RoleLevel.MANAGER;
-
-    // Admin pages require Admin level (handled above, so here we return false)
-    return false;
 }
+
+/** All page slugs in catalog order. */
+export const ALL_PAGE_SLUGS: string[] = Object.keys(PAGE_BY_SLUG);
+
+/**
+ * Map a request path to the catalog page that owns it (longest prefix match).
+ * Returns null for paths outside the catalog — e.g. `/dashboard` root and
+ * trip detail pages, which are open to any authenticated user at the
+ * middleware level (ownership is enforced by the server components themselves).
+ */
+export function findPageForPath(pathname: string): AccessPage | null {
+    let best: AccessPage | null = null;
+    let bestLen = 0;
+    for (const page of Object.values(PAGE_BY_SLUG)) {
+        for (const p of page.paths) {
+            if ((pathname === p || pathname.startsWith(p + "/")) && p.length > bestLen) {
+                best = page;
+                bestLen = p.length;
+            }
+        }
+    }
+    return best;
+}
+
+/**
+ * Seed permissions for the four system roles — mirrors the pre-migration
+ * level map exactly (editor/manager areas were mutually exclusive, admin had
+ * everything). Used by scripts/migrate-roles.mjs and as the DB fallback.
+ */
+export const SYSTEM_ROLE_SEEDS: Record<string, { name: string; groups: string[] }> = {
+    client: { name: "Клієнт", groups: ["client"] },
+    editor: { name: "Редактор", groups: ["client", "articles"] },
+    manager: { name: "Менеджер", groups: ["client", "tours"] },
+    admin: { name: "Адмін", groups: ["client", "articles", "tours", "admin"] },
+};
+
+export const SYSTEM_ROLE_SLUGS = Object.keys(SYSTEM_ROLE_SEEDS);

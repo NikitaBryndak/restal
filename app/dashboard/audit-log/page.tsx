@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import {
     ScrollText,
     ChevronLeft,
@@ -169,8 +168,7 @@ export default function AuditLogPage() {
     const [dateFrom, setDateFrom] = useState("");
     const [dateTo, setDateTo] = useState("");
 
-    const isAdmin =
-        (session?.user?.privilegeLevel ?? 1) >= ADMIN_PRIVILEGE_LEVEL;
+    const isAdmin = (session?.user?.allowedPages ?? []).includes("audit-log");
 
     /* ---- fetch ---- */
 

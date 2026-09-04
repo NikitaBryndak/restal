@@ -3,13 +3,12 @@
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { PageSkeleton } from '@/components/ui/skeleton';
 import { BadgePercent, ArrowRight, XCircle } from 'lucide-react';
-import { MANAGER_PRIVILEGE_LEVEL } from '@/config/constants';
 import Link from 'next/link';
 
 export default function PromoCodesManagerPage() {
     const { userProfile, loading: profileLoading } = useUserProfile();
 
-    const isManager = userProfile && userProfile.privilegeLevel >= MANAGER_PRIVILEGE_LEVEL;
+    const isManager = (userProfile?.allowedPages ?? []).includes("promo-codes");
 
     if (profileLoading) {
         return <PageSkeleton />;

@@ -14,7 +14,6 @@ import {
     Wallet, Search, Phone, ArrowUpDown, Target,
 } from 'lucide-react';
 import {
-    ADMIN_PRIVILEGE_LEVEL,
     TOUR_STATUS_COLORS,
     PIE_COLORS,
     PERIOD_OPTIONS,
@@ -413,7 +412,7 @@ export default function AnalyticsPage() {
     const [bonusSortField, setBonusSortField] = useState<'balance' | 'totalAccrued' | 'totalUsed' | 'name'>('balance');
     const [bonusSortDir, setBonusSortDir] = useState<'asc' | 'desc'>('desc');
 
-    const isAdmin = userProfile && userProfile.privilegeLevel >= ADMIN_PRIVILEGE_LEVEL;
+    const isAdmin = (userProfile?.allowedPages ?? []).includes("analytics");
 
     const fetchAnalytics = useCallback(async (p: Period = period) => {
         try {
