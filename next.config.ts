@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
 
+  // BUILD FIX: keep isomorphic-dompurify (and its nested jsdom) out of the server bundle.
+  // Turbopack inlines jsdom's CJS and computes a wrong __dirname during SSR prerender, so
+  // style-rules.js resolves default-stylesheet.css to a bogus "C:\ROOT\..." path and the build
+  // crashes on /dashboard/add-article. Externalizing the direct import keeps the whole subtree
+  // (isomorphic-dompurify -> jsdom) as runtime requires with a correct __dirname.
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom"],
+
   // SECURITY: Add security headers to all responses
   async headers() {
     return [
