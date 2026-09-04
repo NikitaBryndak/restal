@@ -12,6 +12,7 @@ type AuthFormData = {
   password: string;
   confirmPassword?: string;
   referralCode?: string;
+  notifyTelegram?: boolean;
 };
 
 type RegistrationStep = "form" | "otp" | "complete";
@@ -130,6 +131,7 @@ export function useAuth({ type }: AuthFormProps) {
           email: pendingFormData.email,
           password: pendingFormData.password,
           referralCode: pendingFormData.referralCode || undefined,
+          notifyTelegram: pendingFormData.notifyTelegram === true,
         }),
       });
 

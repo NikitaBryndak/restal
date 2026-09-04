@@ -102,6 +102,27 @@ const userSchema = new Schema({
         type: Boolean,
         default: false, // Opt-in for SMS delivery of trip events
     },
+    notifyTelegram: {
+        type: Boolean,
+        default: false, // Opt-in for Telegram delivery of trip events (checkbox at registration / settings toggle)
+    },
+    telegramChatId: {
+        type: Number,
+        required: false,
+        index: true,
+        sparse: true,  // Set when the user's Telegram account is bound to this phone number
+    },
+    // One-time code shown in the site's bind prompt; user sends it to the bot to link their chat.
+    telegramBindCode: {
+        type: String,
+        required: false,
+        index: true,
+        sparse: true,
+    },
+    telegramBindCodeExpiresAt: {
+        type: Date,
+        required: false,
+    },
 }, { timestamps: true });
 
 // Auto-generate referral code before saving if not set

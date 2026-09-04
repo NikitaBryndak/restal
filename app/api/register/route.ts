@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
         const { name, phoneNumber, email, password, referralCode } = body;
+        const notifyTelegram = typeof body.notifyTelegram === "boolean" ? body.notifyTelegram : false;
         // Capture marketing attribution (UTM) from the landing URL or explicit body fields
         const utm = extractUtm(request, body);
 
@@ -118,6 +119,7 @@ export async function POST(request: NextRequest) {
             utmSource: utm.source,
             utmMedium: utm.medium,
             utmCampaign: utm.campaign,
+            notifyTelegram,
         });
 
         // Clean up verification record after successful registration

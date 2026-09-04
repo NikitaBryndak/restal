@@ -6,6 +6,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
 import User from "@/models/user";
 import Notification from "@/models/notification";
+import { sendTelegramNotification } from "@/telegram/notifications";
 import { CASHBACK_RATE } from "@/config/constants";
 import { getSessionRole, hasAnyScope, getRoleSlugsGrantingPage } from "@/lib/role-access";
 import { DOCUMENT_LABELS, TOUR_STATUS_LABELS, TourStatus } from "@/types";
@@ -44,6 +45,13 @@ async function createNotification(
             read: false,
         });
         await notification.save();
+        // Telegram delivery — fire-and-forget (no SMS fallback; see telegram/notifications.ts).
+        void sendTelegramNotification({
+            userPhone,
+            message,
+            tripNumber,
+            logType: type === 'document_upload' ? 'document_upload' : 'trip_status',
+        }).catch((err) => console.error('[telegram] Dispatch error:', err instanceof Error ? err.message : err));
     } catch (error) {
         console.error('Failed to create notification:', error);
     }

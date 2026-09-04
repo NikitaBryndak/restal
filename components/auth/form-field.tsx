@@ -10,6 +10,7 @@ interface FormFieldProps {
   placeholder?: string;
   minLength?: number;
   className?: string;
+  defaultValue?: string;
 }
 
 export function FormField({
@@ -20,7 +21,8 @@ export function FormField({
   disabled = false,
   placeholder,
   minLength,
-  className
+  className,
+  defaultValue
 }: FormFieldProps) {
   return (
     <div>
@@ -36,6 +38,7 @@ export function FormField({
         className={`h-11 bg-background/50 border border-foreground/10 focus:border-foreground/30 ${className}`}
         minLength={minLength}
         placeholder={placeholder}
+        defaultValue={defaultValue}
       />
     </div>
   );

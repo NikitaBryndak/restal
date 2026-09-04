@@ -21,7 +21,8 @@ import {
     Check,
     Eye,
     EyeOff,
-    AlertCircle
+    AlertCircle,
+    Send
 } from "lucide-react";
 import { MIN_PASSWORD_LENGTH, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
 
@@ -46,6 +47,7 @@ export default function SettingsPage() {
     const [emailChangeSuccess, setEmailChangeSuccess] = useState("");
     const [notifyEmail, setNotifyEmail] = useState(false);
     const [notifySms, setNotifySms] = useState(false);
+    const [notifyTelegram, setNotifyTelegram] = useState(false);
     const [prefsLoaded, setPrefsLoaded] = useState(false);
     const [prefsSaving, setPrefsSaving] = useState(false);
     const [prefsSaved, setPrefsSaved] = useState(false);
@@ -70,11 +72,12 @@ export default function SettingsPage() {
         if (userProfile && !prefsLoaded) {
             setNotifyEmail(userProfile.notifyEmail ?? false);
             setNotifySms(userProfile.notifySms ?? false);
+            setNotifyTelegram(userProfile.notifyTelegram ?? false);
             setPrefsLoaded(true);
         }
     }, [userProfile, prefsLoaded]);
 
-    const handleTogglePreference = async (key: "notifyEmail" | "notifySms", value: boolean) => {
+    const handleTogglePreference = async (key: "notifyEmail" | "notifySms" | "notifyTelegram", value: boolean) => {
         if (prefsSaving) return;
         setPrefsSaving(true);
         setPrefsSaved(false);
@@ -88,6 +91,7 @@ export default function SettingsPage() {
             const data = await response.json();
             setNotifyEmail(data.notifyEmail);
             setNotifySms(data.notifySms);
+            setNotifyTelegram(data.notifyTelegram);
             setPrefsSaved(true);
             setTimeout(() => setPrefsSaved(false), 2500);
         } catch (err) {
@@ -578,6 +582,25 @@ export default function SettingsPage() {
                                 {notifyEmail && !userProfile?.userEmail && (
                                     <p className="text-xs text-amber-300/90 -mt-2">Спершу вкажіть email у розділі «Обліковий запис» — без адреси листи не надішлються</p>
                                 )}
+                                <button
+                                    type="button"
+                                    onClick={() => handleTogglePreference("notifyTelegram", !notifyTelegram)}
+                                    disabled={prefsSaving}
+                                    className="w-full flex items-center justify-between py-3 border-b border-white/10 text-left disabled:opacity-60 cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Send className="w-5 h-5 text-sky-400" />
+                                        <div>
+                                            <p className="font-medium text-white">Telegram сповіщення</p>
+                                            <p className="text-sm text-white/60">Отримувати оновлення через Telegram-бота</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className={`w-12 h-6 rounded-full ${notifyTelegram ? 'bg-accent' : 'bg-white/20'}`}
+                                    >
+                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifyTelegram ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                    </div>
+                                </button>
                                 <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Smartphone className="w-5 h-5 text-white/60" />

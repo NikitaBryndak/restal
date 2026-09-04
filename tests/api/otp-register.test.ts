@@ -162,4 +162,22 @@ describe('POST /api/register', () => {
     expect(res.status).toBe(201);
     expect(await PhoneVerification.countDocuments({ phoneNumber: VALID_PHONE })).toBe(0);
   });
+
+  it('persists the telegram opt-in checkbox when provided', async () => {
+    await seedVerification(VALID_PHONE, { verified: true });
+    const res = await register(json({ name: 'TG Opt In', phoneNumber: VALID_PHONE, password: 'Password123', notifyTelegram: true }));
+
+    expect(res.status).toBe(201);
+    const user = (await User.findOne({ phoneNumber: VALID_PHONE }))!;
+    expect(user.notifyTelegram).toBe(true);
+  });
+
+  it('defaults notifyTelegram to false when omitted', async () => {
+    await seedVerification(VALID_PHONE, { verified: true });
+    const res = await register(json({ name: 'TG Default', phoneNumber: VALID_PHONE, password: 'Password123' }));
+    expect(res.status).toBe(201);
+
+    const user = (await User.findOne({ phoneNumber: VALID_PHONE }))!;
+    expect(user.notifyTelegram ?? false).toBe(false);
+  });
 });

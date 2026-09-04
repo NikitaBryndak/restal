@@ -16,6 +16,9 @@ interface UserProfile {
     referralBonusEarned: number;
     notifyEmail?: boolean;
     notifySms?: boolean;
+    notifyTelegram?: boolean;
+    telegramChatId?: number | null;
+    telegramBindCode?: string | null;
 }
 
 export const useUserProfile = () => {

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         }
 
         const updates: Record<string, boolean> = {};
-        for (const key of ["notifyEmail", "notifySms"] as const) {
+        for (const key of ["notifyEmail", "notifySms", "notifyTelegram"] as const) {
             if (body[key] !== undefined) {
                 if (typeof body[key] !== "boolean") {
                     return NextResponse.json({ message: `${key} must be a boolean` }, { status: 400 });
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
             { phoneNumber: session.user.phoneNumber },
             { $set: updates },
             { new: true }
-        ).select("notifyEmail notifySms name");
+        ).select("notifyEmail notifySms notifyTelegram name");
 
         if (!user) {
             return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             notifyEmail: user.notifyEmail ?? false,
             notifySms: user.notifySms ?? false,
+            notifyTelegram: user.notifyTelegram ?? false,
         }, { status: 200 });
 
     } catch (error) {

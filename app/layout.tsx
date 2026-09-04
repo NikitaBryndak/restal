@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BASE_URL } from "@/config/constants";
 import { PWARegistration } from "@/components/pwa/pwa-registration";
 import { OfflineBanner } from "@/components/pwa/offline-banner";
+import { TelegramBindPrompt } from "@/components/telegram-bind-prompt";
 
 export const viewport: Viewport = {
   themeColor: "#1e40af",
@@ -96,6 +97,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <OfflineBanner />
+          <TelegramBindPrompt />
         </AuthProvider>
         <PWARegistration />
         <Analytics />

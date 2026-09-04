@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextResponse } from "next/server";
@@ -21,7 +22,7 @@ export async function GET() {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber })
-            .select("name email phoneNumber createdAt cashbackAmount role referralCode referralCount referralBonusEarned notifyEmail notifySms");
+            .select("name email phoneNumber createdAt cashbackAmount role referralCode referralCount referralBonusEarned notifyEmail notifySms notifyTelegram telegramChatId telegramBindCode telegramBindCodeExpiresAt");
 
         if (!user) {
             return NextResponse.json({
@@ -31,6 +32,21 @@ export async function GET() {
                 status: 404
             });
 
+        }
+        // Telegram binding: while opted-in but unbound, keep a fresh one-time code for the site prompt.
+        let telegramBindCode: string | null = null;
+        if ((user.notifyTelegram ?? false) && !user.telegramChatId) {
+            const now = Date.now();
+            const expired = !user.telegramBindCodeExpiresAt || user.telegramBindCodeExpiresAt.getTime() < now;
+            if (!user.telegramBindCode || expired) {
+                telegramBindCode = generateBindCode();
+                await User.updateOne(
+                    { _id: user._id },
+                    { $set: { telegramBindCode, telegramBindCodeExpiresAt: new Date(now + 15 * 60_000) } }
+                );
+            } else {
+                telegramBindCode = user.telegramBindCode;
+            }
         }
 
         return NextResponse.json({
@@ -46,6 +62,9 @@ export async function GET() {
             referralBonusEarned: user.referralBonusEarned || 0,
             notifyEmail: user.notifyEmail ?? false,
             notifySms: user.notifySms ?? false,
+            notifyTelegram: user.notifyTelegram ?? false,
+            telegramChatId: user.telegramChatId ?? null,
+            telegramBindCode,
         }, {
             status: 200
         });
@@ -59,4 +78,16 @@ export async function GET() {
             status: 500
         });
     }
+}
+
+// Unambiguous alphabet (no 0/O/1/I) — the code is typed by hand on a phone.
+const BIND_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function generateBindCode(): string {
+    const bytes = crypto.randomBytes(4);
+    let code = "";
+    for (let i = 0; i < 4; i++) {
+        code += BIND_CODE_ALPHABET[bytes[i] % BIND_CODE_ALPHABET.length];
+    }
+    return `TG-${code}`;
 }

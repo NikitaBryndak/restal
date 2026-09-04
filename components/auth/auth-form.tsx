@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 
-export function AuthForm({ type }: { type: "login" | "register" }) {
+export function AuthForm({ type, initialReferralCode }: { type: "login" | "register"; initialReferralCode?: string }) {
     const {
       isLoading,
       error,
@@ -54,6 +54,7 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
         password: formData.get("password") as string,
         confirmPassword: formData.get("confirmPassword") as string,
         referralCode: formData.get("referralCode") as string,
+        notifyTelegram: type === "register" && formData.has("notifyTelegram"),
       });
     };
 
@@ -231,7 +232,20 @@ export function AuthForm({ type }: { type: "login" | "register" }) {
                   disabled={isLoading}
                   placeholder="REF-XXXX-XXXX"
                   className="uppercase tracking-wider font-mono"
+                  defaultValue={initialReferralCode}
                 />
+              )}
+
+              {type === "register" && (
+                <label className="flex items-center gap-3 py-1 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    name="notifyTelegram"
+                    disabled={isLoading}
+                    className="w-4 h-4 rounded border-foreground/20 bg-background/50 accent-white"
+                  />
+                  <span className="text-sm text-foreground/70">Отримувати оновлення через Telegram</span>
+                </label>
               )}
 
               {/* Submit Button */}
