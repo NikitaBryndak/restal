@@ -28,7 +28,12 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const newEmail = typeof body.newEmail === "string" ? body.newEmail.trim() : "";
+        if (typeof body.newEmail !== "string") {
+            return NextResponse.json({
+                message: "Поле newEmail обов'язкове"
+            }, { status: 400 });
+        }
+        const newEmail = body.newEmail.trim();
 
         // Empty value clears the email address (user opts out of email entirely)
         if (newEmail && !EMAIL_REGEX.test(newEmail)) {
