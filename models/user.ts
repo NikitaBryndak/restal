@@ -95,7 +95,7 @@ const userSchema = new Schema({
     // Notification preferences (user-controlled from /dashboard/settings)
     notifyEmail: {
         type: Boolean,
-        default: true,  // Trip status/reminder/cashback emails
+        default: false, // Opt-in for trip status/reminder/cashback emails (off by default since 2026-09-04)
     },
     notifySms: {
         type: Boolean,

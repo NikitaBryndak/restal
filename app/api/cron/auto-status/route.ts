@@ -259,7 +259,7 @@ async function sendStatusChangeEmail(
 ) {
     try {
         const user = await User.findOne({ phoneNumber: trip.ownerPhone }).lean() as { name?: string; email?: string; notifyEmail?: boolean } | null;
-        if (!user?.email || user.notifyEmail === false) return;
+        if (!user?.email || user.notifyEmail !== true) return;
         await sendTripStatusEmail({
             to: user.email,
             userName: user.name || "Шановний клієнт",
@@ -276,7 +276,7 @@ async function sendStatusChangeEmail(
 async function sendPaymentReminderEmail(trip: Record<string, any>) {
     try {
         const user = await User.findOne({ phoneNumber: trip.ownerPhone }).lean() as { name?: string; email?: string; notifyEmail?: boolean } | null;
-        if (!user?.email || user.notifyEmail === false) return;
+        if (!user?.email || user.notifyEmail !== true) return;
         await sendTripReminderEmail({
             to: user.email,
             userName: user.name || "Шановний клієнт",
@@ -295,7 +295,7 @@ async function sendPaymentReminderEmail(trip: Record<string, any>) {
 async function sendDepartureReminderEmail(trip: Record<string, any>) {
     try {
         const user = await User.findOne({ phoneNumber: trip.ownerPhone }).lean() as { name?: string; email?: string; notifyEmail?: boolean } | null;
-        if (!user?.email || user.notifyEmail === false) return;
+        if (!user?.email || user.notifyEmail !== true) return;
         await sendTripReminderEmail({
             to: user.email,
             userName: user.name || "Шановний клієнт",

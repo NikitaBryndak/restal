@@ -39,7 +39,7 @@ export default function SettingsPage() {
     const [usernameChangeLoading, setUsernameChangeLoading] = useState(false);
     const [usernameChangeError, setUsernameChangeError] = useState("");
     const [usernameChangeSuccess, setUsernameChangeSuccess] = useState("");
-    const [notifyEmail, setNotifyEmail] = useState(true);
+    const [notifyEmail, setNotifyEmail] = useState(false);
     const [notifySms, setNotifySms] = useState(false);
     const [prefsLoaded, setPrefsLoaded] = useState(false);
     const [prefsSaving, setPrefsSaving] = useState(false);
@@ -56,7 +56,7 @@ export default function SettingsPage() {
     // Load saved notification preferences once the profile arrives
     useEffect(() => {
         if (userProfile && !prefsLoaded) {
-            setNotifyEmail(userProfile.notifyEmail ?? true);
+            setNotifyEmail(userProfile.notifyEmail ?? false);
             setNotifySms(userProfile.notifySms ?? false);
             setPrefsLoaded(true);
         }
@@ -443,25 +443,18 @@ export default function SettingsPage() {
                                         <div className={`w-5 h-5 rounded-full bg-white transform ${notifyEmail ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </div>
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => handleTogglePreference("notifySms", !notifySms)}
-                                    disabled={prefsSaving}
-                                    className="w-full flex items-center justify-between py-3 border-b border-white/10 text-left disabled:opacity-60 cursor-pointer"
-                                >
+                                <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Smartphone className="w-5 h-5 text-white/60" />
                                         <div>
                                             <p className="font-medium text-white">SMS сповіщення</p>
-                                            <p className="text-sm text-white/60">Отримувати SMS про важливі оновлення</p>
+                                            <p className="text-sm text-white/60">Незабаром</p>
                                         </div>
                                     </div>
-                                    <div
-                                        className={`w-12 h-6 rounded-full ${notifySms ? 'bg-accent' : 'bg-white/20'}`}
-                                    >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifySms ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                    <div className="w-12 h-6 rounded-full bg-white/20">
+                                        <div className="w-5 h-5 rounded-full bg-white transform translate-x-0.5" />
                                     </div>
-                                </button>
+                                </div>
                                 <div className="flex items-center justify-between py-3 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Bell className="w-5 h-5 text-white/60" />

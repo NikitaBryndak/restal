@@ -107,7 +107,7 @@ export async function POST(request: Request) {
                             data: { type: "cashback_credited", amount: trip.cashbackAmount },
                         });
                         // Send cashback email if user has email
-                        if (updatedUser.email && updatedUser.notifyEmail !== false) {
+                    if (updatedUser.email && updatedUser.notifyEmail === true) {
                             await sendCashbackCreditedEmail({
                                 to: updatedUser.email,
                                 userName: updatedUser.name || "Шановний клієнт",

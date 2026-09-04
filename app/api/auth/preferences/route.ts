@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         });
 
         return NextResponse.json({
-            notifyEmail: user.notifyEmail ?? true,
+            notifyEmail: user.notifyEmail ?? false,
             notifySms: user.notifySms ?? false,
         }, { status: 200 });
 

@@ -42,7 +42,7 @@ export async function GET() {
             referralCode: user.referralCode || null,
             referralCount: user.referralCount || 0,
             referralBonusEarned: user.referralBonusEarned || 0,
-            notifyEmail: user.notifyEmail ?? true,
+            notifyEmail: user.notifyEmail ?? false,
             notifySms: user.notifySms ?? false,
         }, {
             status: 200

@@ -567,7 +567,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-1 bg-white/3 border border-white/8 rounded-xl p-1 w-fit">
+            <div className="flex items-center gap-1 bg-white/3 border border-white/8 rounded-xl p-1 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {([
                     { id: 'overview' as const, label: 'Огляд', icon: BarChart3 },
                     { id: 'revenue' as const, label: 'Фінанси', icon: DollarSign },
@@ -582,7 +582,7 @@ export default function AnalyticsPage() {
                             if (tab.id === 'requests' && !requestsData) fetchRequests();
                             if (tab.id === 'bonuses' && !bonusData) fetchBonuses();
                         }}
-                        className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all duration-200 ${activeTab === tab.id
+                        className={`flex shrink-0 whitespace-nowrap items-center gap-1.5 text-xs px-4 py-2 rounded-lg transition-all duration-200 ${activeTab === tab.id
                             ? 'bg-white/8 text-white'
                             : 'text-secondary hover:text-white hover:bg-white/3'
                             }`}

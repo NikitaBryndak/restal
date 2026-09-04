@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
 import { TableSkeleton } from "@/components/ui/skeleton";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 
 interface UserRow {
     _id: string;
@@ -28,6 +28,7 @@ export default function UsersPage() {
     const [users, setUsers] = useState<UserRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [savingPhone, setSavingPhone] = useState<string | null>(null);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         if (status === "loading") return;
@@ -88,12 +89,26 @@ export default function UsersPage() {
     }
 
     const myPhone = session.user.phoneNumber;
+    const query = search.trim().toLowerCase();
+    const filteredUsers = query
+        ? users.filter((u) => (u.name || "").toLowerCase().includes(query) || u.phoneNumber.toLowerCase().includes(query))
+        : users;
 
     return (
         <div className="max-w-5xl mx-auto px-4 max-sm:px-2 py-8 sm:py-10 space-y-6">
             <div>
                 <h1 className="text-xl sm:text-2xl font-light text-white">Користувачі</h1>
                 <p className="text-sm text-white/40 mt-1">Керування ролями користувачів. Зміни застосовуються одразу.</p>
+            </div>
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Пошук за ім'ям або номером телефону..."
+                    className="w-full h-11 pl-9 pr-4 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder:text-white/30 outline-none transition focus:border-accent/50"
+                />
             </div>
 
             <div className="rounded-2xl border border-white/5 overflow-hidden">
@@ -108,14 +123,14 @@ export default function UsersPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.length === 0 ? (
+                            {filteredUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="h-24 text-center text-white/40">
-                                        Користувачів не знайдено.
+                                        {search.trim() ? 'Нічого не знайдено за вашим запитом.' : 'Користувачів не знайдено.'}
                                     </td>
                                 </tr>
                             ) : (
-                                users.map((user) => {
+                                filteredUsers.map((user) => {
                                     const isSelf = user.phoneNumber === myPhone;
                                     return (
                                         <tr key={user._id} className="border-b border-white/3 last:border-b-0 hover:bg-white/3 transition-colors">
