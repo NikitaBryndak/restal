@@ -39,6 +39,11 @@ export default function SettingsPage() {
     const [usernameChangeLoading, setUsernameChangeLoading] = useState(false);
     const [usernameChangeError, setUsernameChangeError] = useState("");
     const [usernameChangeSuccess, setUsernameChangeSuccess] = useState("");
+    const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [newEmail, setNewEmail] = useState(userProfile?.userEmail || "");
+    const [emailChangeLoading, setEmailChangeLoading] = useState(false);
+    const [emailChangeError, setEmailChangeError] = useState("");
+    const [emailChangeSuccess, setEmailChangeSuccess] = useState("");
     const [notifyEmail, setNotifyEmail] = useState(false);
     const [notifySms, setNotifySms] = useState(false);
     const [prefsLoaded, setPrefsLoaded] = useState(false);
@@ -52,6 +57,13 @@ export default function SettingsPage() {
             setNewUsername(userProfile.userName);
         }
     }, [userProfile?.userName, isEditingUsername]);
+
+    // Sync newEmail when userProfile updates
+    useEffect(() => {
+        if (!isEditingEmail) {
+            setNewEmail(userProfile?.userEmail || "");
+        }
+    }, [userProfile?.userEmail, isEditingEmail]);
 
     // Load saved notification preferences once the profile arrives
     useEffect(() => {
@@ -209,6 +221,61 @@ export default function SettingsPage() {
         }
     };
 
+    const handleChangeEmail = async () => {
+        // Reset previous messages
+        setEmailChangeError("");
+        setEmailChangeSuccess("");
+
+        const trimmed = newEmail.trim();
+
+        if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmed)) {
+            setEmailChangeError("Некоректний формат email");
+            return;
+        }
+
+        if (trimmed === (userProfile?.userEmail || "")) {
+            setIsEditingEmail(false);
+            return;
+        }
+
+        setEmailChangeLoading(true);
+
+        try {
+            const response = await fetch("/api/auth/change-email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    newEmail: trimmed,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setEmailChangeError(data.message || "Не вдалося зберегти email");
+                return;
+            }
+
+            setEmailChangeSuccess(trimmed ? "Email успішно збережено!" : "Email видалено!");
+            setIsEditingEmail(false);
+
+            // Refetch user profile to update the display immediately
+            await refetch();
+
+            // Clear success message after 3 seconds
+            setTimeout(() => {
+                setEmailChangeSuccess("");
+            }, 3000);
+        } catch (err) {
+            setEmailChangeError("Сталася помилка при збереженні email");
+            console.error("Change email error:", err);
+        } finally {
+            setEmailChangeLoading(false);
+        }
+    };
+
     if (loading) {
         return <SettingsSkeleton />;
     }
@@ -317,6 +384,71 @@ export default function SettingsPage() {
                                     <div className="flex items-center gap-3 p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
                                         <Check className="w-5 h-5 text-emerald-400 shrink-0" />
                                         <p className="text-sm text-emerald-200">{usernameChangeSuccess}</p>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between py-3 border-b border-white/10">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-white">Email</p>
+                                        {!isEditingEmail ? (
+                                            <p className="text-sm text-white/60">{userProfile?.userEmail || 'Не вказано'}</p>
+                                        ) : (
+                                            <div className="mt-2 space-y-2">
+                                                <Input
+                                                    type="email"
+                                                    value={newEmail}
+                                                    onChange={(e) => setNewEmail(e.target.value)}
+                                                    placeholder="you@example.com"
+                                                    className="bg-white/10 border-white/20 h-10 text-white rounded-lg"
+                                                />
+                                                {emailChangeError && (
+                                                    <p className="text-xs text-red-400">{emailChangeError}</p>
+                                                )}
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        onClick={handleChangeEmail}
+                                                        disabled={emailChangeLoading}
+                                                        size="sm"
+                                                        className="bg-accent hover:bg-accent/90 text-white rounded-lg disabled:opacity-50"
+                                                    >
+                                                        {emailChangeLoading ? "Збереження..." : "Зберегти"}
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setIsEditingEmail(false);
+                                                            setNewEmail(userProfile?.userEmail || "");
+                                                            setEmailChangeError("");
+                                                            setEmailChangeSuccess("");
+                                                        }}
+                                                        disabled={emailChangeLoading}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-white/60 hover:text-white disabled:opacity-50"
+                                                    >
+                                                        Скасувати
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {!isEditingEmail && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setIsEditingEmail(true);
+                                                setNewEmail(userProfile?.userEmail || "");
+                                                setEmailChangeError("");
+                                            }}
+                                            className="text-accent hover:text-accent/80"
+                                        >
+                                            Змінити
+                                        </Button>
+                                    )}
+                                </div>
+                                {emailChangeSuccess && (
+                                    <div className="flex items-center gap-3 p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
+                                        <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+                                        <p className="text-sm text-emerald-200">{emailChangeSuccess}</p>
                                     </div>
                                 )}
                                 <div className="flex items-center justify-between py-3 border-b border-white/10">
@@ -443,6 +575,9 @@ export default function SettingsPage() {
                                         <div className={`w-5 h-5 rounded-full bg-white transform ${notifyEmail ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </div>
                                 </button>
+                                {notifyEmail && !userProfile?.userEmail && (
+                                    <p className="text-xs text-amber-300/90 -mt-2">Спершу вкажіть email у розділі «Обліковий запис» — без адреси листи не надішлються</p>
+                                )}
                                 <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Smartphone className="w-5 h-5 text-white/60" />

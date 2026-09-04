@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { NOTIFICATION_RECIPIENTS } from "@/config/constants";
+import EmailLog from "@/models/emailLog";
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -8,6 +9,43 @@ const transporter = nodemailer.createTransport({
         pass: process.env.GMAIL_APP_PASSWORD,
     },
 });
+
+type EmailType = "contact_request" | "trip_status" | "trip_reminder_payment" | "trip_reminder_departure" | "cashback_credited";
+
+async function logEmailSend(entry: {
+    type: EmailType;
+    to: string;
+    subject: string;
+    status: "sent" | "failed";
+    messageId?: string;
+    error?: string;
+    tripNumber?: string;
+}) {
+    try {
+        await EmailLog.create(entry);
+    } catch (err) {
+        console.error("Failed to write email log:", err instanceof Error ? err.message : err);
+    }
+}
+
+async function sendTracked(
+    type: EmailType,
+    from: string,
+    to: string,
+    subject: string,
+    html: string,
+    tripNumber?: string
+) {
+    try {
+        const info = await transporter.sendMail({ from, to, subject, html });
+        await logEmailSend({ type, to, subject, status: "sent", messageId: info.messageId, tripNumber });
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`Email send failed (${type} -> ${to}):`, message);
+        await logEmailSend({ type, to, subject, status: "failed", error: message.slice(0, 500), tripNumber });
+        throw err;
+    }
+}
 
 interface ContactRequestEmail {
     source: string;
@@ -65,12 +103,13 @@ export async function sendContactRequestNotification(data: ContactRequestEmail) 
     </div>
   `;
 
-    await transporter.sendMail({
-        from: `"Restal" <${process.env.GMAIL_USER}>`,
-        to: NOTIFICATION_RECIPIENTS.join(", "),
-        subject: `Нова заявка на зв'язок — ${fullName} (${sourceLabel})`,
-        html,
-    });
+    await sendTracked(
+        "contact_request",
+        `"Restal" <${process.env.GMAIL_USER}>`,
+        NOTIFICATION_RECIPIENTS.join(", "),
+        `Нова заявка на зв'язок — ${fullName} (${sourceLabel})`,
+        html
+    );
 }
 
 /* ================================================================== */
@@ -125,12 +164,14 @@ export async function sendTripStatusEmail(data: TripStatusEmail) {
     </div>
   `;
 
-    await transporter.sendMail({
-        from: `"RestAL" <${process.env.GMAIL_USER}>`,
-        to: data.to,
-        subject: `Подорож ${data.tripNumber}: ${data.newStatus}`,
+    await sendTracked(
+        "trip_status",
+        `"RestAL" <${process.env.GMAIL_USER}>`,
+        data.to,
+        `Подорож ${data.tripNumber}: ${data.newStatus}`,
         html,
-    });
+        data.tripNumber
+    );
 }
 
 /* ================================================================== */
@@ -252,14 +293,16 @@ export async function sendTripReminderEmail(data: TripReminderEmail) {
     </div>
   `;
 
-    await transporter.sendMail({
-        from: `"RestAL" <${process.env.GMAIL_USER}>`,
-        to: data.to,
-        subject: isPayment
+    await sendTracked(
+        isPayment ? "trip_reminder_payment" : "trip_reminder_departure",
+        `"RestAL" <${process.env.GMAIL_USER}>`,
+        data.to,
+        isPayment
             ? `⚠️ Нагадування: оплата за подорож ${data.tripNumber} — ${data.deadline}`
             : `✈️ Завтра ваша подорож ${data.tripNumber} — ${data.country}!`,
         html,
-    });
+        data.tripNumber
+    );
 }
 
 /* ================================================================== */
@@ -308,10 +351,12 @@ export async function sendCashbackCreditedEmail(data: CashbackCreditedEmail) {
     </div>
   `;
 
-    await transporter.sendMail({
-        from: `"RestAL" <${process.env.GMAIL_USER}>`,
-        to: data.to,
-        subject: `🎉 Кешбек +${data.cashbackAmount.toLocaleString('uk-UA')} грн за подорож ${data.tripNumber}`,
+    await sendTracked(
+        "cashback_credited",
+        `"RestAL" <${process.env.GMAIL_USER}>`,
+        data.to,
+        `🎉 Кешбек +${data.cashbackAmount.toLocaleString('uk-UA')} грн за подорож ${data.tripNumber}`,
         html,
-    });
+        data.tripNumber
+    );
 }
