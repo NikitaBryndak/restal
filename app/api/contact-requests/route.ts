@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { MANAGER_PRIVILEGE_LEVEL } from "@/config/constants";
 import { sendContactRequestNotification } from "@/lib/email";
 import { logAudit } from "@/lib/audit";
+import { extractUtm } from "@/lib/utm";
 
 // Rate limit: max 5 requests per IP per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -26,6 +27,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         const { source, firstName, lastName, phone, message, managerName } = body;
+        // Capture marketing attribution (UTM) from the landing URL or explicit body fields
+        const utm = extractUtm(request, body);
 
         // Validate required fields
         if (!source || !phone) {
@@ -75,6 +78,9 @@ export async function POST(request: NextRequest) {
             phone: phoneClean,
             message: message?.trim().slice(0, 2000) || "",
             managerName: managerName?.trim().slice(0, 100) || "",
+            utmSource: utm.source,
+            utmMedium: utm.medium,
+            utmCampaign: utm.campaign,
         };
 
         const contactRequest = await ContactRequest.create({

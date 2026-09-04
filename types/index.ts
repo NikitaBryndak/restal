@@ -147,7 +147,7 @@ export type Trip = {
 const DEFAULT_TICKET_FILE: TicketFile = { uploaded: false, url: '', fileName: '' };
 
 export type Article = {
-  images: string;
+  images: string | string[];
   tag: string;
   title: string;
   description: string;

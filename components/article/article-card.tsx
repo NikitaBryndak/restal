@@ -20,7 +20,7 @@ type ArticleProps = {
   data: {
     title: string;
     description: string;
-    images: string;
+    images: string | string[];
     tag: string;
     content?: string;
     _id?: string;
@@ -36,6 +36,7 @@ export default function ArticleCard({ data }: ArticleProps) {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-");
 
+  const coverImage = Array.isArray(data.images) ? data.images[0] : data.images;
   return (
     <div
       className="group relative rounded-2xl border border-white/6 hover:border-accent/30 bg-white/3 hover:bg-white/5 overflow-hidden transition-all duration-300 flex flex-col cursor-pointer shadow-lg shadow-black/20 hover:shadow-accent/10"
@@ -49,9 +50,9 @@ export default function ArticleCard({ data }: ArticleProps) {
 
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
-        {data.images ? (
+        {coverImage ? (
           <img
-            src={data.images}
+            src={coverImage}
             alt={data.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />

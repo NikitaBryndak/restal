@@ -67,7 +67,7 @@ describe('authorize()', () => {
 
 describe('jwt callback', () => {
   const jwtCb = (params: Record<string, unknown>) =>
-    authOptions.callbacks.jwt!(params as never) as Promise<Record<string, unknown>>;
+    authOptions.callbacks!.jwt!(params as never) as unknown as Promise<Record<string, unknown>>;
 
   it('copies identity fields from the user object on first sign-in', async () => {
     // Phone not in DB → re-fetch finds nothing and keeps the user-provided values.
@@ -102,7 +102,7 @@ describe('jwt callback', () => {
 
 describe('session callback', () => {
   it('exposes privilegeLevel and phoneNumber on session.user', async () => {
-    const session = await authOptions.callbacks.session!({
+    const session = await authOptions.callbacks!.session!({
       session: { user: {} },
       token: { privilegeLevel: 3, phoneNumber: '+380679000013' },
     } as never) as { user: Record<string, unknown> };

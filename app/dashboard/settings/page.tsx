@@ -39,11 +39,11 @@ export default function SettingsPage() {
     const [usernameChangeLoading, setUsernameChangeLoading] = useState(false);
     const [usernameChangeError, setUsernameChangeError] = useState("");
     const [usernameChangeSuccess, setUsernameChangeSuccess] = useState("");
-    const notifications = {
-        email: true,
-        sms: true,
-        marketing: false
-    };
+    const [notifyEmail, setNotifyEmail] = useState(true);
+    const [notifySms, setNotifySms] = useState(false);
+    const [prefsLoaded, setPrefsLoaded] = useState(false);
+    const [prefsSaving, setPrefsSaving] = useState(false);
+    const [prefsSaved, setPrefsSaved] = useState(false);
     const theme = 'dark' as const;
 
     // Sync newUsername when userProfile updates
@@ -52,6 +52,38 @@ export default function SettingsPage() {
             setNewUsername(userProfile.userName);
         }
     }, [userProfile?.userName, isEditingUsername]);
+
+    // Load saved notification preferences once the profile arrives
+    useEffect(() => {
+        if (userProfile && !prefsLoaded) {
+            setNotifyEmail(userProfile.notifyEmail ?? true);
+            setNotifySms(userProfile.notifySms ?? false);
+            setPrefsLoaded(true);
+        }
+    }, [userProfile, prefsLoaded]);
+
+    const handleTogglePreference = async (key: "notifyEmail" | "notifySms", value: boolean) => {
+        if (prefsSaving) return;
+        setPrefsSaving(true);
+        setPrefsSaved(false);
+        try {
+            const response = await fetch("/api/auth/preferences", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ [key]: value }),
+            });
+            if (!response.ok) throw new Error("Failed to save preferences");
+            const data = await response.json();
+            setNotifyEmail(data.notifyEmail);
+            setNotifySms(data.notifySms);
+            setPrefsSaved(true);
+            setTimeout(() => setPrefsSaved(false), 2500);
+        } catch (err) {
+            console.error("Save preferences error:", err);
+        } finally {
+            setPrefsSaving(false);
+        }
+    };
 
     const handleChangePassword = async () => {
         // Reset previous messages
@@ -388,10 +420,16 @@ export default function SettingsPage() {
                                         <h2 className="text-lg sm:text-xl font-bold text-white">Сповіщення</h2>
                                         <p className="text-xs sm:text-sm text-white/60">Налаштуйте способи отримання сповіщень</p>
                                     </div>
+                                {prefsSaved && <span className="text-xs font-medium text-emerald-400 shrink-0">Збережено ✓</span>}
                                 </div>
                             </div>
                             <div className="p-4 sm:p-6 space-y-4">
-                                <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
+                                <button
+                                    type="button"
+                                    onClick={() => handleTogglePreference("notifyEmail", !notifyEmail)}
+                                    disabled={prefsSaving}
+                                    className="w-full flex items-center justify-between py-3 border-b border-white/10 text-left disabled:opacity-60 cursor-pointer"
+                                >
                                     <div className="flex items-center gap-3">
                                         <Mail className="w-5 h-5 text-white/60" />
                                         <div>
@@ -400,12 +438,17 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
                                     <div
-                                        className={`w-12 h-6 rounded-full ${notifications.email ? 'bg-accent' : 'bg-white/20'}`}
+                                        className={`w-12 h-6 rounded-full ${notifyEmail ? 'bg-accent' : 'bg-white/20'}`}
                                     >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.email ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifyEmail ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </div>
-                                </div>
-                                <div className="flex items-center justify-between py-3 border-b border-white/10 opacity-60 pointer-events-none">
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleTogglePreference("notifySms", !notifySms)}
+                                    disabled={prefsSaving}
+                                    className="w-full flex items-center justify-between py-3 border-b border-white/10 text-left disabled:opacity-60 cursor-pointer"
+                                >
                                     <div className="flex items-center gap-3">
                                         <Smartphone className="w-5 h-5 text-white/60" />
                                         <div>
@@ -414,11 +457,11 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
                                     <div
-                                        className={`w-12 h-6 rounded-full ${notifications.sms ? 'bg-accent' : 'bg-white/20'}`}
+                                        className={`w-12 h-6 rounded-full ${notifySms ? 'bg-accent' : 'bg-white/20'}`}
                                     >
-                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifications.sms ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                                        <div className={`w-5 h-5 rounded-full bg-white transform ${notifySms ? 'translate-x-6' : 'translate-x-0.5'}`} />
                                     </div>
-                                </div>
+                                </button>
                                 <div className="flex items-center justify-between py-3 opacity-60 pointer-events-none">
                                     <div className="flex items-center gap-3">
                                         <Bell className="w-5 h-5 text-white/60" />

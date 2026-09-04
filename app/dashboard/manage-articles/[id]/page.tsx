@@ -4,10 +4,10 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useForm, FormProvider, useWatch, Controller } from "react-hook-form";
+import { useForm, useWatch, FormProvider, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/ui/form-input";
 import RichTextEditor from "@/components/ui/rich-text-editor";
@@ -18,11 +18,15 @@ import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constant
 // Schema Definition (duplicated from add-article/schema.ts for safety)
 const articleSchema = z.object({
     tag: z.enum(["Каталог Послуг", "Корисно знати", "Шпаргалки мандрівникам", "Інструкції сайта", "Умови бронювання"]),
-    images: z.string().min(1, "Image URL is required"),
-    title: z.string().min(1, "Title is required"),
-    description: z.string().min(1, "Description is required"),
-    content: z.string().min(1, "Content is required"),
-    creatorPhone: z.string().optional(), // Make optional here as we might not edit it
+    images: z.array(z.object({ url: z.string() })).refine(
+        (arr) => arr.some((i) => i.url.trim().length > 0),
+        { message: "At least one image URL is required" }
+    ),
+    title: z.string(),
+    description: z.string(),
+    content: z.string(),
+    creatorPhone: z.string(),
+    status: z.enum(["draft", "published"]),
 });
 
 type ArticleFormValues = z.infer<typeof articleSchema>;
@@ -45,15 +49,17 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
             title: "",
             description: "",
             content: "",
-            images: "",
+            images: [{ url: "" }],
             tag: "Каталог Послуг",
             creatorPhone: "",
+            status: "published",
         },
         mode: 'onChange',
     });
 
     const { register, control, reset, setValue } = form;
     const formValues = useWatch({ control });
+    const { fields: imageFields, append: addImage, remove: removeImage } = useFieldArray({ control, name: "images" });
 
     // Fetch Article Data
     useEffect(() => {
@@ -65,13 +71,15 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                 if (response.ok) {
                     const data = await response.json();
                     if (data.article) {
+                        const rawImages = data.article.images;
                         reset({
                             title: data.article.title,
                             description: data.article.description,
                             content: data.article.content,
-                            images: data.article.images,
+                            images: (Array.isArray(rawImages) ? rawImages : [rawImages]).map((u: string) => ({ url: u })),
                             tag: data.article.tag,
                             creatorPhone: data.article.creatorPhone,
+                            status: data.article.status || "published",
                         });
                     }
                 } else {
@@ -106,7 +114,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
             title: formValues.title || "Untitled article",
             description: formValues.description || "No description provided",
             content: formValues.content || "Start writing your article...",
-            images: formValues.images || "",
+            images: formValues.images?.map((i) => i.url ?? "") ?? [],
             tag: (formValues.tag as any) || "Каталог Послуг",
             creatorPhone: formValues.creatorPhone || session?.user?.phoneNumber || "",
             _id: params?.id || "preview-id",
@@ -126,7 +134,7 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ ...data, images: data.images.map((i) => i.url).filter((u) => u.trim().length > 0) }),
             });
 
             if (response.ok) {
@@ -210,13 +218,39 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                             required
                                             {...register("description")}
                                         />
-                                        <FormInput
-                                            labelText="Image URL"
-                                            type="text"
-                                            placeholder="Enter image URL"
-                                            required
-                                            {...register("images")}
-                                        />
+                                        <div className="space-y-2 md:col-span-2">
+                                            <label htmlFor="article-images" className="text-sm font-medium text-white/60">
+                                                Image URLs <span className="text-red-500">*</span>
+                                            </label>
+                                            {imageFields.map((field, index) => (
+                                                <div key={field.id} className="flex items-center gap-2">
+                                                    <input
+                                                        id={index === 0 ? "article-images" : undefined}
+                                                        type="text"
+                                                        placeholder={index === 0 ? "Cover image URL" : "Additional image URL"}
+                                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-accent/50 placeholder:text-white/30"
+                                                        {...register(`images.${index}.url`)}
+                                                    />
+                                                    {imageFields.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeImage(index)}
+                                                            className="shrink-0 p-2 text-white/40 hover:text-red-400 transition-colors"
+                                                            aria-label="Remove image"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => addImage({ url: "" })}
+                                                className="text-sm text-white/50 hover:text-accent transition-colors"
+                                            >
+                                                + Add image
+                                            </button>
+                                        </div>
                                          <div className="space-y-1.5 md:col-span-2">
                                             <label htmlFor="article-tag" className="text-sm font-medium text-white/60">Tag</label>
                                             <select
@@ -229,6 +263,17 @@ export default function EditArticlePage({ params: paramsPromise }: { params: Pro
                                                 <option value="Шпаргалки мандрівникам">Шпаргалки мандрівникам</option>
                                                 <option value="Інструкції сайта">Інструкції сайта</option>
                                                 <option value="Умови бронювання">Умови бронювання</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label htmlFor="article-status" className="text-sm font-medium text-white/60">Status</label>
+                                            <select
+                                                id="article-status"
+                                                className="flex h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-50"
+                                                {...register("status")}
+                                            >
+                                                <option value="published">Published</option>
+                                                <option value="draft">Draft</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1.5 md:col-span-2">

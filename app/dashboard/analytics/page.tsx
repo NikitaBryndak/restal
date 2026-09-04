@@ -11,7 +11,7 @@ import {
     Plane, Award, CreditCard, Clock,
     Download, ArrowUpRight, ArrowDownRight,
     Filter, CheckCircle2, Percent, Gift, UserCheck,
-    Wallet, Search, Phone, ArrowUpDown,
+    Wallet, Search, Phone, ArrowUpDown, Target,
 } from 'lucide-react';
 import {
     ADMIN_PRIVILEGE_LEVEL,
@@ -87,6 +87,8 @@ interface RequestsData {
     sourceStatus: { source: string; new: number; in_progress: number; completed: number; dismissed: number; total: number }[];
     overTime: { month: string; contact: number; manager: number; tour: number; 'ai-trip-plan': number; total: number }[];
     responseTimeBySource: { source: string; avgMinutes: number; count: number }[];
+    utmBreakdown?: { source: string; medium: string; campaign: string; count: number }[];
+    registrationsByUtm?: { source: string; medium: string; campaign: string; count: number }[];
 }
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -1356,6 +1358,45 @@ export default function AnalyticsPage() {
                                         )}
                                     </ChartCard>
                                 </div>
+                                <ChartCard title="UTM атрибуція" icon={Target}>
+                                    {(requestsData.utmBreakdown?.length || requestsData.registrationsByUtm?.length) ? (
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            {[{ label: "Запити", rows: requestsData.utmBreakdown ?? [] }, { label: "Реєстрації", rows: requestsData.registrationsByUtm ?? [] }].map((section) => (
+                                                <div key={section.label}>
+                                                    <h4 className="text-xs font-semibold text-secondary uppercase tracking-wider mb-3">{section.label}</h4>
+                                                    {section.rows.length === 0 ? (
+                                                        <p className="text-secondary text-sm py-4">Немає даних</p>
+                                                    ) : (
+                                                        <div className="overflow-x-auto">
+                                                            <table className="w-full text-xs">
+                                                                <thead>
+                                                                    <tr className="border-b border-white/5 text-left">
+                                                                        <th className="py-2 pr-3 font-medium text-secondary">Джерело</th>
+                                                                        <th className="py-2 pr-3 font-medium text-secondary">Медіа</th>
+                                                                        <th className="py-2 pr-3 font-medium text-secondary">Кампанія</th>
+                                                                        <th className="py-2 text-right font-medium text-secondary">Кількість</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {section.rows.map((row, i) => (
+                                                                        <tr key={i} className="border-b border-white/3 last:border-b-0">
+                                                                            <td className="py-2 pr-3 text-white">{row.source}</td>
+                                                                            <td className="py-2 pr-3 text-secondary">{row.medium || "—"}</td>
+                                                                            <td className="py-2 pr-3 text-secondary">{row.campaign || "—"}</td>
+                                                                            <td className="py-2 text-right font-medium text-white">{row.count}</td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-secondary text-sm text-center py-8">Немає даних про UTM атрибуцію</p>
+                                    )}
+                                </ChartCard>
                             </>
                         ) : (
                             <div className="flex flex-col justify-center items-center py-20 gap-4">

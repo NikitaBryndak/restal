@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, type Mock } from 'vitest';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import User from '@/models/user';
@@ -35,7 +35,8 @@ describe('User model', () => {
     // Seed a user holding the code that the first generated attempt will produce.
     await User.create({ name: 'Ref Holder', phoneNumber: '+380679100003', password: 'x', referralCode: 'REF-AAAA-AAAA' });
 
-    const randomBytesSpy = vi.spyOn(crypto, 'randomBytes');
+    // crypto.randomBytes' last overload is callback-based (returns void) — cast to mock the sync form.
+    const randomBytesSpy = vi.spyOn(crypto, 'randomBytes') as unknown as Mock<(size: number) => Buffer>;
     // Attempt 1 → REF-AAAA-AAAA (collision); attempt 2 → REF-BCDE-FGHJ.
     randomBytesSpy
       .mockReturnValueOnce(Buffer.from([0, 0, 0, 0]))

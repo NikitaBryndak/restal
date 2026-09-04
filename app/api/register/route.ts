@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 import { logAudit } from "@/lib/audit";
+import { extractUtm } from "@/lib/utm";
 
 // SECURITY: Basic email format validation
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +25,8 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
         const { name, phoneNumber, email, password, referralCode } = body;
+        // Capture marketing attribution (UTM) from the landing URL or explicit body fields
+        const utm = extractUtm(request, body);
 
         // Input validation
         if (!name || typeof name !== 'string' || !phoneNumber || typeof phoneNumber !== 'string' || !password || typeof password !== 'string') {
@@ -112,6 +115,9 @@ export async function POST(request: NextRequest) {
             password: hashedPassword,
             cashbackAmount: WELCOME_BONUS,
             referredBy: referrerId,
+            utmSource: utm.source,
+            utmMedium: utm.medium,
+            utmCampaign: utm.campaign,
         });
 
         // Clean up verification record after successful registration

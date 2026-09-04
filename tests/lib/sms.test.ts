@@ -16,10 +16,10 @@ describe('sendSMS without Twilio credentials (client is null)', () => {
     const { sendSMS } = await import('@/lib/sms');
     const prevNodeEnv = process.env.NODE_ENV;
     try {
-      process.env.NODE_ENV = 'test';
+      (process.env as Record<string, string | undefined>).NODE_ENV = 'test';
       await expect(sendSMS('+380671234567', 'hello')).rejects.toThrow('Twilio credentials are not configured.');
     } finally {
-      process.env.NODE_ENV = prevNodeEnv;
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
     }
   });
 
@@ -29,12 +29,12 @@ describe('sendSMS without Twilio credentials (client is null)', () => {
     const { sendSMS } = await import('@/lib/sms');
     const prevNodeEnv = process.env.NODE_ENV;
     try {
-      process.env.NODE_ENV = 'development';
+      (process.env as Record<string, string | undefined>).NODE_ENV = 'development';
       const result = await sendSMS('+380671234567', 'otp 123456');
       expect(result).toEqual({ sid: 'mock-sid' });
       expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Would send to +380671234567'));
     } finally {
-      process.env.NODE_ENV = prevNodeEnv;
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
       logSpy.mockRestore();
       warnSpy.mockRestore();
     }

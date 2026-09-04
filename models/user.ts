@@ -63,6 +63,19 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,  // Whether this user received their referee bonus (awarded on first trip)
     },
+    // UTM attribution captured at registration (marketing source of this user)
+    utmSource: {
+        type: String,
+        required: false,
+    },
+    utmMedium: {
+        type: String,
+        required: false,
+    },
+    utmCampaign: {
+        type: String,
+        required: false,
+    },
     resetPasswordToken: {
         type: String,
         required: false,
@@ -78,6 +91,15 @@ const userSchema = new Schema({
     resetPasswordLockUntil: {
         type: Date,
         required: false,
+    },
+    // Notification preferences (user-controlled from /dashboard/settings)
+    notifyEmail: {
+        type: Boolean,
+        default: true,  // Trip status/reminder/cashback emails
+    },
+    notifySms: {
+        type: Boolean,
+        default: false, // Opt-in for SMS delivery of trip events
     },
 }, { timestamps: true });
 

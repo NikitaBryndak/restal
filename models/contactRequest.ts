@@ -55,6 +55,19 @@ const contactRequestSchema = new Schema({
         type: String,
         required: false,
     },
+    // UTM attribution captured at submission (marketing source of this lead)
+    utmSource: {
+        type: String,
+        required: false,
+    },
+    utmMedium: {
+        type: String,
+        required: false,
+    },
+    utmCampaign: {
+        type: String,
+        required: false,
+    },
 }, { timestamps: true });
 
 contactRequestSchema.index({ status: 1, createdAt: -1 });

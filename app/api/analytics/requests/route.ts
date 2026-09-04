@@ -101,6 +101,8 @@ export async function GET(request: NextRequest) {
             avgResponseBySource,
             totalCurrent,
             totalPrevious,
+            utmBreakdown,
+            registrationsByUtm,
         ] = await Promise.all([
             // Requests grouped by source
             ContactRequest.aggregate([
@@ -174,6 +176,30 @@ export async function GET(request: NextRequest) {
             previousPeriodStart && previousPeriodEnd
                 ? ContactRequest.countDocuments(prevDateFilter)
                 : Promise.resolve(0),
+
+            // Contact requests grouped by UTM attribution (only attributed ones)
+            ContactRequest.aggregate([
+                { $match: { ...(periodStart ? { createdAt: { $gte: periodStart } } : {}), utmSource: { $nin: [null, ""] } } },
+                {
+                    $group: {
+                        _id: { source: "$utmSource", medium: "$utmMedium", campaign: "$utmCampaign" },
+                        count: { $sum: 1 },
+                    },
+                },
+                { $sort: { count: -1 } },
+            ]),
+
+            // User registrations grouped by UTM attribution (only attributed ones)
+            User.aggregate([
+                { $match: { ...(periodStart ? { createdAt: { $gte: periodStart } } : {}), utmSource: { $nin: [null, ""] } } },
+                {
+                    $group: {
+                        _id: { source: "$utmSource", medium: "$utmMedium", campaign: "$utmCampaign" },
+                        count: { $sum: 1 },
+                    },
+                },
+                { $sort: { count: -1 } },
+            ]),
         ]);
 
         const monthNames = [
@@ -220,6 +246,16 @@ export async function GET(request: NextRequest) {
             avgMinutes: Math.round(item.avgResponseTimeMs / 60000),
             count: item.count,
         }));
+        // Format UTM attribution breakdowns (contact requests + registrations)
+        const formatUtm = (rows: { _id: { source: string; medium?: string | null; campaign?: string | null }; count: number }[]) =>
+            rows.map((item) => ({
+                source: item._id.source,
+                medium: item._id.medium || "",
+                campaign: item._id.campaign || "",
+                count: item.count,
+            }));
+        const utmBreakdownData = formatUtm(utmBreakdown as { _id: { source: string; medium?: string | null; campaign?: string | null }; count: number }[]);
+        const registrationsByUtmData = formatUtm(registrationsByUtm as { _id: { source: string; medium?: string | null; campaign?: string | null }; count: number }[]);
 
         // Comparison
         function calcChange(current: number, previous: number): number | null {
@@ -237,6 +273,8 @@ export async function GET(request: NextRequest) {
                 sourceStatus: sourceStatusData,
                 overTime: requestsOverTime,
                 responseTimeBySource,
+                utmBreakdown: utmBreakdownData,
+                registrationsByUtm: registrationsByUtmData,
             },
             { headers: SECURITY_HEADERS }
         );

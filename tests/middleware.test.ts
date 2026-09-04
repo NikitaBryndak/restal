@@ -10,58 +10,65 @@ process.env.NEXTAUTH_SECRET = SECRET;
 // Builds a NextRequest carrying a valid next-auth v4 session cookie.
 async function authedReq(path: string, privilegeLevel: number) {
   const req = new NextRequest(`http://localhost${path}`);
-  const token = await encode({ token: { privilegeLevel }, secret: SECRET });
+  const token = await encode({ token: { privilegeLevel, phoneNumber: '+380670000000' }, secret: SECRET });
   req.cookies.set('next-auth.session-token', token);
   return req;
 }
 
+// withAuth's type requires both args and may return undefined — normalize for tests.
+async function runMiddleware(req: NextRequest): Promise<Response> {
+  const res = (await middleware(req as never, undefined as never)) as Response;
+  expect(res).toBeDefined();
+  return res;
+}
+
 describe('middleware (withAuth wrapper)', () => {
   it('redirects unauthenticated requests to /login', async () => {
-    const res = await middleware(new NextRequest('http://localhost/dashboard/profile'));
+    const res = await runMiddleware(new NextRequest('http://localhost/dashboard/profile'));
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('/login');
   });
 
   it('lets an admin through to an admin-only page', async () => {
-    const res = await middleware(await authedReq('/dashboard/analytics', RoleLevel.ADMIN));
+    const res = await runMiddleware(await authedReq('/dashboard/analytics', RoleLevel.ADMIN));
     expect(res.status).toBe(200);
   });
 
   it('lets a client through to a client-level page', async () => {
-    const res = await middleware(await authedReq('/dashboard/profile', RoleLevel.CLIENT));
+    const res = await runMiddleware(await authedReq('/dashboard/profile', RoleLevel.CLIENT));
     expect(res.status).toBe(200);
   });
 
   it('blocks a client from a manager-only page (redirects to /dashboard/profile)', async () => {
-    const res = await middleware(await authedReq('/dashboard/manage-tour', RoleLevel.CLIENT));
+    const res = await runMiddleware(await authedReq('/dashboard/manage-tour', RoleLevel.CLIENT));
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('/dashboard/profile');
   });
 
   it('lets an editor through to editor-only pages but not manager pages', async () => {
-    const allowed = await middleware(await authedReq('/dashboard/manage-articles', RoleLevel.EDITOR));
+    const allowed = await runMiddleware(await authedReq('/dashboard/manage-articles', RoleLevel.EDITOR));
     expect(allowed.status).toBe(200);
 
-    const blocked = await middleware(await authedReq('/dashboard/promo-codes', RoleLevel.EDITOR));
+    const blocked = await runMiddleware(await authedReq('/dashboard/promo-codes', RoleLevel.EDITOR));
     expect(blocked.status).toBe(307);
   });
 
   it('lets a manager through to manager-only pages but not admin pages', async () => {
-    const allowed = await middleware(await authedReq('/dashboard/contact-requests', RoleLevel.MANAGER));
+    const allowed = await runMiddleware(await authedReq('/dashboard/contact-requests', RoleLevel.MANAGER));
     expect(allowed.status).toBe(200);
 
-    const blocked = await middleware(await authedReq('/dashboard/audit-log', RoleLevel.MANAGER));
+    const blocked = await runMiddleware(await authedReq('/dashboard/audit-log', RoleLevel.MANAGER));
     expect(blocked.status).toBe(307);
   });
 
   it('allows unmapped API paths by default for authenticated users', async () => {
     // canAccessPath returns true for paths without an explicit rule.
-    const res = await middleware(await authedReq('/api/trips/manage/abc123', RoleLevel.EDITOR));
+    const res = await runMiddleware(await authedReq('/api/trips/manage/abc123', RoleLevel.EDITOR));
     expect(res.status).toBe(200);
   });
 
   it('allows unmapped dashboard paths for any authenticated user', async () => {
-    const res = await middleware(await authedReq('/dashboard/some-future-page', RoleLevel.CLIENT));
+    const res = await runMiddleware(await authedReq('/dashboard/some-future-page', RoleLevel.CLIENT));
     expect(res.status).toBe(200);
   });
 });

@@ -1,36 +1,47 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import Article from "@/models/article";
+import Article, { normalizeArticleImages } from "@/models/article";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Counter from "@/models/counter";
 import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
 import { logAudit } from "@/lib/audit";
+import { PUBLISHED_ARTICLE_QUERY, serializeArticle } from "@/lib/articles";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
         await connectToDatabase();
 
-        // SECURITY: Limit results to prevent loading unbounded data
-        const articles = await Article.find()
-            .sort({ createdAt: -1 })
-            .limit(100)
-            .lean();
-        // Ensure _id is string for client consistency
-         // SECURITY: Exclude creatorPhone from public response to prevent PII leakage
-         const serializedArticles = articles.map((article: any) => {
-             const { creatorPhone: _phone, ...rest } = article;
-             return {
-                 ...rest,
-                 _id: article._id.toString(),
-                 createdAt: article.createdAt ? new Date(article.createdAt).toISOString() : null,
-                 updatedAt: article.updatedAt ? new Date(article.updatedAt).toISOString() : null,
-             };
-         });
+        // Editors/admins can request drafts for the manage-articles UI
+        const url = new URL(request.url);
+        const includeDrafts = url.searchParams.get("includeDrafts") === "true";
+        let query: Record<string, unknown> = PUBLISHED_ARTICLE_QUERY;
+        if (includeDrafts) {
+            const session = (await getServerSession(authOptions as any) as any);
+            const level = session?.user?.privilegeLevel ?? 1;
+            if (level === EDITOR_PRIVILEGE_LEVEL || level === ADMIN_PRIVILEGE_LEVEL) {
+                query = {};
+            }
+        }
 
+        // SECURITY: Limit results to prevent loading unbounded data
+        const articles = await Article.find(query as never)
+            .sort({ createdAt: -1 })
+            .limit(200)
+            .lean();
+
+        // SECURITY: Exclude creatorPhone from public response to prevent PII leakage;
+        // normalize legacy single-string images and default status for old docs
+        const serializedArticles = (articles as unknown[]).map((a) => serializeArticle(a as never));
+
+        const isPublic = Object.keys(query).length > 0;
         const response = NextResponse.json({ articles: serializedArticles }, { status: 200 });
-        // Cache publicly for 60s at CDN, serve stale for 5min while revalidating
-        response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+        if (isPublic) {
+            // Cache publicly for 60s at CDN, serve stale for 5min while revalidating
+            response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+        } else {
+            response.headers.set("Cache-Control", "private, no-store");
+        }
         return response;
     } catch {
         return NextResponse.json({ message: "Error fetching articles" }, { status: 500 });
@@ -66,8 +77,17 @@ export async function POST(request: Request) {
         if (!body.description || typeof body.description !== 'string') {
             return NextResponse.json({ message: "Description is required" }, { status: 400 });
         }
-        if (!body.images || typeof body.images !== 'string') {
-            return NextResponse.json({ message: "Image URL is required" }, { status: 400 });
+        // Images: accept a single URL (legacy) or an array of URLs; first is the cover
+        const rawImages = Array.isArray(body.images) ? body.images : [body.images];
+        const images = normalizeArticleImages(rawImages).map((u: string) => u.trim().slice(0, ARTICLE_MAX_IMAGE_URL_LENGTH));
+        if (images.length === 0) {
+            return NextResponse.json({ message: "At least one image URL is required" }, { status: 400 });
+        }
+
+        // Optional publish state — defaults to published for backward compatibility
+        const status = body.status === undefined ? "published" : body.status;
+        if (status !== "draft" && status !== "published") {
+            return NextResponse.json({ message: "Invalid status" }, { status: 400 });
         }
 
         await connectToDatabase();
@@ -89,7 +109,8 @@ export async function POST(request: Request) {
             description: body.description.trim().slice(0, ARTICLE_MAX_DESCRIPTION_LENGTH),
             content: body.content.slice(0, ARTICLE_MAX_CONTENT_LENGTH),
             tag: body.tag.trim().slice(0, ARTICLE_MAX_TAG_LENGTH),
-            images: body.images.trim().slice(0, ARTICLE_MAX_IMAGE_URL_LENGTH),
+            images,
+            status,
         };
 
         const created = await Article.create(toCreate);

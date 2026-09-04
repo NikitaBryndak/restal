@@ -32,6 +32,7 @@ export const PAGE_ACCESS_CONTROLS: PageAccessControl[] = [
     { path: '/dashboard/analytics', minLevel: RoleLevel.ADMIN },
     { path: '/dashboard/audit-log', minLevel: RoleLevel.ADMIN },
     { path: '/dashboard/manager-performance', minLevel: RoleLevel.ADMIN },
+    { path: '/dashboard/users', minLevel: RoleLevel.ADMIN },
 ];
 
 /**

@@ -5,7 +5,7 @@ import Notification from '@/models/notification';
 
 describe('createNotification', () => {
   it('creates an unread notification with default empty data', async () => {
-    const tripId = new mongoose.Types.ObjectId();
+    const tripId = new mongoose.Types.ObjectId().toString();
     const created = await createNotification({
       userPhone: '+380671234567',
       tripId,
@@ -23,7 +23,7 @@ describe('createNotification', () => {
   });
 
   it('stores custom data payload and document_upload type', async () => {
-    const tripId = new mongoose.Types.ObjectId();
+    const tripId = new mongoose.Types.ObjectId().toString();
     const created = await createNotification({
       userPhone: '+380670000001',
       tripId,

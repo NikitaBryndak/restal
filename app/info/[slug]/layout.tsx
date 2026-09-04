@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { connectToDatabase } from '@/lib/mongodb';
-import Article from '@/models/article';
-import mongoose from 'mongoose';
+import { resolveArticleBySlug, serializeArticle } from '@/lib/articles';
 
 export async function generateMetadata({
   params,
@@ -13,69 +12,47 @@ export async function generateMetadata({
 
   try {
     await connectToDatabase();
-
-    let article: any = null;
-
-    // First, try to fetch by numeric ID if slug is a number
-    if (!Number.isNaN(Number(slug))) {
-      const numericId = Number(slug);
-      article = await Article.findOne({ articleID: numericId }).lean();
-    }
-
-    // Test if valid Mongo ID
-    if (!article && mongoose.Types.ObjectId.isValid(slug)) {
-      try {
-        const objectId = new mongoose.Types.ObjectId(slug);
-        article = await Article.findOne({ _id: objectId }).lean();
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    // If not found, try to search all articles by title to match slug
-    if (!article) {
-      // we need to find the article where title formatted as slug matches
-      // it might not be efficient to pull all but that's what page.tsx does effectively
-      const allArticles = await Article.find({}).lean();
-      article = allArticles.find((a: any) => a.title?.toLowerCase().replace(/\s+/g, '-') === slug.toLowerCase());
-    }
+    const article = await resolveArticleBySlug(slug);
 
     if (article) {
-      const imageUrl = article.images || article.image;
+      const serialized = serializeArticle(article);
+      const coverImage = serialized.images[0];
 
       const metadataResult: Metadata = {
-        title: article.title,
-        description: article.description || article.title,
+        title: serialized.title,
+        description: serialized.description || serialized.title,
+        // Drafts must never be indexed or cached by crawlers
+        robots: serialized.status === 'draft' ? { index: false, follow: false } : undefined,
       };
 
-      if (imageUrl) {
+      if (coverImage) {
         metadataResult.openGraph = {
-          title: article.title,
-          description: article.description || article.title,
+          title: serialized.title,
+          description: serialized.description || serialized.title,
           images: [
             {
-              url: imageUrl,
+              url: coverImage,
               width: 1200,
               height: 630,
-              alt: article.title,
+              alt: serialized.title,
             }
           ],
         };
         metadataResult.twitter = {
           card: 'summary_large_image',
-          title: article.title,
-          description: article.description || article.title,
-          images: [imageUrl],
+          title: serialized.title,
+          description: serialized.description || serialized.title,
+          images: [coverImage],
         };
       } else {
         metadataResult.openGraph = {
-          title: article.title,
-          description: article.description || article.title,
+          title: serialized.title,
+          description: serialized.description || serialized.title,
         };
         metadataResult.twitter = {
           card: 'summary',
-          title: article.title,
-          description: article.description || article.title,
+          title: serialized.title,
+          description: serialized.description || serialized.title,
         };
       }
 

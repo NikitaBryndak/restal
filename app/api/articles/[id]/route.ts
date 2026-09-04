@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import Article from '@/models/article';
+import Article, { normalizeArticleImages } from '@/models/article';
 import mongoose from 'mongoose';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL, ARTICLE_MAX_TITLE_LENGTH, ARTICLE_MAX_DESCRIPTION_LENGTH, ARTICLE_MAX_CONTENT_LENGTH, ARTICLE_MAX_TAG_LENGTH, ARTICLE_MAX_IMAGE_URL_LENGTH } from "@/config/constants";
 import { logAudit } from "@/lib/audit";
+import { serializeArticle, type ArticleDoc } from "@/lib/articles";
 
 export async function GET(
     request: NextRequest,
@@ -31,7 +32,7 @@ export async function GET(
             }
         }
 
-        const foundArticle: any = article || articleById;
+        const foundArticle = (article || articleById) as unknown as ArticleDoc | null;
 
         if (!foundArticle) {
             return NextResponse.json(
@@ -40,19 +41,28 @@ export async function GET(
             );
         }
 
-        // Must serialize ObjectId to string explicitly if it wasn't done by lean() (though lean usually does)
-        // Or if it's returning Number type for articleID but string for _id
-        // SECURITY: Exclude creatorPhone from public response to prevent PII leakage
-        const { creatorPhone: _phone, ...articleWithoutPhone } = foundArticle;
-        const sanitizedArticle = {
-            ...articleWithoutPhone,
-            _id: foundArticle._id.toString(),
-            createdAt: foundArticle.createdAt ? new Date(foundArticle.createdAt).toISOString() : null,
-            updatedAt: foundArticle.updatedAt ? new Date(foundArticle.updatedAt).toISOString() : null,
-        };
+        // Drafts are only visible to editors/admins — everyone else gets a plain 404
+        if (foundArticle.status === "draft") {
+            const session = (await getServerSession(authOptions as any) as any);
+            const level = session?.user?.privilegeLevel ?? 1;
+            if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) {
+                return NextResponse.json(
+                    { message: 'Article not found' },
+                    { status: 404 }
+                );
+            }
+        }
+
+        // SECURITY: Exclude creatorPhone from public response to prevent PII leakage;
+        // normalize legacy single-string images and default status for old docs
+        const sanitizedArticle = serializeArticle(foundArticle);
 
         const response = NextResponse.json({ article: sanitizedArticle });
-        response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+        if (foundArticle.status === "draft") {
+            response.headers.set("Cache-Control", "private, no-store");
+        } else {
+            response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+        }
         return response;
     } catch (e) {
         console.error("Error in GET /api/articles/[id]:", e);
@@ -92,8 +102,8 @@ export async function PUT(
         const body = await request.json();
 
         // Security check for fields
-        const allowedUpdates = ['title', 'description', 'content', 'tag', 'images'];
-        const updateData: any = {};
+        const allowedUpdates = ['title', 'description', 'content', 'tag', 'images', 'status'];
+        const updateData: Record<string, unknown> = {};
 
         // SECURITY: Apply the same length limits as the POST handler
         const lengthLimits: Record<string, number> = {
@@ -101,18 +111,24 @@ export async function PUT(
             description: ARTICLE_MAX_DESCRIPTION_LENGTH,
             content: ARTICLE_MAX_CONTENT_LENGTH,
             tag: ARTICLE_MAX_TAG_LENGTH,
-            images: ARTICLE_MAX_IMAGE_URL_LENGTH,
         };
 
         Object.keys(body).forEach(key => {
-            if (allowedUpdates.includes(key)) {
-                let value = body[key];
-                // Apply length limits for string fields
-                if (typeof value === 'string' && lengthLimits[key]) {
-                    value = value.slice(0, lengthLimits[key]);
-                }
-                updateData[key] = value;
+            if (!allowedUpdates.includes(key)) return;
+            let value = body[key];
+            if (key === "images") {
+                // Accept a single URL (legacy) or an array of URLs; first is the cover
+                const rawImages = Array.isArray(value) ? value : [value];
+                const normalized = normalizeArticleImages(rawImages).map((u: string) => u.trim().slice(0, ARTICLE_MAX_IMAGE_URL_LENGTH));
+                if (normalized.length === 0) return; // empty input keeps existing images
+                value = normalized;
+            } else if (key === "status") {
+                if (value !== "draft" && value !== "published") return;
+            } else if (typeof value === 'string') {
+                const limit = lengthLimits[key];
+                if (limit) value = value.slice(0, limit);
             }
+            updateData[key] = value;
         });
 
         const updatedArticle = await Article.findByIdAndUpdate(

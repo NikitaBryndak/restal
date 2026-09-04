@@ -13,6 +13,8 @@ interface UserProfile {
     referralCode: string | null;
     referralCount: number;
     referralBonusEarned: number;
+    notifyEmail?: boolean;
+    notifySms?: boolean;
 }
 
 export const useUserProfile = () => {

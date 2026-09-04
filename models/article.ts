@@ -1,5 +1,22 @@
 import mongoose, { Schema } from "mongoose";
 
+export const ARTICLE_STATUSES = ["draft", "published"] as const;
+export type ArticleStatus = typeof ARTICLE_STATUSES[number];
+
+/**
+ * Normalizes the `images` field to a string array.
+ * Legacy documents store a single URL string; new ones store an array.
+ */
+export function normalizeArticleImages(raw: unknown): string[] {
+    if (Array.isArray(raw)) {
+        return raw.filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+    }
+    if (typeof raw === "string" && raw.trim().length > 0) {
+        return [raw];
+    }
+    return [];
+}
+
 const articleSchema = new Schema({
     articleID: {
         type: Number,
@@ -11,8 +28,8 @@ const articleSchema = new Schema({
         required: true
     },
     images: {
-        type: String, // TODO: need to do list later
-        required: true
+        type: [String],
+        default: []  // First entry is the cover image; legacy docs hold a single string (normalized on read)
     },
     title: {
         type: String,
@@ -25,6 +42,11 @@ const articleSchema = new Schema({
     content: {
         type: String,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ARTICLE_STATUSES,
+        default: "published"  // Legacy docs have no field — treated as published by query filters
     },
     creatorPhone: {
         type: String,

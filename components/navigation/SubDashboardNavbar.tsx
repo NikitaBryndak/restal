@@ -105,6 +105,9 @@ export default function SubDashboardNavbar() {
                             <NavLink href="/dashboard/manager-performance" className={NAV_ITEM_CLASS}>
                                 Менеджери
                             </NavLink>
+                            <NavLink href="/dashboard/users" className={NAV_ITEM_CLASS}>
+                                Користувачі
+                            </NavLink>
 
                         </div>
                     )}

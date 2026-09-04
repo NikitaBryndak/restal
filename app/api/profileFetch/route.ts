@@ -20,7 +20,7 @@ export async function GET() {
         await connectToDatabase();
 
         const user = await User.findOne({ phoneNumber: session.user.phoneNumber })
-            .select("name email phoneNumber createdAt cashbackAmount privilegeLevel referralCode referralCount referralBonusEarned");
+            .select("name email phoneNumber createdAt cashbackAmount privilegeLevel referralCode referralCount referralBonusEarned notifyEmail notifySms");
 
         if (!user) {
             return NextResponse.json({
@@ -42,6 +42,8 @@ export async function GET() {
             referralCode: user.referralCode || null,
             referralCount: user.referralCount || 0,
             referralBonusEarned: user.referralBonusEarned || 0,
+            notifyEmail: user.notifyEmail ?? true,
+            notifySms: user.notifySms ?? false,
         }, {
             status: 200
         });

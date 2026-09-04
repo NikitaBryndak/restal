@@ -1,7 +1,7 @@
 import { PreviewState } from './types';
 
 export const blankPreview: PreviewState = {
-    images: '',
+    images: [],
     title: '',
     description: '',
     content: '',

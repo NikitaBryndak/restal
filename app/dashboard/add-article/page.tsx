@@ -4,7 +4,8 @@ import ArticleCard from "@/components/article/article-card";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/ui/form-input";
 import RichTextEditor from "@/components/ui/rich-text-editor";
-import { FormProvider, Controller } from "react-hook-form";
+import { FormProvider, Controller, useFieldArray } from "react-hook-form";
+import { X } from "lucide-react";
 import { useAddArticleForm } from "./hooks/useAddArticleForm";
 import { usePreviewData } from './hooks/usePreviewData';
 import { useSession } from "next-auth/react";
@@ -18,7 +19,8 @@ export default function AddArticlePage() {
     const router = useRouter();
     const { form, previewState, onSubmit } = useAddArticleForm();
     const previewData = usePreviewData({ ...previewState, creatorPhone: previewState.creatorPhone || "" });
-    const { register } = form;
+    const { register, control } = form;
+    const { fields: imageFields, append: addImage, remove: removeImage } = useFieldArray({ control, name: "images" });
 
     useEffect(() => {
         if (status === "loading") return;
@@ -86,13 +88,39 @@ export default function AddArticlePage() {
                                             required
                                             {...register("description")}
                                         />
-                                        <FormInput
-                                            labelText="URL зображення"
-                                            type="text"
-                                            placeholder="Введіть URL зображення"
-                                            required
-                                            {...register("images")}
-                                        />
+                                        <div className="space-y-2 md:col-span-2">
+                                            <label htmlFor="article-images" className="text-sm font-medium text-white/60">
+                                                URL зображень <span className="text-red-400">*</span>
+                                            </label>
+                                            {imageFields.map((field, index) => (
+                                                <div key={field.id} className="flex items-center gap-2">
+                                                    <input
+                                                        id={index === 0 ? "article-images" : undefined}
+                                                        type="text"
+                                                        placeholder={index === 0 ? "Головне зображення — введіть URL" : "Додаткове зображення — введіть URL"}
+                                                        className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-accent/50 placeholder:text-white/25"
+                                                        {...register(`images.${index}.url`)}
+                                                    />
+                                                    {imageFields.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeImage(index)}
+                                                            className="shrink-0 p-2 text-white/40 hover:text-red-400 transition-colors"
+                                                            aria-label="Видалити зображення"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => addImage({ url: "" })}
+                                                className="text-sm text-white/50 hover:text-accent transition-colors"
+                                            >
+                                                + Додати зображення
+                                            </button>
+                                        </div>
                                         <div className="space-y-1.5">
                                             <label htmlFor="article-tag" className="text-sm font-medium text-white/60">
                                                 Тег статті
@@ -107,6 +135,19 @@ export default function AddArticlePage() {
                                                 <option value="Шпаргалки мандрівникам" className="bg-black">Шпаргалки мандрівникам</option>
                                                 <option value="Інструкції сайта" className="bg-black">Інструкції сайта</option>
                                                 <option value="Умови бронювання" className="bg-black">Умови бронювання</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label htmlFor="article-status" className="text-sm font-medium text-white/60">
+                                                Опублікація
+                                            </label>
+                                            <select
+                                                id="article-status"
+                                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-accent/50"
+                                                {...register("status")}
+                                            >
+                                                <option value="published" className="bg-black">Опублікувати одразу</option>
+                                                <option value="draft" className="bg-black">Зберегти як чернетку</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1.5 md:col-span-2">

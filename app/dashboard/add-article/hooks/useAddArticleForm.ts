@@ -1,4 +1,4 @@
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type DeepPartial } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { articleSchema, ArticleFormValues } from '../schema';
 import { useRouter } from 'next/navigation';
@@ -13,11 +13,12 @@ export const useAddArticleForm = () => {
         resolver: zodResolver(articleSchema),
         defaultValues: {
             tag: "Каталог Послуг",
-            images: "",
+            images: [{ url: "" }],
             title: "",
             description: "",
             content: "",
             creatorPhone: session?.user?.phoneNumber || "",
+            status: "published",
         },
         mode: 'onChange',
     });
@@ -27,11 +28,11 @@ export const useAddArticleForm = () => {
     });
 
 
-    const mapToPreview = (values: Partial<ArticleFormValues>): PreviewState => ({
+    const mapToPreview = (values: DeepPartial<ArticleFormValues>): PreviewState => ({
         title: (values.title as string) || "Untitled article",
         description: (values.description as string) || "No description provided",
         content: (values.content as string) || "Start writing your article...",
-        images: (values.images as string) || "",
+            images: values.images?.map((i) => i?.url ?? "").filter((u) => u.trim().length > 0) ?? [],
         tag: (values.tag as "Каталог Послуг" | "Корисно знати" | "Шпаргалки мандрівникам" | "Інструкції сайта" | "Умови бронювання") || "Каталог Послуг",
         creatorPhone: values.creatorPhone || session?.user?.phoneNumber || "",
     });
@@ -42,11 +43,12 @@ export const useAddArticleForm = () => {
     const onSubmit = async (data: ArticleFormValues) => {
         const payload = {
             tag: data.tag,
-            images: data.images,
+            images: data.images.map((i) => i.url).filter((u) => u.trim().length > 0),
             title: data.title,
             description: data.description,
             content: data.content,
             creatorPhone: data.creatorPhone || session?.user?.phoneNumber,
+            status: data.status,
         };
 
         try {

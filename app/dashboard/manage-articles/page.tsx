@@ -19,7 +19,7 @@ interface Article {
     tag: string;
     creatorPhone: string;
     createdAt: string;
-    status?: string; // If status exists in future schema
+    status?: string; // "draft" | "published" (legacy docs default to published)
 }
 
 export default function ManageArticlesPage() {
@@ -35,7 +35,7 @@ export default function ManageArticlesPage() {
     // Fetch articles
     const fetchArticles = async () => {
         try {
-            const response = await fetch('/api/articles');
+            const response = await fetch('/api/articles?includeDrafts=true');
             if (response.ok) {
                 const data = await response.json();
                 setArticles(data.articles);
@@ -151,6 +151,7 @@ export default function ManageArticlesPage() {
                         <thead>
                             <tr className="border-b border-white/5">
                                 <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider">Назва</th>
+                                <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider">Статус</th>
                                 <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider hidden md:table-cell">Тег</th>
                                 <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider hidden sm:table-cell">Автор</th>
                                 <th className="h-11 px-4 text-left text-xs font-semibold text-white/35 uppercase tracking-wider hidden lg:table-cell">Дата</th>
@@ -160,7 +161,7 @@ export default function ManageArticlesPage() {
                         <tbody>
                             {filteredArticles.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="h-24 text-center text-white/40">
+                                    <td colSpan={6} className="h-24 text-center text-white/40">
                                         Статей не знайдено.
                                     </td>
                                 </tr>
@@ -170,6 +171,11 @@ export default function ManageArticlesPage() {
                                         <td className="p-4">
                                             <div className="font-medium text-white/90">{article.title}</div>
                                             <div className="text-xs text-white/35 md:hidden mt-0.5">{article.tag}</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${article.status === 'draft' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'}`}>
+                                                {article.status === 'draft' ? 'Чернетка' : 'Опубліковано'}
+                                            </span>
                                         </td>
                                         <td className="p-4 hidden md:table-cell">
                                             <span className="inline-flex items-center rounded-full bg-accent/10 border border-accent/20 px-2.5 py-0.5 text-xs font-medium text-accent">
