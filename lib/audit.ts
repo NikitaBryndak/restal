@@ -11,7 +11,8 @@ export type EntityType =
     | "document"
     | "system"
     | "cashback"
-    | "auth";
+    | "auth"
+    | "role";
 
 interface AuditParams {
     action: string;

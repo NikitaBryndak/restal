@@ -27,9 +27,10 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    privilegeLevel: {
-        type: Number,
-        default: 1
+    role: {
+        type: String,
+        default: "client",
+        index: true,
     },
     cashbackAmount: {
         type: Number,

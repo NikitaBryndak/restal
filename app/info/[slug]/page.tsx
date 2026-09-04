@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import { resolveArticleBySlug, serializeArticle } from "@/lib/articles";
-import { EDITOR_PRIVILEGE_LEVEL, ADMIN_PRIVILEGE_LEVEL } from "@/config/constants";
+import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import ArticleView from "./article-view";
 
 export default async function ArticlePage({
@@ -19,9 +19,10 @@ export default async function ArticlePage({
 
   // Drafts are only visible to editors/admins — everyone else gets a plain 404
   if (article.status === "draft") {
-    const session = (await getServerSession(authOptions as any) as any);
-    const level = session?.user?.privilegeLevel ?? 1;
-    if (level !== EDITOR_PRIVILEGE_LEVEL && level !== ADMIN_PRIVILEGE_LEVEL) notFound();
+    const session = await getServerSession(authOptions);
+    const role = await getSessionRole(session);
+    // Drafts are only visible to users with article access — everyone else gets a plain 404
+    if (!hasAnyScope(role, ["manage-articles", "add-article"])) notFound();
   }
 
   return <ArticleView article={serializeArticle(article)} />;

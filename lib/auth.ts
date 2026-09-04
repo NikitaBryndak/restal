@@ -5,12 +5,14 @@ import User from "@/models/user";
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getRoleBySlug } from "./role-cache";
+import { allowedPagesForRole } from "./role-eval";
 
 interface MongoUser {
     _id: { toString: () => string };
     password: string;
     phoneNumber: string;
-    privilegeLevel?: number;
+    role?: string;
 }
 
 export const authOptions: AuthOptions = {
@@ -41,12 +43,12 @@ export const authOptions: AuthOptions = {
                         return null;
                     }
 
-                    const level = user.privilegeLevel ?? 1;
+                    const role = user.role ?? "client";
 
                     return {
                         id: user._id.toString(),
                         phoneNumber: user.phoneNumber,
-                        privilegeLevel: level,
+                        role,
                     };
                 } catch (error) {
                     console.error("Auth error:", error);
@@ -58,25 +60,33 @@ export const authOptions: AuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.privilegeLevel = user.privilegeLevel;
+                token.role = (user as { role?: string }).role;
                 token.phoneNumber = user.phoneNumber;
             }
 
-            // SECURITY: Re-fetch privilegeLevel from DB on every token refresh
-            // to ensure demoted users lose access promptly, not after 24h JWT expiry
+            // SECURITY: Re-fetch the user's role from DB on every token refresh
+            // so role/permission changes propagate to live sessions promptly,
+            // not after 24h JWT expiry.
             if (token.phoneNumber) {
                 try {
                     await connectToDatabase();
                     const dbUser = await User.findOne(
                         { phoneNumber: token.phoneNumber },
-                        { privilegeLevel: 1 }
-                    ).lean() as { privilegeLevel?: number } | null;
+                        { role: 1 }
+                    ).lean() as { role?: string } | null;
 
-                    if (dbUser) {
-                        token.privilegeLevel = dbUser.privilegeLevel ?? 1;
+                    if (dbUser?.role) {
+                        token.role = dbUser.role;
+                        const roleDoc = await getRoleBySlug(dbUser.role);
+                        token.allowedPages = allowedPagesForRole(roleDoc);
+                    } else {
+                        // User deleted or missing role — fall back to the least-privileged role.
+                        token.role = "client";
+                        const clientRole = await getRoleBySlug("client");
+                        token.allowedPages = allowedPagesForRole(clientRole);
                     }
                 } catch {
-                    // If DB lookup fails, keep the existing token value
+                    // If DB lookup fails, keep the existing token data
                     // to avoid locking users out on transient errors
                 }
             }
@@ -85,7 +95,8 @@ export const authOptions: AuthOptions = {
         },
         async session({ session, token }) {
             if (session.user) {
-                session.user.privilegeLevel = token.privilegeLevel;
+                session.user.role = token.role;
+                session.user.allowedPages = token.allowedPages;
                 session.user.phoneNumber = token.phoneNumber;
             }
             return session;
