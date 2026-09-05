@@ -106,7 +106,6 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
         openGraph: {
             title: `✈️ Подорож до ${trip.country} | RestAL`,
             description: `Тур #${trip.number} · ${trip.tripStartDate} — ${trip.tripEndDate} · ${trip.hotel.name || "Готель уточнюється"}`,
-            images: [`/countryImages/${getCountryImageName(trip.country)}.jpg`],
         },
     };
 }

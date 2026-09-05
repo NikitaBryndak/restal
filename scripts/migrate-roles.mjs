@@ -75,6 +75,9 @@ async function main() {
     for (const doc of await usersCol.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]).toArray()) {
         byRole[doc._id ?? "client"] = doc.count;
     }
+    console.log(`Users migrated: ${migrated}, total users: ${totalUsers}`);
+    console.log("By role:", JSON.stringify(byRole));
+    await mongoose.disconnect();
 }
 
 main().catch((err) => {

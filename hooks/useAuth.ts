@@ -15,6 +15,16 @@ type AuthFormData = {
   notifyTelegram?: boolean;
 };
 
+/**
+ * Resolves where to redirect after a successful login.
+ * Only same-origin relative paths are honored — protocol-relative ("//evil.com")
+ * and absolute URLs are rejected (open-redirect guard). Falls back to the profile page.
+ */
+export function resolveCallbackUrl(raw: string | null): string {
+  if (!raw) return "/dashboard/profile";
+  if (raw.startsWith("/") && !raw.startsWith("//")) return raw;
+  return "/dashboard/profile";
+}
 type RegistrationStep = "form" | "otp" | "complete";
 
 export function useAuth({ type }: AuthFormProps) {
@@ -99,7 +109,7 @@ export function useAuth({ type }: AuthFormProps) {
             return;
         }
 
-        router.push("/dashboard/profile");
+        router.push(resolveCallbackUrl(new URLSearchParams(window.location.search).get("callbackUrl")));
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : undefined;
       setError(message || `Помилка під час ${type === 'register' ? 'реєстрації' : 'входу'}. Спробуйте ще раз.`);

@@ -5,6 +5,7 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 ## Hard rules
 
 - **Subagents**: YOU ARE NEVER ALLOWED TO USE SUBAGENTS — no `task` tool, no delegation of any kind; do all work directly in this session.
+- **Prod is READ-ONLY for agents** (user decision 2026-09-05): prod resources — DB `test`, restal.in.ua endpoints, Vercel production — may only be read. Any write/mutation against prod (data changes, running scripts against the bare prod URI, state-mutating API calls) requires explicit user permission: ask first via a question and act only after approval. An explicit instruction in conversation counts as permission (e.g., an approved `git push origin dev:production`).
 
 ## Running locally
 

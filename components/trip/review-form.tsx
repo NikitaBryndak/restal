@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Star, Loader2, MessageSquarePlus } from "lucide-react";
 import type { TourStatus } from "@/types";
@@ -16,6 +16,7 @@ const REVIEWABLE_STATUSES: TourStatus[] = ["Completed", "Archived"];
 
 export default function ReviewForm({ tripNumber, status, isAuthenticated }: ReviewFormProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const [rating, setRating] = useState(0);
     const [text, setText] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -41,7 +42,7 @@ export default function ReviewForm({ tripNumber, status, isAuthenticated }: Revi
                 <MessageSquarePlus className="w-8 h-8 text-blue-400 mx-auto mb-3" />
                 <p className="text-white/70 mb-4">Були ви на цій подорожі? Поділіться враженнями.</p>
                 <Link
-                    href="/login"
+                    href={`/login?callbackUrl=${encodeURIComponent(pathname)}`}
                     className="inline-block px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors"
                 >
                     Увійти, щоб залишити відгук
