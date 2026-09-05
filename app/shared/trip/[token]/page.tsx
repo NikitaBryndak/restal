@@ -1,10 +1,14 @@
-import { Plane, Calendar, Hotel, Shield, Car, Users, MapPin } from "lucide-react";
+import { Plane, Calendar, Hotel, Shield, Car, Users, MapPin, Star } from "lucide-react";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
+import ReviewModel from "@/models/review";
+import { authOptions } from "@/lib/auth";
 import { TOUR_STATUS_LABELS, TourStatus } from "@/types";
 import { getCountryImageName } from "@/data";
+import ReviewForm from "@/components/trip/review-form";
 import type { Metadata } from "next";
 
 const statusColors: Record<TourStatus, string> = {
@@ -123,6 +127,20 @@ export default async function SharedTripPage({ params }: { params: Promise<{ tok
     }
 
     const status = trip.status as TourStatus;
+
+    // Post-trip reviews (public) + session for the review form
+    let reviews: { _id: string; userName: string; rating: number; text: string; createdAt: Date }[] = [];
+    try {
+        const docs = await ReviewModel.find({ tripNumber: trip.number }).sort({ createdAt: -1 }).lean();
+        reviews = (docs ?? []) as unknown as typeof reviews;
+    } catch {
+        // Reviews must never break the shared page
+    }
+    const reviewCount = reviews.length;
+    const averageRating = reviewCount > 0
+        ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount) * 10) / 10
+        : 0;
+    const session = await getServerSession(authOptions);
 
     return (
         <div className="min-h-screen px-4 py-6 md:px-6">
@@ -251,6 +269,40 @@ export default async function SharedTripPage({ params }: { params: Promise<{ tok
                     </div>
                 </div>
 
+                {/* Reviews */}
+                {(reviewCount > 0 || ["Completed", "Archived"].includes(status)) && (
+                    <div className="space-y-6">
+                        {reviewCount > 0 && (
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/10">
+                                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                    <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                                    Відгуки ({reviewCount}) · Середня оцінка {averageRating}
+                                </h2>
+                                <div className="space-y-4">
+                                    {reviews.map((review) => (
+                                        <div key={String(review._id)} className="border-b border-white/10 pb-4 last:border-0 last:pb-0">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <p className="text-white font-semibold text-sm">{review.userName || "Турист"}</p>
+                                                <span className="text-xs text-white/40">
+                                                    {new Date(review.createdAt).toLocaleDateString("uk-UA")}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-0.5 mb-2">
+                                                {[1, 2, 3, 4, 5].map((v) => (
+                                                    <Star key={v} className={`w-4 h-4 ${v <= review.rating ? "fill-amber-400 text-amber-400" : "text-white/20"}`} />
+                                                ))}
+                                            </div>
+                                            {review.text && (
+                                                <p className="text-white/70 text-sm">{review.text}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        <ReviewForm tripNumber={trip.number} status={status} isAuthenticated={!!session?.user} />
+                    </div>
+                )}
                 {/* RestAL Branding */}
                 <div className="text-center py-6">
                     <p className="text-white/30 text-sm">
