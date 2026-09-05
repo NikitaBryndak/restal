@@ -6,6 +6,7 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 
 - **Subagents**: YOU ARE NEVER ALLOWED TO USE SUBAGENTS — no `task` tool, no delegation of any kind; do all work directly in this session.
 - **Prod is READ-ONLY for agents** (user decision 2026-09-05): prod resources — DB `test`, restal.in.ua endpoints, Vercel production — may only be read. Any write/mutation against prod (data changes, running scripts against the bare prod URI, state-mutating API calls) requires explicit user permission: ask first via a question and act only after approval. An explicit instruction in conversation counts as permission (e.g., an approved `git push origin dev:production`).
+- **Secrets & PII**: tokens/keys live only in `.env.local` (local) and Vercel secrets (remote) — never write them into tracked files, memory, skills, commits, or chat logs. The local `TELEGRAM_BOT_TOKEN` is a dedicated DEV bot; the production bot token must not be placed in `.env.local` (polling with it conflicts with the prod webhook on the same bot). Public surfaces (shared trip pages, OG images, review listings) may expose only data meant to be public: country/dates/hotel/tour number + reviewer display name — never phone numbers or internal IDs.
 
 ## Running locally
 
@@ -55,4 +56,4 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 
 ## Memory
 
-Persistent project memory lives in `.memory/` (gitignored; **English-only** content, no secret values). The full protocol — when to write, file format, hybrid retrieval — is defined by the **restal-memory** skill. Read `skill://restal-memory` (file: `.claude/skills/restal-memory/SKILL.md`) before non-trivial work in this repo, and follow it whenever recording decisions or findings. For browser-driven UI testing/smoke passes, read `skill://restal-browser-testing` first — it catalogs every automation error hit so far with the working technique.
+Persistent project memory lives in `.memory/` (gitignored; **English-only** content, no secret values). The full protocol — when to write, file format, hybrid retrieval — is defined by the **restal-memory** skill. Read `skill://restal-memory` (file: `.claude/skills/restal-memory/SKILL.md`) before non-trivial work in this repo, and follow it whenever recording decisions or findings. For browser-driven UI testing/smoke passes, read `skill://restal-browser-testing` first — it catalogs every automation error hit so far with the working technique. For Open Graph image / satori rendering work, read `skill://restal-og-images` first — it catalogs every satori error hit with the working card pattern and verification loop.
