@@ -6,10 +6,7 @@
 
 import { getUpdates } from "./client";
 import { handleUpdate } from "./handler";
-
-const RETRY_DELAY_MS = 3_000;
-// Must stay below the client's 15s request abort, or every poll dies as "aborted".
-const POLL_TIMEOUT_SEC = 10;
+import { TELEGRAM_RETRY_DELAY_MS, TELEGRAM_POLL_TIMEOUT_SEC } from "@/config/constants";
 
 // Survives module re-evaluation (dev hot reload) — one loop per process.
 const GLOBAL_KEY = Symbol.for("restal.telegram.poller.running");
@@ -34,14 +31,14 @@ export async function startPolling(): Promise<void> {
     void (async () => {
         while (true) {
             try {
-                const updates = await getUpdates(offset, POLL_TIMEOUT_SEC);
+                const updates = await getUpdates(offset, TELEGRAM_POLL_TIMEOUT_SEC);
                 for (const update of updates) {
                     offset = Math.max(offset, update.update_id + 1);
                     await handleUpdate(update);
                 }
             } catch (err) {
                 console.error("[telegram] Poll error:", err instanceof Error ? err.message : err);
-                await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+                await new Promise((r) => setTimeout(r, TELEGRAM_RETRY_DELAY_MS));
             }
         }
     })();

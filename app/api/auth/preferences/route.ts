@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { logAudit } from "@/lib/audit";
+import { RATE_LIMITS } from "@/config/constants";
 
 /**
  * POST /api/auth/preferences
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const rateLimitResult = checkRateLimit("update-preferences", session.user.phoneNumber, 10, 60 * 1000);
+        const rateLimitResult = checkRateLimit("update-preferences", session.user.phoneNumber, RATE_LIMITS["update-preferences"].max, RATE_LIMITS["update-preferences"].windowMs);
         if (!rateLimitResult.allowed) {
             return NextResponse.json({ message: "Too many requests" }, { status: 429 });
         }

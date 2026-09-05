@@ -7,7 +7,7 @@
  * write a `failed` log entry, surface the error to the caller, stop.
  */
 
-const REQUEST_TIMEOUT_MS = 15_000;
+import { TELEGRAM_REQUEST_TIMEOUT_MS } from "@/config/constants";
 
 export interface TgResponse<T = unknown> {
     ok: boolean;
@@ -37,7 +37,7 @@ export async function tgRequest<T = unknown>(
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), TELEGRAM_REQUEST_TIMEOUT_MS);
     try {
         const res = await fetch(url, {
             method: params ? "POST" : "GET",

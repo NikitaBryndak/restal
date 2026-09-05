@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, RATE_LIMITS } from "@/config/constants";
 import { logAudit } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
         // SECURITY: Rate limit password changes — max 5 attempts per user per 15 minutes
         // Prevents brute-forcing the current password with a stolen session
-        const { allowed } = checkRateLimit("change-password", session.user.phoneNumber, 5, 15 * 60 * 1000);
+        const { allowed } = checkRateLimit("change-password", session.user.phoneNumber, RATE_LIMITS["change-password"].max, RATE_LIMITS["change-password"].windowMs);
         if (!allowed) {
             return NextResponse.json({
                 message: "Забагато спроб зміни паролю. Спробуйте пізніше."

@@ -7,12 +7,7 @@ import Trip from "@/models/trip";
 import PromoCode from "@/models/promoCode";
 import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const SECURITY_HEADERS = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, private",
-    "Pragma": "no-cache",
-    "X-Content-Type-Options": "nosniff",
-};
+import { SECURITY_HEADERS, RATE_LIMITS } from "@/config/constants";
 
 /**
  * GET /api/analytics/bonuses
@@ -31,7 +26,7 @@ export async function GET() {
             );
         }
 
-        const rl = checkRateLimit("analytics-bonuses", session.user.phoneNumber, 20, 5 * 60 * 1000);
+        const rl = checkRateLimit("analytics-bonuses", session.user.phoneNumber, RATE_LIMITS["analytics-bonuses"].max, RATE_LIMITS["analytics-bonuses"].windowMs);
         if (!rl.allowed) {
             return NextResponse.json(
                 { message: "Забагато запитів. Спробуйте пізніше." },

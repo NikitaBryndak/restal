@@ -5,6 +5,7 @@ import User from "@/models/user";
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/config/constants";
 import { getRoleBySlug } from "./role-cache";
 import { allowedPagesForRole } from "./role-eval";
 
@@ -25,7 +26,7 @@ export const authOptions: AuthOptions = {
                     const { phoneNumber, password } = credentials as Credential;
 
                     // SECURITY: Rate limit login attempts per phone number
-                    const rateLimitResult = checkRateLimit("login", phoneNumber, 10, 15 * 60 * 1000);
+                    const rateLimitResult = checkRateLimit("login", phoneNumber, RATE_LIMITS.login.max, RATE_LIMITS.login.windowMs);
                     if (!rateLimitResult.allowed) {
                         throw new Error("Забагато спроб входу. Спробуйте через 15 хвилин.");
                     }

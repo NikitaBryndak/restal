@@ -5,6 +5,7 @@ import * as React from "react";
 import { cn, getDateErrorMessage } from "@/lib/utils";
 import { Label } from "./label";
 import { Input } from "./input";
+import { EMAIL_REGEX_BASIC } from "@/config/constants";
 
 type FormatType = 'date' | 'time' | 'email' | 'phone' | 'none';
 
@@ -99,10 +100,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         const getEmailErrorMessage = (emailStr: string): string | null => {
             if (!emailStr || emailStr.length === 0) return null; // Empty is okay (optional field)
 
-            // Basic email validation regex
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (!emailRegex.test(emailStr)) {
+            if (!EMAIL_REGEX_BASIC.test(emailStr)) {
                 return 'Please enter a valid email address.';
             }
 

@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getRoleBySlug } from "@/lib/role-cache";
 import { allowedPagesForRole } from "@/lib/role-eval";
+import { UNAMBIGUOUS_CHARS } from "@/config/constants";
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
@@ -80,14 +81,11 @@ export async function GET() {
     }
 }
 
-// Unambiguous alphabet (no 0/O/1/I) — the code is typed by hand on a phone.
-const BIND_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
 function generateBindCode(): string {
     const bytes = crypto.randomBytes(4);
     let code = "";
     for (let i = 0; i < 4; i++) {
-        code += BIND_CODE_ALPHABET[bytes[i] % BIND_CODE_ALPHABET.length];
+        code += UNAMBIGUOUS_CHARS[bytes[i] % UNAMBIGUOUS_CHARS.length];
     }
     return `TG-${code}`;
 }

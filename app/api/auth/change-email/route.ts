@@ -5,9 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { logAudit } from "@/lib/audit";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const MAX_EMAIL_LENGTH = 254;
+import { EMAIL_REGEX, MAX_EMAIL_LENGTH, RATE_LIMITS } from "@/config/constants";
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,7 +18,7 @@ export async function POST(request: NextRequest) {
         }
 
         // SECURITY: Rate limit email changes
-        const rateLimitResult = checkRateLimit("change-email", session.user.phoneNumber, 5, 15 * 60 * 1000);
+        const rateLimitResult = checkRateLimit("change-email", session.user.phoneNumber, RATE_LIMITS["change-email"].max, RATE_LIMITS["change-email"].windowMs);
         if (!rateLimitResult.allowed) {
             return NextResponse.json({
                 message: "Забагато спроб. Спробуйте пізніше."

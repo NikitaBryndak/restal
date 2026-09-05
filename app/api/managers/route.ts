@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { getSessionRole, hasAnyScope, getRoleSlugsGrantingPage } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/config/constants";
 
 /**
  * GET /api/managers
@@ -25,7 +26,7 @@ export async function GET() {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
-        const rateLimitResult = checkRateLimit("managers-list", session.user.phoneNumber, 20, 60 * 1000);
+        const rateLimitResult = checkRateLimit("managers-list", session.user.phoneNumber, RATE_LIMITS["managers-list"].max, RATE_LIMITS["managers-list"].windowMs);
         if (!rateLimitResult.allowed) {
             return NextResponse.json({ message: "Too many requests" }, { status: 429 });
         }

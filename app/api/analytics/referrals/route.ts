@@ -6,12 +6,7 @@ import User from "@/models/user";
 import Trip from "@/models/trip";
 import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const SECURITY_HEADERS = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, private",
-    "Pragma": "no-cache",
-    "X-Content-Type-Options": "nosniff",
-};
+import { SECURITY_HEADERS, RATE_LIMITS } from "@/config/constants";
 
 /**
  * GET /api/analytics/referrals
@@ -26,7 +21,7 @@ export async function GET() {
             return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
         }
 
-        const rl = checkRateLimit("analytics-referrals", session.user.phoneNumber, 20, 5 * 60 * 1000);
+        const rl = checkRateLimit("analytics-referrals", session.user.phoneNumber, RATE_LIMITS["analytics-referrals"].max, RATE_LIMITS["analytics-referrals"].windowMs);
         if (!rl.allowed) {
             return NextResponse.json({ message: "Too many requests" }, { status: 429 });
         }

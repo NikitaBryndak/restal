@@ -2,14 +2,14 @@ import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
-import { PHONE_REGEX } from "@/config/constants";
+import { PHONE_REGEX, RATE_LIMITS } from "@/config/constants";
 
 export async function POST(request: NextRequest) {
     try {
         // SECURITY: Rate limit user existence checks — max 10 per IP per 15 minutes
         // Prevents mass phone number enumeration
         const ip = getServerIp(request);
-        const { allowed } = checkRateLimit("userExists", ip, 10, 15 * 60 * 1000);
+        const { allowed } = checkRateLimit("userExists", ip, RATE_LIMITS.userExists.max, RATE_LIMITS.userExists.windowMs);
         if (!allowed) {
             return NextResponse.json({
                 exists: false,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/user";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/config/constants";
 
 // POST - Validate a referral code before registration
 export async function POST(request: NextRequest) {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
         // SECURITY: Rate limit referral validation — max 10 per IP per 15 minutes
         // Prevents brute-forcing valid referral codes
         const ip = getServerIp(request);
-        const { allowed } = checkRateLimit("referral-validate", ip, 10, 15 * 60 * 1000);
+        const { allowed } = checkRateLimit("referral-validate", ip, RATE_LIMITS["referral-validate"].max, RATE_LIMITS["referral-validate"].windowMs);
         if (!allowed) {
             return NextResponse.json(
                 { valid: false, message: "Too many requests. Please try again later." },

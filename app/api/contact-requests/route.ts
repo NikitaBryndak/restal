@@ -8,10 +8,7 @@ import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { sendContactRequestNotification } from "@/lib/email";
 import { logAudit } from "@/lib/audit";
 import { extractUtm } from "@/lib/utm";
-
-// Rate limit: max 5 requests per IP per hour
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const RATE_LIMIT_MAX = 5;
+import { CONTACT_FORM_MAX_REQUESTS, CONTACT_FORM_WINDOW_MS } from "@/config/constants";
 
 function getClientIp(request: NextRequest): string {
     const forwarded = request.headers.get("x-forwarded-for");
@@ -56,13 +53,13 @@ export async function POST(request: NextRequest) {
         await connectToDatabase();
 
         // Rate limiting check
-        const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
+        const windowStart = new Date(Date.now() - CONTACT_FORM_WINDOW_MS);
         const recentRequests = await ContactRequest.countDocuments({
             ip,
             createdAt: { $gte: windowStart },
         });
 
-        if (recentRequests >= RATE_LIMIT_MAX) {
+        if (recentRequests >= CONTACT_FORM_MAX_REQUESTS) {
             return NextResponse.json(
                 { message: "Забагато запитів. Спробуйте через годину." },
                 { status: 429 }

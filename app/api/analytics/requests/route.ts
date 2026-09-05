@@ -6,15 +6,7 @@ import ContactRequest from "@/models/contactRequest";
 import User from "@/models/user";
 import { getSessionRole, hasAnyScope } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-const SECURITY_HEADERS = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, private",
-    "Pragma": "no-cache",
-    "X-Content-Type-Options": "nosniff",
-};
-
-const ALLOWED_PERIODS = ["7d", "30d", "90d", "12m", "all"] as const;
-type Period = (typeof ALLOWED_PERIODS)[number];
+import { SECURITY_HEADERS, ALLOWED_PERIODS, Period, RATE_LIMITS } from "@/config/constants";
 
 function getPeriodDates(period: Period) {
     const now = new Date();
@@ -64,7 +56,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const rl = checkRateLimit("analytics-requests", session.user.phoneNumber, 20, 5 * 60 * 1000);
+        const rl = checkRateLimit("analytics-requests", session.user.phoneNumber, RATE_LIMITS["analytics-requests"].max, RATE_LIMITS["analytics-requests"].windowMs);
         if (!rl.allowed) {
             return NextResponse.json(
                 { message: "Забагато запитів. Спробуйте пізніше." },

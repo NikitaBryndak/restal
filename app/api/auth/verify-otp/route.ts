@@ -3,14 +3,14 @@ import { connectToDatabase } from "@/lib/mongodb";
 import PhoneVerification from "@/models/phoneVerification";
 import crypto from "crypto";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
-import { PHONE_REGEX, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS } from "@/config/constants";
+import { PHONE_REGEX, OTP_LENGTH, OTP_MAX_ATTEMPTS, LOCKOUT_DURATION_MS, RATE_LIMITS } from "@/config/constants";
 import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
   try {
     // SECURITY: Rate limit OTP verification — max 10 per IP per 15 minutes
     const ip = getServerIp(req);
-    const { allowed } = checkRateLimit("verify-otp", ip, 10, 15 * 60 * 1000);
+    const { allowed } = checkRateLimit("verify-otp", ip, RATE_LIMITS["verify-otp"].max, RATE_LIMITS["verify-otp"].windowMs);
     if (!allowed) {
       return NextResponse.json(
         { message: "Забагато спроб. Спробуйте пізніше." },

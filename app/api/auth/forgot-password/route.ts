@@ -4,14 +4,14 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { sendSMS } from "@/lib/sms";
 import crypto, { randomInt } from "crypto";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
-import { OTP_EXPIRY_MS, PHONE_REGEX } from "@/config/constants";
+import { OTP_EXPIRY_MS, PHONE_REGEX, RATE_LIMITS } from "@/config/constants";
 
 export async function POST(req: NextRequest) {
   try {
     // SECURITY: Rate limit forgot-password — max 3 attempts per IP per 15 minutes
     // Prevents SMS bombing and Twilio billing abuse
     const ip = getServerIp(req);
-    const { allowed } = checkRateLimit("forgot-password", ip, 3, 15 * 60 * 1000);
+    const { allowed } = checkRateLimit("forgot-password", ip, RATE_LIMITS["forgot-password"].max, RATE_LIMITS["forgot-password"].windowMs);
     if (!allowed) {
       return NextResponse.json(
         { message: "Забагато запитів. Спробуйте пізніше." },

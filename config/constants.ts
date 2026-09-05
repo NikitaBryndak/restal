@@ -24,6 +24,11 @@ export const MIN_PASSWORD_LENGTH = 8;
 export const MAX_PASSWORD_LENGTH = 128;  // Bcrypt truncates at 72 bytes; also prevents DoS via expensive hashing
 export const MIN_USERNAME_LENGTH = 2;
 export const MAX_USERNAME_LENGTH = 100;
+/** Strict email format (TLD ≥ 2 chars) — account email changes */
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/** Basic email format — registration + client-side form validation */
+export const EMAIL_REGEX_BASIC = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const MAX_EMAIL_LENGTH = 254; // RFC 5321 max addr-spec length
 
 // ─── Article field limits ───────────────────────────────────────────
 export const ARTICLE_MAX_TITLE_LENGTH = 200;
@@ -51,6 +56,47 @@ export const TRUSTED_ORIGINS: readonly string[] = [
 
 // ─── AI / Chat ──────────────────────────────────────────────────────
 export const AI_DAILY_RATE_LIMIT = 120;  // Max AI chat requests per IP per day
+// ─── Rate limits ────────────────────────────────────────────────────
+/**
+ * Per-namespace rate limit presets for checkRateLimit() (max requests per window).
+ * Keys MUST match the namespace strings passed to checkRateLimit() — they are
+ * also the in-memory store keys.
+ */
+export const RATE_LIMITS = {
+    // Auth flows (per IP)
+    "login":               { max: 10, windowMs: 15 * 60_000 },
+    "register":            { max: 5,  windowMs: 60 * 60_000 },
+    "send-otp":            { max: 3,  windowMs: 15 * 60_000 },
+    "verify-otp":          { max: 10, windowMs: 15 * 60_000 },
+    "forgot-password":     { max: 3,  windowMs: 15 * 60_000 },
+    "reset-password":      { max: 5,  windowMs: 15 * 60_000 },
+    "userExists":          { max: 10, windowMs: 15 * 60_000 },
+    // Account changes (per phone)
+    "change-email":        { max: 5,  windowMs: 15 * 60_000 },
+    "change-password":     { max: 5,  windowMs: 15 * 60_000 },
+    "change-username":     { max: 5,  windowMs: 15 * 60_000 },
+    "update-preferences":  { max: 10, windowMs: 60_000 },
+    // Analytics (per phone)
+    "analytics":           { max: 30, windowMs: 5 * 60_000 },
+    "analytics-bonuses":   { max: 20, windowMs: 5 * 60_000 },
+    "analytics-referrals": { max: 20, windowMs: 5 * 60_000 },
+    "analytics-requests":  { max: 20, windowMs: 5 * 60_000 },
+    "manager-perf":        { max: 20, windowMs: 5 * 60_000 },
+    "managers-list":       { max: 20, windowMs: 60_000 },
+    "manage-trips-list":   { max: 30, windowMs: 60_000 },
+    // Misc (per IP)
+    "referral-validate":   { max: 10, windowMs: 15 * 60_000 },
+    // Reviews (per phone)
+    "reviews":             { max: 20, windowMs: 60_000 },
+    // Admin dashboards (per phone)
+    "cron-runs":           { max: 30, windowMs: 5 * 60_000 },
+} as const;
+
+export type RateLimitNamespace = keyof typeof RATE_LIMITS;
+
+/** Contact form limiter (DB-based, not checkRateLimit): max submissions per IP within the window */
+export const CONTACT_FORM_MAX_REQUESTS = 5;
+export const CONTACT_FORM_WINDOW_MS = 60 * 60_000; // 1 hour
 
 // ─── UI ─────────────────────────────────────────────────────────────
 export const TITLE_FADE_DURATION = 3;
@@ -83,13 +129,31 @@ export const PERIOD_OPTIONS: { value: Period; label: string }[] = [
     { value: '12m', label: '12 місяців' },
     { value: 'all', label: 'Весь час' },
 ];
+/** Allowed period values (derived from PERIOD_OPTIONS) */
+export const ALLOWED_PERIODS: readonly Period[] = PERIOD_OPTIONS.map((o) => o.value);
 
 // ─── Notifications ──────────────────────────────────────────────────
 export const NOTIFICATION_RECIPIENTS = [
     "nikitabryndak@gmail.com",
     "eleonstrevel@gmail.com",
 ];
+// ─── Security headers ───────────────────────────────────────────────
+/** Response headers for analytics endpoints serving sensitive data */
+export const SECURITY_HEADERS = {
+    "Cache-Control": "no-store, no-cache, must-revalidate, private",
+    "Pragma": "no-cache",
+    "X-Content-Type-Options": "nosniff",
+} as const;
 
 // ─── Date ───────────────────────────────────────────────────────────
 export const MIN_YEAR = 1940;
 export const MAX_YEAR = 2050;
+// ─── Telegram bot ───────────────────────────────────────────────────
+export const TELEGRAM_REQUEST_TIMEOUT_MS = 15_000; // HTTP request abort (client.ts)
+/** getUpdates long-poll timeout — must stay below TELEGRAM_REQUEST_TIMEOUT_MS or every poll dies as "aborted" */
+export const TELEGRAM_POLL_TIMEOUT_SEC = 10;
+export const TELEGRAM_RETRY_DELAY_MS = 3_000; // Poller retry backoff
+/** Per-chat cooldown so an unbound chat isn't spammed with the register prompt on every message */
+export const TELEGRAM_REGISTER_PROMPT_COOLDOWN_MS = 10 * 60_000;
+/** Registration link sent to unregistered users — always the production site, tagged for attribution */
+export const TELEGRAM_REGISTER_URL = `${BASE_URL}/register?utm_source=telegram&utm_medium=bot&utm_campaign=register_prompt`;

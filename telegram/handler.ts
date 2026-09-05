@@ -14,6 +14,7 @@ import MessageLog from "./message-log";
 import { sendMessage } from "./client";
 import { formatTelegramHtml } from "./notifications";
 import type { TgUpdate } from "./client";
+import { TELEGRAM_REGISTER_URL, TELEGRAM_REGISTER_PROMPT_COOLDOWN_MS } from "@/config/constants";
 
 /** Resolves the Restal account bound to a Telegram chat, if any. */
 export async function findUserByChatId(chatId: number) {
@@ -21,20 +22,13 @@ export async function findUserByChatId(chatId: number) {
         .select("phoneNumber name notifyTelegram");
 }
 
-/** Registration link sent to unregistered users — always the production site, tagged for attribution. */
-const REGISTER_URL = "https://restal.in.ua/register?utm_source=telegram&utm_medium=bot&utm_campaign=register_prompt";
-
-// Per-chat cooldown so a single unbound chat doesn't get spammed with the
-// register prompt on every message (in-memory: effective in poller mode,
-// best-effort across serverless webhook invocations).
-const REGISTER_PROMPT_COOLDOWN_MS = 10 * 60_000;
 const lastRegisterPromptAt = new Map<number, number>();
 
 function shouldSendRegisterPrompt(chatId: number): boolean {
     const now = Date.now();
     if (lastRegisterPromptAt.size > 1000) lastRegisterPromptAt.clear(); // bounded hygiene
     const last = lastRegisterPromptAt.get(chatId);
-    if (last && now - last < REGISTER_PROMPT_COOLDOWN_MS) return false;
+    if (last && now - last < TELEGRAM_REGISTER_PROMPT_COOLDOWN_MS) return false;
     lastRegisterPromptAt.set(chatId, now);
     return true;
 }
@@ -43,7 +37,7 @@ function shouldSendRegisterPrompt(chatId: number): boolean {
 async function sendRegisterPrompt(message: NonNullable<TgUpdate["message"]>): Promise<void> {
     const text =
         "Ви ще не зареєстровані в RestAL.\n\n" +
-        `Зареєструйтесь на сайті та увімкніть сповіщення через Telegram — ми надішлемо сюди код для прив'язки цього чату:\n${REGISTER_URL}`;
+        `Зареєструйтесь на сайті та увімкніть сповіщення через Telegram — ми надішлемо сюди код для прив'язки цього чату:\n${TELEGRAM_REGISTER_URL}`;
     try {
         await sendMessage(message.chat.id, text);
     } catch (err) {

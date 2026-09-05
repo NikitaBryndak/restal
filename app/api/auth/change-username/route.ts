@@ -3,7 +3,7 @@ import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
+import { MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH, RATE_LIMITS } from "@/config/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { logAudit } from "@/lib/audit";
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         }
 
         // SECURITY: Rate limit username changes
-        const rateLimitResult = checkRateLimit("change-username", session.user.phoneNumber, 5, 15 * 60 * 1000);
+        const rateLimitResult = checkRateLimit("change-username", session.user.phoneNumber, RATE_LIMITS["change-username"].max, RATE_LIMITS["change-username"].windowMs);
         if (!rateLimitResult.allowed) {
             return NextResponse.json({
                 message: "Забагато спроб. Спробуйте пізніше."

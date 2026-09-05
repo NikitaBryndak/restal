@@ -24,7 +24,7 @@ import {
     AlertCircle,
     Send
 } from "lucide-react";
-import { MIN_PASSWORD_LENGTH, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH } from "@/config/constants";
+import { MIN_PASSWORD_LENGTH, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH, EMAIL_REGEX } from "@/config/constants";
 
 export default function SettingsPage() {
     const { userProfile, loading, error, refetch } = useUserProfile();
@@ -232,7 +232,7 @@ export default function SettingsPage() {
 
         const trimmed = newEmail.trim();
 
-        if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmed)) {
+        if (trimmed && !EMAIL_REGEX.test(trimmed)) {
             setEmailChangeError("Некоректний формат email");
             return;
         }

@@ -6,6 +6,7 @@ import TripModel from "@/models/trip";
 import UserModel from "@/models/user";
 import { getSessionRole, hasAnyScope, getRoleSlugsGrantingPage } from "@/lib/role-access";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/config/constants";
 
 export async function GET(request: Request) {
     try {
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
         }
 
         // Rate limit
-        const rateLimitResult = checkRateLimit("manager-perf", session.user.phoneNumber, 20, 5 * 60 * 1000);
+        const rateLimitResult = checkRateLimit("manager-perf", session.user.phoneNumber, RATE_LIMITS["manager-perf"].max, RATE_LIMITS["manager-perf"].windowMs);
         if (!rateLimitResult.allowed) {
             return NextResponse.json({ error: "Too many requests" }, { status: 429 });
         }

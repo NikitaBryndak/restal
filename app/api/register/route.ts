@@ -3,19 +3,16 @@ import User from "@/models/user";
 import PhoneVerification from "@/models/phoneVerification";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS } from "@/config/constants";
+import { WELCOME_BONUS, PHONE_REGEX, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, BCRYPT_SALT_ROUNDS, EMAIL_REGEX_BASIC, RATE_LIMITS } from "@/config/constants";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
 import { logAudit } from "@/lib/audit";
 import { extractUtm } from "@/lib/utm";
-
-// SECURITY: Basic email format validation
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
     try {
         // SECURITY: Rate limit registration — max 5 attempts per IP per hour
         const ip = getServerIp(request);
-        const { allowed } = checkRateLimit("register", ip, 5, 60 * 60 * 1000);
+        const { allowed } = checkRateLimit("register", ip, RATE_LIMITS.register.max, RATE_LIMITS.register.windowMs);
         if (!allowed) {
             return NextResponse.json(
                 { message: "Too many registration attempts. Please try again later." },
@@ -99,7 +96,7 @@ export async function POST(request: NextRequest) {
 
         // SECURITY: Validate email format if provided
         if (email && typeof email === 'string' && email.trim().length > 0) {
-            if (!EMAIL_REGEX.test(email.trim())) {
+            if (!EMAIL_REGEX_BASIC.test(email.trim())) {
                 return NextResponse.json({
                     message: "Invalid email format"
                 }, { status: 400 });

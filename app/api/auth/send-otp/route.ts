@@ -4,14 +4,14 @@ import PhoneVerification from "@/models/phoneVerification";
 import { sendSMS } from "@/lib/sms";
 import crypto, { randomInt } from "crypto";
 import { checkRateLimit, getServerIp } from "@/lib/rate-limit";
-import { PHONE_REGEX, OTP_EXPIRY_MS } from "@/config/constants";
+import { PHONE_REGEX, OTP_EXPIRY_MS, RATE_LIMITS } from "@/config/constants";
 
 export async function POST(req: NextRequest) {
   try {
     // SECURITY: Rate limit OTP sending — max 3 per IP per 15 minutes
     // Prevents SMS bombing and Twilio billing abuse
     const ip = getServerIp(req);
-    const { allowed } = checkRateLimit("send-otp", ip, 3, 15 * 60 * 1000);
+    const { allowed } = checkRateLimit("send-otp", ip, RATE_LIMITS["send-otp"].max, RATE_LIMITS["send-otp"].windowMs);
     if (!allowed) {
       return NextResponse.json(
         { message: "Забагато запитів. Спробуйте пізніше." },
