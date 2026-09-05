@@ -105,7 +105,7 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
         description: `Подорож #${trip.number} до ${trip.country}${trip.region ? `, ${trip.region}` : ""}. ${trip.tripStartDate} — ${trip.tripEndDate}. Організовано RestAL.`,
         openGraph: {
             title: `✈️ Подорож до ${trip.country} | RestAL`,
-            description: `Тур #${trip.number} · ${trip.tripStartDate} — ${trip.tripEndDate} · ${trip.hotel.name || "Готель уточнюється"}`,
+            description: `Тур #${trip.number} · ${trip.tripStartDate} — ${trip.tripEndDate} · ${trip.hotel?.name || "Готель уточнюється"}`,
         },
     };
 }
@@ -191,7 +191,7 @@ export default async function SharedTripPage({ params }: { params: Promise<{ tok
                             Переліт
                         </h2>
                         <div className="space-y-3">
-                            {trip.flightInfo.departure.airportCode && (
+                            {trip.flightInfo?.departure?.airportCode && (
                                 <div className="flex items-center gap-2">
                                     <span className="text-xs text-white/50">Виліт:</span>
                                     <span className="text-white font-medium">
@@ -204,7 +204,7 @@ export default async function SharedTripPage({ params }: { params: Promise<{ tok
                                     )}
                                 </div>
                             )}
-                            {trip.flightInfo.arrival.airportCode && (
+                            {trip.flightInfo?.arrival?.airportCode && (
                                 <div className="flex items-center gap-2">
                                     <span className="text-xs text-white/50">Приліт:</span>
                                     <span className="text-white font-medium">
@@ -221,7 +221,7 @@ export default async function SharedTripPage({ params }: { params: Promise<{ tok
                     </div>
 
                     {/* Hotel */}
-                    {trip.hotel.name && (
+                    {trip.hotel?.name && (
                         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/10">
                             <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                                 <Hotel className="w-5 h-5 text-purple-400" />
@@ -247,13 +247,13 @@ export default async function SharedTripPage({ params }: { params: Promise<{ tok
                                 <Users className="w-4 h-4" />
                                 <span>{trip.touristCount} {trip.touristCount === 1 ? "турист" : trip.touristCount < 5 ? "туристи" : "туристів"}</span>
                             </div>
-                            {trip.addons.insurance && (
+                            {trip.addons?.insurance && (
                                 <div className="flex items-center gap-2 text-white/70">
                                     <Shield className="w-4 h-4 text-emerald-400" />
                                     <span>Страхування включено</span>
                                 </div>
                             )}
-                            {trip.addons.transfer && (
+                            {trip.addons?.transfer && (
                                 <div className="flex items-center gap-2 text-white/70">
                                     <Car className="w-4 h-4 text-amber-400" />
                                     <span>Трансфер включено</span>

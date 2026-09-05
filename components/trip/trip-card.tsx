@@ -24,12 +24,15 @@ export default function TripCard({ data }: { data: Trip }) {
       ? data.cashbackAmount
       : totalAmount * CASHBACK_RATE;
 
+  // Legacy/incomplete trip docs may lack subdocuments entirely — never let a
+  // missing field crash the whole dashboard page (server render error).
+  const addons = data.addons ?? { insurance: false, transfer: false };
   const addonItems = [
-    { label: "Страхування", value: data.addons.insurance, icon: "🛡️" },
-    { label: "Трансфер", value: data.addons.transfer, icon: "🚗" },
+    { label: "Страхування", value: addons.insurance, icon: "🛡️" },
+    { label: "Трансфер", value: addons.transfer, icon: "🚗" },
   ];
 
-  const [day, month, year] = data.tripEndDate
+  const [day, month, year] = (data.tripEndDate || "")
     .split("/")
     .map((part: string) => Number.parseInt(part, 10));
 
@@ -122,86 +125,92 @@ export default function TripCard({ data }: { data: Trip }) {
           <div className="w-full bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-6 text-white border border-white/10">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4 sm:gap-y-5">
               {/* Departure */}
-              <div className="space-y-1.5 sm:space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-4 bg-blue-400/60 rounded-full"></div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">
-                    Виліт
+              {data.flightInfo?.departure && (
+                <div className="space-y-1.5 sm:space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-blue-400/60 rounded-full"></div>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">
+                      Виліт
+                    </p>
+                  </div>
+                  <p className="text-sm sm:text-base font-semibold pl-3">
+                    {data.flightInfo.departure.airportCode} ·{" "}
+                    {data.flightInfo.departure.flightNumber}
                   </p>
-                </div>
-                <p className="text-sm sm:text-base font-semibold pl-3">
-                  {data.flightInfo.departure.airportCode} ·{" "}
-                  {data.flightInfo.departure.flightNumber}
-                </p>
-                <div className="flex items-center gap-2 text-white/80 pl-3">
-                  <p className="text-xs font-medium">
-                    {data.flightInfo.departure.date}
-                  </p>
-                  <Clock className="w-3.5 h-3.5 text-white/60" />
-                  <p className="text-xs font-medium">
-                    {data.flightInfo.departure.time}
-                  </p>
-                </div>
-              </div>
-
-              {/* Return */}
-              <div className="space-y-1.5 sm:space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-4 bg-purple-400/60 rounded-full"></div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">
-                    Повернення
-                  </p>
-                </div>
-                <p className="text-sm sm:text-base font-semibold pl-3">
-                  {data.flightInfo.arrival.airportCode} ·{" "}
-                  {data.flightInfo.arrival.flightNumber}
-                </p>
-                <div className="flex items-center gap-2 text-white/80 pl-3">
-                  <p className="text-xs font-medium">
-                    {data.flightInfo.arrival.date}
-                  </p>
-                  <Clock className="w-3.5 h-3.5 text-white/60" />
-                  <p className="text-xs font-medium">
-                    {data.flightInfo.arrival.time}
-                  </p>
-                </div>
-              </div>
-
-              {/* Stay */}
-              <div className="space-y-1.5 sm:space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-4 bg-amber-400/60 rounded-full"></div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">
-                    Проживання
-                  </p>
-                  <span className="w-6 h-6 rounded-full bg-linear-to-br from-amber-400/30 to-orange-400/30 border border-white/20 text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
-                    {data.hotel.nights}
-                  </span>
-                </div>
-                <p className="text-xs sm:text-sm font-bold leading-tight pl-3 wrap-break-word">
-                  {data.hotel.name}
-                </p>
-                <div className="space-y-1 text-white/75 text-xs pl-3 min-w-0">
-                  <p className="flex justify-between gap-1">
-                    <span className="text-white/60 shrink-0">С-:</span>
-                    <span className="font-medium truncate">
-                      {data.hotel.checkIn}
-                    </span>
-                  </p>
-                  <p className="flex justify-between gap-1">
-                    <span className="text-white/60 shrink-0">До:</span>
-                    <span className="font-medium truncate">
-                      {data.hotel.checkOut}
-                    </span>
-                  </p>
-                  <div className="pt-1 border-t border-white/10 mt-2">
-                    <p className="flex justify-between">
-                      <span className="text-white/60">Харчування:</span>
-                      <span className="font-medium">{data.hotel.food}</span>
+                  <div className="flex items-center gap-2 text-white/80 pl-3">
+                    <p className="text-xs font-medium">
+                      {data.flightInfo.departure.date}
+                    </p>
+                    <Clock className="w-3.5 h-3.5 text-white/60" />
+                    <p className="text-xs font-medium">
+                      {data.flightInfo.departure.time}
                     </p>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Return */}
+              {data.flightInfo?.arrival && (
+                <div className="space-y-1.5 sm:space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-purple-400/60 rounded-full"></div>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">
+                      Повернення
+                    </p>
+                  </div>
+                  <p className="text-sm sm:text-base font-semibold pl-3">
+                    {data.flightInfo.arrival.airportCode} ·{" "}
+                    {data.flightInfo.arrival.flightNumber}
+                  </p>
+                  <div className="flex items-center gap-2 text-white/80 pl-3">
+                    <p className="text-xs font-medium">
+                      {data.flightInfo.arrival.date}
+                    </p>
+                    <Clock className="w-3.5 h-3.5 text-white/60" />
+                    <p className="text-xs font-medium">
+                      {data.flightInfo.arrival.time}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Stay */}
+              {data.hotel && (
+                <div className="space-y-1.5 sm:space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-amber-400/60 rounded-full"></div>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-semibold">
+                      Проживання
+                    </p>
+                    <span className="w-6 h-6 rounded-full bg-linear-to-br from-amber-400/30 to-orange-400/30 border border-white/20 text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
+                      {data.hotel.nights}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm font-bold leading-tight pl-3 wrap-break-word">
+                    {data.hotel.name}
+                  </p>
+                  <div className="space-y-1 text-white/75 text-xs pl-3 min-w-0">
+                    <p className="flex justify-between gap-1">
+                      <span className="text-white/60 shrink-0">С-:</span>
+                      <span className="font-medium truncate">
+                        {data.hotel.checkIn}
+                      </span>
+                    </p>
+                    <p className="flex justify-between gap-1">
+                      <span className="text-white/60 shrink-0">До:</span>
+                      <span className="font-medium truncate">
+                        {data.hotel.checkOut}
+                      </span>
+                    </p>
+                    <div className="pt-1 border-t border-white/10 mt-2">
+                      <p className="flex justify-between">
+                        <span className="text-white/60">Харчування:</span>
+                        <span className="font-medium">{data.hotel.food}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Add-ons */}
               <div className="space-y-1.5 sm:space-y-2.5">

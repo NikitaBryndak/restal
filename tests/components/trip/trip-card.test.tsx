@@ -86,4 +86,24 @@ describe("TripCard", () => {
     const activeRoots = Array.from(activeContainer.querySelectorAll("div")).filter((el) => el.className.includes("hover:scale-[1.02]"));
     expect(activeRoots.length).toBe(1);
   });
+
+  it("renders without crashing when a legacy doc lacks addons/flightInfo/hotel/end date", () => {
+    setToday();
+    const incomplete = baseTrip() as any;
+    delete incomplete.addons;
+    delete incomplete.flightInfo;
+    delete incomplete.hotel;
+    delete incomplete.tripEndDate;
+
+    // Pre-fix this threw "Cannot read properties of undefined (reading 'insurance')"
+    // and crashed the whole /dashboard/trips server render.
+    expect(() => render(<TripCard data={incomplete} />)).not.toThrow();
+
+    // Add-ons cell still renders with default-off values; flight/hotel cells hide cleanly.
+    expect(screen.getByText("Страхування")).toBeInTheDocument();
+    expect(screen.getByText("Трансфер")).toBeInTheDocument();
+    expect(screen.queryByText("Виліт")).not.toBeInTheDocument();
+    expect(screen.queryByText("Повернення")).not.toBeInTheDocument();
+    expect(screen.queryByText("Проживання")).not.toBeInTheDocument();
+  });
 });

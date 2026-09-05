@@ -104,7 +104,20 @@ async function getTripData(id: string): Promise<EnrichedTrip | null> {
       clientName = (client as { name?: string })?.name || "";
     }
 
-    return JSON.parse(JSON.stringify({ ...trip, managerName, clientName }));
+    const safe = JSON.parse(JSON.stringify({ ...trip, managerName, clientName }));
+
+    // Legacy/incomplete docs may lack subdocuments entirely — fill empty shapes
+    // so rendering never crashes on a missing field (server render error).
+    safe.flightInfo = {
+      departure: { airportCode: "", country: "", flightNumber: "", date: "", time: "", ...(safe.flightInfo?.departure ?? {}) },
+      arrival: { airportCode: "", country: "", flightNumber: "", date: "", time: "", ...(safe.flightInfo?.arrival ?? {}) },
+    };
+    safe.hotel = { name: "", nights: 0, food: "", roomType: "", checkIn: "", checkOut: "", ...(safe.hotel ?? {}) };
+    safe.addons = { insurance: false, transfer: false, ...(safe.addons ?? {}) };
+    safe.tourists = safe.tourists ?? [];
+    safe.documents = safe.documents ?? {};
+
+    return safe;
   } catch (error) {
     console.error("Error fetching trip:", error);
     return null;
