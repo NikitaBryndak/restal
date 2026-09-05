@@ -20,6 +20,7 @@ export type TelegramLogType =
     | "reminder_payment"
     | "reminder_departure"
     | "cashback_credited"
+    | "review_request"
     | "trip_created"
     | "other";
 

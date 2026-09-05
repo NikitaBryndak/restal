@@ -11,6 +11,7 @@ import { CASHBACK_RATE } from "@/config/constants";
 import { getSessionRole, hasAnyScope, getRoleSlugsGrantingPage } from "@/lib/role-access";
 import { DOCUMENT_LABELS, TOUR_STATUS_LABELS, TourStatus } from "@/types";
 import mongoose from "mongoose";
+import { sendReviewRequest } from "@/lib/notifications";
 
 const buildQuery = (rawId: string) => {
     // Strip leading # if present (e.g., "Trip #5468189" -> "5468189")
@@ -237,6 +238,21 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
                 `Статус туру #${existingTrip.number} змінено з "${oldStatusLabel}" на "${newStatusLabel}"`,
                 { oldStatus: existingTrip.status, newStatus: updates.status }
             );
+        }
+
+        // Post-trip review request when a manager completes the trip manually
+        if (updates.status === "Completed" && existingTrip.status !== "Completed") {
+            try {
+                await sendReviewRequest({
+                    userPhone: existingTrip.ownerPhone,
+                    tripId: existingTrip._id.toString(),
+                    tripNumber: existingTrip.number,
+                    country: updatedTrip.country || existingTrip.country,
+                    shareToken: updatedTrip.shareToken ?? existingTrip.shareToken,
+                });
+            } catch (err) {
+                console.error("Failed to send review request:", err);
+            }
         }
 
         // Create notifications for new document uploads

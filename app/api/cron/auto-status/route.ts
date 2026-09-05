@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Trip from "@/models/trip";
-import { createNotification } from "@/lib/notifications";
+import { createNotification, sendReviewRequest } from "@/lib/notifications";
 import { sendTripStatusEmail, sendTripReminderEmail } from "@/lib/email";
 import User from "@/models/user";
 import { TOUR_STATUS_LABELS } from "@/types";
@@ -127,14 +127,13 @@ export async function POST(request: Request) {
                             data: { oldStatus: "In Progress", newStatus: "Completed" },
                         });
                         await sendStatusChangeEmail(trip, "In Progress", "Completed");
-                        // Ask for a post-trip review (in-app + Telegram via createNotification)
-                        await createNotification({
+                        // Ask for a post-trip review (in-app + Telegram; includes share link if present)
+                        await sendReviewRequest({
                             userPhone: trip.ownerPhone,
                             tripId: String(trip._id),
                             tripNumber: trip.number,
-                            type: "status_change",
-                            message: `Дякуємо, що подорожували з RestAL! Поділіться враженнями від подорожі ${trip.number} (${trip.country}) — ваш відгук допоможе іншим туристам. ⭐`,
-                            data: { type: "review_request" },
+                            country: trip.country,
+                            shareToken: trip.shareToken,
                         });
                     }
                 }
