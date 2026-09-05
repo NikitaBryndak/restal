@@ -2,11 +2,11 @@
  * Incoming update router — single entry point shared by the webhook route and
  * the local poller, so both paths behave identically.
  *
- * CURRENT SCOPE (2026-09-04): messages from bound chats are logged to
- * `messagelogs`. Unbound chats are ignored UNLESS the text is a one-time bind
- * code shown in the site's Telegram prompt — then the chat gets linked and the
- * user receives a confirmation reply. This file is the expansion point for
- * future bot features (support inbox, commands). Keep per-update-type logic
+ * CURRENT SCOPE: messages from bound chats are logged to `messagelogs`.
+ * Unbound chats get a register prompt with a site link (throttled per chat)
+ * UNLESS the text is a one-time bind code shown in the site's Telegram prompt —
+ * then the chat gets linked and the user receives a confirmation reply. This
+ * file is the expansion point for future bot features (support inbox, commands).
  */
 
 import User from "@/models/user";
@@ -21,6 +21,49 @@ export async function findUserByChatId(chatId: number) {
         .select("phoneNumber name notifyTelegram");
 }
 
+/** Registration link sent to unregistered users — always the production site, tagged for attribution. */
+const REGISTER_URL = "https://restal.in.ua/register?utm_source=telegram&utm_medium=bot&utm_campaign=register_prompt";
+
+// Per-chat cooldown so a single unbound chat doesn't get spammed with the
+// register prompt on every message (in-memory: effective in poller mode,
+// best-effort across serverless webhook invocations).
+const REGISTER_PROMPT_COOLDOWN_MS = 10 * 60_000;
+const lastRegisterPromptAt = new Map<number, number>();
+
+function shouldSendRegisterPrompt(chatId: number): boolean {
+    const now = Date.now();
+    if (lastRegisterPromptAt.size > 1000) lastRegisterPromptAt.clear(); // bounded hygiene
+    const last = lastRegisterPromptAt.get(chatId);
+    if (last && now - last < REGISTER_PROMPT_COOLDOWN_MS) return false;
+    lastRegisterPromptAt.set(chatId, now);
+    return true;
+}
+
+/** Invites an unregistered user to the site. Fire-and-log — never throws. */
+async function sendRegisterPrompt(message: NonNullable<TgUpdate["message"]>): Promise<void> {
+    const text =
+        "Ви ще не зареєстровані в RestAL.\n\n" +
+        `Зареєструйтесь на сайті та увімкніть сповіщення через Telegram — ми надішлемо сюди код для прив'язки цього чату:\n${REGISTER_URL}`;
+    try {
+        await sendMessage(message.chat.id, text);
+    } catch (err) {
+        console.error("[telegram] Failed to send register prompt:", err instanceof Error ? err.message : err);
+        return; // a failed send is not logged as sent
+    }
+    try {
+        await MessageLog.create({
+            direction: "out",
+            chatId: message.chat.id,
+            username: message.from?.username || undefined,
+            userPhone: null, // unbound chat by definition
+            text,
+            type: "other",
+        });
+    } catch (err) {
+        console.error("[telegram] Failed to write register prompt log:", err instanceof Error ? err.message : err);
+    }
+}
+
 async function handleMessage(message: NonNullable<TgUpdate["message"]>): Promise<void> {
     if (!message.text) return; // non-text updates (photos, stickers…) are out of scope for now
 
@@ -31,11 +74,14 @@ async function handleMessage(message: NonNullable<TgUpdate["message"]>): Promise
         const boundPhone = await tryBindByCode(message);
         if (boundPhone) return;
 
-        // Otherwise ignored on purpose — logged to the server console so unknown
-        // chats stay visible during development.
+        // Unregistered user — invite them to the site (throttled per chat so a
+        // chatty stranger doesn't trigger a reply storm).
         console.log(
-            `[telegram] Ignoring message from unbound chat ${message.chat.id} (@${message.from?.username ?? "?"}): ${JSON.stringify(message.text).slice(0, 200)}`
+            `[telegram] Message from unbound chat ${message.chat.id} (@${message.from?.username ?? "?"}): ${JSON.stringify(message.text).slice(0, 200)}`
         );
+        if (shouldSendRegisterPrompt(message.chat.id)) {
+            await sendRegisterPrompt(message);
+        }
         return;
     }
 

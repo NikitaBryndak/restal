@@ -14,6 +14,11 @@ async function seedBoundUser(phone: string, chatId: number) {
 }
 
 describe('handleUpdate (incoming Telegram routing)', () => {
+  beforeEach(() => {
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ ok: true, result: {} });
+  });
+
   it('logs incoming messages from bound chats with the user phone', async () => {
     await seedBoundUser('+380675551234', 101);
 
@@ -24,10 +29,17 @@ describe('handleUpdate (incoming Telegram routing)', () => {
     expect(log.chatId).toBe(101);
   });
 
-  it('ignores messages from unbound chats (no log, no crash)', async () => {
+  it('replies with a register prompt for messages from unbound chats', async () => {
     await handleUpdate({ update_id: 2, message: { message_id: 6, chat: { id: 999 }, text: 'who am i' } });
 
-    expect(await MessageLog.countDocuments({ chatId: 999 })).toBe(0);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    const [chatId, text] = sendMock.mock.calls[0];
+    expect(chatId).toBe(999);
+    expect(text).toContain('/register');
+    // The prompt is logged as an outgoing "other" message; no incoming log for unbound chats.
+    const out = (await MessageLog.findOne({ direction: 'out', chatId: 999 }))!;
+    expect(out.type).toBe('other');
+    expect(await MessageLog.countDocuments({ direction: 'in', chatId: 999 })).toBe(0);
   });
 
   it('ignores non-message updates (e.g. my_chat_member)', async () => {
@@ -60,6 +72,7 @@ describe('handleUpdate (bind code flow)', () => {
     const log = (await MessageLog.findOne({ direction: 'in', type: 'bind', chatId: 501 }))!;
     expect(log.userPhone).toBe('+380675559001');
     expect(sendMock).toHaveBeenCalledWith(501, expect.stringContaining("пов'язано"));
+    expect(sendMock).toHaveBeenCalledTimes(1); // bind confirmation only — no register prompt
   });
 
   it('rejects an expired bind code (chat stays unbound)', async () => {
@@ -69,14 +82,55 @@ describe('handleUpdate (bind code flow)', () => {
 
     const fresh = (await User.findById(user._id))!;
     expect(fresh.telegramChatId ?? null).toBeNull();
-    expect(await MessageLog.countDocuments({ type: 'bind', chatId: 502 })).toBe(0);
-    expect(sendMock).not.toHaveBeenCalled();
+    // The expired code falls through to the unregistered-user register prompt.
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendMock.mock.calls[0][1]).toContain('/register');
   });
 
-  it('ignores unknown bind codes from unbound chats', async () => {
+  it('sends the register prompt for unknown bind codes from unbound chats', async () => {
     await handleUpdate({ update_id: 12, message: { message_id: 72, chat: { id: 503 }, text: 'TG-ZZZZ' } });
 
-    expect(await MessageLog.countDocuments({ chatId: 503 })).toBe(0);
-    expect(sendMock).not.toHaveBeenCalled();
+    expect(await MessageLog.countDocuments({ type: 'bind', chatId: 503 })).toBe(0);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendMock.mock.calls[0][1]).toContain('/register');
+  });
+});
+
+describe('handleUpdate (unregistered user register prompt)', () => {
+  beforeEach(() => {
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ ok: true, result: {} });
+  });
+
+  it('replies with a registration invite containing the site link', async () => {
+    await handleUpdate({ update_id: 20, message: { message_id: 80, chat: { id: 701 }, from: { username: 'stranger' }, text: 'hello bot' } });
+
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    const [chatId, text] = sendMock.mock.calls[0];
+    expect(chatId).toBe(701);
+    expect(text).toContain('Зареєструйтесь');
+    expect(text).toContain('/register');
+  });
+
+  it('always links to the production register page with telegram UTM attribution', async () => {
+    await handleUpdate({ update_id: 21, message: { message_id: 81, chat: { id: 702 }, text: 'hi' } });
+
+    const link = sendMock.mock.calls[0][1];
+    expect(link).toContain('https://restal.in.ua/register?utm_source=telegram&utm_medium=bot&utm_campaign=register_prompt');
+  });
+
+  it('throttles repeated prompts from the same unbound chat', async () => {
+    await handleUpdate({ update_id: 22, message: { message_id: 82, chat: { id: 703 }, text: 'first' } });
+    await handleUpdate({ update_id: 23, message: { message_id: 83, chat: { id: 703 }, text: 'second' } });
+
+    expect(sendMock).toHaveBeenCalledTimes(1); // second message within cooldown → no reply
+  });
+
+  it('does not log a prompt when the send fails', async () => {
+    sendMock.mockRejectedValueOnce(new Error('telegram down'));
+
+    await handleUpdate({ update_id: 24, message: { message_id: 84, chat: { id: 704 }, text: 'hi' } });
+
+    expect(await MessageLog.countDocuments({ direction: 'out', chatId: 704 })).toBe(0);
   });
 });
