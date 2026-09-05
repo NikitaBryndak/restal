@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, act } from '@testing-library/react';
+import { fireEvent } from '@testing-library/dom';
 import { render, user } from './test-utils';
 import { TelegramBindPrompt } from '@/components/telegram-bind-prompt';
 
@@ -28,6 +29,12 @@ beforeEach(() => {
   sessionRef.current = null;
   sessionStorage.clear();
   vi.stubGlobal('fetch', vi.fn());
+  Object.defineProperty(navigator, 'clipboard', {
+    value: { writeText: vi.fn().mockResolvedValue(undefined) },
+    configurable: true,
+  });
+  // Anchor with target=_blank would otherwise hit jsdom's unimplemented navigation.
+  vi.stubGlobal('open', vi.fn());
 });
 
 describe('TelegramBindPrompt (global bind prompt)', () => {
@@ -88,5 +95,55 @@ describe('TelegramBindPrompt (global bind prompt)', () => {
         expect.objectContaining({ method: 'POST', body: JSON.stringify({ notifyTelegram: false }) }),
       );
     });
+  });
+
+  it('auto-collapses into a slim pill after 8s and re-expands on tap', async () => {
+    vi.useFakeTimers();
+    try {
+      sessionRef.current = authenticated;
+      mockProfile({ notifyTelegram: true, telegramChatId: null, telegramBindCode: 'TG-ABCD' });
+      render(<TelegramBindPrompt />);
+
+      // act() flushes React scheduler work (MessageChannel) that fake timers alone don't run.
+      await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+      expect(screen.getByText(TITLE)).toBeInTheDocument();
+
+      await act(async () => { await vi.advanceTimersByTimeAsync(8000); });
+      const pill = screen.getByRole('button', { name: 'Розгорнути Telegram-сповіщення' });
+      expect(pill).toHaveTextContent('TG-ABCD');
+      expect(screen.queryByText(TITLE)).toBeNull();
+
+      fireEvent.click(pill); // tap expands again and stays expanded
+      expect(screen.getByText(TITLE)).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('copies the bind code to clipboard when "Відкрити бота" is clicked', async () => {
+    sessionRef.current = authenticated;
+    mockProfile({ notifyTelegram: true, telegramChatId: null, telegramBindCode: 'TG-ABCD' });
+    render(<TelegramBindPrompt />);
+    await screen.findByText('TG-ABCD');
+
+    const writeText = navigator.clipboard.writeText as unknown as ReturnType<typeof vi.fn>;
+    // fireEvent (not user-event): setup() replaces navigator.clipboard with its own stub, shadowing the spy.
+    fireEvent.click(screen.getByRole('link', { name: /Відкрити бота/ }));
+
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('TG-ABCD'));
+    // Feedback swaps the button label briefly.
+    expect(await screen.findByText('Скопійовано')).toBeInTheDocument();
+  });
+
+  it('copies the code when the inline code chip is tapped', async () => {
+    sessionRef.current = authenticated;
+    mockProfile({ notifyTelegram: true, telegramChatId: null, telegramBindCode: 'TG-ABCD' });
+    render(<TelegramBindPrompt />);
+    await screen.findByText('TG-ABCD');
+
+    const writeText = navigator.clipboard.writeText as unknown as ReturnType<typeof vi.fn>;
+    fireEvent.click(screen.getByRole('button', { name: 'Скопіювати код TG-ABCD' }));
+
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('TG-ABCD'));
   });
 });
