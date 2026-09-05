@@ -20,6 +20,7 @@ export type TelegramLogType =
     | "reminder_payment"
     | "reminder_departure"
     | "cashback_credited"
+    | "trip_created"
     | "other";
 
 export interface SendTelegramParams {

@@ -37,6 +37,7 @@ const messageLogSchema = new Schema(
                 "reminder_payment",
                 "reminder_departure",
                 "cashback_credited",
+                "trip_created",
                 "incoming",
                 "bind", // one-time bind code accepted — chat linked to a user
                 "other",

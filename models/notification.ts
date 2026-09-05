@@ -20,7 +20,7 @@ const notificationSchema = new Schema({
     // Type of notification
     type: {
         type: String,
-        enum: ['document_upload', 'status_change'],
+        enum: ['document_upload', 'status_change', 'trip_created'],
         required: true,
     },
     // Notification message

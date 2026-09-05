@@ -5,7 +5,7 @@ interface CreateNotificationParams {
     userPhone: string;
     tripId: string;
     tripNumber: string;
-    type: "document_upload" | "status_change";
+    type: "document_upload" | "status_change" | "trip_created";
     message: string;
     data?: Record<string, unknown>;
 }
@@ -13,6 +13,7 @@ interface CreateNotificationParams {
 /** Derives the telegram message-log type from the in-app notification kind. */
 function deriveTelegramLogType(type: string, data?: Record<string, unknown>): TelegramLogType {
     if (type === "document_upload") return "document_upload";
+    if (type === "trip_created") return "trip_created";
     const dt = data?.type;
     if (dt === "payment_reminder") return "reminder_payment";
     if (dt === "departure_reminder") return "reminder_departure";

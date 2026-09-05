@@ -8,6 +8,8 @@ import { authOptions } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { CASHBACK_RATE, PHONE_REGEX } from '@/config/constants';
 import { getSessionRole, hasAnyScope } from "@/lib/role-access";
+import { createNotification } from "@/lib/notifications";
+import { TOUR_STATUS_LABELS } from "@/types";
 
 // Validate required trip fields
 function validateTripData(body: any): string | null {
@@ -263,6 +265,20 @@ export async function POST(request: Request) {
             userName: currentManager?.name,
             details: { number: body.number, country: body.country, ownerPhone: sanitizedOwnerPhone, ...(promoCode ? { promoCode, promoDiscount } : {}) },
         });
+
+        // Notify the owner about the new trip (in-app + Telegram if opted in).
+        // Must never break trip creation — failures are logged, not thrown.
+        try {
+            await createNotification({
+                userPhone: sanitizedOwnerPhone,
+                tripId: newTrip._id.toString(),
+                tripNumber: newTrip.number,
+                type: "trip_created",
+                message: `Створено тур #${newTrip.number} (${body.country}) — ${body.tripStartDate} до ${body.tripEndDate}. Статус: "${TOUR_STATUS_LABELS["In Booking"]}"`,
+            });
+        } catch (err) {
+            console.error("Failed to create trip_created notification:", err);
+        }
 
         // NOTE: Cashback is now added one day after the tour ends (tripEndDate)
         // This is handled by the /api/cron/process-cashback endpoint
