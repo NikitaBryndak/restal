@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import PromoCode from "@/models/promoCode";
 import Notification from "@/models/notification";
 import { logAudit } from "@/lib/audit";
+import { recordCronRun } from "@/lib/cron-log";
 
 /**
  * Promo code expiry reminder cron job.
@@ -12,6 +13,7 @@ import { logAudit } from "@/lib/audit";
  * - Auto-expires promo codes past their expiry date
  */
 export async function POST(request: Request) {
+    const startedAt = Date.now();
     try {
         const authHeader = request.headers.get('authorization');
         const cronSecret = process.env.CRON_SECRET;
@@ -108,6 +110,14 @@ export async function POST(request: Request) {
             }
         }
 
+        // Record the run for observability (fire-and-forget safe)
+        await recordCronRun("promo-maintenance", {
+            status: "success",
+            summary: { reminders: results.reminders, expired: results.expired },
+            errors: results.errors,
+            durationMs: Date.now() - startedAt,
+        });
+
         return NextResponse.json({
             message: "Promo code maintenance completed",
             ...results,
@@ -115,6 +125,11 @@ export async function POST(request: Request) {
         }, { status: 200 });
     } catch (error) {
         console.error("Promo maintenance error:", error);
+        await recordCronRun("promo-maintenance", {
+            status: "error",
+            errors: [error instanceof Error ? error.message : String(error)],
+            durationMs: Date.now() - startedAt,
+        });
         return NextResponse.json({ message: "Error" }, { status: 500 });
     }
 }

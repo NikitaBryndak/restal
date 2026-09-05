@@ -6,6 +6,7 @@ import { sendTripStatusEmail, sendTripReminderEmail } from "@/lib/email";
 import User from "@/models/user";
 import { TOUR_STATUS_LABELS } from "@/types";
 import { logAudit } from "@/lib/audit";
+import { recordCronRun } from "@/lib/cron-log";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -29,6 +30,7 @@ function parseDate(dateStr: string): Date | null {
  *  - Trip starts tomorrow
  */
 export async function POST(request: Request) {
+    const startedAt = Date.now();
     try {
         // Verify cron secret
         const authHeader = request.headers.get('authorization');
@@ -125,6 +127,15 @@ export async function POST(request: Request) {
                             data: { oldStatus: "In Progress", newStatus: "Completed" },
                         });
                         await sendStatusChangeEmail(trip, "In Progress", "Completed");
+                        // Ask for a post-trip review (in-app + Telegram via createNotification)
+                        await createNotification({
+                            userPhone: trip.ownerPhone,
+                            tripId: String(trip._id),
+                            tripNumber: trip.number,
+                            type: "status_change",
+                            message: `Дякуємо, що подорожували з RestAL! Поділіться враженнями від подорожі ${trip.number} (${trip.country}) — ваш відгук допоможе іншим туристам. ⭐`,
+                            data: { type: "review_request" },
+                        });
                     }
                 }
             } catch (err) {
@@ -239,6 +250,20 @@ export async function POST(request: Request) {
             }
         }
 
+        // Record the run for observability (fire-and-forget safe)
+        await recordCronRun("auto-status", {
+            status: "success",
+            summary: {
+                paidToInProgress: results.paidToInProgress,
+                inProgressToCompleted: results.inProgressToCompleted,
+                completedToArchived: results.completedToArchived,
+                paymentReminders: results.paymentReminders,
+                departureReminders: results.departureReminders,
+            },
+            errors: results.errors,
+            durationMs: Date.now() - startedAt,
+        });
+
         return NextResponse.json({
             message: "Auto-status processing completed",
             ...results,
@@ -246,6 +271,11 @@ export async function POST(request: Request) {
         }, { status: 200 });
     } catch (error) {
         console.error("Auto-status processing error:", error);
+        await recordCronRun("auto-status", {
+            status: "error",
+            errors: [error instanceof Error ? error.message : String(error)],
+            durationMs: Date.now() - startedAt,
+        });
         return NextResponse.json({ message: "Error processing auto-status" }, { status: 500 });
     }
 }

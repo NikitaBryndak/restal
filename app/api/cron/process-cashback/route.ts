@@ -6,6 +6,7 @@ import { REFERRAL_BONUS_REFERRER, REFERRAL_BONUS_REFEREE } from "@/config/consta
 import { createNotification } from "@/lib/notifications";
 import { sendCashbackCreditedEmail } from "@/lib/email";
 import { logAudit } from "@/lib/audit";
+import { recordCronRun } from "@/lib/cron-log";
 
 // Helper to parse DD/MM/YYYY date format
 function parseDate(dateStr: string): Date | null {
@@ -18,6 +19,7 @@ function parseDate(dateStr: string): Date | null {
 // This endpoint should be called daily by a cron job or scheduled task
 // It processes cashback for trips that ended one day ago
 export async function POST(request: Request) {
+    const startedAt = Date.now();
     try {
         // Verify cron secret to prevent unauthorized access
         const authHeader = request.headers.get('authorization');
@@ -194,6 +196,14 @@ export async function POST(request: Request) {
             }
         }
 
+        // Record the run for observability (fire-and-forget safe)
+        await recordCronRun("process-cashback", {
+            status: "success",
+            summary: { processedCount },
+            errors,
+            durationMs: Date.now() - startedAt,
+        });
+
         return NextResponse.json({
             message: "Cashback processing completed",
             processedCount,
@@ -201,6 +211,11 @@ export async function POST(request: Request) {
         }, { status: 200 });
     } catch (error) {
         console.error("Cashback processing error:", error);
+        await recordCronRun("process-cashback", {
+            status: "error",
+            errors: [error instanceof Error ? error.message : String(error)],
+            durationMs: Date.now() - startedAt,
+        });
         return NextResponse.json({ message: "Error processing cashback" }, { status: 500 });
     }
 }

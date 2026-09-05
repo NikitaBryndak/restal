@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-type EmailType = "contact_request" | "trip_status" | "trip_reminder_payment" | "trip_reminder_departure" | "cashback_credited";
+type EmailType = "contact_request" | "trip_status" | "trip_reminder_payment" | "trip_reminder_departure" | "cashback_credited" | "cron_failure";
 
 async function logEmailSend(entry: {
     type: EmailType;
@@ -358,5 +358,47 @@ export async function sendCashbackCreditedEmail(data: CashbackCreditedEmail) {
         `🎉 Кешбек +${data.cashbackAmount.toLocaleString('uk-UA')} грн за подорож ${data.tripNumber}`,
         html,
         data.tripNumber
+    );
+}
+
+/**
+ * Alert the notification recipients when a cron job finishes with errors.
+ */
+export async function sendCronFailureEmail(
+    job: string,
+    details: { status: string; errors?: string[]; summary?: Record<string, unknown> }
+) {
+    const errorList = (details.errors ?? [])
+        .slice(0, 20)
+        .map((e) => `<li style="margin: 4px 0;">${String(e).replace(/</g, "&lt;")}</li>`)
+        .join("");
+    const summaryStr = Object.entries(details.summary ?? {})
+        .filter(([, v]) => typeof v === "number")
+        .map(([k, v]) => `${k}: <strong>${String(v)}</strong>`)
+        .join(" · ");
+
+    const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #1a1a1a; border-bottom: 2px solid #dc2626; padding-bottom: 8px;">
+        ⚠️ Cron ${job}: помилки при виконанні
+      </h2>
+      <p style="color: #555; font-size: 14px; line-height: 1.6;">
+        Статус запуску: <strong>${details.status}</strong>
+        ${summaryStr ? `<br/>Результати: ${summaryStr}` : ""}
+      </p>
+      ${errorList ? `<ul style="color: #7f1d1d; font-size: 13px; line-height: 1.5;">${errorList}</ul>` : ""}
+      <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; text-align: center;">
+        <p style="color: #64748b; font-size: 12px; margin: 0;">
+          Цей лист надіслано автоматично з сайту restal.in.ua
+        </p>
+      </div>
+    </div>
+  `;
+    await sendTracked(
+        "cron_failure",
+        `"RestAL" <${process.env.GMAIL_USER}>`,
+        NOTIFICATION_RECIPIENTS.join(", "),
+        `⚠️ Cron ${job}: помилки при виконанні`,
+        html
     );
 }

@@ -56,6 +56,7 @@ export const ACCESS_GROUPS: AccessGroup[] = [
             { slug: "managers", label: "Менеджери", paths: ["/dashboard/manager-performance"] },
             { slug: "users", label: "Користувачі", paths: ["/dashboard/users"] },
             { slug: "roles", label: "Ролі та доступ", paths: ["/dashboard/roles"] },
+            { slug: "cron", label: "Cron-завдання", paths: ["/dashboard/cron"] },
         ],
     },
 ];
