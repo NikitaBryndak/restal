@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Check, Copy, Send, X } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { TELEGRAM_BOT_USERNAME } from "@/config/constants";
 
 const DISMISS_KEY = "tg-bind-prompt-dismissed";
-const BOT_URL = "https://t.me/restal_info_bot";
+const BOT_URL = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 /** After this long the card collapses into a slim pill so it stops covering page content. */
 const COLLAPSE_MS = 8000;
 /** How long the "copied" feedback stays visible. */
@@ -37,7 +38,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
 /**
  * Global floating prompt for users who opted in to Telegram notifications but
  * have not linked their chat yet. Rendered on every page (root layout) until
- * the user sends the one-time bind code to @restal_info_bot or opts out.
+ * the user sends the one-time bind code to the Telegram bot (see TELEGRAM_BOT_USERNAME) or opts out.
  *
  * Behavior: expanded card for COLLAPSE_MS, then auto-collapses into a slim pill
  * at the bottom edge so it never covers page content; tapping the pill expands
@@ -149,7 +150,7 @@ export function TelegramBindPrompt() {
                                 {copied === "chip" ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                                 {code}
                             </button>{" "}
-                            боту @restal_info_bot — і оновлення про ваші тури надходитимуть у Telegram.
+                            боту @{TELEGRAM_BOT_USERNAME} — і оновлення про ваші тури надходитимуть у Telegram.
                         </p>
                     </div>
                     <button

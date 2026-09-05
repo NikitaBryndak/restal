@@ -157,3 +157,5 @@ export const TELEGRAM_RETRY_DELAY_MS = 3_000; // Poller retry backoff
 export const TELEGRAM_REGISTER_PROMPT_COOLDOWN_MS = 10 * 60_000;
 /** Registration link sent to unregistered users — always the production site, tagged for attribution */
 export const TELEGRAM_REGISTER_URL = `${BASE_URL}/register?utm_source=telegram&utm_medium=bot&utm_campaign=register_prompt`;
+/** Bot username for the bind prompt — production is @restal_info_bot; local dev overrides with its own polling bot */
+export const TELEGRAM_BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "restal_info_bot";
