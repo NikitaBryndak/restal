@@ -45,6 +45,13 @@ Next.js 15 (App Router) + Turbopack, React 19, Tailwind v4. MongoDB Atlas via mo
 - **`NEXTAUTH_URL`** must match the URL clients actually use (e.g., LAN IP for phone testing) or auth callbacks break.
 - Rate limits: `/api/register` 5/h/IP, `/api/auth/send-otp` 3/15min/IP, `/api/auth/verify-otp` 10/15min/IP — relevant when smoke-testing flows repeatedly.
 
+## Debugging discipline (avoid loops)
+
+- **Stop condition**: max 2–3 independent probes per live-page symptom. If they don't yield decisive evidence (or the observation tool itself proves unreliable), STOP: report what's fixed + unit-verified, document residual symptoms with collected evidence in `.memory/`, and hand manual verification to the user. Continuing requires explicit user approval.
+- **Stuck on a real bug → pause and ask** (user decision 2026-09-05): if after reasonable investigation you can't find the solution, stop digging and ask — present what's known, what was tried, and the options. Do not keep generating new hypotheses from ambiguous probe results on your own.
+- **Unit-verified fix = shippable.** A fix verified against real schema/resolver/components in tests is done; chasing the last 10% of live-page behavior (reading dist/minified sources, fiber probes) is optional follow-up, not part of "done".
+- **Verify observation tooling first.** Before building a hypothesis on probe output, confirm the probe works (e.g., a deliberate `console.log` must be captured). If it doesn't, discard all evidence collected with that tool — don't reinterpret it.
+
 ## Memory
 
 Persistent project memory lives in `.memory/` (gitignored; **English-only** content, no secret values). The full protocol — when to write, file format, hybrid retrieval — is defined by the **restal-memory** skill. Read `skill://restal-memory` (file: `.claude/skills/restal-memory/SKILL.md`) before non-trivial work in this repo, and follow it whenever recording decisions or findings. For browser-driven UI testing/smoke passes, read `skill://restal-browser-testing` first — it catalogs every automation error hit so far with the working technique.

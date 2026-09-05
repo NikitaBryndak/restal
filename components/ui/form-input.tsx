@@ -138,16 +138,20 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             // For formatted inputs
             setDisplayValue(formattedValue);
 
-            // Create a new event with the formatted value
+            // Create a new event with the formatted value.
+            // target.name MUST be preserved: react-hook-form's register onChange
+            // identifies the field via event.target.name and silently no-ops without it.
             const syntheticEvent = {
                 ...e,
                 target: {
                     ...e.target,
                     value: formattedValue,
+                    name: (e.target as HTMLInputElement).name,
                 },
                 currentTarget: {
                     ...e.currentTarget,
                     value: formattedValue,
+                    name: (e.target as HTMLInputElement).name,
                 },
             } as React.ChangeEvent<HTMLInputElement>;
 
